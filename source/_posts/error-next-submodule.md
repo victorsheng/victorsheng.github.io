@@ -22,4 +22,7 @@ git add .gitmodules
 
 <img src="http://pic.victor123.cn/17-11-30/78270359.jpg">
 
-<img src="http://pic.victor123.cn/17-11-30/77720584.jpg">
+## .gitmodulesn内容如下：
+[submodule "themes/next"]
+	path = themes/next
+	url = git@github.com:victorsheng/hexo-theme-next.git
