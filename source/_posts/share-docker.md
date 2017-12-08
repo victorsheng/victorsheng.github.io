@@ -4,16 +4,23 @@ date: 2017-11-27 22:36:20
 tags: 
     - docker
     - 技术分享
-categories:
+categories: docker
 ---
 # 简介
-Docker 是个划时代的开源项目，它彻底释放了计算虚拟化的威力，极大提高了应用的运行效率，降低了云计算资源供应的成本！使用 Docker，可以让应用的部署、测试和分发都变得前所未有的高效和轻松！
+- Docker 是个划时代的开源项目，它彻底释放了计算虚拟化的威力，极大提高了应用的运行效率，降低了云计算资源供应的成本！使用 Docker，可以让应用的部署、测试和分发都变得前所未有的高效和轻松！
 
-无论是应用开发者、运维人员、还是其他信息技术从业人员，都有必要认识和掌握 Docker，节约有限的时间。
+- 无论是应用开发者、运维人员、还是其他信息技术从业人员，都有必要认识和掌握 Docker，节约有限的时间。
 
 
 # docker的由来
-https://joshhu.gitbooks.io/docker_theory_install/content/
+- Docker 是 PaaS 提供商 dotCloud 开源的一个基于 LXC 的高级容器引擎，由 Go 语言编写的，源代码托管在 github 而且居然只有 1W 行就完成了这些功能。
+
+- Docker自2013年以来非常火热，无论是从 github 上的代码活跃度，还是Redhat在RHEL6.5中集成对Docker的支持, 就连 Google 的 Compute Engine 也支持 docker 在其之上运行。
+
+- Docker设想是交付运行环境如同海运，OS如同一个货轮，每一个在OS基础上的软件都如同一个集装箱，用户可以通过标准化手段自由组装运行环境，同时集装箱的内容可以由用户自定义，也可以由专业人员制造。这样，交付一个软件，就是一系列标准化组件的集合的交付，如同乐高积木，用户只需要选择合适的积木组合，并且在最顶端署上自己的名字(最后个标准化组件是用户的app)。这也就是基于docker的PaaS产品的原型。
+
+![ image.png](http://pic.victor123.cn/17-12-1/22516184.jpg)
+
 
 # 为什么要使用 Docker？
 - 更高效的利用系统资源
@@ -23,7 +30,7 @@ https://joshhu.gitbooks.io/docker_theory_install/content/
 - 更轻松的迁移
 - 更轻松的维护和扩展
 
-https://yeasy.gitbooks.io/docker_practice/content/introduction/why.html
+
 
 # 基本概念
 - 镜像（Image）
@@ -34,7 +41,11 @@ https://yeasy.gitbooks.io/docker_practice/content/introduction/why.html
 - 仓库（Repository）
     + 一个 Docker Registry 中可以包含多个仓库（Repository）；每个仓库可以包含多个标签（Tag）；每个标签对应一个镜像。
 
+# 基本命令
+- docker run busybox echo "hello world"
 
+<img src="http://pic.victor123.cn/17-12-1/3097858.jpg">
+- docker ps
 
 
 # 官方仓库
@@ -49,24 +60,54 @@ Kitematic 完全自动化了 Docker 安装和设置过程，并提供了一个�
 
 Kitematic 也让Docker的一些高级特性使用更加方便，比如管理端口和配置 volumes。你可以方便的修改环境变量、查看日志，单机终端就可以进入容器，这些特性GUI都支持。
 ----
+# dockerfile
+Dockerfile是由一系列命令和参数构成的脚本，这些命令应用于基础镜像并最终创建一个新的镜像。
+例如:
+https://hub.docker.com/r/haocen/docker-hexo-with-hexo-admin/
 
 
 # 进阶
+
 ## 数据卷
+
 - 数据卷 是一个可供一个或多个容器使用的特殊目录，它绕过 UFS，可以提供很多有用的特性:
     + 数据卷 可以在容器之间共享和重用
     + 对 数据卷 的修改会立马生效
     + 对 数据卷 的更新，不会影响镜像
     + 数据卷 默认会一直存在，即使容器被删除
+
 ## 网络管理
+
+Docker启动时，会自动在主机上创建一个docker0虚拟网桥，实际上是Linux的一个bridge,可以理解为一个软件交换机，它会而挂载到它的网口之间进行转发 当创建一个Docker容器的时候，同理会创建一对veth pair接口(当数据包发送到一个接口时，另外一个接口也可以收到相同的数据包)，这对接口一端在容器内，即eth0;另一端在本地并被挂载到docker0网桥，名称以veth开头。
+
+## 容器安全
+- 内核命名空间
+- 控制组
+控制组是 Linux 容器机制的另外一个关键组件，负责实现资源的审计和限制。
+它提供了很多有用的特性；以及确保各个容器可以公平地分享主机的内存、CPU、磁盘 IO 等资源；当然，更重要的是，控制组确保了当容器内的资源使用产生压力时不会连累主机系统。
+- 内核能力机制
+```
+大部分情况下，容器并不需要“真正的” root 权限，容器只需要少数的能力即可。为了加强安全，容器可以禁用一些没必要的权限。
+
+    完全禁止任何 mount 操作；
+    禁止直接访问本地主机的套接字；
+    禁止访问一些文件系统的操作，比如创建新的设备、修改文件属性等；
+    禁止模块加载。
+
+这样，就算攻击者在容器中取得了 root 权限，也不能获得本地主机的较高权限，能进行的破坏也有限。
+
+默认情况下，Docker采用白名单机制，禁用必需功能之外的其它权限。 当然，用户也可以根据自身需求来为 Docker 容器启用额外的权限。
+```
+
 ## 容器编排
+
     编排是一个新的词汇，指的是容器的集群化和调度。另一类含义指的是容器管理，负责管理容器化应用和组件任务。
     <img src="http://pic.victor123.cn/17-11-29/58239834.jpg">
 
 Docker Swarm、Kubernetes、Marathon和Nomad
 
 
-----
+-------
 
 # 快速安装docker
 ```
@@ -130,25 +171,39 @@ server {
 
 ```
 
-## mysql数据库
+## 用docker安装mysql数据库
+准备工作
+```
+yum install git
+mkdir /docker
+chown -R appusr /docker
+
+sudo mkdir -p /etc/docker
+sudo tee /etc/docker/daemon.json <<-'EOF'
+{
+  "registry-mirrors": ["https://cz3my8je.mirror.aliyuncs.com"]
+}
+EOF
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+
+```
+启动
 ```
 要复制conf到制定目录下
 
 docker run -p 3306:3306 --name mymysql -v /docker/mysql/conf/my.cnf:/etc/mysql/my.cnf -v /docker/mysql/logs:/logs -v /docker/mysql/data:/mysql_data -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.6
 
-docker run -it --link some-mysql:mysql --rm mysql sh -c 'exec mysql -h 172.18.0.1 -P 3306 -u root -p123456'
+docker ps -a
+
+docker run -it --link mymysql:mysql --rm mysql sh -c 'exec mysql -h 172.18.0.1 -P 3306 -u root -p123456'
 
 CREATE USER 'pig'@'%' IDENTIFIED BY '123456';
 GRANT ALL ON *.* TO 'pig'@'%';
 ```
 
 
-# 使用加速器
-```
-docker-machine create --engine-registry-mirror=https://cz3my8je.mirror.aliyuncs.com -d virtualbox default
-重启docker守护线程
-```
-<img src="http://pic.victor123.cn/17-11-29/78047338.jpg">
+-------
 
 # 附录
 
@@ -165,6 +220,11 @@ http://dockone.io/article/783
 - Docker 安装 Redis
 - Docker 安装 MongoDB
 - Docker 安装 Apache
+
+## 学习资料
+- https://joshhu.gitbooks.io/docker_theory_install/content/
+- https://docs.docker.com/
+- https://yeasy.gitbooks.io/docker_practice/content/introduction/why.html
 
 
 
