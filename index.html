@@ -1566,7 +1566,14 @@
 </ul>
 </li>
 </ul>
-<h2 id="网络管理"><a href="#网络管理" class="headerlink" title="网络管理"></a>网络管理</h2><h2 id="容器编排"><a href="#容器编排" class="headerlink" title="容器编排"></a>容器编排</h2><pre><code>编排是一个新的词汇，指的是容器的集群化和调度。另一类含义指的是容器管理，负责管理容器化应用和组件任务。
+<h2 id="网络管理"><a href="#网络管理" class="headerlink" title="网络管理"></a>网络管理</h2><p>Docker启动时，会自动在主机上创建一个docker0虚拟网桥，实际上是Linux的一个bridge,可以理解为一个软件交换机，它会而挂载到它的网口之间进行转发 当创建一个Docker容器的时候，同理会创建一对veth pair接口(当数据包发送到一个接口时，另外一个接口也可以收到相同的数据包)，这对接口一端在容器内，即eth0;另一端在本地并被挂载到docker0网桥，名称以veth开头。</p>
+<h2 id="容器安全"><a href="#容器安全" class="headerlink" title="容器安全"></a>容器安全</h2><ul>
+<li>内核命名空间</li>
+<li>控制组<br>控制组是 Linux 容器机制的另外一个关键组件，负责实现资源的审计和限制。<br>它提供了很多有用的特性；以及确保各个容器可以公平地分享主机的内存、CPU、磁盘 IO 等资源；当然，更重要的是，控制组确保了当容器内的资源使用产生压力时不会连累主机系统。</li>
+<li>内核能力机制<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">大部分情况下，容器并不需要“真正的” root 权限，容器只需要少数的能力即可。为了加强安全，容器可以禁用一些没必要的权限。</span><br><span class="line"></span><br><span class="line">    完全禁止任何 mount 操作；</span><br><span class="line">    禁止直接访问本地主机的套接字；</span><br><span class="line">    禁止访问一些文件系统的操作，比如创建新的设备、修改文件属性等；</span><br><span class="line">    禁止模块加载。</span><br><span class="line"></span><br><span class="line">这样，就算攻击者在容器中取得了 root 权限，也不能获得本地主机的较高权限，能进行的破坏也有限。</span><br><span class="line"></span><br><span class="line">默认情况下，Docker采用白名单机制，禁用必需功能之外的其它权限。 当然，用户也可以根据自身需求来为 Docker 容器启用额外的权限。</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="容器编排"><a href="#容器编排" class="headerlink" title="容器编排"></a>容器编排</h2><pre><code>编排是一个新的词汇，指的是容器的集群化和调度。另一类含义指的是容器管理，负责管理容器化应用和组件任务。
 &lt;img src=&quot;http://pic.victor123.cn/17-11-29/58239834.jpg&quot;&gt;
 </code></pre><p>Docker Swarm、Kubernetes、Marathon和Nomad</p>
 <hr>
