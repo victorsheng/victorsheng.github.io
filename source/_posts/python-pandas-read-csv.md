@@ -1,5 +1,5 @@
 ---
-title: python-pandas-read_csv
+title: pandas中read_csv方法的学习
 date: 2017-12-05 23:24:55
 tags:
 categories:

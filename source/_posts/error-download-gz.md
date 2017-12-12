@@ -1,5 +1,5 @@
 ---
-title: error-download-gz
+title: mac_Chrome浏览器下载csv.gz后缀时遇到的问题
 date: 2017-12-04 22:34:00
 tags:
 categories:

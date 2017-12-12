@@ -1,5 +1,5 @@
 ---
-title: errro-pip-install-seaborn
+title: mac安装seaborn遇到的问题
 date: 2017-11-30 07:58:24
 tags:
 categories: 异常

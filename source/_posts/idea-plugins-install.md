@@ -1,5 +1,5 @@
 ---
-title: idea-plugins-install
+title: 优化idea插件安装
 date: 2017-12-01 06:42:00
 tags:
 categories: idea
