@@ -1,5 +1,5 @@
 ---
-title: kaggle-expedia-hotel-recommendations
+title: kaggle-expedia-hotel-recommendations学习笔记
 date: 2017-12-05 16:31:06
 tags:
 categories:
@@ -14,6 +14,8 @@ https://www.dataquest.io/blog/kaggle-tutorial/
 # 目标
 - 初步了解机器学习流程
 - 通过实际代码,了解python代码的语法
+
+<!-- more -->
 
 # 学习心得
 - 数据探索
@@ -84,6 +86,7 @@ print(["d{0}".format(i + 1) for i in range(149)])
 def calc_fast_features(df):
     df["date_time"] = pd.to_datetime(df["date_time"])
     df["srch_ci"] = pd.to_datetime(df["srch_ci"], format='%Y-%m-%d', errors="coerce")
+    # 参数errors="coerce" 遇到错误可以赋值为空。
     df["srch_co"] = pd.to_datetime(df["srch_co"], format='%Y-%m-%d', errors="coerce")
     
     props = {}
@@ -109,6 +112,31 @@ def calc_fast_features(df):
 df = calc_fast_features(t1)
 df.fillna(-1, inplace=True)
 ```
+
+```
+新的列:
+[                  'channel',                    'ci_day',
+                    'ci_dayofweek',                  'ci_month',
+                      'ci_quarter',                       'cnt',
+                          'co_day',              'co_dayofweek',
+                        'co_month',                'co_quarter',
+                             'day',                 'dayofweek',
+                   'hotel_cluster',           'hotel_continent',
+                   'hotel_country',              'hotel_market',
+                            'hour',                'is_booking',
+                       'is_mobile',                'is_package',
+                          'minute',                     'month',
+       'orig_destination_distance',            'posa_continent',
+                         'quarter',                 'site_name',
+                 'srch_adults_cnt',         'srch_children_cnt',
+             'srch_destination_id',  'srch_destination_type_id',
+                     'srch_rm_cnt',                 'stay_span',
+                         'user_id',        'user_location_city',
+           'user_location_country',      'user_location_region',
+                            'year',                           0,
+                                 1,                           2]
+```
+
     + 机器学习
         * 随机森林
 ```
@@ -134,8 +162,11 @@ for cluster in unique_clusters:
     predictors = [col for col in df if col not in ['hotel_cluster', "target"]]
     probs = []
     cv = KFold(len(df["target"]), n_folds=2)
+    # 交叉验证(CrossValidation)
+    # 方法思想是为了在不动用测试集之前，就评估一下模型是否过于复杂而引起过度拟合
     clf = RandomForestClassifier(n_estimators=10, min_weight_fraction_leaf=0.1)
     for i, (tr, te) in enumerate(cv):
+    # 不是很理解 上面一句
         clf.fit(df[predictors].iloc[tr], df["target"].iloc[tr])
         preds = clf.predict_proba(df[predictors].iloc[te])
         probs.append([p[1] for p in preds])

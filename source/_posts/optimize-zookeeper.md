@@ -29,3 +29,8 @@ http://pic.victor123.cn/17-12-12/59575921.jpg
 <img src="http://pic.victor123.cn/17-12-12/1580197.jpg">
 
 # 效果
+<img src="http://pic.victor123.cn/17-12-12/29291132.jpg">
+
+# 相关知识
+http://www.linuxidc.com/Linux/2016-03/129509.htm
+dataDir用于存储Log（事务日志）与Snapshot（快照）数据
