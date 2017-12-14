@@ -1,8 +1,10 @@
----
 title: 优化idea插件安装
-date: 2017-12-01 06:42:00
 tags:
-categories: idea
+  - 代理
+  - idea
+categories:
+  - idea
+date: 2017-12-01 06:42:00
 ---
 # 常常遇到从idea程序中搜索插件，下载超时的情况,解决方式如下
 

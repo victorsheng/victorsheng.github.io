@@ -1,9 +1,11 @@
-
----
 title: 学习pandas api时发现了一个奇怪的现象
-date: 2017-12-10 16:15:05
 tags:
+  - pandas
+  - 机器学习
+  - jupyter
 categories:
+  - 机器学习
+date: 2017-12-10 16:15:00
 ---
 # 学习pandas api时发现了一个奇怪的现象
 <img src="http://pic.victor123.cn/17-12-10/542730.jpg">

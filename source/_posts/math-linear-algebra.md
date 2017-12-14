@@ -1,9 +1,11 @@
----
 title: 线性代数学习
-date: 2017-11-24 21:59:28
 tags:
-    - 数学
-    - 线性代数
+  - 数学
+  - 线性代数
+  - 机器学习
+categories:
+  - 机器学习
+date: 2017-11-24 21:59:00
 ---
 # 推荐一(博客)
 http://www.hahack.com/wiki/math-linear-algebra.html

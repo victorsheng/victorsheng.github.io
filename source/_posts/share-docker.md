@@ -1,10 +1,10 @@
----
 title: docker学习分型
-date: 2017-11-27 22:36:20
-tags: 
-    - docker
-    - 技术分享
-categories: docker
+tags:
+  - 技术分享
+  - docker
+categories:
+  - docker
+date: 2017-11-27 22:36:00
 ---
 # 简介
 - Docker 是个划时代的开源项目，它彻底释放了计算虚拟化的威力，极大提高了应用的运行效率，降低了云计算资源供应的成本！使用 Docker，可以让应用的部署、测试和分发都变得前所未有的高效和轻松！

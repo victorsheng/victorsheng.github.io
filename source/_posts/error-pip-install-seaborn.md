@@ -1,8 +1,11 @@
----
 title: mac安装seaborn遇到的问题
-date: 2017-11-30 07:58:24
 tags:
-categories: 异常
+  - python
+  - mac
+  - seaborn
+categories:
+  - 异常
+date: 2017-11-30 07:58:00
 ---
 # 异常信息
 ```

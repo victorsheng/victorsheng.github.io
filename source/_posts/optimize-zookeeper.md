@@ -1,8 +1,9 @@
----
-title: optimize_zookeeper
-date: 2017-12-12 14:51:30
+title: '156服务器优化1:清理zookeeper过多的历史文件'
 tags:
-categories:
+  - zookeeper
+  - io高
+categories: []
+date: 2017-12-12 14:51:00
 ---
 # 背景
 156机器是本地开发环境上的机器
@@ -20,7 +21,7 @@ top命令后,负载一直很高
 iotop命令看到zookeeper的io比较高
 http://pic.victor123.cn/17-12-12/59575921.jpg
 
-# 解决
+# 操作步骤
 - https://www.cnblogs.com/jxwch/p/6526271.html
 - 打开这两个参数
     - autopurge.snapRetainCount这个参数指定了需要保留的文件数目，默认保留3个；
@@ -34,3 +35,11 @@ http://pic.victor123.cn/17-12-12/59575921.jpg
 # 相关知识
 http://www.linuxidc.com/Linux/2016-03/129509.htm
 dataDir用于存储Log（事务日志）与Snapshot（快照）数据
+
+
+```
+在后续的观察中发现,156的io高并不全是zookeeper的问题,so本次支持清楚了历史文件,对于156的io高问题目前定位是mysql问题,待续
+```
+
+
+

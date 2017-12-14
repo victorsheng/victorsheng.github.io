@@ -1,8 +1,11 @@
----
 title: kaggle-expedia-hotel-recommendations学习笔记
-date: 2017-12-05 16:31:06
 tags:
+  - kaggle
+  - 随机森林
+  - python
 categories:
+  - kaggle
+date: 2017-12-05 16:31:00
 ---
 
 # 题目地址

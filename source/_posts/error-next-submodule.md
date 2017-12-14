@@ -1,8 +1,11 @@
----
 title: hexo next主题保存
-date: 2017-11-30 22:41:04
 tags:
-categories: 异常
+  - hexo
+  - git
+  - submodule
+categories:
+  - 异常
+date: 2017-11-30 22:41:00
 ---
 # 通过git的submodule功能对博客内容和主题分别进行版本控制
 

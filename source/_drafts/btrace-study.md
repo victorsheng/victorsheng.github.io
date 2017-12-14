@@ -20,6 +20,12 @@ categories:
 # 学习的博客:
 http://mgoann.iteye.com/blog/1409685
 http://calvin1978.blogcn.com/articles/btrace1.html 
+http://codepub.cn/2017/09/22/btrace-uses-tutorials/
+
+
+# byteman
+局部变量
+http://codepub.cn/2017/09/22/byteman-uses-tutorials/
 
 
 # github地址:
