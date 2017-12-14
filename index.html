@@ -322,6 +322,875 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/12/14/optimize-dubbuo-reference/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/14/optimize-dubbuo-reference/" itemprop="url">optimize_dubbuo_reference</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-14T17:04:05+08:00">
+                2017-12-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="dubbo服务引用"><a href="#dubbo服务引用" class="headerlink" title="dubbo服务引用"></a>dubbo服务引用</h1><p>默认情况下可以通过@Reference和xml注解来引入<br>例如<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Reference</span>(version = <span class="string">"0.1"</span>, timeout = <span class="number">8000</span>)</span><br><span class="line">   <span class="keyword">private</span> TenantService tenantService;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Reference</span>(version = <span class="string">"0.1"</span>, timeout = <span class="number">8000</span>)</span><br><span class="line">   <span class="keyword">private</span> ProductService productService;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Reference</span>(version = <span class="string">"0.1"</span>, timeout = <span class="number">8000</span>)</span><br><span class="line">   <span class="keyword">private</span> DictService dictService;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Reference</span>(version = <span class="string">"0.1"</span>, timeout = <span class="number">8000</span>)</span><br><span class="line">   <span class="keyword">private</span> CategoryService categoryService;</span><br></pre></td></tr></table></figure></p>
+<p>或者<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dubbo:reference</span> <span class="attr">id</span>=<span class="string">"remoteBaseCustomPropsService"</span> <span class="attr">interface</span>=<span class="string">"com.ejlerp.baseinfo.api.BaseCustomPropsService"</span></span></span><br><span class="line"><span class="tag">                 <span class="attr">version</span>=<span class="string">"0.1"</span> <span class="attr">timeout</span>=<span class="string">"60000"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dubbo:reference</span> <span class="attr">id</span>=<span class="string">"remoteSkuStepPriceService"</span> <span class="attr">interface</span>=<span class="string">"com.ejlerp.baseinfo.api.SkuStepPriceService"</span></span></span><br><span class="line"><span class="tag">                 <span class="attr">version</span>=<span class="string">"0.1"</span> <span class="attr">timeout</span>=<span class="string">"60000"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dubbo:reference</span> <span class="attr">id</span>=<span class="string">"remoteSkuUnitService"</span> <span class="attr">interface</span>=<span class="string">"com.ejlerp.baseinfo.api.SkuUnitService"</span></span></span><br><span class="line"><span class="tag">                 <span class="attr">version</span>=<span class="string">"0.1"</span> <span class="attr">timeout</span>=<span class="string">"60000"</span>/&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h1 id="出现的问题"><a href="#出现的问题" class="headerlink" title="出现的问题"></a>出现的问题</h1><p>生产环境上调用微服务超时,结果发现即使通过<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">service:</span><br><span class="line">    <span class="meta">@Reference</span>(version = <span class="string">"0.1"</span>, timeout = <span class="number">8000</span>)</span><br><span class="line">    <span class="keyword">private</span> ProductService productService;</span><br></pre></td></tr></table></figure></p>
+<p>的方式设置了超时时间,但生产环境的错误,还是设置的1000ms的超时时间,</p>
+<h1 id="问题原因"><a href="#问题原因" class="headerlink" title="问题原因"></a>问题原因</h1><p>在其他的service中同样是引用了这个注解<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">其他service:</span><br><span class="line">    <span class="meta">@Reference</span>(version = <span class="string">"0.1"</span>)</span><br><span class="line">    <span class="keyword">private</span> ProductService productService;</span><br></pre></td></tr></table></figure></p>
+<p>Reference注解 包含了初始化和注入dubbo的bean,两种功能<br>其实是声明了一个bean,但是到底是用哪个timeout,是有spring初始化bean的顺序所决定的,很可能出现设置了timeout但是仍然没有效果的情况</p>
+<h1 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h1><ul>
+<li>在2017-12-12后的,所有微服务,禁止使用Reference注解,通过autowirdj进行钟乳</li>
+<li>统一使用xml的方式,进行声明dubbo的bean</li>
+</ul>
+<h1 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h1><ul>
+<li>统一Reference方式对其他微服务的引用,放置不一致的配置出现</li>
+<li>xml的方式,方便设置方法级别的参数</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dubbo:reference</span> <span class="attr">id</span>=<span class="string">"remoteArrivalStockOutReportService"</span> <span class="attr">interface</span>=<span class="string">"com.ejlerp.pms.api.StockOutReportService"</span></span></span><br><span class="line"><span class="tag">                 <span class="attr">version</span>=<span class="string">"0.1"</span> <span class="attr">timeout</span>=<span class="string">"60000"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dubbo:method</span> <span class="attr">name</span>=<span class="string">"refreshAction"</span> <span class="attr">timeout</span>=<span class="string">"9000000"</span> <span class="attr">retry</span>=<span class="string">"0"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dubbo:reference</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h1 id="修改步骤如下"><a href="#修改步骤如下" class="headerlink" title="修改步骤如下"></a>修改步骤如下</h1><ul>
+<li>去除掉DubboConf.java中大部分代码</li>
+<li>添加spring-dubbo,xml</li>
+<li>删除旧的@Reference,同时添加@Autowird<ul>
+<li>替换默认的@Reference无超时时间的,基本为dao中id 和 sn generater</li>
+<li>将web中最全的dubbo.conf复制到为服务中</li>
+<li>本项目为pms,删除掉所有pms相关的xml注入</li>
+<li>逐行全文搜索,删掉没用的service<br><img src="http://pic.victor123.cn/17-12-14/76912018.jpg"><br><img src="http://pic.victor123.cn/17-12-14/61534900.jpg"></li>
+<li>再次遍历dubb.conf的所有service,修改成项目中原来的超时时间,并去掉个性化设置的@Reference</li>
+</ul>
+</li>
+<li>编译,解决编译问题,补充一些@Autowird的包</li>
+<li>尝试启动,补充一些egenie-web中没有声明,但是微服务中用到的service<ul>
+<li>例如:com.ejlerp.messages.api.QueueService,com.ejlerp.cache.api.SortedSetCacher,com.ejlerp.cache.api.IDGenerator,com.ejlerp.cache.api.IDGenerator等</li>
+</ul>
+</li>
+<li>启动成功<br><img src="http://pic.victor123.cn/17-12-14/72995353.jpg"></li>
+</ul>
+<ul>
+<li>具体改动,见git:</li>
+<li><a href="http://git.ejlerp.com/egenie/ejlerp-pms/commit/4d431233af740e0f1c85c8733afcaadfb0638a18" target="_blank" rel="noopener">http://git.ejlerp.com/egenie/ejlerp-pms/commit/4d431233af740e0f1c85c8733afcaadfb0638a18</a></li>
+</ul>
+<h1 id="BTW"><a href="#BTW" class="headerlink" title="BTW"></a>BTW</h1><ul>
+<li><a href="http://dubbo.io/books/dubbo-user-book/demos/fault-tolerent-strategy.html" target="_blank" rel="noopener">http://dubbo.io/books/dubbo-user-book/demos/fault-tolerent-strategy.html</a></li>
+<li><p>在集群调用失败时，Dubbo 提供了多种容错方案，缺省为 failover 重试。<br><img src="http://dubbo.io/books/dubbo-user-book/sources/images/cluster.jpg"></p>
+</li>
+<li><p>Failover Cluster</p>
+</li>
+</ul>
+<p>失败自动切换，当出现失败，重试其它服务器 1。通常用于读操作，但重试会带来更长延迟。可通过 retries=”2” 来设置重试次数(不含第一次)。<br>Failfast Cluster</p>
+<p>快速失败，只发起一次调用，失败立即报错。通常用于非幂等性的写操作，比如新增记录。</p>
+<ul>
+<li>Failsafe Cluster</li>
+</ul>
+<p>失败安全，出现异常时，直接忽略。通常用于写入审计日志等操作。</p>
+<ul>
+<li>Failback Cluster</li>
+</ul>
+<p>失败自动恢复，后台记录失败请求，定时重发。通常用于消息通知操作。</p>
+<ul>
+<li>Forking Cluster</li>
+</ul>
+<p>并行调用多个服务器，只要一个成功即返回。通常用于实时性要求较高的读操作，但需要浪费更多服务资源。可通过 forks=”2” 来设置最大并行数。</p>
+<ul>
+<li>Broadcast Cluster</li>
+</ul>
+<p>广播调用所有提供者，逐个调用，任意一台报错则报错 2。通常用于通知所有提供者更新缓存或日志等本地资源信息。</p>
+<p>开发人员可以根据自己的实际业务,设置失败时的处理方式</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/12/14/operation-jvm/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/14/operation-jvm/" itemprop="url">operation_jvm</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-14T14:14:44+08:00">
+                2017-12-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="日常日志及错误"><a href="#日常日志及错误" class="headerlink" title="日常日志及错误"></a>日常日志及错误</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">2017-12-13 18:26:00.001 [pool-27-thread-1] INFO  com.ejlerp.pms.provider.mqCrond.MqPmsTradeOrderCrond.sendMsgToInter - == 处理采购推送交易库定时任务 start ==</span><br><span class="line">2017-12-13 18:26:05.711 [pool-27-thread-1] ERROR org.springframework.scheduling.support.TaskUtils$LoggingErrorHandler.handleError - Unexpected error occurred in scheduled task.</span><br><span class="line">java.lang.OutOfMemoryError: Java heap space</span><br></pre></td></tr></table></figure>
+<p>同时jvm由于重启过,gc日志也刷新了</p>
+<h1 id="每个jvm不仅用自己个性化的参数调优-还应该有共同参数-例如-打印gc日志-dump内存等参数"><a href="#每个jvm不仅用自己个性化的参数调优-还应该有共同参数-例如-打印gc日志-dump内存等参数" class="headerlink" title="每个jvm不仅用自己个性化的参数调优,还应该有共同参数,例如:打印gc日志,dump内存等参数"></a>每个jvm不仅用自己个性化的参数调优,还应该有共同参数,例如:打印gc日志,dump内存等参数</h1><h1 id="TODO-待总结"><a href="#TODO-待总结" class="headerlink" title="TODO 待总结"></a>TODO 待总结</h1>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/12/14/operation-redis/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/14/operation-redis/" itemprop="url">operation_redis</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-14T09:39:02+08:00">
+                2017-12-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="错误日志"><a href="#错误日志" class="headerlink" title="错误日志"></a>错误日志</h1><p>grep com.alibaba.dubbo.rpc.filter.ExceptionFilter.error<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">9:02</span><br><span class="line">org.springframework.data.redis.RedisConnectionFailureException: Unexpected end of stream.; nested exception is redis.clients.jedis.exceptions.JedisConnectionException: Unexpected en</span><br><span class="line">d of stream.好多条</span><br><span class="line"></span><br><span class="line">org.springframework.dao.InvalidDataAccessApiUsageException: LOADING Redis is loading the dataset in memory; nested exception is redis.clients.jedis.exceptions.JedisDataException: LOADING Redis is loading the dataset in memory 好多条</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">org.springframework.data.redis.RedisConnectionFailureException: java.net.SocketTimeoutException: Read timed out; nested exception is redis.clients.jedis.exceptions.JedisConnectionException: java.net.SocketTimeoutException: Read timed out</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">org.springframework.data.redis.RedisConnectionFailureException: java.net.SocketException: Connection reset; nested exception is redis.clients.jedis.exceptions.JedisConnectionException: java.net.SocketException: Connection reset</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">org.springframework.data.redis.RedisConnectionFailureException: Cannot get Jedis connection; nested exception is redis.clients.jedis.exceptions.JedisConnectionException: Could not get a resource from the pool很多</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">9:21开始</span><br><span class="line">org.springframework.dao.InvalidDataAccessApiUsageException: ERR READONLY You can&apos;t write against a read only instance; nested exception is redis.clients.jedis.exceptions.JedisDataException: ERR READONLY You can&apos;t write against a read only instance很多</span><br></pre></td></tr></table></figure></p>
+<h1 id="期间代码回滚到了上一版本-过了一段时间系统正常"><a href="#期间代码回滚到了上一版本-过了一段时间系统正常" class="headerlink" title="期间代码回滚到了上一版本,过了一段时间系统正常"></a>期间代码回滚到了上一版本,过了一段时间系统正常</h1><h1 id="最后发现是-业务层面循环调用了redis操作-一次请求会有1k次的redis-导致redis崩掉-而且我们使用的阿里云的主从版云redis"><a href="#最后发现是-业务层面循环调用了redis操作-一次请求会有1k次的redis-导致redis崩掉-而且我们使用的阿里云的主从版云redis" class="headerlink" title="最后发现是 业务层面循环调用了redis操作,一次请求会有1k次的redis,导致redis崩掉,而且我们使用的阿里云的主从版云redis"></a>最后发现是 业务层面循环调用了redis操作,一次请求会有1k次的redis,导致redis崩掉,而且我们使用的阿里云的主从版云redis</h1><ul>
+<li>几次循环调用,inFlow的变化</li>
+<li><img src="http://pic.victor123.cn/17-12-14/44581326.jpg"></li>
+<li>具体得失hset方法的调用</li>
+<li><img src="http://pic.victor123.cn/17-12-14/50782333.jpg"></li>
+</ul>
+<h1 id="反思"><a href="#反思" class="headerlink" title="反思"></a>反思</h1><ul>
+<li>对于监控系统,应该有各个节点的平时统计数据,包括,调用次数+相应时长</li>
+<li>通过环比和同比数据的对比,可以快速的发现问题,解决问题,而不是当系统垮掉时,才有所反应</li>
+</ul>
+<h1 id="BTW"><a href="#BTW" class="headerlink" title="BTW"></a>BTW</h1><h2 id="nest-exception学习"><a href="#nest-exception学习" class="headerlink" title="nest exception学习"></a>nest exception学习</h2><p><a href="http://www.iteye.com/problems/87876" target="_blank" rel="noopener">http://www.iteye.com/problems/87876</a></p>
+<ul>
+<li>即调用顺序是 action—&gt;service—&gt;dao—-&gt;hibernate—&gt;jdbc </li>
+<li>抛出异常顺序是 jdbc—-&gt;hibernate—-&gt;dao–抛出–&gt;service–继续抛出–&gt;action </li>
+<li><p>异常其实是栈调用的快照 </p>
+</li>
+<li><p>1、最下层的异常是出错的原因，上边的异常是对下边的封装，目的是一致性 和 更可读；（即下边异常是引起上边异常的原因，每一个Exception都有一个cause，如hibernate异常的cause就是jdbc的异常） </p>
+</li>
+<li>2、对于每一段异常，方法调用顺序是从下往上</li>
+<li>3、想知道是由于前面创建的错误导致后边的异常，还是后边的异常导致前面的创建错误，后边导致前面，，，前面对后面的进行了封装，，目的是提供一致的异常（并且把原始错误显示出来 就是 nested exception 后边部分） </li>
+</ul>
+<h2 id="NestedRuntimeException-例子"><a href="#NestedRuntimeException-例子" class="headerlink" title="NestedRuntimeException 例子"></a>NestedRuntimeException 例子</h2><p>我们最熟悉的就是 DataAccessException<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">package org.springframework.dao;</span><br><span class="line"></span><br><span class="line">import org.springframework.core.NestedRuntimeException;</span><br><span class="line"></span><br><span class="line">public abstract class DataAccessException extends NestedRuntimeException &#123;</span><br><span class="line">    public DataAccessException(String msg) &#123;</span><br><span class="line">        super(msg);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public DataAccessException(String msg, Throwable cause) &#123;</span><br><span class="line">        super(msg, cause);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/12/14/bugfix-2-1213/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/14/bugfix-2-1213/" itemprop="url">bugfix总结-12.13</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-14T08:00:21+08:00">
+                2017-12-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="bugfix1-redis相关"><a href="#bugfix1-redis相关" class="headerlink" title="bugfix1-redis相关"></a>bugfix1-redis相关</h1><ul>
+<li><p>快速定位问题</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">2017-12-13 18:33:39.688 DEBUG [http-bio-6000-exec-17][JdbcTemplate.java:875] - SQL update affected 1 rows</span><br><span class="line">2017-12-13 18:33:40.590 ERROR [http-bio-6000-exec-17][UniExceptionHandler.java:57] - 捕捉到技术异常: URI: /shop/insert  最大内存: 1012m  已分配内存: 1012m  已分配内存中的剩余空间: 532m  最大可用内存: 532m</span><br><span class="line">java.lang.RuntimeException: org.springframework.data.redis.RedisSystemException: Unknown redis exception; nested exception is java.lang.NullPointerException</span><br><span class="line">org.springframework.data.redis.RedisSystemException: Unknown redis exception; nested exception is java.lang.NullPointerException</span><br><span class="line">        at org.springframework.data.redis.FallbackExceptionTranslationStrategy.getFallback(FallbackExceptionTranslationStrategy.java:48)</span><br><span class="line">        at org.springframework.data.redis.FallbackExceptionTranslationStrategy.translate(FallbackExceptionTranslationStrategy.java:38)</span><br><span class="line">        at org.springframework.data.redis.connection.jedis.JedisConnection.convertJedisAccessException(JedisConnection.java:242)</span><br><span class="line">        at org.springframework.data.redis.connection.jedis.JedisConnection.set(JedisConnection.java:1236)</span><br><span class="line">        at org.springframework.data.redis.connection.DefaultStringRedisConnection.set(DefaultStringRedisConnection.java:744)</span><br><span class="line">        at org.springframework.data.redis.core.DefaultValueOperations$10.inRedis(DefaultValueOperations.java:172)</span><br><span class="line">        at org.springframework.data.redis.core.AbstractOperations$ValueDeserializingRedisCallback.doInRedis(AbstractOperations.java:57)</span><br><span class="line">        at org.springframework.data.redis.core.RedisTemplate.execute(RedisTemplate.java:207)</span><br><span class="line">        at org.springframework.data.redis.core.RedisTemplate.execute(RedisTemplate.java:169)</span><br><span class="line">        at org.springframework.data.redis.core.AbstractOperations.execute(AbstractOperations.java:91)</span><br><span class="line">        at org.springframework.data.redis.core.DefaultValueOperations.set(DefaultValueOperations.java:169)</span><br><span class="line">        at com.ejlerp.cache.redis.KVCacherImpl.set(KVCacherImpl.java:34)</span><br><span class="line">        at com.alibaba.dubbo.common.bytecode.Wrapper7.invokeMethod(Wrapper7.java)</span><br><span class="line">        at com.alibaba.dubbo.rpc.proxy.javassist.JavassistProxyFactory$1.doInvoke(JavassistProxyFactory.java:46)</span><br><span class="line">        at com.alibaba.dubbo.rpc.proxy.AbstractProxyInvoker.invoke(AbstractProxyInvoker.java:72)</span><br><span class="line">        at com.alibaba.dubbo.rpc.protocol.InvokerWrapper.invoke(InvokerWrapper.java:53)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>首先这个是一个没有见过的异常</p>
+</li>
+<li><p>解决途径:</p>
+<ul>
+<li>搜索自己公司包开头的代码,找到调用地方</li>
+<li>下载源码,底层依赖可能有真的有</li>
+<li>在本次bugfix中,由于是微服务调用,真正看出问题是在,controller层才看出的问题<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">@ApiOperation(value = &quot;新增&quot;)</span><br><span class="line">@RequestMapping(value = &quot;/insert&quot;, method = RequestMethod.POST)</span><br><span class="line">public JsonResult insert(@RequestBody String body) &#123;</span><br><span class="line">    Long id = IdGenerator.generate(getEntityName(), fetchTenantId()).getIdValue();</span><br><span class="line">    CommonVo vo = CommonVo.of(getEntityName(), WebHelper.parseJsonBody(body, false, false));</span><br><span class="line">    vo.put(&quot;shop_id&quot;, id);</span><br><span class="line">    getService().insert(fetchTenantId(), fetchUserId(), vo);</span><br><span class="line">    kvCacher.set(&quot;logistic_node_&quot; + id.toString(), vo.get(&quot;logistic_node&quot;));</span><br><span class="line">    return new JsonResult(JsonResult.SUCCESSFUL, null);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>vo可能别没有获取到</p>
+</li>
+<li>反思:at com.ejlerp.cache.redis.KVCacherImpl.set(KVCacherImpl.java:34),这个一句其实只有两个参数,一个是传入的key,一个是value,一定是其中一个入参发生了问题,才会导致底层出现问题的</li>
+<li>当然,也不排除是redis服务可能出现了问题,但是当时已经重启了reids,错误依旧存在</li>
+<li>最后,bug定位到了是前端一个select标签,由于数据库中的dict没有初始化,导致这个select标签的初始值没有初始化完成,当然表单提交时,便不会提交这个字段,</li>
+</ul>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><ul>
+<li>controller层的vo依然不要使用map,否则排查起来很费劲</li>
+</ul>
+<h1 id="bugfix2-分组问题"><a href="#bugfix2-分组问题" class="headerlink" title="bugfix2 分组问题"></a>bugfix2 分组问题</h1><ul>
+<li><p>这个bugfix,其实是这样的,条件写反导致的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">         Map&lt;Long, VSaleOrder&gt; orderMap = omsAgentService.findByIds(callerInfo, arriveMap.keySet());</span><br><span class="line">-        Set&lt;Long&gt; legalIds = orderMap.values().stream().filter(Objects::isNull).filter(v -&gt; &#123;</span><br><span class="line">+        Set&lt;Long&gt; legalIds = orderMap.values().stream().filter(Objects::nonNull).filter(v -&gt; &#123;</span><br><span class="line">             Integer courierPrintMarkState = v.getCourierPrintMarkState();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>问题是,历史数据的修复,其实应该在线上发现问题时,作为一套完整的方案,进行提交的,而不是部署到生产环境后,又发现历史数据有问题,在半夜升级后改数据,风险真是很大</p>
+</li>
+<li>对于一些合并操作,虽然业务上提出了操作,其实从逻辑上讲,应该出现拆分的反响逻辑预支对应</li>
+</ul>
+<h1 id="问题3-jvm参数设置"><a href="#问题3-jvm参数设置" class="headerlink" title="问题3 jvm参数设置"></a>问题3 jvm参数设置</h1>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/12/13/bugfix-voice-generate/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/13/bugfix-voice-generate/" itemprop="url">bugfix-voice-generate</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-13T19:26:48+08:00">
+                2017-12-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>项目中使用了baidu的语音合成,原本的设计是,批量获取设置到redis中,用户每次使用时从redis中获取</p>
+<h1 id="空指针异常"><a href="#空指针异常" class="headerlink" title="空指针异常"></a>空指针异常</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">2017-12-13 16:34:30.076 ERROR [http-bio-6000-exec-45][DownloadVoiceFromBaiduYY.java:36] - DownloadVoiceFromBaiduYY error &#123;&#125;</span><br><span class="line">java.lang.NullPointerException</span><br><span class="line">    at com.baidu.aip.speech.AipSpeech.synthesis(AipSpeech.java:133) ~[java-sdk-3.2.0.jar:?]</span><br><span class="line">    at com.ejlerp.web.wms.voice.baidu.DownloadVoiceFromBaiduYY.downloadVoice(DownloadVoiceFromBaiduYY.java:33) [classes/:?]</span><br><span class="line">    at com.ejlerp.web.wms.voice.baidu.DownloadVoiceFromBaiduYY.downloadVoiceB64(DownloadVoiceFromBaiduYY.java:45) [classes/:?]</span><br><span class="line">    at com.ejlerp.web.wms.voice.VoiceController.getB64(VoiceController.java:233) [classes/:?]</span><br><span class="line">    at com.ejlerp.web.wms.voice.VoiceController.getVoiceData(VoiceController.java:149) [classes/:?]</span><br><span class="line">    at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:1.8.0_92]</span><br><span class="line">    at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) ~[?:1.8.0_92]</span><br><span class="line">    at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[?:1.8.0_92]</span><br><span class="line">    at java.lang.reflect.Method.invoke(Method.java:498) ~[?:1.8.0_92]</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>下载源码后debug返现返回的response Content-Type是大写,与sdk中get的string不一致,<br>于是查找github的源文件<br><img src="http://pic.victor123.cn/17-12-13/86911891.jpg"></p>
+</li>
+<li><p>发现了,这个bug已经fix了,<a href="https://github.com/Baidu-AIP/java-sdk/commit/c338bc71690f84351def0d64b311986c586763d2" target="_blank" rel="noopener">https://github.com/Baidu-AIP/java-sdk/commit/c338bc71690f84351def0d64b311986c586763d2</a></p>
+</li>
+</ul>
+<p><img src="http://pic.victor123.cn/17-12-13/31618622.jpg"></p>
+<h1 id="其他遇到的问题"><a href="#其他遇到的问题" class="headerlink" title="其他遇到的问题"></a>其他遇到的问题</h1><ul>
+<li><p>判断字符串写反</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">-            if (StringUtils.isEmpty(value)) &#123;</span><br><span class="line">+            if (!StringUtils.isEmpty(value)) &#123;</span><br><span class="line">                 redisMap.put(key, value);</span><br><span class="line">             &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>APPkey修改错了配置文件</p>
+</li>
+</ul>
+<h1 id="反思"><a href="#反思" class="headerlink" title="反思"></a>反思</h1><ul>
+<li><p>在与外部api进行接口对接时,一定要判断各种异常情况的发生,不能只考虑正常情况</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">try &#123;</span><br><span class="line">    TtsResponse res = client.synthesis(voice, &quot;zh&quot;, 1, options);</span><br><span class="line">    JSONObject result = res.getResult();</span><br><span class="line">    if (result != null) &#123;</span><br><span class="line">        LOGGER.warn(&quot;downloadVoice:&#123;&#125;&quot;, result);</span><br><span class="line">    &#125;</span><br><span class="line">    download = res.getData();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>删除掉无用的代码,放置误导自己和别人</p>
+</li>
+<li>本地充分测试后,再提交测试部署,否则害人害己,耽误时间</li>
+<li>应该充分利用各种调试工具或手段,如Btrace,(临时抱佛脚,来不及,自己有待提高)</li>
+<li>不能依靠测试发现程序问题,即使是别人的代码,也要认真研读,滤清思路,不能头疼医头,脚痛医脚</li>
+<li>要有自己的脚手架工程,方便自己后门程序的快速编写,和部署</li>
+</ul>
+<h1 id="待提高"><a href="#待提高" class="headerlink" title="待提高"></a>待提高</h1><ul>
+<li>应该充分利用各种调试工具或手段,如Btrace,(临时抱佛脚,来不及,自己有待提高)</li>
+<li>测试用例编写</li>
+<li>要有自己的脚手架工程,方便自己后门程序的快速编写,和部署</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/12/13/optime-156/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/13/optime-156/" itemprop="url">optime-156</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-13T13:39:41+08:00">
+                2017-12-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>#重新定位问题<br>-%wa指CPU等待磁盘写入完成的时间</p>
+<p>首先看下%wa的解释：Percentage of time that the CPU or CPUs were idle during which the system had an outstanding disk I/O request.</p>
+<p>#iostat</p>
+<p>#pidstat 2 10 -d<br>发现mysql的读写量非常高<br><img src="http://pic.victor123.cn/17-12-13/27569242.jpg"></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/12/12/optimize-zookeeper/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -777,945 +1646,19 @@
 
       
         
-          
-            <h1 id="题目地址"><a href="#题目地址" class="headerlink" title="题目地址"></a>题目地址</h1><p><a href="https://www.kaggle.com/c/expedia-hotel-recommendations#description" target="_blank" rel="noopener">https://www.kaggle.com/c/expedia-hotel-recommendations#description</a></p>
+          <h1 id="题目地址"><a href="#题目地址" class="headerlink" title="题目地址"></a>题目地址</h1><p><a href="https://www.kaggle.com/c/expedia-hotel-recommendations#description" target="_blank" rel="noopener">https://www.kaggle.com/c/expedia-hotel-recommendations#description</a></p>
 <h1 id="学习地址"><a href="#学习地址" class="headerlink" title="学习地址"></a>学习地址</h1><p><a href="https://www.dataquest.io/blog/kaggle-tutorial/" target="_blank" rel="noopener">https://www.dataquest.io/blog/kaggle-tutorial/</a></p>
 <h1 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h1><ul>
 <li>初步了解机器学习流程</li>
 <li>通过实际代码,了解python代码的语法</li>
 </ul>
-<h1 id="学习心得"><a href="#学习心得" class="headerlink" title="学习心得"></a>学习心得</h1><ul>
-<li><p>数据探索</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"></span><br><span class="line">destinations = pd.read_csv(<span class="string">"destinations.csv"</span>)</span><br><span class="line">test = pd.read_csv(<span class="string">"test.csv"</span>)</span><br><span class="line">train = pd.read_csv(<span class="string">"train.csv"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#train文件有4个g大,读了半天都不出来</span></span><br></pre></td></tr></table></figure>
-<ul>
-<li>数据量</li>
-<li>数据分布</li>
-</ul>
-</li>
-<li>目标变量<ul>
-<li>目标变量是什么</li>
-<li>探索目标变量</li>
-<li>探索用户id </li>
-</ul>
-</li>
-<li>采样统计<ul>
-<li>添加时间和日期</li>
-<li>挑选1000名用户</li>
-<li>区分测试集和验证集</li>
-<li>移除无关数据(click 事件)</li>
-</ul>
-</li>
-<li><p>一个简单的算法</p>
-<ul>
-<li><p>生成预测</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">predictions = [most_common_clusters for i in range(t2.shape[0])]</span><br><span class="line"># 不是很理解 [] 和 shape[0]的含义</span><br><span class="line"># shape()方法返回 行数 和 维度数 .其中:0:行数 1:维度数</span><br><span class="line"># pyhton中的遍历:</span><br><span class="line">for iterating_var in sequence:</span><br><span class="line">   statements(s)</span><br><span class="line"># 但是 for前面的most_common_clusters 是什么意思?</span><br><span class="line"># 通过测试了解到是复制一个变量n遍的意思</span><br><span class="line">aa=[&quot;abc&quot; for i in range(10)]</span><br><span class="line">print(aa)</span><br><span class="line">输出了10个 abc</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>评估效果</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">import ml_metrics as metrics</span><br><span class="line">target = [[l] for l in t2[&quot;hotel_cluster&quot;]]</span><br><span class="line">metrics.mapk(target, predictions, k=5)</span><br><span class="line"># 不是很理解 [l]代表什么</span><br><span class="line"># 把t2[&quot;hotel_cluster&quot;]列表中的变量l,外面 前一层 列表 []</span><br><span class="line">xx=[1,2,3,4]</span><br><span class="line">target = [[l] for l in xx]</span><br><span class="line">print(target)</span><br><span class="line">[[1], [2], [3], [4]]</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>查找相关因素</p>
-</li>
-</ul>
-</li>
-<li><p>更近一步</p>
-<ul>
-<li><p>生成特征</p>
-<ul>
-<li><p>从destinations生成特征</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">from sklearn.decomposition import PCA</span><br><span class="line"></span><br><span class="line">pca = PCA(n_components=3)</span><br><span class="line">dest_small = pca.fit_transform(destinations[[&quot;d&#123;0&#125;&quot;.format(i + 1) for i in range(149)]])</span><br><span class="line">dest_small = pd.DataFrame(dest_small)</span><br><span class="line">dest_small[&quot;srch_destination_id&quot;] = destinations[&quot;srch_destination_id&quot;]</span><br><span class="line"># 解释 取d1-d149字段</span><br><span class="line">print([&quot;d&#123;0&#125;&quot;.format(i + 1) for i in range(149)])</span><br><span class="line">[&apos;d1&apos;, &apos;d2&apos;, &apos;d3&apos;, &apos;d4&apos;, &apos;d5&apos;, &apos;d6&apos;, &apos;d7&apos;, &apos;d8&apos;, &apos;d9&apos;, &apos;d10&apos;, &apos;d11&apos;, &apos;d12&apos;, &apos;d13&apos;, &apos;d14&apos;, &apos;d15&apos;, &apos;d16&apos;, &apos;d17&apos;, &apos;d18&apos;, &apos;d19&apos;, &apos;d20&apos;, &apos;d21&apos;, &apos;d22&apos;, &apos;d23&apos;, &apos;d24&apos;, &apos;d25&apos;, &apos;d26&apos;, &apos;d27&apos;, &apos;d28&apos;, &apos;d29&apos;, &apos;d30&apos;, &apos;d31&apos;, &apos;d32&apos;, &apos;d33&apos;, &apos;d34&apos;, &apos;d35&apos;, &apos;d36&apos;, &apos;d37&apos;, &apos;d38&apos;, &apos;d39&apos;, &apos;d40&apos;, &apos;d41&apos;, &apos;d42&apos;, &apos;d43&apos;, &apos;d44&apos;, &apos;d45&apos;, &apos;d46&apos;, &apos;d47&apos;, &apos;d48&apos;, &apos;d49&apos;, &apos;d50&apos;, &apos;d51&apos;, &apos;d52&apos;, &apos;d53&apos;, &apos;d54&apos;, &apos;d55&apos;, &apos;d56&apos;, &apos;d57&apos;, &apos;d58&apos;, &apos;d59&apos;, &apos;d60&apos;, &apos;d61&apos;, &apos;d62&apos;, &apos;d63&apos;, &apos;d64&apos;, &apos;d65&apos;, &apos;d66&apos;, &apos;d67&apos;, &apos;d68&apos;, &apos;d69&apos;, &apos;d70&apos;, &apos;d71&apos;, &apos;d72&apos;, &apos;d73&apos;, &apos;d74&apos;, &apos;d75&apos;, &apos;d76&apos;, &apos;d77&apos;, &apos;d78&apos;, &apos;d79&apos;, &apos;d80&apos;, &apos;d81&apos;, &apos;d82&apos;, &apos;d83&apos;, &apos;d84&apos;, &apos;d85&apos;, &apos;d86&apos;, &apos;d87&apos;, &apos;d88&apos;, &apos;d89&apos;, &apos;d90&apos;, &apos;d91&apos;, &apos;d92&apos;, &apos;d93&apos;, &apos;d94&apos;, &apos;d95&apos;, &apos;d96&apos;, &apos;d97&apos;, &apos;d98&apos;, &apos;d99&apos;, &apos;d100&apos;, &apos;d101&apos;, &apos;d102&apos;, &apos;d103&apos;, &apos;d104&apos;, &apos;d105&apos;, &apos;d106&apos;, &apos;d107&apos;, &apos;d108&apos;, &apos;d109&apos;, &apos;d110&apos;, &apos;d111&apos;, &apos;d112&apos;, &apos;d113&apos;, &apos;d114&apos;, &apos;d115&apos;, &apos;d116&apos;, &apos;d117&apos;, &apos;d118&apos;, &apos;d119&apos;, &apos;d120&apos;, &apos;d121&apos;, &apos;d122&apos;, &apos;d123&apos;, &apos;d124&apos;, &apos;d125&apos;, &apos;d126&apos;, &apos;d127&apos;, &apos;d128&apos;, &apos;d129&apos;, &apos;d130&apos;, &apos;d131&apos;, &apos;d132&apos;, &apos;d133&apos;, &apos;d134&apos;, &apos;d135&apos;, &apos;d136&apos;, &apos;d137&apos;, &apos;d138&apos;, &apos;d139&apos;, &apos;d140&apos;, &apos;d141&apos;, &apos;d142&apos;, &apos;d143&apos;, &apos;d144&apos;, &apos;d145&apos;, &apos;d146&apos;, &apos;d147&apos;, &apos;d148&apos;, &apos;d149&apos;]</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>生成其他特征</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">def calc_fast_features(df):</span><br><span class="line">    df[&quot;date_time&quot;] = pd.to_datetime(df[&quot;date_time&quot;])</span><br><span class="line">    df[&quot;srch_ci&quot;] = pd.to_datetime(df[&quot;srch_ci&quot;], format=&apos;%Y-%m-%d&apos;, errors=&quot;coerce&quot;)</span><br><span class="line">    # 参数errors=&quot;coerce&quot; 遇到错误可以赋值为空。</span><br><span class="line">    df[&quot;srch_co&quot;] = pd.to_datetime(df[&quot;srch_co&quot;], format=&apos;%Y-%m-%d&apos;, errors=&quot;coerce&quot;)</span><br><span class="line">    </span><br><span class="line">    props = &#123;&#125;</span><br><span class="line">    for prop in [&quot;month&quot;, &quot;day&quot;, &quot;hour&quot;, &quot;minute&quot;, &quot;dayofweek&quot;, &quot;quarter&quot;]:</span><br><span class="line">        props[prop] = getattr(df[&quot;date_time&quot;].dt, prop)</span><br><span class="line">    </span><br><span class="line">    carryover = [p for p in df.columns if p not in [&quot;date_time&quot;, &quot;srch_ci&quot;, &quot;srch_co&quot;]]</span><br><span class="line">    for prop in carryover:</span><br><span class="line">        props[prop] = df[prop]</span><br><span class="line">    </span><br><span class="line">    date_props = [&quot;month&quot;, &quot;day&quot;, &quot;dayofweek&quot;, &quot;quarter&quot;]</span><br><span class="line">    for prop in date_props:</span><br><span class="line">        props[&quot;ci_&#123;0&#125;&quot;.format(prop)] = getattr(df[&quot;srch_ci&quot;].dt, prop)</span><br><span class="line">        props[&quot;co_&#123;0&#125;&quot;.format(prop)] = getattr(df[&quot;srch_co&quot;].dt, prop)</span><br><span class="line">    props[&quot;stay_span&quot;] = (df[&quot;srch_co&quot;] - df[&quot;srch_ci&quot;]).astype(&apos;timedelta64[h]&apos;)</span><br><span class="line">        </span><br><span class="line">    ret = pd.DataFrame(props)</span><br><span class="line">    </span><br><span class="line">    ret = ret.join(dest_small, on=&quot;srch_destination_id&quot;, how=&apos;left&apos;, rsuffix=&quot;dest&quot;)</span><br><span class="line">    ret = ret.drop(&quot;srch_destination_iddest&quot;, axis=1)</span><br><span class="line">    return ret</span><br><span class="line"></span><br><span class="line">df = calc_fast_features(t1)</span><br><span class="line">df.fillna(-1, inplace=True)</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">新的列:</span><br><span class="line">[                  &apos;channel&apos;,                    &apos;ci_day&apos;,</span><br><span class="line">                    &apos;ci_dayofweek&apos;,                  &apos;ci_month&apos;,</span><br><span class="line">                      &apos;ci_quarter&apos;,                       &apos;cnt&apos;,</span><br><span class="line">                          &apos;co_day&apos;,              &apos;co_dayofweek&apos;,</span><br><span class="line">                        &apos;co_month&apos;,                &apos;co_quarter&apos;,</span><br><span class="line">                             &apos;day&apos;,                 &apos;dayofweek&apos;,</span><br><span class="line">                   &apos;hotel_cluster&apos;,           &apos;hotel_continent&apos;,</span><br><span class="line">                   &apos;hotel_country&apos;,              &apos;hotel_market&apos;,</span><br><span class="line">                            &apos;hour&apos;,                &apos;is_booking&apos;,</span><br><span class="line">                       &apos;is_mobile&apos;,                &apos;is_package&apos;,</span><br><span class="line">                          &apos;minute&apos;,                     &apos;month&apos;,</span><br><span class="line">       &apos;orig_destination_distance&apos;,            &apos;posa_continent&apos;,</span><br><span class="line">                         &apos;quarter&apos;,                 &apos;site_name&apos;,</span><br><span class="line">                 &apos;srch_adults_cnt&apos;,         &apos;srch_children_cnt&apos;,</span><br><span class="line">             &apos;srch_destination_id&apos;,  &apos;srch_destination_type_id&apos;,</span><br><span class="line">                     &apos;srch_rm_cnt&apos;,                 &apos;stay_span&apos;,</span><br><span class="line">                         &apos;user_id&apos;,        &apos;user_location_city&apos;,</span><br><span class="line">           &apos;user_location_country&apos;,      &apos;user_location_region&apos;,</span><br><span class="line">                            &apos;year&apos;,                           0,</span><br><span class="line">                                 1,                           2]</span><br></pre></td></tr></table></figure>
-<pre><code>+ 机器学习
-    * 随机森林
-</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">predictors = [c for c in df.columns if c not in [&quot;hotel_cluster&quot;]]</span><br><span class="line">from sklearn import cross_validation</span><br><span class="line">from sklearn.ensemble import RandomForestClassifier</span><br><span class="line"></span><br><span class="line">clf = RandomForestClassifier(n_estimators=10, min_weight_fraction_leaf=0.1)</span><br><span class="line">scores = cross_validation.cross_val_score(clf, df[predictors], df[&apos;hotel_cluster&apos;], cv=3)</span><br><span class="line">scores</span><br></pre></td></tr></table></figure>
-<pre><code>* 二分分类
-</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">from sklearn.ensemble import RandomForestClassifier</span><br><span class="line">from sklearn.cross_validation import KFold</span><br><span class="line">from itertools import chain</span><br><span class="line"></span><br><span class="line">all_probs = []</span><br><span class="line">unique_clusters = df[&quot;hotel_cluster&quot;].unique()</span><br><span class="line">for cluster in unique_clusters:</span><br><span class="line">    df[&quot;target&quot;] = 1</span><br><span class="line">    df[&quot;target&quot;][df[&quot;hotel_cluster&quot;] != cluster] = 0</span><br><span class="line">    predictors = [col for col in df if col not in [&apos;hotel_cluster&apos;, &quot;target&quot;]]</span><br><span class="line">    probs = []</span><br><span class="line">    cv = KFold(len(df[&quot;target&quot;]), n_folds=2)</span><br><span class="line">    # 交叉验证(CrossValidation)</span><br><span class="line">    # 方法思想是为了在不动用测试集之前，就评估一下模型是否过于复杂而引起过度拟合</span><br><span class="line">    clf = RandomForestClassifier(n_estimators=10, min_weight_fraction_leaf=0.1)</span><br><span class="line">    for i, (tr, te) in enumerate(cv):</span><br><span class="line">    # 不是很理解 上面一句</span><br><span class="line">        clf.fit(df[predictors].iloc[tr], df[&quot;target&quot;].iloc[tr])</span><br><span class="line">        preds = clf.predict_proba(df[predictors].iloc[te])</span><br><span class="line">        probs.append([p[1] for p in preds])</span><br><span class="line">    full_probs = chain.from_iterable(probs)</span><br><span class="line">    all_probs.append(list(full_probs))</span><br><span class="line"></span><br><span class="line">prediction_frame = pd.DataFrame(all_probs).T</span><br><span class="line">prediction_frame.columns = unique_clusters</span><br><span class="line">def find_top_5(row):</span><br><span class="line">    return list(row.nlargest(5).index)</span><br><span class="line"></span><br><span class="line">preds = []</span><br><span class="line">for index, row in prediction_frame.iterrows():</span><br><span class="line">    preds.append(find_top_5(row))</span><br><span class="line"></span><br><span class="line">metrics.mapk([[l] for l in t2.iloc[&quot;hotel_cluster&quot;]], preds, k=5)</span><br></pre></td></tr></table></figure>
-<ul>
-<li><p>在目的地下的最受欢迎的酒店选择</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">def make_key(items):</span><br><span class="line">    return &quot;_&quot;.join([str(i) for i in items])</span><br><span class="line"></span><br><span class="line">match_cols = [&quot;srch_destination_id&quot;]</span><br><span class="line">cluster_cols = match_cols + [&apos;hotel_cluster&apos;]</span><br><span class="line">groups = t1.groupby(cluster_cols)</span><br><span class="line">top_clusters = &#123;&#125;</span><br><span class="line">for name, group in groups:</span><br><span class="line">    clicks = len(group.is_booking[group.is_booking == False])</span><br><span class="line">    bookings = len(group.is_booking[group.is_booking == True])</span><br><span class="line">    </span><br><span class="line">    score = bookings + .15 * clicks</span><br><span class="line">    </span><br><span class="line">    clus_name = make_key(name[:len(match_cols)])</span><br><span class="line">    if clus_name not in top_clusters:</span><br><span class="line">        top_clusters[clus_name] = &#123;&#125;</span><br><span class="line">    top_clusters[clus_name][name[-1]] = score</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">import operator</span><br><span class="line"></span><br><span class="line">cluster_dict = &#123;&#125;</span><br><span class="line">for n in top_clusters:</span><br><span class="line">    tc = top_clusters[n]</span><br><span class="line">    top = [l[0] for l in sorted(tc.items(), key=operator.itemgetter(1), reverse=True)[:5]]</span><br><span class="line">    cluster_dict[n] = top</span><br></pre></td></tr></table></figure>
-<ul>
-<li><p>给予目的地,进行预测</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">preds = []</span><br><span class="line">for index, row in t2.iterrows():</span><br><span class="line">    key = make_key([row[m] for m in match_cols])</span><br><span class="line">    if key in cluster_dict:</span><br><span class="line">        preds.append(cluster_dict[key])</span><br><span class="line">    else:</span><br><span class="line">        preds.append([])</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>评估错误</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">metrics.mapk([[l] for l in t2[&quot;hotel_cluster&quot;]], preds, k=5)</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-<li><p>更好的结果</p>
-<ul>
-<li><p>根据用户</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">match_cols = [&apos;user_location_country&apos;, &apos;user_location_region&apos;, &apos;user_location_city&apos;, &apos;hotel_market&apos;, &apos;orig_destination_distance&apos;]</span><br><span class="line"></span><br><span class="line">groups = t1.groupby(match_cols)</span><br><span class="line">    </span><br><span class="line">def generate_exact_matches(row, match_cols):</span><br><span class="line">    index = tuple([row[t] for t in match_cols])</span><br><span class="line">    try:</span><br><span class="line">        group = groups.get_group(index)</span><br><span class="line">    except Exception:</span><br><span class="line">        return []</span><br><span class="line">    clus = list(set(group.hotel_cluster))</span><br><span class="line">    return clus</span><br><span class="line"></span><br><span class="line">exact_matches = []</span><br><span class="line">for i in range(t2.shape[0]):</span><br><span class="line">    exact_matches.append(generate_exact_matches(t2.iloc[i], match_cols))</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>合并预测</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">def f5(seq, idfun=None): </span><br><span class="line">    if idfun is None:</span><br><span class="line">        def idfun(x): return x</span><br><span class="line">    seen = &#123;&#125;</span><br><span class="line">    result = []</span><br><span class="line">    for item in seq:</span><br><span class="line">        marker = idfun(item)</span><br><span class="line">        if marker in seen: continue</span><br><span class="line">        seen[marker] = 1</span><br><span class="line">        result.append(item)</span><br><span class="line">    return result</span><br><span class="line">    </span><br><span class="line">full_preds = [f5(exact_matches[p] + preds[p] + most_common_clusters)[:5] for p in range(len(preds))]</span><br><span class="line">mapk([[l] for l in t2[&quot;hotel_cluster&quot;]], full_preds, k=5)</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-<li><p>生成提交文件</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">write_p = [&quot; &quot;.join([str(l) for l in p]) for p in full_preds]</span><br><span class="line">write_frame = [&quot;&#123;0&#125;,&#123;1&#125;&quot;.format(t2[&quot;id&quot;][i], write_p[i]) for i in range(len(full_preds))]</span><br><span class="line">write_frame = [&quot;id,hotel_clusters&quot;] + write_frame</span><br><span class="line">with open(&quot;predictions.csv&quot;, &quot;w+&quot;) as f:</span><br><span class="line">    f.write(&quot;\n&quot;.join(write_frame))</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>总结</p>
-<ul>
-<li>下一步</li>
-</ul>
-</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/12/04/error-download-gz/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/04/error-download-gz/" itemprop="url">mac_Chrome浏览器下载csv.gz后缀时遇到的问题</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-04T22:34:00+08:00">
-                2017-12-04
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述:"></a>问题描述:</h1><ul>
-<li>下载一个应该为csv.gz后缀名的问题,不知道为什么没有了后缀名,一开始以为是字符集问题</li>
-<li>下载的是kaggle的data数据<br><a href="https://www.kaggle.com/c/expedia-hotel-recommendations/data" target="_blank" rel="noopener">https://www.kaggle.com/c/expedia-hotel-recommendations/data</a></li>
-</ul>
-<p><img src="http://pic.victor123.cn/17-12-4/19333252.jpg"></p>
-<ul>
-<li>报错错误<br><img src="http://pic.victor123.cn/17-12-4/81379727.jpg"></li>
-<li>问了小伙伴,解压后的文件应该有几个g,不应该几百兆,因此推断是后缀名问题</li>
-</ul>
-<h1 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h1><p><a href="http://pic.victor123.cn/17-12-4/7396408.jpg" target="_blank" rel="noopener">http://pic.victor123.cn/17-12-4/7396408.jpg</a></p>
-<h1 id="知识小结"><a href="#知识小结" class="headerlink" title="知识小结"></a>知识小结</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">.tar </span><br><span class="line">解包：tar xvf FileName.tar</span><br><span class="line">打包：tar cvf FileName.tar DirName</span><br><span class="line">（注：tar是打包，不是压缩！）</span><br><span class="line">———————————————</span><br><span class="line">.gz</span><br><span class="line">解压1：gunzip FileName.gz</span><br><span class="line">解压2：gzip -d FileName.gz</span><br><span class="line">压缩：gzip FileName</span><br><span class="line"></span><br><span class="line">.tar.gz 和 .tgz</span><br><span class="line">解压：tar zxvf FileName.tar.gz</span><br><span class="line">压缩：tar zcvf FileName.tar.gz DirName</span><br><span class="line">———————————————</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/12/01/idea-plugins-install/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/01/idea-plugins-install/" itemprop="url">优化idea插件安装</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-01T06:42:00+08:00">
-                2017-12-01
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/idea/" itemprop="url" rel="index">
-                    <span itemprop="name">idea</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="常常遇到从idea程序中搜索插件，下载超时的情况-解决方式如下"><a href="#常常遇到从idea程序中搜索插件，下载超时的情况-解决方式如下" class="headerlink" title="常常遇到从idea程序中搜索插件，下载超时的情况,解决方式如下"></a>常常遇到从idea程序中搜索插件，下载超时的情况,解决方式如下</h1><p>1.直接在官网下载并进行安装,然后Install from disk<br><a href="https://plugins.jetbrains.com/search?correctionAllowed=true&amp;pr=idea&amp;orderBy=&amp;search=" target="_blank" rel="noopener">https://plugins.jetbrains.com/search?correctionAllowed=true&amp;pr=idea&amp;orderBy=&amp;search=</a></p>
-<p>2.使用ss作代理，直接下载<br><img src="http://pic.victor123.cn/17-12-1/24998248.jpg"></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/11/30/error-next-submodule/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/30/error-next-submodule/" itemprop="url">hexo next主题保存</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-30T22:41:04+08:00">
-                2017-11-30
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/异常/" itemprop="url" rel="index">
-                    <span itemprop="name">异常</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="通过git的submodule功能对博客内容和主题分别进行版本控制"><a href="#通过git的submodule功能对博客内容和主题分别进行版本控制" class="headerlink" title="通过git的submodule功能对博客内容和主题分别进行版本控制"></a>通过git的submodule功能对博客内容和主题分别进行版本控制</h1><h1 id="方案"><a href="#方案" class="headerlink" title="方案"></a>方案</h1><p><a href="https://stackoverflow.com/questions/12898278/issue-with-adding-common-code-as-git-submodule-already-exists-in-the-index" target="_blank" rel="noopener">https://stackoverflow.com/questions/12898278/issue-with-adding-common-code-as-git-submodule-already-exists-in-the-index</a></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">git ls-files --stage</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">git rm --cached themes/next</span><br><span class="line"></span><br><span class="line">git submodule add git@github.com:victorsheng/hexo-theme-next.git themes/next</span><br><span class="line"></span><br><span class="line">git add .gitmodules</span><br></pre></td></tr></table></figure>
-<p><img src="http://pic.victor123.cn/17-11-30/78270359.jpg"></p>
-<h2 id="gitmodulesn内容如下："><a href="#gitmodulesn内容如下：" class="headerlink" title=".gitmodulesn内容如下："></a>.gitmodulesn内容如下：</h2><p>[submodule “themes/next”]<br>    path = themes/next<br>    url = git@github.com:victorsheng/hexo-theme-next.git</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/11/30/error-pip-install-seaborn/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/30/error-pip-install-seaborn/" itemprop="url">mac安装seaborn遇到的问题</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-30T07:58:24+08:00">
-                2017-11-30
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/异常/" itemprop="url" rel="index">
-                    <span itemprop="name">异常</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="异常信息"><a href="#异常信息" class="headerlink" title="异常信息"></a>异常信息</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">pip install numpy</span><br><span class="line"></span><br><span class="line">MacBook-Pro:~ victor$ pip install seaborn</span><br><span class="line">Collecting seaborn</span><br><span class="line">  Downloading seaborn-0.8.1.tar.gz (178kB)</span><br><span class="line">    100% |████████████████████████████████| 184kB 666kB/s</span><br><span class="line">Collecting pandas (from seaborn)</span><br><span class="line">  Using cached pandas-0.21.0-cp27-cp27m-macosx_10_6_intel.macosx_10_9_intel.macosx_10_9_x86_64.macosx_10_10_intel.macosx_10_10_x86_64.whl</span><br><span class="line">Requirement already satisfied: python-dateutil in /System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python (from pandas-&gt;seaborn)</span><br><span class="line">Collecting numpy&gt;=1.9.0 (from pandas-&gt;seaborn)</span><br><span class="line">  Using cached numpy-1.13.3-cp27-cp27m-macosx_10_6_intel.macosx_10_9_intel.macosx_10_9_x86_64.macosx_10_10_intel.macosx_10_10_x86_64.whl</span><br><span class="line">Requirement already satisfied: pytz&gt;=2011k in /System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python (from pandas-&gt;seaborn)</span><br><span class="line">Installing collected packages: numpy, pandas, seaborn</span><br><span class="line">  Found existing installation: numpy 1.8.0rc1</span><br><span class="line">    DEPRECATION: Uninstalling a distutils installed project (numpy) has been deprecated and will be removed in a future version. This is due to the fact that uninstalling a distutils project will only partially uninstall the project.</span><br><span class="line">    Uninstalling numpy-1.8.0rc1:</span><br><span class="line">Exception:</span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/basecommand.py&quot;, line 215, in main</span><br><span class="line">    status = self.run(options, args)</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/commands/install.py&quot;, line 342, in run</span><br><span class="line">    prefix=options.prefix_path,</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/req/req_set.py&quot;, line 778, in install</span><br><span class="line">    requirement.uninstall(auto_confirm=True)</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/req/req_install.py&quot;, line 754, in uninstall</span><br><span class="line">    paths_to_remove.remove(auto_confirm)</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/req/req_uninstall.py&quot;, line 115, in remove</span><br><span class="line">    renames(path, new_path)</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/utils/__init__.py&quot;, line 267, in renames</span><br><span class="line">    shutil.move(old, new)</span><br><span class="line">  File &quot;/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/shutil.py&quot;, line 302, in move</span><br><span class="line">    copy2(src, real_dst)</span><br><span class="line">  File &quot;/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/shutil.py&quot;, line 131, in copy2</span><br><span class="line">    copystat(src, dst)</span><br><span class="line">  File &quot;/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/shutil.py&quot;, line 103, in copystat</span><br><span class="line">    os.chflags(dst, st.st_flags)</span><br><span class="line">OSError: [Errno 1] Operation not permitted: &apos;/var/folders/sk/hl26sn7n1pg9jrzgzqydvfq00000gn/T/pip-gOIIvZ-uninstall/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/numpy-1.8.0rc1-py2.7.egg-info&apos;</span><br></pre></td></tr></table></figure>
-<h1 id="发现卸载这个numpy都不行"><a href="#发现卸载这个numpy都不行" class="headerlink" title="发现卸载这个numpy都不行"></a>发现卸载这个numpy都不行</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">sudo -H pip uninstall  numpy</span><br><span class="line">DEPRECATION: Uninstalling a distutils installed project (numpy) has been deprecated and will be removed in a future version. This is due to the fact that uninstalling a distutils project will only partially uninstall the project.</span><br><span class="line">Uninstalling numpy-1.8.0rc1:</span><br><span class="line">  /System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/numpy-1.8.0rc1-py2.7.egg-info</span><br><span class="line">Proceed (y/n)? y</span><br><span class="line">Exception:</span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/basecommand.py&quot;, line 215, in main</span><br><span class="line">    status = self.run(options, args)</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/commands/uninstall.py&quot;, line 76, in run</span><br><span class="line">    requirement_set.uninstall(auto_confirm=options.yes)</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/req/req_set.py&quot;, line 346, in uninstall</span><br><span class="line">    req.uninstall(auto_confirm=auto_confirm)</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/req/req_install.py&quot;, line 754, in uninstall</span><br><span class="line">    paths_to_remove.remove(auto_confirm)</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/req/req_uninstall.py&quot;, line 115, in remove</span><br><span class="line">    renames(path, new_path)</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/utils/__init__.py&quot;, line 267, in renames</span><br><span class="line">    shutil.move(old, new)</span><br><span class="line">  File &quot;/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/shutil.py&quot;, line 302, in move</span><br><span class="line">    copy2(src, real_dst)</span><br><span class="line">  File &quot;/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/shutil.py&quot;, line 131, in copy2</span><br><span class="line">    copystat(src, dst)</span><br><span class="line">  File &quot;/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/shutil.py&quot;, line 103, in copystat</span><br><span class="line">    os.chflags(dst, st.st_flags)</span><br><span class="line">OSError: [Errno 1] Operation not permitted: &apos;/tmp/pip-Ez2DTF-uninstall/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/numpy-1.8.0rc1-py2.7.egg-info</span><br></pre></td></tr></table></figure>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p><a href="https://blog.wizchen.com/2016/06/17/Mac%E4%B8%8B%E6%9B%B4%E6%96%B0python%E7%A7%91%E5%AD%A6%E8%AE%A1%E7%AE%97%E5%BA%93numpy/" target="_blank" rel="noopener">https://blog.wizchen.com/2016/06/17/Mac%E4%B8%8B%E6%9B%B4%E6%96%B0python%E7%A7%91%E5%AD%A6%E8%AE%A1%E7%AE%97%E5%BA%93numpy/</a></p>
-<ul>
-<li><p>说是System Integrity Protection的问题，解决的办法是关闭SIP:</p>
-</li>
-<li><p>重启电脑，电脑启动的时候安住 command + R</p>
-</li>
-<li>等画面上出现 apple logo 的，你会看到 OS X 工具程式的窗口，选择终端，等待终端打开，直接输入csrutil disable，回车后重启即可</li>
-<li>重启完毕后，再次在终端输入</li>
-</ul>
-<h1 id="最后成功"><a href="#最后成功" class="headerlink" title="最后成功"></a>最后成功</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">pip install -U numpy</span><br><span class="line">Collecting numpy</span><br><span class="line">  Using cached numpy-1.13.3-cp27-cp27m-macosx_10_6_intel.macosx_10_9_intel.macosx_10_9_x86_64.macosx_10_10_intel.macosx_10_10_x86_64.whl</span><br><span class="line">Installing collected packages: numpy</span><br><span class="line">  Found existing installation: numpy 1.8.0rc1</span><br><span class="line">    DEPRECATION: Uninstalling a distutils installed project (numpy) has been deprecated and will be removed in a future version. This is due to the fact that uninstalling a distutils project will only partially uninstall the project.</span><br><span class="line">    Uninstalling numpy-1.8.0rc1:</span><br><span class="line">Exception:</span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/basecommand.py&quot;, line 215, in main</span><br><span class="line">    status = self.run(options, args)</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/commands/install.py&quot;, line 342, in run</span><br><span class="line">    prefix=options.prefix_path,</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/req/req_set.py&quot;, line 778, in install</span><br><span class="line">    requirement.uninstall(auto_confirm=True)</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/req/req_install.py&quot;, line 754, in uninstall</span><br><span class="line">    paths_to_remove.remove(auto_confirm)</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/req/req_uninstall.py&quot;, line 115, in remove</span><br><span class="line">    renames(path, new_path)</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/utils/__init__.py&quot;, line 267, in renames</span><br><span class="line">    shutil.move(old, new)</span><br><span class="line">  File &quot;/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/shutil.py&quot;, line 302, in move</span><br><span class="line">    copy2(src, real_dst)</span><br><span class="line">  File &quot;/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/shutil.py&quot;, line 131, in copy2</span><br><span class="line">    copystat(src, dst)</span><br><span class="line">  File &quot;/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/shutil.py&quot;, line 103, in copystat</span><br><span class="line">    os.chflags(dst, st.st_flags)</span><br><span class="line">OSError: [Errno 1] Operation not permitted: &apos;/var/folders/sk/hl26sn7n1pg9jrzgzqydvfq00000gn/T/pip-rfPgIG-uninstall/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/numpy-1.8.0rc1-py2.7.egg-info&apos;</span><br><span class="line">shengsiyudeMacBook-Pro:~ victor$ sudo -H pip install -U numpy</span><br><span class="line">Password:</span><br><span class="line">Collecting numpy</span><br><span class="line">  Using cached numpy-1.13.3-cp27-cp27m-macosx_10_6_intel.macosx_10_9_intel.macosx_10_9_x86_64.macosx_10_10_intel.macosx_10_10_x86_64.whl</span><br><span class="line">Installing collected packages: numpy</span><br><span class="line">  Found existing installation: numpy 1.8.0rc1</span><br><span class="line">    DEPRECATION: Uninstalling a distutils installed project (numpy) has been deprecated and will be removed in a future version. This is due to the fact that uninstalling a distutils project will only partially uninstall the project.</span><br><span class="line">    Uninstalling numpy-1.8.0rc1:</span><br><span class="line">      Successfully uninstalled numpy-1.8.0rc1</span><br><span class="line">Successfully installed numpy-1.13.3</span><br></pre></td></tr></table></figure>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/11/28/code-blog-website/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/28/code-blog-website/" itemprop="url">技术搜索技巧</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-28T17:34:56+08:00">
-                2017-11-28
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="结合搜索引擎语法-site-功能-可以高效的搜索出常见的技术类问题的解决方案"><a href="#结合搜索引擎语法-site-功能-可以高效的搜索出常见的技术类问题的解决方案" class="headerlink" title="结合搜索引擎语法 site:功能,可以高效的搜索出常见的技术类问题的解决方案"></a>结合搜索引擎语法 site:功能,可以高效的搜索出常见的技术类问题的解决方案</h1><p>常见的网址如下:</p>
-<h2 id="国内"><a href="#国内" class="headerlink" title="国内"></a>国内</h2><ul>
-<li>博客园       cnblogs.com</li>
-<li>CSDN        csdn.net</li>
-<li>开源中国      oschina.net</li>
-<li>简书         jianshu.com</li>
-<li>SegmentFault segmentfault.com</li>
-<li>掘金          juejin.im</li>
-</ul>
-<h2 id="国外"><a href="#国外" class="headerlink" title="国外"></a>国外</h2><ul>
-<li>stackoverflow</li>
-<li>Github</li>
-<li>GithubPage</li>
-</ul>
-<h2 id="知识分享"><a href="#知识分享" class="headerlink" title="知识分享"></a>知识分享</h2><ul>
-<li>知乎</li>
-<li>quora</li>
-</ul>
-<hr>
-<h1 id="而对于相对专业的技能"><a href="#而对于相对专业的技能" class="headerlink" title="而对于相对专业的技能"></a>而对于相对专业的技能</h1><ul>
-<li>api文档</li>
-<li>和官方文档</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/11/28/BI-tool/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/28/BI-tool/" itemprop="url">数据展现技术选型</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-28T16:36:53+08:00">
-                2017-11-28
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>数据展现技术选型<br><img src="http://pic.victor123.cn/17-11-28/27291686.jpg" alt=" image.png"></p>
-<p><img src="http://pic.victor123.cn/17-11-28/97879159.jpg" alt=" image.png"></p>
-<h2 id="阿里云Quick-Bi-试用过30天"><a href="#阿里云Quick-Bi-试用过30天" class="headerlink" title="阿里云Quick Bi(试用过30天)"></a>阿里云Quick Bi(试用过30天)</h2><p>Quick BI 是一个基于云计算的灵活的轻量级的自助 BI 工具服务平台。</p>
-<p>Quick BI 支持众多种类的数据源，既可以连接 MaxCompute（ODPS）、RDS、Analytic DB、HybridDB（Greenplum）等云数据源，也支持连接 ECS 上您自有的 MySQL 数据库，还支持上传本地文件到 Quick BI 内置的探索空间进行分析。</p>
-<h2 id="Tableau"><a href="#Tableau" class="headerlink" title="Tableau"></a>Tableau</h2><p><a href="https://www.tableau.com/" target="_blank" rel="noopener">https://www.tableau.com/</a></p>
-<hr>
-<h1 id="From-GitHub"><a href="#From-GitHub" class="headerlink" title="From GitHub"></a>From GitHub</h1><h2 id="Superset"><a href="#Superset" class="headerlink" title="Superset"></a>Superset</h2><ul>
-<li>Superset 是 Airbnb （知名在线房屋短租公司）开源的数据探查与可视化平台（曾用名Panoramix、Caravel），该工具在可视化、易用性和交互性上非常有特色，用户可以轻松对数据进行可视化分析。</li>
-</ul>
-<p><a href="https://github.com/apache/incubator-superset" target="_blank" rel="noopener">https://github.com/apache/incubator-superset</a><br><img src="https://cloud.githubusercontent.com/assets/130878/20371438/a703a2a0-ac19-11e6-80c4-00a47c2eb644.gif" alt="image"></p>
-<h2 id="Saiku"><a href="#Saiku" class="headerlink" title="Saiku"></a>Saiku</h2><p><img src="https://raw.githubusercontent.com/OSBI/saiku/assets/saiku-demo-1.jpg" alt="image"></p>
-<p><a href="https://github.com/OSBI/saiku" target="_blank" rel="noopener">https://github.com/OSBI/saiku</a></p>
-<hr>
-<p>另外一些是没有实际调研过的一些工具</p>
-<h3 id="Qlikview"><a href="#Qlikview" class="headerlink" title="Qlikview"></a>Qlikview</h3><h2 id="FineBI"><a href="#FineBI" class="headerlink" title="FineBI"></a>FineBI</h2><h2 id="BDP商业数据平台"><a href="#BDP商业数据平台" class="headerlink" title="BDP商业数据平台"></a>BDP商业数据平台</h2><h2 id="永洪"><a href="#永洪" class="headerlink" title="永洪"></a>永洪</h2>
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/12/05/kaggle-expedia-hotel-recommendations/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1753,7 +1696,7 @@
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1799,7 +1742,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-count">21</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
