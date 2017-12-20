@@ -1,4 +1,4 @@
-title: optimize_dubbuo_reference
+title: 禁止使用@Reference的注解
 tags:
   - dubbo
   - reference
