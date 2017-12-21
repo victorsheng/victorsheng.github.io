@@ -322,6 +322,549 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/12/21/study-ubernetes-install/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/21/study-ubernetes-install/" itemprop="url">mac安装kubernetes</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-21T07:17:00+08:00">
+                2017-12-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/12/21/study-ubernetes-install/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/12/21/study-ubernetes-install/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/12/21/study-ubernetes-install/" class="leancloud_visitors" data-flag-title="mac安装kubernetes">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><a href="https://github.com/jolestar/kubernetes-complete-course" target="_blank" rel="noopener">https://github.com/jolestar/kubernetes-complete-course</a></p>
+<hr>
+<h1 id="容器的特性"><a href="#容器的特性" class="headerlink" title="容器的特性"></a>容器的特性</h1><ul>
+<li>让不标准的物品标准化（杂物，水，应用）</li>
+<li>给上层工具提供标准化的操作方式，屏蔽细节<ul>
+<li>包装，运输</li>
+<li>add/remove/iterator（复用算法）</li>
+<li>应用管理和调度</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h1 id="Docker-Moby-如何实现应用标准化"><a href="#Docker-Moby-如何实现应用标准化" class="headerlink" title="Docker (Moby)  如何实现应用标准化"></a>Docker (Moby)  如何实现应用标准化</h1><table>
+<thead>
+<tr>
+<th>问题</th>
+<th>现状</th>
+<th style="text-align:left">Docker 的方案</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>安装包</td>
+<td>war/jar，rpm/deb, src, bin</td>
+<td style="text-align:left">Image/Image Layer</td>
+</tr>
+<tr>
+<td>运行环境</td>
+<td>jvm，php, ruby, python</td>
+<td style="text-align:left">Image/Image Layer</td>
+</tr>
+<tr>
+<td>进程启动方式</td>
+<td>web container, cmd, script</td>
+<td style="text-align:left">Image ENTRYPOINT/CMD</td>
+</tr>
+<tr>
+<td>进程资源隔离限制</td>
+<td></td>
+<td style="text-align:left">Namespace/CGroup</td>
+</tr>
+<tr>
+<td>进程文件路径冲突</td>
+<td></td>
+<td style="text-align:left">Chroot</td>
+</tr>
+<tr>
+<td>端口冲突</td>
+<td>修改配置</td>
+<td style="text-align:left">Network（IP per Container）</td>
+</tr>
+<tr>
+<td>日志输出</td>
+<td>文件</td>
+<td style="text-align:left">stderr/stdout</td>
+</tr>
+<tr>
+<td>安装包的仓库</td>
+<td>nexus, rpm rep，ftp</td>
+<td style="text-align:left">Docker Registry</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h1 id="Kubernetes-为何而生-云发展到一个新阶段"><a href="#Kubernetes-为何而生-云发展到一个新阶段" class="headerlink" title="Kubernetes 为何而生 - 云发展到一个新阶段"></a>Kubernetes 为何而生 - 云发展到一个新阶段</h1><h2 id="IaaS-云解决了哪些问题"><a href="#IaaS-云解决了哪些问题" class="headerlink" title="IaaS 云解决了哪些问题"></a>IaaS 云解决了哪些问题</h2><p>按需购买<br>接管硬件资源的运维<br>提供可编程接口来管理资源<br>提供 SDN，SDS 模拟硬件网络以及存储</p>
+<h2 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h2><p>对应用无侵入<br>面向资源</p>
+<blockquote>
+<p><strong>用户从关注资源的运维转向关注应用的开发运维成本</strong></p>
+</blockquote>
+<hr>
+<h1 id="Kubernetes-为何而生-容器的成熟奠定了基础"><a href="#Kubernetes-为何而生-容器的成熟奠定了基础" class="headerlink" title="Kubernetes 为何而生 - 容器的成熟奠定了基础"></a>Kubernetes 为何而生 - 容器的成熟奠定了基础</h1><h2 id="容器（Docker-Moby）-解决了哪些问题"><a href="#容器（Docker-Moby）-解决了哪些问题" class="headerlink" title="容器（Docker/Moby） 解决了哪些问题"></a>容器（Docker/Moby） 解决了哪些问题</h2><p>应用安装包的标准化（Image）<br>应用进程的标准化（Container）</p>
+<h2 id="特点-1"><a href="#特点-1" class="headerlink" title="特点"></a>特点</h2><p>单进程标准化</p>
+<hr>
+<h1 id="容器编排系统应运而生"><a href="#容器编排系统应运而生" class="headerlink" title="容器编排系统应运而生"></a>容器编排系统应运而生</h1><p>我们需要一种 <strong>面向应用（Application Oriented）</strong> 的系统来降低服务端应用的开发部署和运维成本</p>
+<blockquote>
+<p>We wanted people to be able to <strong>program</strong> for the data center just like they program for their laptop –Ben Hindman</p>
+</blockquote>
+<p>我们再引申一下，从开发延伸到部署运维</p>
+<blockquote>
+<p>We wanted people to be able to manager app for the data center just like they manager app on their laptop</p>
+</blockquote>
+<hr>
+<h1 id="官网地址"><a href="#官网地址" class="headerlink" title="官网地址"></a>官网地址</h1><p><a href="http://kubernetes.kansea.com/docs/whatisk8s/" target="_blank" rel="noopener">http://kubernetes.kansea.com/docs/whatisk8s/</a></p>
+<hr>
+<h1 id="mac本地安装kubernetes-minikube"><a href="#mac本地安装kubernetes-minikube" class="headerlink" title="mac本地安装kubernetes(minikube)"></a>mac本地安装kubernetes(minikube)</h1><p><a href="http://kubernetes.kansea.com/docs/getting-started-guides/minikube/" target="_blank" rel="noopener">http://kubernetes.kansea.com/docs/getting-started-guides/minikube/</a></p>
+<ul>
+<li>virtualBox安装</li>
+<li>minikube安装</li>
+<li>kubectl安装</li>
+<li>需要ss的的代理,否则google的镜像无法下载<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">minikube delete</span><br><span class="line"></span><br><span class="line">minikube start --docker-env HTTP_PROXY=http://192.168.99.1:1087 --docker-env HTTPS_PROXY=http://192.168.99.1:1087 --docker-env NO_PROXY=192.168.99.0/24</span><br><span class="line"></span><br><span class="line">kubectl get pods --all-namespaces</span><br><span class="line"></span><br><span class="line">等待ready</span><br><span class="line"></span><br><span class="line">kubectl get nodes</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p><img src="http://pic.victor123.cn/17-12-21/46187591.jpg"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">victordeMacBook-Pro:~ victor$ kubectl run nginx --image=nginx --port=80</span><br><span class="line">deployment &quot;nginx&quot; created</span><br><span class="line">victordeMacBook-Pro:~ victor$ kubectl expose deployment nginx --port=80 --type=NodePort --name=nginx-http</span><br><span class="line">service &quot;nginx-http&quot; exposed</span><br><span class="line">victordeMacBook-Pro:~ victor$ kubectl get pods</span><br><span class="line">NAME                     READY     STATUS              RESTARTS   AGE</span><br><span class="line">nginx-85dfb4bc54-72fbk   0/1       ContainerCreating   0          17s</span><br><span class="line">victordeMacBook-Pro:~ victor$ kubectl get services</span><br><span class="line">NAME         TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)        AGE</span><br><span class="line">kubernetes   ClusterIP   10.96.0.1     &lt;none&gt;        443/TCP        20m</span><br><span class="line">nginx-http   NodePort    10.99.7.195   &lt;none&gt;        80:32562/TCP   12s</span><br><span class="line">victordeMacBook-Pro:~ victor$ minikube service nginx-http --url</span><br><span class="line">Waiting, endpoint for service is not ready yet...</span><br><span class="line">Waiting, endpoint for service is not ready yet...</span><br><span class="line">Waiting, endpoint for service is not ready yet...</span><br><span class="line">Waiting, endpoint for service is not ready yet...</span><br><span class="line">^C</span><br><span class="line">victordeMacBook-Pro:~ victor$ kubectl get nodes</span><br><span class="line">NAME       STATUS    ROLES     AGE       VERSION</span><br><span class="line">minikube   Ready     &lt;none&gt;    22m       v1.8.0</span><br><span class="line">victordeMacBook-Pro:~ victor$ kubectl get pods</span><br><span class="line">NAME                     READY     STATUS    RESTARTS   AGE</span><br><span class="line">nginx-85dfb4bc54-72fbk   1/1       Running   0          2m</span><br><span class="line">victordeMacBook-Pro:~ victor$ minikube service nginx-http --url</span><br><span class="line">http://192.168.99.100:32562</span><br></pre></td></tr></table></figure>
+<ul>
+<li>tips:</li>
+<li>本地的ss需要设置http代理,其中监听的地址从127.0.0.1改为0.0.0.0,这样虚拟机就可以访问到了,在这步卡了很久</li>
+</ul>
+<h1 id="docker安装"><a href="#docker安装" class="headerlink" title="docker安装"></a>docker安装</h1><p><a href="https://yeasy.gitbooks.io/docker_practice/content/kubernetes/quickstart.html" target="_blank" rel="noopener">https://yeasy.gitbooks.io/docker_practice/content/kubernetes/quickstart.html</a></p>
+<p><img src="/images/pasted-0.png" alt="upload successful"></p>
+<p>这些服务大概分为三类：主节点服务、工作节点服务和其它服务。</p>
+<h2 id="主节点服务"><a href="#主节点服务" class="headerlink" title="主节点服务"></a>主节点服务</h2><p>apiserver 是整个系统的对外接口，提供 RESTful 方式供客户端和其它组件调用；</p>
+<p>scheduler 负责对资源进行调度，分配某个 pod 到某个节点上；</p>
+<p>controller-manager 负责管理控制器，包括 endpoint-controller（刷新服务和 pod 的关联信息）和 replication-controller（维护某个 pod 的复制为配置的数值）。</p>
+<h2 id="工作节点服务"><a href="#工作节点服务" class="headerlink" title="工作节点服务"></a>工作节点服务</h2><p>kubelet 是工作节点执行操作的 agent，负责具体的容器生命周期管理，根据从数据库中获取的信息来管理容器，并上报 pod 运行状态等；</p>
+<p>proxy 为 pod 上的服务提供访问的代理。</p>
+<h2 id="其它服务"><a href="#其它服务" class="headerlink" title="其它服务"></a>其它服务</h2><p>Etcd 是所有状态的存储数据库；</p>
+<p>gcr.io/google_containers/pause:0.8.0 是 Kubernetes 启动后自动 pull 下来的测试镜像。</p>
+<hr>
+<p><a href="https://yeasy.gitbooks.io/docker_practice/content/kubernetes/concepts.html" target="_blank" rel="noopener">https://yeasy.gitbooks.io/docker_practice/content/kubernetes/concepts.html</a></p>
+<p><img src="/images/pasted-1.png" alt="upload successful"></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/12/20/study-service-mesh/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/20/study-service-mesh/" itemprop="url">study-service-mesh(服务网格)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-20T21:47:00+08:00">
+                2017-12-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/12/20/study-service-mesh/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/12/20/study-service-mesh/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/12/20/study-service-mesh/" class="leancloud_visitors" data-flag-title="study-service-mesh(服务网格)">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="service-mesh概念"><a href="#service-mesh概念" class="headerlink" title="service-mesh概念"></a>service-mesh概念</h1><p>首先服务网格是一个基础设施层，功能在于处理服务间通信，职责是负责实现请求的可靠传递。在实践中，服务网格通常实现为轻量级网络代理，通常与应用程序部署在一起，但是对应用程序透明。</p>
+<h1 id="设计图"><a href="#设计图" class="headerlink" title="设计图"></a>设计图</h1><p><img src="http://pic.victor123.cn/17-12-20/10500365.jpg"></p>
+<h2 id="概念学习"><a href="#概念学习" class="headerlink" title="概念学习"></a>概念学习</h2><p><a href="https://zhuanlan.zhihu.com/p/28794062" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/28794062</a><br><a href="https://zhuanlan.zhihu.com/p/30292372" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/30292372</a></p>
+<h2 id="Kubernetes和Spring-Cloud哪个部署微服务更好？"><a href="#Kubernetes和Spring-Cloud哪个部署微服务更好？" class="headerlink" title="Kubernetes和Spring Cloud哪个部署微服务更好？"></a>Kubernetes和Spring Cloud哪个部署微服务更好？</h2><p><a href="https://www.kubernetes.org.cn/1057.html" target="_blank" rel="noopener">https://www.kubernetes.org.cn/1057.html</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/12/20/opitimize-git-clone/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/20/opitimize-git-clone/" itemprop="url">opitimize_git_clone</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-20T10:09:27+08:00">
+                2017-12-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/12/20/opitimize-git-clone/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/12/20/opitimize-git-clone/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/12/20/opitimize-git-clone/" class="leancloud_visitors" data-flag-title="opitimize_git_clone">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="找到自己代理的端口"><a href="#找到自己代理的端口" class="headerlink" title="找到自己代理的端口"></a>找到自己代理的端口</h1><p><img src="http://pic.victor123.cn/17-12-20/69754851.jpg"></p>
+<h1 id="命令"><a href="#命令" class="headerlink" title="命令:"></a>命令:</h1><p>git config –global http.<a href="https://github.com.proxy" target="_blank" rel="noopener">https://github.com.proxy</a> <a href="https://127.0.0.1:1087" target="_blank" rel="noopener">https://127.0.0.1:1087</a><br>git config –global https.<a href="https://github.com.proxy" target="_blank" rel="noopener">https://github.com.proxy</a> <a href="https://127.0.0.1:1087" target="_blank" rel="noopener">https://127.0.0.1:1087</a></p>
+<p>作者：汪小九<br>链接：<a href="https://www.zhihu.com/question/27159393/answer/141047266" target="_blank" rel="noopener">https://www.zhihu.com/question/27159393/answer/141047266</a><br>来源：知乎<br>著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</p>
+<h1 id="查看git设置"><a href="#查看git设置" class="headerlink" title="查看git设置"></a>查看git设置</h1><p>git config –list</p>
+<p>#BTW<br>此种加速对http和https协议有效 对ssh协议无效,如:<br>git clone git@github.com:xxxxxx/xxxxxx.git</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/12/19/jikeshijian-ai-base-study1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -353,7 +896,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-19T19:03:55+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-19T19:03:00+08:00">
                 2017-12-19
               </time>
             
@@ -487,7 +1030,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/12/18/jikeshijian-ai-study1/" itemprop="url">极客时间-学习笔记-AI技术内参1</a></h1>
+                <a class="post-title-link" href="/2017/12/18/jikeshijian-ai-study1/" itemprop="url">极客时间-学习笔记-AI技术内参1-经典搜索核心算法</a></h1>
         
 
         <div class="post-meta">
@@ -499,7 +1042,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-18T21:43:24+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-18T21:43:00+08:00">
                 2017-12-18
               </time>
             
@@ -528,7 +1071,7 @@
 
           
           
-             <span id="/2017/12/18/jikeshijian-ai-study1/" class="leancloud_visitors" data-flag-title="极客时间-学习笔记-AI技术内参1">
+             <span id="/2017/12/18/jikeshijian-ai-study1/" class="leancloud_visitors" data-flag-title="极客时间-学习笔记-AI技术内参1-经典搜索核心算法">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -582,19 +1125,49 @@
 </ul>
 <h1 id="BM25及其变种"><a href="#BM25及其变种" class="headerlink" title="BM25及其变种"></a>BM25及其变种</h1><ul>
 <li>BM是’最佳匹配’Best Match的简称</li>
-<li>非监督学习排序算法中的一个典型代表</li>
+<li>用来计算某一目标文档(Document)相对于一个查询关键字(Query)的”相关性”(Relevance)的流程, 非监督学习排序算法中的一个典型代表</li>
 <li>定义:<ul>
-<li>单词和目标文档的相关性</li>
-<li>单词和查询关键词的相关性</li>
-<li>单词的权重部分<ul>
-<li>某种变形的来对单词加权</li>
-<li>罗伯逊-斯巴克-琼斯权重</li>
+<li>单词和目标文档的相关性<ul>
+<li>词频 TF-IDF里面的TF部分,but词频需要”标准化”,某一个单词对最后的分数的贡献不会随着词频的增加而无限增加</li>
+<li>两个超参数:当前文档的长度,整个数据集所有文档的平均长度</li>
 </ul>
 </li>
+<li>单词和查询关键词的相关性<ul>
+<li>同样需要标准化过程</li>
+</ul>
+</li>
+<li>单词的权重部分<ul>
+<li>某种变形的来对单词加权,例如某种变形的IDF来对单词甲醛</li>
+<li>罗伯逊-斯巴克-琼斯权重,需要一个监督信息</li>
+<li>在很多情况下,利用IDF来直接对单词权重的版本更加普遍,如果再有监督信息的情况下,RSJ值也不失为一个很好的选择</li>
+</ul>
+</li>
+<li>这个三个部分的乘积组成某一个单词的分数,然后,整个文档相对于某个查询关键字的分数,就是所有查询关键字里所有单词分数的总和 </li>
 </ul>
 </li>
 <li>bm25是对某一概率相关模型的逼近</li>
-<li>bm25算法变种:bm25f,域的概念</li>
+<li>bm25算法变种:bm25f,<ul>
+<li>域的概念(文档包括标题,摘要和正文)</li>
+<li>把BM25和其他文档信息(非文字)结合起来</li>
+<li>BM25和PageRank的线性结果来确定网页的相关性</li>
+</ul>
+</li>
+</ul>
+<h1 id="语言模型及其变种"><a href="#语言模型及其变种" class="headerlink" title="语言模型及其变种"></a>语言模型及其变种</h1><ul>
+<li>详解:用概率模型(Probabilistic Model)来描述查询关键字和目标文档之间的关系</li>
+<li>最简单的:查询关键字似然检索模型<ul>
+<li>一个语言模型就是一个针对词汇表的概率分布</li>
+<li>词汇表1w个单词,1w个单词上的离散概率分布</li>
+<li>查询关键字是从一个语言模型中”抽样”得到一个样本</li>
+<li>对一个查询关键字打分=这组词出现的联合概率,因为联合概率可能会很小,因此很多时候都通过一个对数变化,来把概率的乘积变成概率对数加和</li>
+<li>语言模型的参数:”类别分布”(Categorical Distiribution),也就是多项式分布,去除排列组合信息</li>
+<li>参数股计算法:最大似然估计</li>
+<li>每个单词出现的可能性,正好等于这个单词在目标文档中出现的次数,除以所有单词在文档中出现的次数.</li>
+<li>每个文档都对应一个类别分布,有多少文档,就有多少个类别分布</li>
+<li>如果没有在训练数据中出现过,最优解就是0</li>
+<li>平滑(Smoohting)<br><a href="http://52opencourse.com/111/%E6%96%AF%E5%9D%A6%E7%A6%8F%E5%A4%A7%E5%AD%A6%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E7%AC%AC%E5%9B%9B%E8%AF%BE-%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%EF%BC%88language-modeling%EF%BC%89" target="_blank" rel="noopener">http://52opencourse.com/111/%E6%96%AF%E5%9D%A6%E7%A6%8F%E5%A4%A7%E5%AD%A6%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E7%AC%AC%E5%9B%9B%E8%AF%BE-%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%EF%BC%88language-modeling%EF%BC%89</a></li>
+</ul>
+</li>
 </ul>
 
           
@@ -663,7 +1236,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/12/18/study-api-gateway/" itemprop="url">study-api-gateway</a></h1>
+                <a class="post-title-link" href="/2017/12/18/study-api-gateway/" itemprop="url">api网关学习</a></h1>
         
 
         <div class="post-meta">
@@ -675,7 +1248,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-18T19:42:55+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-18T19:42:00+08:00">
                 2017-12-18
               </time>
             
@@ -704,7 +1277,7 @@
 
           
           
-             <span id="/2017/12/18/study-api-gateway/" class="leancloud_visitors" data-flag-title="study-api-gateway">
+             <span id="/2017/12/18/study-api-gateway/" class="leancloud_visitors" data-flag-title="api网关学习">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -815,7 +1388,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/12/14/optimize-dubbuo-reference/" itemprop="url">optimize_dubbuo_reference</a></h1>
+                <a class="post-title-link" href="/2017/12/14/optimize-dubbuo-reference/" itemprop="url">禁止使用@Reference的注解</a></h1>
         
 
         <div class="post-meta">
@@ -856,7 +1429,7 @@
 
           
           
-             <span id="/2017/12/14/optimize-dubbuo-reference/" class="leancloud_visitors" data-flag-title="optimize_dubbuo_reference">
+             <span id="/2017/12/14/optimize-dubbuo-reference/" class="leancloud_visitors" data-flag-title="禁止使用@Reference的注解">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -1466,480 +2039,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/12/13/bugfix-voice-generate/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/13/bugfix-voice-generate/" itemprop="url">bugfix对接baidu语音合成</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-13T19:26:00+08:00">
-                2017-12-13
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/12/13/bugfix-voice-generate/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/12/13/bugfix-voice-generate/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2017/12/13/bugfix-voice-generate/" class="leancloud_visitors" data-flag-title="bugfix对接baidu语音合成">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>项目中使用了baidu的语音合成,原本的设计是,批量获取设置到redis中,用户每次使用时从redis中获取</p>
-<h1 id="空指针异常"><a href="#空指针异常" class="headerlink" title="空指针异常"></a>空指针异常</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">2017-12-13 16:34:30.076 ERROR [http-bio-6000-exec-45][DownloadVoiceFromBaiduYY.java:36] - DownloadVoiceFromBaiduYY error &#123;&#125;</span><br><span class="line">java.lang.NullPointerException</span><br><span class="line">    at com.baidu.aip.speech.AipSpeech.synthesis(AipSpeech.java:133) ~[java-sdk-3.2.0.jar:?]</span><br><span class="line">    at com.ejlerp.web.wms.voice.baidu.DownloadVoiceFromBaiduYY.downloadVoice(DownloadVoiceFromBaiduYY.java:33) [classes/:?]</span><br><span class="line">    at com.ejlerp.web.wms.voice.baidu.DownloadVoiceFromBaiduYY.downloadVoiceB64(DownloadVoiceFromBaiduYY.java:45) [classes/:?]</span><br><span class="line">    at com.ejlerp.web.wms.voice.VoiceController.getB64(VoiceController.java:233) [classes/:?]</span><br><span class="line">    at com.ejlerp.web.wms.voice.VoiceController.getVoiceData(VoiceController.java:149) [classes/:?]</span><br><span class="line">    at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:1.8.0_92]</span><br><span class="line">    at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) ~[?:1.8.0_92]</span><br><span class="line">    at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[?:1.8.0_92]</span><br><span class="line">    at java.lang.reflect.Method.invoke(Method.java:498) ~[?:1.8.0_92]</span><br></pre></td></tr></table></figure>
-<ul>
-<li><p>下载源码后debug返现返回的response Content-Type是大写,与sdk中get的string不一致,<br>于是查找github的源文件<br><img src="http://pic.victor123.cn/17-12-13/86911891.jpg"></p>
-</li>
-<li><p>发现了,这个bug已经fix了,<a href="https://github.com/Baidu-AIP/java-sdk/commit/c338bc71690f84351def0d64b311986c586763d2" target="_blank" rel="noopener">https://github.com/Baidu-AIP/java-sdk/commit/c338bc71690f84351def0d64b311986c586763d2</a></p>
-</li>
-</ul>
-<p><img src="http://pic.victor123.cn/17-12-13/31618622.jpg"></p>
-<h1 id="其他遇到的问题"><a href="#其他遇到的问题" class="headerlink" title="其他遇到的问题"></a>其他遇到的问题</h1><ul>
-<li><p>判断字符串写反</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">-            if (StringUtils.isEmpty(value)) &#123;</span><br><span class="line">+            if (!StringUtils.isEmpty(value)) &#123;</span><br><span class="line">                 redisMap.put(key, value);</span><br><span class="line">             &#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>APPkey修改错了配置文件</p>
-</li>
-</ul>
-<h1 id="反思"><a href="#反思" class="headerlink" title="反思"></a>反思</h1><ul>
-<li><p>在与外部api进行接口对接时,一定要判断各种异常情况的发生,不能只考虑正常情况</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">try &#123;</span><br><span class="line">    TtsResponse res = client.synthesis(voice, &quot;zh&quot;, 1, options);</span><br><span class="line">    JSONObject result = res.getResult();</span><br><span class="line">    if (result != null) &#123;</span><br><span class="line">        LOGGER.warn(&quot;downloadVoice:&#123;&#125;&quot;, result);</span><br><span class="line">    &#125;</span><br><span class="line">    download = res.getData();</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>删除掉无用的代码,放置误导自己和别人</p>
-</li>
-<li>本地充分测试后,再提交测试部署,否则害人害己,耽误时间</li>
-<li>应该充分利用各种调试工具或手段,如Btrace,(临时抱佛脚,来不及,自己有待提高)</li>
-<li>不能依靠测试发现程序问题,即使是别人的代码,也要认真研读,滤清思路,不能头疼医头,脚痛医脚</li>
-<li>要有自己的脚手架工程,方便自己后门程序的快速编写,和部署</li>
-</ul>
-<h1 id="待提高"><a href="#待提高" class="headerlink" title="待提高"></a>待提高</h1><ul>
-<li>应该充分利用各种调试工具或手段,如Btrace,(临时抱佛脚,来不及,自己有待提高)</li>
-<li>测试用例编写</li>
-<li>要有自己的脚手架工程,方便自己后门程序的快速编写,和部署</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/12/13/optime-156/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/13/optime-156/" itemprop="url">156服务器优化2:定位io高的原因mysql</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-13T13:39:00+08:00">
-                2017-12-13
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/12/13/optime-156/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/12/13/optime-156/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2017/12/13/optime-156/" class="leancloud_visitors" data-flag-title="156服务器优化2:定位io高的原因mysql">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>#重新定位问题<br>-%wa指CPU等待磁盘写入完成的时间</p>
-<p>首先看下%wa的解释：Percentage of time that the CPU or CPUs were idle during which the system had an outstanding disk I/O request.</p>
-<p>#iostat</p>
-<p>#pidstat 2 10 -d<br>发现mysql的读写量非常高<br><img src="http://pic.victor123.cn/17-12-13/27569242.jpg"></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/12/12/optimize-zookeeper/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/12/optimize-zookeeper/" itemprop="url">156服务器优化1:清理zookeeper过多的历史文件</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-12T14:51:00+08:00">
-                2017-12-12
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/12/12/optimize-zookeeper/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/12/12/optimize-zookeeper/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2017/12/12/optimize-zookeeper/" class="leancloud_visitors" data-flag-title="156服务器优化1:清理zookeeper过多的历史文件">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>156机器是本地开发环境上的机器<br>跑了如下服务:<br>mysql<br>zookeeper<br>dubbokeeper</p>
-<h1 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h1><p>从ssh登陆服务器就比较卡<br>top命令后,负载一直很高<br><img src="http://pic.victor123.cn/17-12-12/5122868.jpg"></p>
-<h1 id="排查"><a href="#排查" class="headerlink" title="排查"></a>排查</h1><p>iotop命令看到zookeeper的io比较高<br><a href="http://pic.victor123.cn/17-12-12/59575921.jpg" target="_blank" rel="noopener">http://pic.victor123.cn/17-12-12/59575921.jpg</a></p>
-<h1 id="操作步骤"><a href="#操作步骤" class="headerlink" title="操作步骤"></a>操作步骤</h1><ul>
-<li><a href="https://www.cnblogs.com/jxwch/p/6526271.html" target="_blank" rel="noopener">https://www.cnblogs.com/jxwch/p/6526271.html</a></li>
-<li>打开这两个参数<ul>
-<li>autopurge.snapRetainCount这个参数指定了需要保留的文件数目，默认保留3个；</li>
-<li>autopurge.purgeInterval这个参数指定了清理频率，单位是小时，需要填写一个1或者更大的数据，默认0表示不开启自动清理功能。</li>
-</ul>
-</li>
-<li>清空历史数据<br><img src="http://pic.victor123.cn/17-12-12/1580197.jpg"></li>
-</ul>
-<h1 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h1><p><img src="http://pic.victor123.cn/17-12-12/29291132.jpg"></p>
-<h1 id="相关知识"><a href="#相关知识" class="headerlink" title="相关知识"></a>相关知识</h1><p><a href="http://www.linuxidc.com/Linux/2016-03/129509.htm" target="_blank" rel="noopener">http://www.linuxidc.com/Linux/2016-03/129509.htm</a><br>dataDir用于存储Log（事务日志）与Snapshot（快照）数据</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">在后续的观察中发现,156的io高并不全是zookeeper的问题,so本次支持清楚了历史文件,对于156的io高问题目前定位是mysql问题,待续</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1990,7 +2089,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">24</span>
+                  <span class="site-state-item-count">27</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -2012,7 +2111,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">35</span>
+                  <span class="site-state-item-count">40</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>

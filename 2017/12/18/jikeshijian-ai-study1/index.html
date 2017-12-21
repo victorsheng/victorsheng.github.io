@@ -81,14 +81,14 @@
 
 <meta name="description" content="TF-IDF及其变种 信息检索,文本挖掘,自然语言处理领域 把查询关键字(Query)和文档(Document)都转为向量 ‘向量空间模型’Vector Spcece Model就是希望吧查询关键字和文档都表达成变量,然后利用向量之间的运算来进行进一步表达向量之间的关系 相似性:余弦相似性,或者是点积 V个词汇,V维度">
 <meta property="og:type" content="article">
-<meta property="og:title" content="极客时间-学习笔记-AI技术内参1">
+<meta property="og:title" content="极客时间-学习笔记-AI技术内参1-经典搜索核心算法">
 <meta property="og:url" content="http://www.victor123.cn/2017/12/18/jikeshijian-ai-study1/index.html">
 <meta property="og:site_name" content="Victor的博客">
 <meta property="og:description" content="TF-IDF及其变种 信息检索,文本挖掘,自然语言处理领域 把查询关键字(Query)和文档(Document)都转为向量 ‘向量空间模型’Vector Spcece Model就是希望吧查询关键字和文档都表达成变量,然后利用向量之间的运算来进行进一步表达向量之间的关系 相似性:余弦相似性,或者是点积 V个词汇,V维度,查询关键字和每个文档的向量都有V个维度 TF和IDF的乘机 TF单词频率Ter">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-12-19T11:05:02.592Z">
+<meta property="og:updated_time" content="2017-12-19T15:25:33.130Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="极客时间-学习笔记-AI技术内参1">
+<meta name="twitter:title" content="极客时间-学习笔记-AI技术内参1-经典搜索核心算法">
 <meta name="twitter:description" content="TF-IDF及其变种 信息检索,文本挖掘,自然语言处理领域 把查询关键字(Query)和文档(Document)都转为向量 ‘向量空间模型’Vector Spcece Model就是希望吧查询关键字和文档都表达成变量,然后利用向量之间的运算来进行进一步表达向量之间的关系 相似性:余弦相似性,或者是点积 V个词汇,V维度,查询关键字和每个文档的向量都有V个维度 TF和IDF的乘机 TF单词频率Ter">
 
 
@@ -125,7 +125,7 @@
 
 
 
-  <title>极客时间-学习笔记-AI技术内参1 | Victor的博客</title>
+  <title>极客时间-学习笔记-AI技术内参1-经典搜索核心算法 | Victor的博客</title>
   
 
 
@@ -339,7 +339,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">极客时间-学习笔记-AI技术内参1</h1>
+          <h1 class="post-title" itemprop="name headline">极客时间-学习笔记-AI技术内参1-经典搜索核心算法</h1>
         
 
         <div class="post-meta">
@@ -351,7 +351,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-18T21:43:24+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-18T21:43:00+08:00">
                 2017-12-18
               </time>
             
@@ -380,7 +380,7 @@
 
           
           
-             <span id="/2017/12/18/jikeshijian-ai-study1/" class="leancloud_visitors" data-flag-title="极客时间-学习笔记-AI技术内参1">
+             <span id="/2017/12/18/jikeshijian-ai-study1/" class="leancloud_visitors" data-flag-title="极客时间-学习笔记-AI技术内参1-经典搜索核心算法">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -432,19 +432,49 @@
 </ul>
 <h1 id="BM25及其变种"><a href="#BM25及其变种" class="headerlink" title="BM25及其变种"></a>BM25及其变种</h1><ul>
 <li>BM是’最佳匹配’Best Match的简称</li>
-<li>非监督学习排序算法中的一个典型代表</li>
+<li>用来计算某一目标文档(Document)相对于一个查询关键字(Query)的”相关性”(Relevance)的流程, 非监督学习排序算法中的一个典型代表</li>
 <li>定义:<ul>
-<li>单词和目标文档的相关性</li>
-<li>单词和查询关键词的相关性</li>
-<li>单词的权重部分<ul>
-<li>某种变形的来对单词加权</li>
-<li>罗伯逊-斯巴克-琼斯权重</li>
+<li>单词和目标文档的相关性<ul>
+<li>词频 TF-IDF里面的TF部分,but词频需要”标准化”,某一个单词对最后的分数的贡献不会随着词频的增加而无限增加</li>
+<li>两个超参数:当前文档的长度,整个数据集所有文档的平均长度</li>
 </ul>
 </li>
+<li>单词和查询关键词的相关性<ul>
+<li>同样需要标准化过程</li>
+</ul>
+</li>
+<li>单词的权重部分<ul>
+<li>某种变形的来对单词加权,例如某种变形的IDF来对单词甲醛</li>
+<li>罗伯逊-斯巴克-琼斯权重,需要一个监督信息</li>
+<li>在很多情况下,利用IDF来直接对单词权重的版本更加普遍,如果再有监督信息的情况下,RSJ值也不失为一个很好的选择</li>
+</ul>
+</li>
+<li>这个三个部分的乘积组成某一个单词的分数,然后,整个文档相对于某个查询关键字的分数,就是所有查询关键字里所有单词分数的总和 </li>
 </ul>
 </li>
 <li>bm25是对某一概率相关模型的逼近</li>
-<li>bm25算法变种:bm25f,域的概念</li>
+<li>bm25算法变种:bm25f,<ul>
+<li>域的概念(文档包括标题,摘要和正文)</li>
+<li>把BM25和其他文档信息(非文字)结合起来</li>
+<li>BM25和PageRank的线性结果来确定网页的相关性</li>
+</ul>
+</li>
+</ul>
+<h1 id="语言模型及其变种"><a href="#语言模型及其变种" class="headerlink" title="语言模型及其变种"></a>语言模型及其变种</h1><ul>
+<li>详解:用概率模型(Probabilistic Model)来描述查询关键字和目标文档之间的关系</li>
+<li>最简单的:查询关键字似然检索模型<ul>
+<li>一个语言模型就是一个针对词汇表的概率分布</li>
+<li>词汇表1w个单词,1w个单词上的离散概率分布</li>
+<li>查询关键字是从一个语言模型中”抽样”得到一个样本</li>
+<li>对一个查询关键字打分=这组词出现的联合概率,因为联合概率可能会很小,因此很多时候都通过一个对数变化,来把概率的乘积变成概率对数加和</li>
+<li>语言模型的参数:”类别分布”(Categorical Distiribution),也就是多项式分布,去除排列组合信息</li>
+<li>参数股计算法:最大似然估计</li>
+<li>每个单词出现的可能性,正好等于这个单词在目标文档中出现的次数,除以所有单词在文档中出现的次数.</li>
+<li>每个文档都对应一个类别分布,有多少文档,就有多少个类别分布</li>
+<li>如果没有在训练数据中出现过,最优解就是0</li>
+<li>平滑(Smoohting)<br><a href="http://52opencourse.com/111/%E6%96%AF%E5%9D%A6%E7%A6%8F%E5%A4%A7%E5%AD%A6%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E7%AC%AC%E5%9B%9B%E8%AF%BE-%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%EF%BC%88language-modeling%EF%BC%89" target="_blank" rel="noopener">http://52opencourse.com/111/%E6%96%AF%E5%9D%A6%E7%A6%8F%E5%A4%A7%E5%AD%A6%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E7%AC%AC%E5%9B%9B%E8%AF%BE-%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%EF%BC%88language-modeling%EF%BC%89</a></li>
+</ul>
+</li>
 </ul>
 
       
@@ -466,7 +496,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="http://www.victor123.cn/2017/12/18/jikeshijian-ai-study1/" title="极客时间-学习笔记-AI技术内参1">http://www.victor123.cn/2017/12/18/jikeshijian-ai-study1/</a>
+    <a href="http://www.victor123.cn/2017/12/18/jikeshijian-ai-study1/" title="极客时间-学习笔记-AI技术内参1-经典搜索核心算法">http://www.victor123.cn/2017/12/18/jikeshijian-ai-study1/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>
@@ -488,8 +518,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/12/18/study-api-gateway/" rel="next" title="study-api-gateway">
-                <i class="fa fa-chevron-left"></i> study-api-gateway
+              <a href="/2017/12/18/study-api-gateway/" rel="next" title="api网关学习">
+                <i class="fa fa-chevron-left"></i> api网关学习
               </a>
             
           </div>
@@ -587,7 +617,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">24</span>
+                  <span class="site-state-item-count">27</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -609,7 +639,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">35</span>
+                  <span class="site-state-item-count">40</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -644,7 +674,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#TF-IDF及其变种"><span class="nav-number">1.</span> <span class="nav-text">TF-IDF及其变种</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#BM25及其变种"><span class="nav-number">2.</span> <span class="nav-text">BM25及其变种</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#TF-IDF及其变种"><span class="nav-number">1.</span> <span class="nav-text">TF-IDF及其变种</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#BM25及其变种"><span class="nav-number">2.</span> <span class="nav-text">BM25及其变种</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#语言模型及其变种"><span class="nav-number">3.</span> <span class="nav-text">语言模型及其变种</span></a></li></ol></div>
             
 
           </div>
@@ -816,7 +846,7 @@
         var disqus_config = function () {
           this.page.url = 'http://www.victor123.cn/2017/12/18/jikeshijian-ai-study1/';
           this.page.identifier = '2017/12/18/jikeshijian-ai-study1/';
-          this.page.title = '极客时间-学习笔记-AI技术内参1';
+          this.page.title = '极客时间-学习笔记-AI技术内参1-经典搜索核心算法';
         };
         var d = document, s = d.createElement('script');
         s.src = 'https://victor123-cn.disqus.com/embed.js';
