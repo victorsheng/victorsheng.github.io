@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="数据结构," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="hashmap内部原理学习  HashMap是一个用于存储Key-Value键值对的集合，每一个键值对也叫做Entry。这些个键值对（Entry）分散存储在一个数组当中，这个数组就是HashMap的主干。 HashMap 使用后台数组（backing array）作为桶，并使用链表（linked list）存储键／值对">
+<meta name="keywords" content="数据结构">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java hashmap 学习">
+<meta property="og:url" content="http://www.victor123.cn/2018/01/05/study-hashmap/index.html">
+<meta property="og:site_name" content="Victor的博客">
+<meta property="og:description" content="hashmap内部原理学习  HashMap是一个用于存储Key-Value键值对的集合，每一个键值对也叫做Entry。这些个键值对（Entry）分散存储在一个数组当中，这个数组就是HashMap的主干。 HashMap 使用后台数组（backing array）作为桶，并使用链表（linked list）存储键／值对。 通过hash的方法，通过put和get存储和获取对象。存储对象时，我们将K/">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://www.victor123.cn/images/pasted-11.png">
+<meta property="og:image" content="http://www.victor123.cn/images/pasted-10.png">
+<meta property="og:image" content="http://pic.victor123.cn/18-1-4/28447320.jpg">
+<meta property="og:updated_time" content="2018-01-06T03:55:27.975Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="java hashmap 学习">
+<meta name="twitter:description" content="hashmap内部原理学习  HashMap是一个用于存储Key-Value键值对的集合，每一个键值对也叫做Entry。这些个键值对（Entry）分散存储在一个数组当中，这个数组就是HashMap的主干。 HashMap 使用后台数组（backing array）作为桶，并使用链表（linked list）存储键／值对。 通过hash的方法，通过put和get存储和获取对象。存储对象时，我们将K/">
+<meta name="twitter:image" content="http://www.victor123.cn/images/pasted-11.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.victor123.cn/2018/01/05/study-hashmap/"/>
+
+
+
+
+
+  <title>java hashmap 学习 | Victor的博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?2342180055c7117a644c0e88269f1028";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Victor的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br />
+            
+            日程表
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/sitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />
+            
+            站点地图
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'zzKb2x8SLZTmjKDh-_N4','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/05/study-hashmap/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">java hashmap 学习</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-05T11:14:00+08:00">
+                2018-01-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/05/study-hashmap/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/05/study-hashmap/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/05/study-hashmap/" class="leancloud_visitors" data-flag-title="java hashmap 学习">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="hashmap内部原理学习"><a href="#hashmap内部原理学习" class="headerlink" title="hashmap内部原理学习"></a>hashmap内部原理学习</h1><p><img src="/images/pasted-11.png" alt="upload successful"></p>
+<ul>
+<li>HashMap是一个用于存储Key-Value键值对的集合，每一个键值对也叫做Entry。这些个键值对（Entry）分散存储在一个数组当中，这个数组就是HashMap的主干。</li>
+<li>HashMap 使用后台数组（backing array）作为桶，并使用链表（linked list）存储键／值对。</li>
+<li>通过hash的方法，通过put和get存储和获取对象。存储对象时，我们将K/V传给put方法时，它调用hashCode计算hash从而得到bucket位置，进一步存储，HashMap会根据当前bucket的占用情况自动调整容量(超过Load Factor则resize为原来的2倍)。获取对象时，我们将K传给get，它调用hashCode计算hash从而得到bucket位置，并进一步调用equals()方法确定键值对。如果发生碰撞的时候，Hashmap通过链表将产生碰撞冲突的元素组织起来，在Java 8中，如果一个bucket中碰撞冲突的元素超过某个限制(默认是8)，则使用红黑树来替换链表，从而提高速度。 </li>
+<li>基于Map接口实现、允许null键/值、非同步、不保证有序(比如插入的顺序)、也不保证序不随时间变化。HashMap存储着Entry(hash, key, value, next)对象。 </li>
+<li>当key==null时，存在table[0]即第一个桶中，hash值为0。HashMap对key==null的键值对会做单独处理</li>
+<li>Capacity的默认值为16： </li>
+<li>  static final int DEFAULT_INITIAL_CAPACITY = 1 &lt;&lt; 4; </li>
+<li>负载因子的默认值为0.75： </li>
+<li>  static final float DEFAULT_LOAD_FACTOR = 0.75f; </li>
+<li>简单的说，Capacity就是bucket的大小，Load factor就是bucket填满程度的最大比例。如果对迭代性能要求很高的话不要把Capacity设置过大，也不要把load factor设置过小。当bucket中的entries的数目大于capacity*load factor时就需要调整bucket的大小为当前的2倍。 </li>
+<li>可以设置初始容量Capacity，但是在HashMap处理过程中，是会把Capacity扩充成2的倍数</li>
+<li>HashMap中有一个成员变量modCount，这个用来实现“fast-fail”机制（也就是快速失败）。所谓快速失败就是在并发集合中，其进行迭代操作时，若有其他线程对其结构性的修改，这是迭代器会立马感知到，并且立刻抛出ConcurrentModificationException异常，而不是等待迭代完成之后才告诉你已经出错。</li>
+</ul>
+<h2 id="hash方法"><a href="#hash方法" class="headerlink" title="hash方法"></a>hash方法</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">final int hash(Object k) &#123;</span><br><span class="line">        int h = hashSeed;</span><br><span class="line">        if (0 != h &amp;&amp; k instanceof String) &#123;</span><br><span class="line">            return sun.misc.Hashing.stringHash32((String) k);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        h ^= k.hashCode();</span><br><span class="line">        h ^= (h &gt;&gt;&gt; 20) ^ (h &gt;&gt;&gt; 12);</span><br><span class="line">        return h ^ (h &gt;&gt;&gt; 7) ^ (h &gt;&gt;&gt; 4);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="indexFor方法"><a href="#indexFor方法" class="headerlink" title="indexFor方法"></a>indexFor方法</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">static int indexFor(int h, int length) &#123;</span><br><span class="line">        // assert Integer.bitCount(length) == 1 : &quot;length must be a non-zero power of 2&quot;;</span><br><span class="line">        return h &amp; (length-1);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>如图是jdk1.8中的h&gt;&gt;&gt;16版本</li>
+<li>混合原始哈希码的高位和低位，以此来加大低位的随机性</li>
+<li>而且混合后的低位掺杂了高位的部分特征，这样高位的信息也被变相保留下来</li>
+</ul>
+<p><img src="/images/pasted-10.png" alt="upload successful"><br><a href="https://www.zhihu.com/question/20733617" target="_blank" rel="noopener">https://www.zhihu.com/question/20733617</a></p>
+<h2 id="put方法"><a href="#put方法" class="headerlink" title="put方法"></a>put方法</h2><ul>
+<li>先判断table(存放bullet的数组，初始类定义：transient Entry<k,v>[] table = (Entry<k,v>[]) EMPTY_TABLE;)是否为空，如果为空则扩充table，其中包括确保table的大小为2的整数倍。</k,v></k,v></li>
+<li>如果key值为null，则特殊处理，调用putForNullKey(V value)，hash值为0，存入table中，返回。</li>
+<li>如果key值不为null，则计算key的hash值；</li>
+<li>然后计算key在table中的索引index;</li>
+<li>遍历table[index]的链表，如果发现链表中有bullet中的键的hash值与key相等，并且调用equals()方法也返回true，则替换旧值（oldValue），保证key的唯一性；</li>
+<li>如果没有，在插入之前先判断table中阈值的大小，如果table中的bullet个数size超过阈值（threshold）则扩容（resize）两倍；注意扩容的顺序，扩容之前old1-&gt;old2-&gt;old3，扩容之后old3-&gt;old2-&gt;old1，扩展之前和扩容之后的table的index不一定相同，但是对于原bullet中的链表中的数据在扩容之后肯定还在一个链表中，因为hash值是一样的。</li>
+<li>插入新的bullet。注意插入的顺序，原先table[index]的链表比如 old1-&gt;old2-&gt;old3，插入新值之后为new1-&gt;old1-&gt;old2-&gt;old3.</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">public V put(K key, V value) &#123;</span><br><span class="line">        if (table == EMPTY_TABLE) &#123;</span><br><span class="line">            inflateTable(threshold);</span><br><span class="line">        &#125;</span><br><span class="line">        if (key == null)</span><br><span class="line">            return putForNullKey(value);</span><br><span class="line">        int hash = hash(key);</span><br><span class="line">        int i = indexFor(hash, table.length);</span><br><span class="line">        for (Entry&lt;K,V&gt; e = table[i]; e != null; e = e.next) &#123;</span><br><span class="line">            Object k;</span><br><span class="line">            if (e.hash == hash &amp;&amp; ((k = e.key) == key || key.equals(k))) &#123;</span><br><span class="line">                V oldValue = e.value;</span><br><span class="line">                e.value = value;</span><br><span class="line">                e.recordAccess(this);</span><br><span class="line">                return oldValue;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        modCount++;</span><br><span class="line">        addEntry(hash, key, value, i);</span><br><span class="line">        return null;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">void addEntry(int hash, K key, V value, int bucketIndex) &#123;</span><br><span class="line">        if ((size &gt;= threshold) &amp;&amp; (null != table[bucketIndex])) &#123;</span><br><span class="line">            resize(2 * table.length);</span><br><span class="line">            hash = (null != key) ? hash(key) : 0;</span><br><span class="line">            bucketIndex = indexFor(hash, table.length);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        createEntry(hash, key, value, bucketIndex);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="位运算符"><a href="#位运算符" class="headerlink" title="位运算符"></a>位运算符</h2><p>左移( &lt;&lt; )、右移( &gt;&gt; ) 、无符号右移( &gt;&gt;&gt; )<br>位与、位或、位异或、位非<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">5&lt;&lt;2</span><br><span class="line">0000 0000 0000 0000 0000 0000 0000 0101           然后左移2位后，低位补0：</span><br><span class="line">0000 0000 0000 0000 0000 0000 0001 0100           换算成10进制为20</span><br><span class="line"></span><br><span class="line">5&gt;&gt;2</span><br><span class="line">还是先将5转为2进制表示形式：</span><br><span class="line">0000 0000 0000 0000 0000 0000 0000 0101 然后右移2位，高位补0：</span><br><span class="line">0000 0000 0000 0000 0000 0000 0000 0001</span><br><span class="line"></span><br><span class="line">-5&gt;&gt;&gt;3</span><br><span class="line">-5换算成二进制： 1111 1111 1111 1111 1111 1111 1111 1011</span><br><span class="line">-5无符号右移3位后的结果 536870911 换算成二进制： </span><br><span class="line">0001 1111 1111 1111 1111 1111 1111 1111   // (用0进行补位)</span><br><span class="line"></span><br><span class="line">位与：第一个操作数的的第n位于第二个操作数的第n位如果都是1，那么结果的第n为也为1，否则为0</span><br><span class="line">5 &amp; 3</span><br><span class="line">5转换为二进制 ：0000 0000 0000 0000 0000 0000 0000 0101</span><br><span class="line">3转换为二进制 ：0000 0000 0000 0000 0000 0000 0000 0011</span><br><span class="line">1转换为二进制	：0000 0000 0000 0000 0000 0000 0000 0001</span><br><span class="line"></span><br><span class="line">位异或：第一个操作数的的第n位于第二个操作数的第n位 相反，那么结果的第n为也为1，否则为0</span><br><span class="line">5 ^ 3</span><br><span class="line">5转换为二进制：0000 0000 0000 0000 0000 0000 0000 0101</span><br><span class="line">3转换为二进制：0000 0000 0000 0000 0000 0000 0000 0011</span><br><span class="line">6转换为二进制：0000 0000 0000 0000 0000 0000 0000 0110</span><br></pre></td></tr></table></figure></p>
+<h2 id="get方法"><a href="#get方法" class="headerlink" title="get方法"></a>get方法</h2><ul>
+<li>判断key值是否为null，如果是则特殊处理（在table[0]的链表中寻找）</li>
+<li>否则计算hash值，进而获得table中的index值</li>
+<li>在table[index]的链表中寻找，根据hash值和equals()方法获得相应的value。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public V get(Object key) &#123;</span><br><span class="line">        if (key == null)</span><br><span class="line">            return getForNullKey();</span><br><span class="line">        Entry&lt;K,V&gt; entry = getEntry(key);</span><br><span class="line"></span><br><span class="line">        return null == entry ? null : entry.getValue();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">final Entry&lt;K,V&gt; getEntry(Object key) &#123;</span><br><span class="line">        if (size == 0) &#123;</span><br><span class="line">            return null;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        int hash = (key == null) ? 0 : hash(key);</span><br><span class="line">        for (Entry&lt;K,V&gt; e = table[indexFor(hash, table.length)];</span><br><span class="line">             e != null;</span><br><span class="line">             e = e.next) &#123;</span><br><span class="line">            Object k;</span><br><span class="line">            if (e.hash == hash &amp;&amp;</span><br><span class="line">                ((k = e.key) == key || (key != null &amp;&amp; key.equals(k))))</span><br><span class="line">                return e;</span><br><span class="line">        &#125;</span><br><span class="line">        return null;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="hashmap的初始长度"><a href="#hashmap的初始长度" class="headerlink" title="hashmap的初始长度"></a>hashmap的初始长度</h1><ul>
+<li>16,长度必须是2的幂</li>
+<li>之所以16是为了服务于哈希函数</li>
+<li>index =  HashCode（Key） &amp;  （Length - 1） </li>
+<li>与运算，101110001110101110 1001 &amp; 1111 = 1001，十进制是9，所以 index=9。</li>
+<li>Hash算法最终得到的index结果，完全取决于Key的Hashcode值的最后几位</li>
+<li>效果上等同于取模,而且大大提高了性能</li>
+</ul>
+<h1 id="rehash"><a href="#rehash" class="headerlink" title="rehash"></a>rehash</h1><ul>
+<li>默认当Entry数量达到桶数量的75%时，哈希冲突已比较严重，就会成倍扩容桶数组，并重新分配所有原来的Entry。</li>
+<li>hashmap在扩容时候的步骤之一</li>
+<li>衡量HashMap是否进行Resize的条件如下：</li>
+<li>HashMap.Size   &gt;=  Capacity * LoadFactor</li>
+<li>具体两个步骤<ul>
+<li>1.扩容:创建一个新的Entry空数组，长度是原数组的2倍。</li>
+<li>2.ReHash:遍历原Entry数组，把所有的Entry重新Hash到新数组</li>
+</ul>
+</li>
+</ul>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><ul>
+<li>声明HashMap时最好使用带initialCapacity的构造函数，传入数据的最大size，可以避免内部数组resize；</li>
+<li>性能要求高的地方，可以将loadFactor设置的小于默认值0.75，使hash值更分散，产生hash碰撞的几率就更小，但需要的内存也更多,用空间换取时间；</li>
+</ul>
+<h1 id="并发问题"><a href="#并发问题" class="headerlink" title="并发问题"></a>并发问题</h1><ul>
+<li>ReHash在并发的情况下可能会形成链表环。</li>
+<li>让下一次循环出现死循环</li>
+</ul>
+<h1 id="ConcurrentHashMap"><a href="#ConcurrentHashMap" class="headerlink" title="ConcurrentHashMap"></a>ConcurrentHashMap</h1><ul>
+<li>避免hashmap的方法有:hashtable,Collections.sysnchronizedMap</li>
+<li>但是上面的都有性能问题,导致阻塞</li>
+<li>Sement</li>
+<li><img src="http://pic.victor123.cn/18-1-4/28447320.jpg"></li>
+<li>可以说，ConcurrentHashMap是一个二级哈希表。在一个总的哈希表下面，有若干个子哈希表。这样的二级结构，和数据库的水平拆分有些相似。</li>
+<li>不同Segment的写入是可以并发执行的。</li>
+<li>同一Segment的一写一读</li>
+<li><p>同一Segment的并发写入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">Get方法：</span><br><span class="line"></span><br><span class="line">1.为输入的Key做Hash运算，得到hash值。</span><br><span class="line"></span><br><span class="line">2.通过hash值，定位到对应的Segment对象</span><br><span class="line"></span><br><span class="line">3.再次通过hash值，定位到Segment当中数组的具体位置。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Put方法：</span><br><span class="line"></span><br><span class="line">1.为输入的Key做Hash运算，得到hash值。</span><br><span class="line"></span><br><span class="line">2.通过hash值，定位到对应的Segment对象</span><br><span class="line"></span><br><span class="line">3.获取可重入锁</span><br><span class="line"></span><br><span class="line">4.再次通过hash值，定位到Segment当中数组的具体位置。</span><br><span class="line"></span><br><span class="line">5.插入或覆盖HashEntry对象。</span><br><span class="line"></span><br><span class="line">6.释放锁。</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>如果在统计Segment元素数量的过程中，已统计过的Segment瞬间插入新的元素，这时候该怎么办呢？</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">ConcurrentHashMap的Size方法是一个嵌套循环，大体逻辑如下：</span><br><span class="line"></span><br><span class="line">1.遍历所有的Segment。</span><br><span class="line"></span><br><span class="line">2.把Segment的元素数量累加起来。</span><br><span class="line"></span><br><span class="line">3.把Segment的修改次数累加起来。</span><br><span class="line"></span><br><span class="line">4.判断所有Segment的总修改次数是否大于上一次的总修改次数。如果大于，说明统计过程中有修改，重新统计，尝试次数+1；如果不是。说明没有修改，统计结束。</span><br><span class="line"></span><br><span class="line">5.如果尝试次数超过阈值，则对每一个Segment加锁，再重新统计。</span><br><span class="line"></span><br><span class="line">6.再次判断所有Segment的总修改次数是否大于上一次的总修改次数。由于已经加锁，次数一定和上次相等。</span><br><span class="line"></span><br><span class="line">7.释放锁，统计结束。</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>为了尽量不锁住所有Segment，首先乐观地假设Size过程中不会有修改。当尝试一定次数，才无奈转为悲观锁，锁住所有Segment保证强一致性。</p>
+<h1 id="jdk-1-8hashmap"><a href="#jdk-1-8hashmap" class="headerlink" title="jdk 1.8hashmap"></a>jdk 1.8hashmap</h1><ul>
+<li>HashMap采用的是数组+链表+红黑树的形式。</li>
+<li>什么时候链表转化为红黑树？当数组大小已经超过64并且链表中的元素个数超过默认设定（8个）时，将链表转化为红黑树</li>
+</ul>
+<h1 id="jdk-1-8ConcurrentHashMap"><a href="#jdk-1-8ConcurrentHashMap" class="headerlink" title="jdk 1.8ConcurrentHashMap"></a>jdk 1.8ConcurrentHashMap</h1><h1 id="优秀博客推荐"><a href="#优秀博客推荐" class="headerlink" title="优秀博客推荐"></a>优秀博客推荐</h1><p><a href="http://blog.csdn.net/u013256816/article/details/50912762" target="_blank" rel="noopener">http://blog.csdn.net/u013256816/article/details/50912762</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Victor
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://www.victor123.cn/2018/01/05/study-hashmap/" title="java hashmap 学习">http://www.victor123.cn/2018/01/05/study-hashmap/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/数据结构/" rel="tag"># 数据结构</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/01/03/jikeshijian-ai-base-study-linear-regression/" rel="next" title="极客时间-学习笔记-人工智能基础课-线性回归">
+                <i class="fa fa-chevron-left"></i> 极客时间-学习笔记-人工智能基础课-线性回归
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/01/05/study-b-tree/" rel="prev" title="study-b-tree">
+                study-b-tree <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Victor</p>
+              <p class="site-description motion-element" itemprop="description">victor的个人博客,作为一枚后端开发工程师,写本博客目的,旨在记录自己在工作生活中的点点滴滴,形成自己的知识体系</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">40</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">42</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#hashmap内部原理学习"><span class="nav-number">1.</span> <span class="nav-text">hashmap内部原理学习</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#hash方法"><span class="nav-number">1.1.</span> <span class="nav-text">hash方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#indexFor方法"><span class="nav-number">1.2.</span> <span class="nav-text">indexFor方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#put方法"><span class="nav-number">1.3.</span> <span class="nav-text">put方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#位运算符"><span class="nav-number">1.4.</span> <span class="nav-text">位运算符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#get方法"><span class="nav-number">1.5.</span> <span class="nav-text">get方法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#hashmap的初始长度"><span class="nav-number">2.</span> <span class="nav-text">hashmap的初始长度</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#rehash"><span class="nav-number">3.</span> <span class="nav-text">rehash</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#小结"><span class="nav-number">4.</span> <span class="nav-text">小结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#并发问题"><span class="nav-number">5.</span> <span class="nav-text">并发问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ConcurrentHashMap"><span class="nav-number">6.</span> <span class="nav-text">ConcurrentHashMap</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#jdk-1-8hashmap"><span class="nav-number">7.</span> <span class="nav-text">jdk 1.8hashmap</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#jdk-1-8ConcurrentHashMap"><span class="nav-number">8.</span> <span class="nav-text">jdk 1.8ConcurrentHashMap</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#优秀博客推荐"><span class="nav-number">9.</span> <span class="nav-text">优秀博客推荐</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Victor</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.3"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://victor123-cn.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://www.victor123.cn/2018/01/05/study-hashmap/';
+          this.page.identifier = '2018/01/05/study-hashmap/';
+          this.page.title = 'java hashmap 学习';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://victor123-cn.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("QdvsGi5rrGt05B6T1cP9buCX-gzGzoHsz", "IPzdnLkdvxDPxh2zyHn82bWk");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
