@@ -322,7 +322,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/09/study-b-tree/">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/15/advantage-api/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
@@ -341,7 +341,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/01/09/study-b-tree/" itemprop="url">study-b-tree</a></h1>
+                <a class="post-title-link" href="/2018/01/15/advantage-api/" itemprop="url">RESTful-API概念学习</a></h1>
         
 
         <div class="post-meta">
@@ -353,8 +353,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-09T11:16:00+08:00">
-                2018-01-09
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-15T20:13:15+08:00">
+                2018-01-15
               </time>
             
 
@@ -372,9 +372,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/01/09/study-b-tree/#comments" itemprop="discussionUrl">
+                <a href="/2018/01/15/advantage-api/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/01/09/study-b-tree/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/01/15/advantage-api/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -382,7 +382,7 @@
 
           
           
-             <span id="/2018/01/09/study-b-tree/" class="leancloud_visitors" data-flag-title="study-b-tree">
+             <span id="/2018/01/15/advantage-api/" class="leancloud_visitors" data-flag-title="RESTful-API概念学习">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -415,62 +415,261 @@
       
         
           
-            <h1 id="b-树"><a href="#b-树" class="headerlink" title="b-树"></a>b-树</h1><ul>
-<li>数据库索引使用b-树</li>
-<li>二叉树查找的时间复杂度O(logN)</li>
-<li>问题:磁盘IO</li>
-<li>最坏的情况下,磁盘IO等于索引树的高度</li>
-<li>把原来”瘦高”的树结构变得”矮胖”就是b-树的特征之一</li>
-<li>B树是一种<b>多路</b>平衡查找树</li>
-<li>B树与红黑树最大的不同在于，B树的结点可以有许多子女，从几个到几千个。</li>
+            <h1 id="RESTful-API"><a href="#RESTful-API" class="headerlink" title="RESTful API"></a>RESTful API</h1><ul>
+<li>透明性，暴露资源存在。</li>
+<li>充分利用 HTTP 协议本身语义。</li>
+<li>无状态，这点非常重要。在调用一个接口（访问、操作资源）的时候，可以不用考虑上下文，不用考虑当前状态，极大的降低了复杂度</li>
+<li>HTTP 本身提供了丰富的内容协商手段，无论是缓存，还是资源修改的乐观并发控制，都可以以业务无关的中间件来实现</li>
 </ul>
-<p><img src="/images/pasted-12.png" alt="upload successful"></p>
-<h1 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h1><ol>
-<li>树中每个结点最多含有m个孩子（m&gt;=2）；</li>
-<li>除根结点和叶子结点外，其它每个结点至少有[ceil(m / 2)]个孩子（其中ceil(x)是一个取上限的函数）；</li>
-<li>根结点至少有2个孩子（除非B树只包含一个结点：根结点）；</li>
-<li>所有叶子结点都出现在同一层，叶子结点不包含任何关键字信息(可以看做是外部结点或查询失败的结点，指向这些结点的指针都为null)；（注：叶子节点只是没有孩子和指向孩子的指针，这些节点也存在，也有元素。类似红黑树中，每一个NULL指针即当做叶子结点，只是没画出来而已）。</li>
-<li>每个非终端结点中包含有n个关键字信息： (n，P0，K1，P1，K2，P2，……，Kn，Pn)。其中：<br>a) Ki (i=1…n)为关键字，且关键字按顺序升序排序K(i-1)&lt; Ki。<br>b) Pi为指向子树根的结点，且指针P(i-1)指向子树种所有结点的关键字均小于Ki，但都大于K(i-1)。<br>c) 关键字的个数n必须满足： [ceil(m / 2)-1]&lt;= n &lt;= m-1。比如有j个孩子的非叶结点恰好有j-1个关键码。</li>
-</ol>
-<h1 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h1><ul>
-<li>文件系统</li>
-<li>数据库索引</li>
+<h1 id="理解RESTful架构"><a href="#理解RESTful架构" class="headerlink" title="理解RESTful架构"></a>理解RESTful架构</h1><ul>
+<li>Representational State Transfer</li>
+<li>REST的名称”表现层状态转化”中，省略了主语。”表现层”其实指的是”资源”（Resources）的”表现层”。<br>所谓”资源”，就是网络上的一个实体，或者说是网络上的一个具体信息。它可以是一段文本、一张图片、一首歌曲、一种服务，总之就是一个具体的实在。你可以用一个URI（统一资源定位符）指向它，每种资源对应一个特定的URI。要获取这个资源，访问它的URI就可以，因此URI就成了每一个资源的地址或独一无二的识别符。</li>
 </ul>
-<h1 id="b-树-1"><a href="#b-树-1" class="headerlink" title="b+树"></a>b+树</h1><ul>
-<li>1.有k个子树的中间节点包含有k个元素（B树中是k-1个元素），每个元素不保存数据，只用来索引，所有数据都保存在叶子节点。</li>
-<li>2.所有的叶子结点中包含了全部元素的信息，及指向含这些元素记录的指针，且叶子结点本身依关键字的大小自小而大顺序链接。</li>
-<li>3.所有的中间节点元素都同时存在于子节点，在子节点元素中是最大（或最小）元素。</li>
-<li>b+树种,只有叶子节点带有卫星信息,其余中间节点仅仅是索引,没有任何数据关联</li>
-<li>在数据库的聚集索引（Clustered Index）中，叶子节点直接包含卫星数据。在非聚集索引（NonClustered Index）中，叶子节点带有指向卫星数据的指针。</li>
+<p>所谓”上网”，就是与互联网上一系列的”资源”互动，调用它的URI。</p>
+<p>互联网通信协议HTTP协议，是一个无状态协议。这意味着，所有的状态都保存在服务器端。因此，如果客户端想要操作服务器，必须通过某种手段，让服务器端发生”状态转化”（State Transfer）。而这种转化是建立在表现层之上的，所以就是”表现层状态转化”。</p>
+<p>最常见的一种设计错误，就是URI包含动词。因为”资源”表示一种实体，所以应该是名词，URI不应该有动词，动词应该放在HTTP协议中。</p>
+<p>因为不同的版本，可以理解成同一种资源的不同表现形式，所以应该采用同一个URI。版本号可以在HTTP请求头信息的Accept字段中进行区分<br><a href="http://www.ruanyifeng.com/blog/2011/09/restful.html" target="_blank" rel="noopener">http://www.ruanyifeng.com/blog/2011/09/restful.html</a></p>
+<h1 id="RESTful-API-设计指南"><a href="#RESTful-API-设计指南" class="headerlink" title="RESTful API 设计指南"></a>RESTful API 设计指南</h1><ul>
+<li>协议</li>
+<li>域名</li>
+<li>版本（Versioning）</li>
+<li>路径（Endpoint）<br>在RESTful架构中，每个网址代表一种资源（resource），所以网址中不能有动词，只能有名词，而且所用的名词往往与数据库的表格名对应。一般来说，数据库中的表都是同种记录的”集合”（collection），所以API中的名词也应该使用复数。</li>
+<li>HTTP动词</li>
+<li>过滤信息（Filtering）</li>
+<li>状态码（Status Codes）</li>
+<li>错误处理</li>
+<li>返回结果</li>
+<li>Hypermedia API<br>RESTful API最好做到Hypermedia，即返回结果中提供链接，连向其他API方法，使得用户不查文档，也知道下一步应该做什么。</li>
+<li>其他<ul>
+<li>（1）API的身份认证应该使用OAuth 2.0框架。</li>
+<li>（2）服务器返回的数据格式，应该尽量使用JSON，避免使用XML。</li>
 </ul>
-<p><img src="/images/pasted-13.png" alt="upload successful"></p>
-<h1 id="B-树的优势："><a href="#B-树的优势：" class="headerlink" title="B+树的优势："></a>B+树的优势：</h1><p>1.单一节点存储更多的元素，使得查询的IO次数更少。<br>2.所有查询都要查找到叶子节点，查询性能稳定。<br>3.所有叶子节点形成有序链表，便于范围查询。</p>
-<h1 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h1><ul>
-<li>mysql的b树索引的物理文件</li>
+</li>
 </ul>
-<h1 id="B-树"><a href="#B-树" class="headerlink" title="B*树"></a>B*树</h1><ul>
-<li>B<em>-tree是B+-tree的变体，在B+树的基础上(所有的叶子结点中包含了全部关键字的信息，及指向含有这些关键字记录的指针)，B</em>树中非根和非叶子结点再增加指向兄弟的指针；B<em>树定义了非叶子结点关键字个数至少为(2/3)</em>M，即块的最低使用率为2/3（代替B+树的1/2）。</li>
-</ul>
-<p><img src="/images/pasted-14.png" alt="upload successful"></p>
-<p>B+树的分裂：当一个结点满时，分配一个新的结点，并将原结点中1/2的数据复制到新结点，最后在父结点中增加新结点的指针；B+树的分裂只影响原结点和父结点，而不会影响兄弟结点，所以它不需要指向兄弟的指针。</p>
-<p>B*树的分裂：当一个结点满时，如果它的下一个兄弟结点未满，那么将一部分数据移到兄弟结点中，再在原结点插入关键字，最后修改父结点中兄弟结点的关键字（因为兄弟结点的关键字范围改变了）；如果兄弟也满了，则在原结点与兄弟结点之间增加新结点，并各复制1/3的数据到新结点，最后在父结点增加新结点的指针。</p>
-<p>所以，B*树分配新结点的概率比B+树要低，空间使用率更高；</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>通过以上介绍，大致将B树，B+树，B*树总结如下：</p>
-<ul>
-<li>B树：有序数组+平衡多叉树；</li>
-<li>B+树：有序数组链表+平衡多叉树；</li>
-<li>B*树：一棵丰满的B+树。</li>
-</ul>
-<p>顺便说一句，无论是B树，还是B+树、b<em>树，由于根或者树的上面几层被反复查询，所以这几块可以存在内存中，换言之，B树、B+树、B</em>树的根结点和部分顶层数据在内存中，大部分下层数据在磁盘上。</p>
-<h1 id="mysql中InnoDB索引和MyISAM索引的区别："><a href="#mysql中InnoDB索引和MyISAM索引的区别：" class="headerlink" title="mysql中InnoDB索引和MyISAM索引的区别："></a>mysql中InnoDB索引和MyISAM索引的区别：</h1><ul>
-<li>主索引的区别，InnoDB的数据文件本身就是索引文件。而MyISAM的索引和数据是分开的。</li>
-<li>辅助索引的区别：InnoDB的辅助索引data域存储相应记录主键的值而不是地址。而MyISAM的辅助索引和主索引没有多大区别。</li>
-<li>聚簇索引<br><img src="/images/pasted-15.png" alt="upload successful"></li>
-<li>非聚簇索引<br><img src="/images/pasted-17.png" alt="upload successful"></li>
-<li>聚集索引这种实现方式使得按主键的搜索十分高效，但是辅助索引搜索需要检索两遍索引：首先检索辅助索引获得主键，然后用主键到主索引中检索获得记录。</li>
-</ul>
-<p><a href="https://github.com/julycoding/The-Art-Of-Programming-By-July/blob/master/ebook/zh/03.02.md" target="_blank" rel="noopener">https://github.com/julycoding/The-Art-Of-Programming-By-July/blob/master/ebook/zh/03.02.md</a></p>
+<p><a href="http://www.ruanyifeng.com/blog/2014/05/restful_api.html" target="_blank" rel="noopener">http://www.ruanyifeng.com/blog/2014/05/restful_api.html</a></p>
 
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/13/review-java-thread/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/13/review-java-thread/" itemprop="url">java-线程复习</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-13T10:13:27+08:00">
+                2018-01-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/13/review-java-thread/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/13/review-java-thread/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/13/review-java-thread/" class="leancloud_visitors" data-flag-title="java-线程复习">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h1><p>创建线程有两种方式：<br>一、继承 Thread 类，扩展线程。<br>二、实现 Runnable 接口。</p>
+<p>Callable接口<br>Future接口<br>FutureTask实现了 Future 接口<br>FutureTask 的好处是 FutureTask 是为了弥补 Thread 的不足而设计的，它可以让程序员准确地知道线程什么时候执行完成并获得到线程执行完成后返回的结果。FutureTask 是一种可以取消的异步的计算任务，它的计算是通过 Callable 实现的，它等价于可以携带结果的 Runnable，并且有三个状态：等待、运行和完成。完成包括所有计算以任意的方式结束，包括正常结束、取消和异常。</p>
+<h1 id="多线程"><a href="#多线程" class="headerlink" title="多线程"></a>多线程</h1><p>多线程的概念很好理解就是多条线程同时存在，但要用好多线程确不容易，涉及到多线程间通信，多线程共用一个资源等诸多问题。</p>
+<h2 id="synchronized"><a href="#synchronized" class="headerlink" title="synchronized"></a>synchronized</h2><p>解决多个线程之间访问资源的同步性</p>
+<ul>
+<li>对于同步方法，锁是当前实例对象。</li>
+<li>对于静态同步方法，锁是当前对象的Class对象。</li>
+<li>对于同步方法块，锁是Synchonized括号里配置的对象。<h2 id="volatile"><a href="#volatile" class="headerlink" title="volatile"></a>volatile</h2>解决变量在多个线程之间的可见性<h2 id="wait-、notify-、notifyAll"><a href="#wait-、notify-、notifyAll" class="headerlink" title="wait()、notify()、notifyAll()"></a>wait()、notify()、notifyAll()</h2>wait():我的部分已经做完了,等别人让我做的时候再做,释放锁<br>notify():等我做完了,释放锁后,让其他一个人做<br>wait() 与 Thread.sleep(long time) 的区别:sleep傻等,sleep不释放锁</li>
+</ul>
+<h2 id="ThreadLocal-变量"><a href="#ThreadLocal-变量" class="headerlink" title="ThreadLocal 变量"></a>ThreadLocal 变量</h2><p>线程隔离<br>InheritableTreadLocal让子线程获取父线程中取得值</p>
+<h2 id="join-方法"><a href="#join-方法" class="headerlink" title="join() 方法"></a>join() 方法</h2><p>等待线程对象销毁<br>等待子进程执行完,我再执行<br>Thread.yield() 方法</p>
+<h1 id="ReentrantLock"><a href="#ReentrantLock" class="headerlink" title="ReentrantLock"></a>ReentrantLock</h1><h2 id="lock"><a href="#lock" class="headerlink" title="lock()"></a>lock()</h2><h2 id="unlock"><a href="#unlock" class="headerlink" title="unlock()"></a>unlock()</h2><h2 id="condition"><a href="#condition" class="headerlink" title="condition"></a>condition</h2><h3 id="等待-通知"><a href="#等待-通知" class="headerlink" title="等待/通知"></a>等待/通知</h3><ul>
+<li>awiate() 相当于Object类中的wait()方法</li>
+<li>await(long time,TImeUnit unit) 相当于Object类中的wait()方法</li>
+<li>signal() 相当于Object类中的notify()方法</li>
+<li>sigalAll() 相当于Object类中的notifyAll()方法</li>
+</ul>
+<h3 id="通知部分线程"><a href="#通知部分线程" class="headerlink" title="通知部分线程"></a>通知部分线程</h3><p>Lock lock=new Reentrantock();<br>Condition conditionA=lock.newCondition();<br>Condition conditionB=lock.newCondition();</p>
+<h3 id="公平锁-非公平锁"><a href="#公平锁-非公平锁" class="headerlink" title="公平锁,非公平锁"></a>公平锁,非公平锁</h3><ul>
+<li>获取锁的顺序是按照线程加锁的顺序来分配的,及先来先得的FIFO先进先出顺序</li>
+</ul>
+<h3 id="getHoldCount-getQueueLength-getWaiteQueueLength"><a href="#getHoldCount-getQueueLength-getWaiteQueueLength" class="headerlink" title="getHoldCount(),getQueueLength(),getWaiteQueueLength()"></a>getHoldCount(),getQueueLength(),getWaiteQueueLength()</h3><ul>
+<li>getHoldCount()查询当前线程保持此锁定的个数,调用lock()方法的次数</li>
+<li>getQueueLength()返回正在等待次锁定的线程估计数</li>
+<li>getWaiteQueueLength(Condition condition)返回等待与此锁定翔安的给定条件Condition的线程估计数</li>
+</ul>
+<h1 id="线程池"><a href="#线程池" class="headerlink" title="线程池"></a>线程池</h1><h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><ul>
+<li>如果并发的线程数量很多，并且每个线程都是执行一个时间很短的任务就结束了，</li>
+<li>频繁创建线程就会大大降低系统的效率，因为频繁创建线程和销毁线程需要时间。</li>
+<li>请求频繁，但是连接上以后读/写很少量的数据就断开连接。考虑到服务的并发问题，如果每个请求来到以后服务都为它启动一个线程，那么这对服务的资源可能会造成很大的浪费。</li>
+</ul>
+<h1 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h1><ul>
+<li>第一：降低资源消耗。通过重复利用已创建的线程降低线程创建和销毁造成的消耗。</li>
+<li>第二：提高响应速度。当任务到达时，任务可以不需要等到线程创建就能立即执行。</li>
+<li>第三：提高线程的可管理性。线程是稀缺资源，如果无限制的创建，不仅会消耗系统资源，还会降低系统的稳定性，使用线程池可以进行统一的分配，调优和监控。</li>
+</ul>
+<h2 id="核心接口ExecutorService-Executor"><a href="#核心接口ExecutorService-Executor" class="headerlink" title="核心接口ExecutorService,Executor"></a>核心接口ExecutorService,Executor</h2><p><img src="/images/pasted-19.png" alt="upload successful"></p>
+<h2 id="类"><a href="#类" class="headerlink" title="类"></a>类</h2><ul>
+<li>ExecutorService：真正的线程池接口。</li>
+<li>ScheduledExecutorService:能和Timer/TimerTask类似，解决那些需要任务重复执行的问题。</li>
+<li>ThreadPoolExecutor:ExecutorService的默认实现。</li>
+<li>ScheduledThreadPoolExecutor:继承ThreadPoolExecutor的- - ScheduledExecutorService接口实现，周期性任务调度的类实现。</li>
+<li>Executors类里面提供了一些静态工厂，生成一些常用的线程池。</li>
+</ul>
+<h2 id="提交任务"><a href="#提交任务" class="headerlink" title="提交任务"></a>提交任务</h2><p>它提供了如下方法来提交一个任务:</p>
+<ul>
+<li>Future&lt;?&gt; submit(Runnable task)</li>
+<li><t> Future<t> submit(Callable<t> task)</t></t></t></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line">     * Submits a value-returning task for execution and returns a</span><br><span class="line">     * Future representing the pending results of the task. The</span><br><span class="line">     * Future&apos;s &#123;@code get&#125; method will return the task&apos;s result upon</span><br><span class="line">     * successful completion.</span><br><span class="line">     *</span><br><span class="line">     * &lt;p&gt;</span><br><span class="line">     * If you would like to immediately block waiting</span><br><span class="line">     * for a task, you can use constructions of the form</span><br><span class="line">     * &#123;@code result = exec.submit(aCallable).get();&#125;</span><br><span class="line">     *</span><br><span class="line">     * &lt;p&gt;Note: The &#123;@link Executors&#125; class includes a set of methods</span><br><span class="line">     * that can convert some other common closure-like objects,</span><br><span class="line">     * for example, &#123;@link java.security.PrivilegedAction&#125; to</span><br><span class="line">     * &#123;@link Callable&#125; form so they can be submitted.</span><br><span class="line">     *</span><br><span class="line">     * @param task the task to submit</span><br><span class="line">     * @param &lt;T&gt; the type of the task&apos;s result</span><br><span class="line">     * @return a Future representing pending completion of the task</span><br><span class="line">     * @throws RejectedExecutionException if the task cannot be</span><br><span class="line">     *         scheduled for execution</span><br><span class="line">     * @throws NullPointerException if the task is null</span><br><span class="line">     */</span><br><span class="line">    &lt;T&gt; Future&lt;T&gt; submit(Callable&lt;T&gt; task);</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Submits a Runnable task for execution and returns a Future</span><br><span class="line">     * representing that task. The Future&apos;s &#123;@code get&#125; method will</span><br><span class="line">     * return the given result upon successful completion.</span><br><span class="line">     *</span><br><span class="line">     * @param task the task to submit</span><br><span class="line">     * @param result the result to return</span><br><span class="line">     * @param &lt;T&gt; the type of the result</span><br><span class="line">     * @return a Future representing pending completion of the task</span><br><span class="line">     * @throws RejectedExecutionException if the task cannot be</span><br><span class="line">     *         scheduled for execution</span><br><span class="line">     * @throws NullPointerException if the task is null</span><br><span class="line">     */</span><br><span class="line">    &lt;T&gt; Future&lt;T&gt; submit(Runnable task, T result);</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Submits a Runnable task for execution and returns a Future</span><br><span class="line">     * representing that task. The Future&apos;s &#123;@code get&#125; method will</span><br><span class="line">     * return &#123;@code null&#125; upon &lt;em&gt;successful&lt;/em&gt; completion.</span><br><span class="line">     *</span><br><span class="line">     * @param task the task to submit</span><br><span class="line">     * @return a Future representing pending completion of the task</span><br><span class="line">     * @throws RejectedExecutionException if the task cannot be</span><br><span class="line">     *         scheduled for execution</span><br><span class="line">     * @throws NullPointerException if the task is null</span><br><span class="line">     */</span><br><span class="line">    Future&lt;?&gt; submit(Runnable task);</span><br></pre></td></tr></table></figure>
+<h2 id="Executors-提供四种线程池"><a href="#Executors-提供四种线程池" class="headerlink" title="Executors 提供四种线程池"></a>Executors 提供四种线程池</h2><ul>
+<li><p>1）newCachedThreadPool 是一个可根据需要创建新线程的线程池，但是在以前构造的线程可用时将重用它们。对于执行很多短期异步任务的程序而言，这些线程池通常可提高程序性能。调用 execute() 将重用以前构造的线程（如果线程可用）。如果现有线程没有可用的，则创建一个新线程并添加到池中。终止并从缓存中移除那些已有 60 秒钟未被使用的线程。因此，长时间保持空闲的线程池不会使用任何资源。注意，可以使用 ThreadPoolExecutor 构造方法创建具有类似属性但细节不同（例如超时参数）的线程池。</p>
+</li>
+<li><p>2）newSingleThreadExecutor 创建是一个单线程池，也就是该线程池只有一个线程在工作，所有的任务是串行执行的，如果这个唯一的线程因为异常结束，那么会有一个新的线程来替代它，此线程池保证所有任务的执行顺序按照任务的提交顺序执行。</p>
+</li>
+<li><p>3）newFixedThreadPool 创建固定大小的线程池，每次提交一个任务就创建一个线程，直到线程达到线程池的最大大小，线程池的大小一旦达到最大值就会保持不变，如果某个线程因为执行异常而结束，那么线程池会补充一个新线程。</p>
+</li>
+<li><p>4）newScheduledThreadPool 创建一个大小无限的线程池，此线程池支持定时以及周期性执行任务的需求。</p>
+</li>
+</ul>
+<h2 id="程池相关参数"><a href="#程池相关参数" class="headerlink" title="程池相关参数"></a>程池相关参数</h2><ul>
+<li><p>1）corePoolSize：线程池的核心线程数，一般情况下不管有没有任务都会一直在线程池中一直存活，只有在 ThreadPoolExecutor 中的方法 allowCoreThreadTimeOut(boolean value) 设置为 true 时，闲置的核心线程会存在超时机制，如果在指定时间没有新任务来时，核心线程也会被终止，而这个时间间隔由第3个属性 keepAliveTime 指定。</p>
+</li>
+<li><p>2）maximumPoolSize：线程池所能容纳的最大线程数，当活动的线程数达到这个值后，后续的新任务将会被<b>阻塞</b>。</p>
+</li>
+<li><p>3）keepAliveTime：控制线程闲置时的超时时长，超过则终止该线程。一般情况下用于非核心线程，只有在 ThreadPoolExecutor 中的方法 allowCoreThreadTimeOut(boolean value) 设置为 true时，也作用于核心线程。</p>
+</li>
+<li><p>4）unit：用于指定 keepAliveTime 参数的时间单位，TimeUnit 是个 enum 枚举类型，常用的有：TimeUnit.HOURS(小时)、TimeUnit.MINUTES(分钟)、TimeUnit.SECONDS(秒) 和 TimeUnit.MILLISECONDS(毫秒)等。</p>
+</li>
+<li><p>5）workQueue：线程池的任务队列，通过线程池的 execute(Runnable command) 方法会将任务 Runnable 存储在队列中。</p>
+</li>
+<li><p>6）threadFactory：线程工厂，它是一个接口，用来为线程池创建新线程的。</p>
+</li>
+</ul>
+<h2 id="线程池的关闭"><a href="#线程池的关闭" class="headerlink" title="线程池的关闭"></a>线程池的关闭</h2><ul>
+<li><p>ThreadPoolExecutor 提供了两个方法，用于线程池的关闭，分别是 shutdown() 和 shutdownNow()。</p>
+</li>
+<li><p>shutdown()：不会立即的终止线程池，而是要等所有任务缓存队列中的任务都执行完后才终止，但再也不会接受新的任务。</p>
+</li>
+<li>shutdownNow()：立即终止线程池，并尝试打断正在执行的任务，并且清空任务缓存队列，返回尚未执行的任务。</li>
+</ul>
+<h2 id="实际案例"><a href="#实际案例" class="headerlink" title="实际案例"></a>实际案例</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">ExecutorService slaver = Executors.newSingleThreadExecutor();</span><br><span class="line">FutureTask&lt;List&lt;Map&lt;String, Object&gt;&gt;&gt; lastFuture = new FutureTask&lt;&gt;(countCallable);</span><br><span class="line">slaver.execute(lastFuture);</span><br><span class="line">slaver.shutdown();</span><br><span class="line"></span><br><span class="line">List&lt;Map&lt;String, Object&gt;&gt; stockFirst = jdbcTemplate.queryForList(contentSql);</span><br><span class="line">List&lt;Map&lt;String, Object&gt;&gt; stockLast = null;</span><br><span class="line">try &#123;</span><br><span class="line">    stockLast = lastFuture.get();</span><br><span class="line">&#125; catch (Exception e) &#123;</span><br><span class="line">    logger.error(&quot;错误&quot;, e);</span><br><span class="line">&#125; finally &#123;</span><br><span class="line">    lastFuture.cancel(true);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
           
         
       
@@ -549,7 +748,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-08T13:59:36+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-08T13:59:00+08:00">
                 2018-01-08
               </time>
             
@@ -1063,35 +1262,18 @@
 
       
         
-          
-            <h1 id="GreePlum"><a href="#GreePlum" class="headerlink" title="GreePlum"></a>GreePlum</h1><p><img src="/images/pasted-9.png" alt="upload successful"></p>
-<ul>
-<li>Greenplum采用Postgresl作为底层引擎，良好的兼容了Postgresql的功能</li>
-<li>Greenplum的艺术，一切皆并行（Parallel Everything）</li>
-<li>Greenplum建立在Share-nothing无共享架构上，让每一颗CPU和每一块磁盘IO都运转起来，无共享架构将这种并行处理发挥到极致。相比一些其它传统数据仓库的Sharedisk架构，后者最大瓶颈就是在IO吞吐上，在大规模数据处理时，IO无法及时feed数据给到CPU，CPU资源处于wait 空转状态，无法充分利用系统资源，导致SQL效率低下</li>
-<li>得益于Postgresql的良好扩展性（这里是extension，不是scalability），Greenplum 可以采用各种开发语言来扩展用户自定义函数（UDF）</li>
-</ul>
-<h2 id="Greenplum-MPP-与-Hadoop"><a href="#Greenplum-MPP-与-Hadoop" class="headerlink" title="Greenplum MPP 与 Hadoop"></a>Greenplum MPP 与 Hadoop</h2><h3 id="相同点"><a href="#相同点" class="headerlink" title="相同点"></a>相同点</h3><ul>
-<li>分布式存储数据在多个节点服务器上</li>
-<li>采用分布式并行计算框架</li>
-<li>支持横向扩展来提高整体的计算能力和存储容量</li>
-<li>都支持X86开放集群架构</li>
-</ul>
-<h3 id="差异点"><a href="#差异点" class="headerlink" title="差异点"></a>差异点</h3><ul>
-<li>MPP按照关系数据库行列表方式存储数据（有模式），Hadoop按照文件切片方式分布式存储（无模式）</li>
-<li>两者采用的数据分布机制不同，MPP采用Hash分布，计算节点和存储紧密耦合，数据分布粒度在记录级的更小粒度（一般在1k以下）；Hadoop FS按照文件切块后随机分配，节点和数据无耦合，数据分布粒度在文件块级（缺省64MB）。</li>
-<li>MPP采用SQL并行查询计划，Hadoop采用Mapreduce框架</li>
-</ul>
-<h1 id="Presto"><a href="#Presto" class="headerlink" title="Presto"></a>Presto</h1><ul>
-<li>Facebook贡献的开源MPP OLAP引擎。</li>
-<li>这是一个红酒的名字，因为开发组所有的人都喜欢喝这个牌子的红酒，所以把它命名为这个名字。作为MPP引擎，它的处理方式是把所有的数据Scan出来，通过Hash的方法把数据变成更小的块，让不同的节点并发，处理完结果后快速地返回给用户。我们看到它的逻辑架构也是这样，发起一个SQL，然后找这些数据在哪些HDFS节点上，然后分配后做具体的处理，最后再把数据返回。 </li>
-</ul>
-<h1 id="Kylin"><a href="#Kylin" class="headerlink" title="Kylin"></a>Kylin</h1><ul>
-<li>Kylin是由eBay开源的一个引擎，Kylin把数据读出来做计算，结算的结果会被存在HBase里，通过HBase做Ad-hoc的功能。HBase的好处是有索引的，所以做Ad-hoc的性能非常好。</li>
-</ul>
-<p><img src="/images/pasted-8.png" alt="upload successful"></p>
-
-          
+          <h1 id="备选列表"><a href="#备选列表" class="headerlink" title="备选列表:"></a>备选列表:</h1><ul>
+<li>阿里云-分析性数据库</li>
+<li>GreePlum</li>
+<li>Presto</li>
+<li>Kylin
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/01/05/BI-olap-tool/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1324,175 +1506,6 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/05/study-red–black-tree/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/05/study-red–black-tree/" itemprop="url">study-red–black-tree</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-05T11:16:42+08:00">
-                2018-01-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/01/05/study-red–black-tree/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/01/05/study-red–black-tree/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/01/05/study-red–black-tree/" class="leancloud_visitors" data-flag-title="study-red–black-tree">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="二叉搜索树"><a href="#二叉搜索树" class="headerlink" title="二叉搜索树"></a>二叉搜索树</h1><p>由于红黑树本质上就是一棵二叉查找树，所以在了解红黑树之前，咱们先来看下二叉查找树。</p>
-<p>二叉查找树（Binary Search Tree），也称有序二叉树（ordered binary tree）,排序二叉树（sorted binary tree），是指一棵空树或者具有下列性质的二叉树：</p>
-<ul>
-<li>若任意结点的左子树不空，则左子树上所有结点的值均小于它的根结点的值；</li>
-<li>若任意结点的右子树不空，则右子树上所有结点的值均大于它的根结点的值；</li>
-<li>任意结点的左、右子树也分别为二叉查找树。</li>
-<li>没有键值相等的结点（no duplicate nodes）。</li>
-</ul>
-<p>因为，一棵由n个结点，随机构造的二叉查找树的高度为lgn，所以顺理成章，一般操作的执行时间为O（lgn）.（至于n个结点的二叉树高度为lgn的证明，可参考算法导论 第12章 二叉查找树 第12.4节）。</p>
-<p>但二叉树若退化成了一棵具有n个结点的线性链后，则此些操作最坏情况运行时间为O（n）。后面我们会看到一种基于二叉查找树-红黑树，它通过一些性质使得树相对平衡，使得最终查找、插入、删除的时间复杂度最坏情况下依然为O（lgn）。</p>
-<h1 id="红黑树特性"><a href="#红黑树特性" class="headerlink" title="红黑树特性"></a>红黑树特性</h1><p>前面我们已经说过，红黑树，本质上来说就是一棵二叉查找树，但它在二叉查找树的基础上增加了着色和相关的性质使得红黑树相对平衡，从而保证了红黑树的查找、插入、删除的时间复杂度最坏为O(log n)。</p>
-<p>但它是如何保证一棵n个结点的红黑树的高度始终保持在h = logn的呢？这就引出了红黑树的5条性质：</p>
-<pre><code>1）每个结点要么是红的，要么是黑的。  
-2）根结点是黑的。  
-3）每个叶结点（叶结点即指树尾端NIL指针或NULL结点）是黑的。  
-4）如果一个结点是红的，那么它的俩个儿子都是黑的。  
-5）对于任一结点而言，其到叶结点树尾端NIL指针的每一条路径都包含相同数目的黑结点。  
-</code></pre><p>正是红黑树的这5条性质，使得一棵n个结点是红黑树始终保持了logn的高度，从而也就解释了上面我们所说的“红黑树的查找、插入、删除的时间复杂度最坏为O(log n)”这一结论的原因。</p>
-<p>如下图所示，即是一颗红黑树(下图引自wikipedia：<a href="http://t.cn/hgvH1l" target="_blank" rel="noopener">http://t.cn/hgvH1l</a>)：</p>
-<h1 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h1><ul>
-<li>treemap</li>
-<li>treeset</li>
-<li><p>1.8中的hashset</p>
-</li>
-<li><p><a href="https://github.com/julycoding/The-Art-Of-Programming-By-July/blob/master/ebook/zh/03.01.md" target="_blank" rel="noopener">https://github.com/julycoding/The-Art-Of-Programming-By-July/blob/master/ebook/zh/03.01.md</a></p>
-</li>
-<li><a href="https://zh.wikipedia.org/wiki/%E7%BA%A2%E9%BB%91%E6%A0%91" target="_blank" rel="noopener">https://zh.wikipedia.org/wiki/%E7%BA%A2%E9%BB%91%E6%A0%91</a></li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/05/study-skip-list/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1648,7 +1661,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/05/study-hashmap/">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/05/study-b-tree/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
@@ -1667,7 +1680,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/01/05/study-hashmap/" itemprop="url">java hashmap 学习</a></h1>
+                <a class="post-title-link" href="/2018/01/05/study-b-tree/" itemprop="url">study-b-tree</a></h1>
         
 
         <div class="post-meta">
@@ -1679,7 +1692,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-05T11:14:00+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-05T11:16:00+08:00">
                 2018-01-05
               </time>
             
@@ -1698,9 +1711,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/01/05/study-hashmap/#comments" itemprop="discussionUrl">
+                <a href="/2018/01/05/study-b-tree/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/01/05/study-hashmap/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/01/05/study-b-tree/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -1708,7 +1721,7 @@
 
           
           
-             <span id="/2018/01/05/study-hashmap/" class="leancloud_visitors" data-flag-title="java hashmap 学习">
+             <span id="/2018/01/05/study-b-tree/" class="leancloud_visitors" data-flag-title="study-b-tree">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -1741,96 +1754,61 @@
       
         
           
-            <h1 id="hashmap内部原理学习"><a href="#hashmap内部原理学习" class="headerlink" title="hashmap内部原理学习"></a>hashmap内部原理学习</h1><p><img src="/images/pasted-11.png" alt="upload successful"></p>
+            <h1 id="b-树"><a href="#b-树" class="headerlink" title="b-树"></a>b-树</h1><ul>
+<li>数据库索引使用b-树</li>
+<li>二叉树查找的时间复杂度O(logN)</li>
+<li>问题:磁盘IO</li>
+<li>最坏的情况下,磁盘IO等于索引树的高度</li>
+<li>把原来”瘦高”的树结构变得”矮胖”就是b-树的特征之一</li>
+<li>B树是一种<b>多路</b>平衡查找树</li>
+<li>B树与红黑树最大的不同在于，B树的结点可以有许多子女，从几个到几千个。</li>
+</ul>
+<p><img src="/images/pasted-12.png" alt="upload successful"></p>
+<h1 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h1><ol>
+<li>树中每个结点最多含有m个孩子（m&gt;=2）；</li>
+<li>除根结点和叶子结点外，其它每个结点至少有[ceil(m / 2)]个孩子（其中ceil(x)是一个取上限的函数）；</li>
+<li>根结点至少有2个孩子（除非B树只包含一个结点：根结点）；</li>
+<li>所有叶子结点都出现在同一层，叶子结点不包含任何关键字信息(可以看做是外部结点或查询失败的结点，指向这些结点的指针都为null)；（注：叶子节点只是没有孩子和指向孩子的指针，这些节点也存在，也有元素。类似红黑树中，每一个NULL指针即当做叶子结点，只是没画出来而已）。</li>
+<li>每个非终端结点中包含有n个关键字信息： (n，P0，K1，P1，K2，P2，……，Kn，Pn)。其中：<br>a) Ki (i=1…n)为关键字，且关键字按顺序升序排序K(i-1)&lt; Ki。<br>b) Pi为指向子树根的结点，且指针P(i-1)指向子树种所有结点的关键字均小于Ki，但都大于K(i-1)。<br>c) 关键字的个数n必须满足： [ceil(m / 2)-1]&lt;= n &lt;= m-1。比如有j个孩子的非叶结点恰好有j-1个关键码。</li>
+</ol>
+<h1 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h1><ul>
+<li>文件系统</li>
+<li>数据库索引</li>
+</ul>
+<h1 id="b-树-1"><a href="#b-树-1" class="headerlink" title="b+树"></a>b+树</h1><ul>
+<li>1.有k个子树的中间节点包含有k个元素（B树中是k-1个元素），每个元素不保存数据，只用来索引，所有数据都保存在叶子节点。</li>
+<li>2.所有的叶子结点中包含了全部元素的信息，及指向含这些元素记录的指针，且叶子结点本身依关键字的大小自小而大顺序链接。</li>
+<li>3.所有的中间节点元素都同时存在于子节点，在子节点元素中是最大（或最小）元素。</li>
+<li>b+树种,只有叶子节点带有卫星信息,其余中间节点仅仅是索引,没有任何数据关联</li>
+<li>在数据库的聚集索引（Clustered Index）中，叶子节点直接包含卫星数据。在非聚集索引（NonClustered Index）中，叶子节点带有指向卫星数据的指针。</li>
+</ul>
+<p><img src="/images/pasted-13.png" alt="upload successful"></p>
+<h1 id="B-树的优势："><a href="#B-树的优势：" class="headerlink" title="B+树的优势："></a>B+树的优势：</h1><p>1.单一节点存储更多的元素，使得查询的IO次数更少。<br>2.所有查询都要查找到叶子节点，查询性能稳定。<br>3.所有叶子节点形成有序链表，便于范围查询。</p>
+<h1 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h1><ul>
+<li>mysql的b树索引的物理文件</li>
+</ul>
+<h1 id="B-树"><a href="#B-树" class="headerlink" title="B*树"></a>B*树</h1><ul>
+<li>B<em>-tree是B+-tree的变体，在B+树的基础上(所有的叶子结点中包含了全部关键字的信息，及指向含有这些关键字记录的指针)，B</em>树中非根和非叶子结点再增加指向兄弟的指针；B<em>树定义了非叶子结点关键字个数至少为(2/3)</em>M，即块的最低使用率为2/3（代替B+树的1/2）。</li>
+</ul>
+<p><img src="/images/pasted-14.png" alt="upload successful"></p>
+<p>B+树的分裂：当一个结点满时，分配一个新的结点，并将原结点中1/2的数据复制到新结点，最后在父结点中增加新结点的指针；B+树的分裂只影响原结点和父结点，而不会影响兄弟结点，所以它不需要指向兄弟的指针。</p>
+<p>B*树的分裂：当一个结点满时，如果它的下一个兄弟结点未满，那么将一部分数据移到兄弟结点中，再在原结点插入关键字，最后修改父结点中兄弟结点的关键字（因为兄弟结点的关键字范围改变了）；如果兄弟也满了，则在原结点与兄弟结点之间增加新结点，并各复制1/3的数据到新结点，最后在父结点增加新结点的指针。</p>
+<p>所以，B*树分配新结点的概率比B+树要低，空间使用率更高；</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>通过以上介绍，大致将B树，B+树，B*树总结如下：</p>
 <ul>
-<li>HashMap是一个用于存储Key-Value键值对的集合，每一个键值对也叫做Entry。这些个键值对（Entry）分散存储在一个数组当中，这个数组就是HashMap的主干。</li>
-<li>HashMap 使用后台数组（backing array）作为桶，并使用链表（linked list）存储键／值对。</li>
-<li>通过hash的方法，通过put和get存储和获取对象。存储对象时，我们将K/V传给put方法时，它调用hashCode计算hash从而得到bucket位置，进一步存储，HashMap会根据当前bucket的占用情况自动调整容量(超过Load Factor则resize为原来的2倍)。获取对象时，我们将K传给get，它调用hashCode计算hash从而得到bucket位置，并进一步调用equals()方法确定键值对。如果发生碰撞的时候，Hashmap通过链表将产生碰撞冲突的元素组织起来，在Java 8中，如果一个bucket中碰撞冲突的元素超过某个限制(默认是8)，则使用红黑树来替换链表，从而提高速度。 </li>
-<li>基于Map接口实现、允许null键/值、非同步、不保证有序(比如插入的顺序)、也不保证序不随时间变化。HashMap存储着Entry(hash, key, value, next)对象。 </li>
-<li>当key==null时，存在table[0]即第一个桶中，hash值为0。HashMap对key==null的键值对会做单独处理</li>
-<li>Capacity的默认值为16： </li>
-<li>  static final int DEFAULT_INITIAL_CAPACITY = 1 &lt;&lt; 4; </li>
-<li>负载因子的默认值为0.75： </li>
-<li>  static final float DEFAULT_LOAD_FACTOR = 0.75f; </li>
-<li>简单的说，Capacity就是bucket的大小，Load factor就是bucket填满程度的最大比例。如果对迭代性能要求很高的话不要把Capacity设置过大，也不要把load factor设置过小。当bucket中的entries的数目大于capacity*load factor时就需要调整bucket的大小为当前的2倍。 </li>
-<li>可以设置初始容量Capacity，但是在HashMap处理过程中，是会把Capacity扩充成2的倍数</li>
-<li>HashMap中有一个成员变量modCount，这个用来实现“fast-fail”机制（也就是快速失败）。所谓快速失败就是在并发集合中，其进行迭代操作时，若有其他线程对其结构性的修改，这是迭代器会立马感知到，并且立刻抛出ConcurrentModificationException异常，而不是等待迭代完成之后才告诉你已经出错。</li>
+<li>B树：有序数组+平衡多叉树；</li>
+<li>B+树：有序数组链表+平衡多叉树；</li>
+<li>B*树：一棵丰满的B+树。</li>
 </ul>
-<h2 id="hash方法"><a href="#hash方法" class="headerlink" title="hash方法"></a>hash方法</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">final int hash(Object k) &#123;</span><br><span class="line">        int h = hashSeed;</span><br><span class="line">        if (0 != h &amp;&amp; k instanceof String) &#123;</span><br><span class="line">            return sun.misc.Hashing.stringHash32((String) k);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        h ^= k.hashCode();</span><br><span class="line">        h ^= (h &gt;&gt;&gt; 20) ^ (h &gt;&gt;&gt; 12);</span><br><span class="line">        return h ^ (h &gt;&gt;&gt; 7) ^ (h &gt;&gt;&gt; 4);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<h2 id="indexFor方法"><a href="#indexFor方法" class="headerlink" title="indexFor方法"></a>indexFor方法</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">static int indexFor(int h, int length) &#123;</span><br><span class="line">        // assert Integer.bitCount(length) == 1 : &quot;length must be a non-zero power of 2&quot;;</span><br><span class="line">        return h &amp; (length-1);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>如图是jdk1.8中的h&gt;&gt;&gt;16版本</li>
-<li>混合原始哈希码的高位和低位，以此来加大低位的随机性</li>
-<li>而且混合后的低位掺杂了高位的部分特征，这样高位的信息也被变相保留下来</li>
+<p>顺便说一句，无论是B树，还是B+树、b<em>树，由于根或者树的上面几层被反复查询，所以这几块可以存在内存中，换言之，B树、B+树、B</em>树的根结点和部分顶层数据在内存中，大部分下层数据在磁盘上。</p>
+<h1 id="mysql中InnoDB索引和MyISAM索引的区别："><a href="#mysql中InnoDB索引和MyISAM索引的区别：" class="headerlink" title="mysql中InnoDB索引和MyISAM索引的区别："></a>mysql中InnoDB索引和MyISAM索引的区别：</h1><ul>
+<li>主索引的区别，InnoDB的数据文件本身就是索引文件。而MyISAM的索引和数据是分开的。</li>
+<li>辅助索引的区别：InnoDB的辅助索引data域存储相应记录主键的值而不是地址。而MyISAM的辅助索引和主索引没有多大区别。</li>
+<li>聚簇索引<br><img src="/images/pasted-15.png" alt="upload successful"></li>
+<li>非聚簇索引<br><img src="/images/pasted-17.png" alt="upload successful"></li>
+<li>聚集索引这种实现方式使得按主键的搜索十分高效，但是辅助索引搜索需要检索两遍索引：首先检索辅助索引获得主键，然后用主键到主索引中检索获得记录。</li>
 </ul>
-<p><img src="/images/pasted-10.png" alt="upload successful"><br><a href="https://www.zhihu.com/question/20733617" target="_blank" rel="noopener">https://www.zhihu.com/question/20733617</a></p>
-<h2 id="put方法"><a href="#put方法" class="headerlink" title="put方法"></a>put方法</h2><ul>
-<li>先判断table(存放bullet的数组，初始类定义：transient Entry<k,v>[] table = (Entry<k,v>[]) EMPTY_TABLE;)是否为空，如果为空则扩充table，其中包括确保table的大小为2的整数倍。</k,v></k,v></li>
-<li>如果key值为null，则特殊处理，调用putForNullKey(V value)，hash值为0，存入table中，返回。</li>
-<li>如果key值不为null，则计算key的hash值；</li>
-<li>然后计算key在table中的索引index;</li>
-<li>遍历table[index]的链表，如果发现链表中有bullet中的键的hash值与key相等，并且调用equals()方法也返回true，则替换旧值（oldValue），保证key的唯一性；</li>
-<li>如果没有，在插入之前先判断table中阈值的大小，如果table中的bullet个数size超过阈值（threshold）则扩容（resize）两倍；注意扩容的顺序，扩容之前old1-&gt;old2-&gt;old3，扩容之后old3-&gt;old2-&gt;old1，扩展之前和扩容之后的table的index不一定相同，但是对于原bullet中的链表中的数据在扩容之后肯定还在一个链表中，因为hash值是一样的。</li>
-<li>插入新的bullet。注意插入的顺序，原先table[index]的链表比如 old1-&gt;old2-&gt;old3，插入新值之后为new1-&gt;old1-&gt;old2-&gt;old3.</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">public V put(K key, V value) &#123;</span><br><span class="line">        if (table == EMPTY_TABLE) &#123;</span><br><span class="line">            inflateTable(threshold);</span><br><span class="line">        &#125;</span><br><span class="line">        if (key == null)</span><br><span class="line">            return putForNullKey(value);</span><br><span class="line">        int hash = hash(key);</span><br><span class="line">        int i = indexFor(hash, table.length);</span><br><span class="line">        for (Entry&lt;K,V&gt; e = table[i]; e != null; e = e.next) &#123;</span><br><span class="line">            Object k;</span><br><span class="line">            if (e.hash == hash &amp;&amp; ((k = e.key) == key || key.equals(k))) &#123;</span><br><span class="line">                V oldValue = e.value;</span><br><span class="line">                e.value = value;</span><br><span class="line">                e.recordAccess(this);</span><br><span class="line">                return oldValue;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        modCount++;</span><br><span class="line">        addEntry(hash, key, value, i);</span><br><span class="line">        return null;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">void addEntry(int hash, K key, V value, int bucketIndex) &#123;</span><br><span class="line">        if ((size &gt;= threshold) &amp;&amp; (null != table[bucketIndex])) &#123;</span><br><span class="line">            resize(2 * table.length);</span><br><span class="line">            hash = (null != key) ? hash(key) : 0;</span><br><span class="line">            bucketIndex = indexFor(hash, table.length);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        createEntry(hash, key, value, bucketIndex);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<h2 id="位运算符"><a href="#位运算符" class="headerlink" title="位运算符"></a>位运算符</h2><p>左移( &lt;&lt; )、右移( &gt;&gt; ) 、无符号右移( &gt;&gt;&gt; )<br>位与、位或、位异或、位非<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">5&lt;&lt;2</span><br><span class="line">0000 0000 0000 0000 0000 0000 0000 0101           然后左移2位后，低位补0：</span><br><span class="line">0000 0000 0000 0000 0000 0000 0001 0100           换算成10进制为20</span><br><span class="line"></span><br><span class="line">5&gt;&gt;2</span><br><span class="line">还是先将5转为2进制表示形式：</span><br><span class="line">0000 0000 0000 0000 0000 0000 0000 0101 然后右移2位，高位补0：</span><br><span class="line">0000 0000 0000 0000 0000 0000 0000 0001</span><br><span class="line"></span><br><span class="line">-5&gt;&gt;&gt;3</span><br><span class="line">-5换算成二进制： 1111 1111 1111 1111 1111 1111 1111 1011</span><br><span class="line">-5无符号右移3位后的结果 536870911 换算成二进制： </span><br><span class="line">0001 1111 1111 1111 1111 1111 1111 1111   // (用0进行补位)</span><br><span class="line"></span><br><span class="line">位与：第一个操作数的的第n位于第二个操作数的第n位如果都是1，那么结果的第n为也为1，否则为0</span><br><span class="line">5 &amp; 3</span><br><span class="line">5转换为二进制 ：0000 0000 0000 0000 0000 0000 0000 0101</span><br><span class="line">3转换为二进制 ：0000 0000 0000 0000 0000 0000 0000 0011</span><br><span class="line">1转换为二进制	：0000 0000 0000 0000 0000 0000 0000 0001</span><br><span class="line"></span><br><span class="line">位异或：第一个操作数的的第n位于第二个操作数的第n位 相反，那么结果的第n为也为1，否则为0</span><br><span class="line">5 ^ 3</span><br><span class="line">5转换为二进制：0000 0000 0000 0000 0000 0000 0000 0101</span><br><span class="line">3转换为二进制：0000 0000 0000 0000 0000 0000 0000 0011</span><br><span class="line">6转换为二进制：0000 0000 0000 0000 0000 0000 0000 0110</span><br></pre></td></tr></table></figure></p>
-<h2 id="get方法"><a href="#get方法" class="headerlink" title="get方法"></a>get方法</h2><ul>
-<li>判断key值是否为null，如果是则特殊处理（在table[0]的链表中寻找）</li>
-<li>否则计算hash值，进而获得table中的index值</li>
-<li>在table[index]的链表中寻找，根据hash值和equals()方法获得相应的value。</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public V get(Object key) &#123;</span><br><span class="line">        if (key == null)</span><br><span class="line">            return getForNullKey();</span><br><span class="line">        Entry&lt;K,V&gt; entry = getEntry(key);</span><br><span class="line"></span><br><span class="line">        return null == entry ? null : entry.getValue();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">final Entry&lt;K,V&gt; getEntry(Object key) &#123;</span><br><span class="line">        if (size == 0) &#123;</span><br><span class="line">            return null;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        int hash = (key == null) ? 0 : hash(key);</span><br><span class="line">        for (Entry&lt;K,V&gt; e = table[indexFor(hash, table.length)];</span><br><span class="line">             e != null;</span><br><span class="line">             e = e.next) &#123;</span><br><span class="line">            Object k;</span><br><span class="line">            if (e.hash == hash &amp;&amp;</span><br><span class="line">                ((k = e.key) == key || (key != null &amp;&amp; key.equals(k))))</span><br><span class="line">                return e;</span><br><span class="line">        &#125;</span><br><span class="line">        return null;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<h1 id="hashmap的初始长度"><a href="#hashmap的初始长度" class="headerlink" title="hashmap的初始长度"></a>hashmap的初始长度</h1><ul>
-<li>16,长度必须是2的幂</li>
-<li>之所以16是为了服务于哈希函数</li>
-<li>index =  HashCode（Key） &amp;  （Length - 1） </li>
-<li>与运算，101110001110101110 1001 &amp; 1111 = 1001，十进制是9，所以 index=9。</li>
-<li>Hash算法最终得到的index结果，完全取决于Key的Hashcode值的最后几位</li>
-<li>效果上等同于取模,而且大大提高了性能</li>
-</ul>
-<h1 id="rehash"><a href="#rehash" class="headerlink" title="rehash"></a>rehash</h1><ul>
-<li>默认当Entry数量达到桶数量的75%时，哈希冲突已比较严重，就会成倍扩容桶数组，并重新分配所有原来的Entry。</li>
-<li>hashmap在扩容时候的步骤之一</li>
-<li>衡量HashMap是否进行Resize的条件如下：</li>
-<li>HashMap.Size   &gt;=  Capacity * LoadFactor</li>
-<li>具体两个步骤<ul>
-<li>1.扩容:创建一个新的Entry空数组，长度是原数组的2倍。</li>
-<li>2.ReHash:遍历原Entry数组，把所有的Entry重新Hash到新数组</li>
-</ul>
-</li>
-</ul>
-<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><ul>
-<li>声明HashMap时最好使用带initialCapacity的构造函数，传入数据的最大size，可以避免内部数组resize；</li>
-<li>性能要求高的地方，可以将loadFactor设置的小于默认值0.75，使hash值更分散，产生hash碰撞的几率就更小，但需要的内存也更多,用空间换取时间；</li>
-</ul>
-<h1 id="并发问题"><a href="#并发问题" class="headerlink" title="并发问题"></a>并发问题</h1><ul>
-<li>ReHash在并发的情况下可能会形成链表环。</li>
-<li>让下一次循环出现死循环</li>
-</ul>
-<h1 id="ConcurrentHashMap"><a href="#ConcurrentHashMap" class="headerlink" title="ConcurrentHashMap"></a>ConcurrentHashMap</h1><ul>
-<li>避免hashmap的方法有:hashtable,Collections.sysnchronizedMap</li>
-<li>但是上面的都有性能问题,导致阻塞</li>
-<li>Sement</li>
-<li><img src="http://pic.victor123.cn/18-1-4/28447320.jpg"></li>
-<li>可以说，ConcurrentHashMap是一个二级哈希表。在一个总的哈希表下面，有若干个子哈希表。这样的二级结构，和数据库的水平拆分有些相似。</li>
-<li>不同Segment的写入是可以并发执行的。</li>
-<li>同一Segment的一写一读</li>
-<li><p>同一Segment的并发写入</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">Get方法：</span><br><span class="line"></span><br><span class="line">1.为输入的Key做Hash运算，得到hash值。</span><br><span class="line"></span><br><span class="line">2.通过hash值，定位到对应的Segment对象</span><br><span class="line"></span><br><span class="line">3.再次通过hash值，定位到Segment当中数组的具体位置。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Put方法：</span><br><span class="line"></span><br><span class="line">1.为输入的Key做Hash运算，得到hash值。</span><br><span class="line"></span><br><span class="line">2.通过hash值，定位到对应的Segment对象</span><br><span class="line"></span><br><span class="line">3.获取可重入锁</span><br><span class="line"></span><br><span class="line">4.再次通过hash值，定位到Segment当中数组的具体位置。</span><br><span class="line"></span><br><span class="line">5.插入或覆盖HashEntry对象。</span><br><span class="line"></span><br><span class="line">6.释放锁。</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>如果在统计Segment元素数量的过程中，已统计过的Segment瞬间插入新的元素，这时候该怎么办呢？</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">ConcurrentHashMap的Size方法是一个嵌套循环，大体逻辑如下：</span><br><span class="line"></span><br><span class="line">1.遍历所有的Segment。</span><br><span class="line"></span><br><span class="line">2.把Segment的元素数量累加起来。</span><br><span class="line"></span><br><span class="line">3.把Segment的修改次数累加起来。</span><br><span class="line"></span><br><span class="line">4.判断所有Segment的总修改次数是否大于上一次的总修改次数。如果大于，说明统计过程中有修改，重新统计，尝试次数+1；如果不是。说明没有修改，统计结束。</span><br><span class="line"></span><br><span class="line">5.如果尝试次数超过阈值，则对每一个Segment加锁，再重新统计。</span><br><span class="line"></span><br><span class="line">6.再次判断所有Segment的总修改次数是否大于上一次的总修改次数。由于已经加锁，次数一定和上次相等。</span><br><span class="line"></span><br><span class="line">7.释放锁，统计结束。</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>为了尽量不锁住所有Segment，首先乐观地假设Size过程中不会有修改。当尝试一定次数，才无奈转为悲观锁，锁住所有Segment保证强一致性。</p>
-<h1 id="jdk-1-8hashmap"><a href="#jdk-1-8hashmap" class="headerlink" title="jdk 1.8hashmap"></a>jdk 1.8hashmap</h1><ul>
-<li>HashMap采用的是数组+链表+红黑树的形式。</li>
-<li>什么时候链表转化为红黑树？当数组大小已经超过64并且链表中的元素个数超过默认设定（8个）时，将链表转化为红黑树</li>
-</ul>
-<h1 id="jdk-1-8ConcurrentHashMap"><a href="#jdk-1-8ConcurrentHashMap" class="headerlink" title="jdk 1.8ConcurrentHashMap"></a>jdk 1.8ConcurrentHashMap</h1><h1 id="优秀博客推荐"><a href="#优秀博客推荐" class="headerlink" title="优秀博客推荐"></a>优秀博客推荐</h1><p><a href="http://blog.csdn.net/u013256816/article/details/50912762" target="_blank" rel="noopener">http://blog.csdn.net/u013256816/article/details/50912762</a></p>
+<p><a href="https://github.com/julycoding/The-Art-Of-Programming-By-July/blob/master/ebook/zh/03.02.md" target="_blank" rel="noopener">https://github.com/julycoding/The-Art-Of-Programming-By-July/blob/master/ebook/zh/03.02.md</a></p>
 
           
         
@@ -1879,7 +1857,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/03/jikeshijian-ai-base-study-linear-regression/">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/05/study-red–black-tree/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
@@ -1898,7 +1876,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/01/03/jikeshijian-ai-base-study-linear-regression/" itemprop="url">极客时间-学习笔记-人工智能基础课-线性回归</a></h1>
+                <a class="post-title-link" href="/2018/01/05/study-red–black-tree/" itemprop="url">study-red–black-tree</a></h1>
         
 
         <div class="post-meta">
@@ -1910,8 +1888,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-03T07:13:39+08:00">
-                2018-01-03
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-05T11:16:00+08:00">
+                2018-01-05
               </time>
             
 
@@ -1929,9 +1907,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/01/03/jikeshijian-ai-base-study-linear-regression/#comments" itemprop="discussionUrl">
+                <a href="/2018/01/05/study-red–black-tree/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/01/03/jikeshijian-ai-base-study-linear-regression/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/01/05/study-red–black-tree/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -1939,7 +1917,7 @@
 
           
           
-             <span id="/2018/01/03/jikeshijian-ai-base-study-linear-regression/" class="leancloud_visitors" data-flag-title="极客时间-学习笔记-人工智能基础课-线性回归">
+             <span id="/2018/01/05/study-red–black-tree/" class="leancloud_visitors" data-flag-title="study-red–black-tree">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -1972,21 +1950,33 @@
       
         
           
-            <h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><ul>
-<li>线性回归假设输出变量是若干输入变量的线性组合,并根据这一关系求解线性组合中的最优系数.</li>
+            <h1 id="二叉搜索树"><a href="#二叉搜索树" class="headerlink" title="二叉搜索树"></a>二叉搜索树</h1><p>由于红黑树本质上就是一棵二叉查找树，所以在了解红黑树之前，咱们先来看下二叉查找树。</p>
+<p>二叉查找树（Binary Search Tree），也称有序二叉树（ordered binary tree）,排序二叉树（sorted binary tree），是指一棵空树或者具有下列性质的二叉树：</p>
+<ul>
+<li>若任意结点的左子树不空，则左子树上所有结点的值均小于它的根结点的值；</li>
+<li>若任意结点的右子树不空，则右子树上所有结点的值均大于它的根结点的值；</li>
+<li>任意结点的左、右子树也分别为二叉查找树。</li>
+<li>没有键值相等的结点（no duplicate nodes）。</li>
 </ul>
-<h1 id="误差"><a href="#误差" class="headerlink" title="误差"></a>误差</h1><ul>
-<li>在线性回归中,误差误差是以军方误差来定义的</li>
-</ul>
-<h1 id="求解"><a href="#求解" class="headerlink" title="求解"></a>求解</h1><ul>
-<li>当线性回归的模型为二维平面上的直线时,军方误差就是预测输出和真实输出之间的欧几里得距离</li>
-<li>求解方法是:最小二乘法</li>
-</ul>
-<h1 id="防止过拟合"><a href="#防止过拟合" class="headerlink" title="防止过拟合"></a>防止过拟合</h1><ul>
-<li>存在多个最优解,意味着存在拟合,要解决过拟合问题,常见的做法是正则化,即添加额外的惩罚项,可分为两种:灵回过和LASSO回归</li>
-<li>岭回归又被称作”参数衰减”</li>
-<li>LASSO回归,全程是”最小绝对缩减和选择算子”</li>
-<li>与岭回归相比,LASSO回归的特点在于稀疏性的引入,时间花复杂问题的常用方法,在数据压缩,信号处理等其他领域中已有广泛的应用</li>
+<p>因为，一棵由n个结点，随机构造的二叉查找树的高度为lgn，所以顺理成章，一般操作的执行时间为O（lgn）.（至于n个结点的二叉树高度为lgn的证明，可参考算法导论 第12章 二叉查找树 第12.4节）。</p>
+<p>但二叉树若退化成了一棵具有n个结点的线性链后，则此些操作最坏情况运行时间为O（n）。后面我们会看到一种基于二叉查找树-红黑树，它通过一些性质使得树相对平衡，使得最终查找、插入、删除的时间复杂度最坏情况下依然为O（lgn）。</p>
+<h1 id="红黑树特性"><a href="#红黑树特性" class="headerlink" title="红黑树特性"></a>红黑树特性</h1><p>前面我们已经说过，红黑树，本质上来说就是一棵二叉查找树，但它在二叉查找树的基础上增加了着色和相关的性质使得红黑树相对平衡，从而保证了红黑树的查找、插入、删除的时间复杂度最坏为O(log n)。</p>
+<p>但它是如何保证一棵n个结点的红黑树的高度始终保持在h = logn的呢？这就引出了红黑树的5条性质：</p>
+<pre><code>1）每个结点要么是红的，要么是黑的。  
+2）根结点是黑的。  
+3）每个叶结点（叶结点即指树尾端NIL指针或NULL结点）是黑的。  
+4）如果一个结点是红的，那么它的俩个儿子都是黑的。  
+5）对于任一结点而言，其到叶结点树尾端NIL指针的每一条路径都包含相同数目的黑结点。  
+</code></pre><p>正是红黑树的这5条性质，使得一棵n个结点是红黑树始终保持了logn的高度，从而也就解释了上面我们所说的“红黑树的查找、插入、删除的时间复杂度最坏为O(log n)”这一结论的原因。</p>
+<p>如下图所示，即是一颗红黑树(下图引自wikipedia：<a href="http://t.cn/hgvH1l" target="_blank" rel="noopener">http://t.cn/hgvH1l</a>)：</p>
+<h1 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h1><ul>
+<li>treemap</li>
+<li>treeset</li>
+<li><p>1.8中的hashset</p>
+</li>
+<li><p><a href="https://github.com/julycoding/The-Art-Of-Programming-By-July/blob/master/ebook/zh/03.01.md" target="_blank" rel="noopener">https://github.com/julycoding/The-Art-Of-Programming-By-July/blob/master/ebook/zh/03.01.md</a></p>
+</li>
+<li><a href="https://zh.wikipedia.org/wiki/%E7%BA%A2%E9%BB%91%E6%A0%91" target="_blank" rel="noopener">https://zh.wikipedia.org/wiki/%E7%BA%A2%E9%BB%91%E6%A0%91</a></li>
 </ul>
 
           
@@ -2073,7 +2063,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">42</span>
+                  <span class="site-state-item-count">44</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -2095,7 +2085,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">42</span>
+                  <span class="site-state-item-count">44</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
