@@ -79,21 +79,22 @@
 
 
 
-<meta name="description" content="hashmap内部原理学习  HashMap是一个用于存储Key-Value键值对的集合，每一个键值对也叫做Entry。这些个键值对（Entry）分散存储在一个数组当中，这个数组就是HashMap的主干。 HashMap 使用后台数组（backing array）作为桶，并使用链表（linked list）存储键／值对">
+<meta name="description" content="hashmap学习  HashMap是一个用于存储Key-Value键值对的集合，每一个键值对也叫做Entry。这些个键值对（Entry）分散存储在一个数组当中，这个数组就是HashMap的主干。 HashMap 使用后台数组（backing array）作为桶，并使用链表（linked list）存储键／值对。 通过">
 <meta name="keywords" content="java,数据结构">
 <meta property="og:type" content="article">
 <meta property="og:title" content="java hashmap 学习">
 <meta property="og:url" content="http://www.victor123.cn/2018/01/05/study-hashmap/index.html">
 <meta property="og:site_name" content="Victor的博客">
-<meta property="og:description" content="hashmap内部原理学习  HashMap是一个用于存储Key-Value键值对的集合，每一个键值对也叫做Entry。这些个键值对（Entry）分散存储在一个数组当中，这个数组就是HashMap的主干。 HashMap 使用后台数组（backing array）作为桶，并使用链表（linked list）存储键／值对。 通过hash的方法，通过put和get存储和获取对象。存储对象时，我们将K/">
+<meta property="og:description" content="hashmap学习  HashMap是一个用于存储Key-Value键值对的集合，每一个键值对也叫做Entry。这些个键值对（Entry）分散存储在一个数组当中，这个数组就是HashMap的主干。 HashMap 使用后台数组（backing array）作为桶，并使用链表（linked list）存储键／值对。 通过hash的方法，通过put和get存储和获取对象。存储对象时，我们将K/V传给p">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://www.victor123.cn/images/pasted-11.png">
 <meta property="og:image" content="http://www.victor123.cn/images/pasted-10.png">
 <meta property="og:image" content="http://pic.victor123.cn/18-1-4/28447320.jpg">
-<meta property="og:updated_time" content="2018-01-09T23:58:13.189Z">
+<meta property="og:image" content="http://www.victor123.cn/images/pasted-35.png">
+<meta property="og:updated_time" content="2018-01-19T02:19:04.348Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="java hashmap 学习">
-<meta name="twitter:description" content="hashmap内部原理学习  HashMap是一个用于存储Key-Value键值对的集合，每一个键值对也叫做Entry。这些个键值对（Entry）分散存储在一个数组当中，这个数组就是HashMap的主干。 HashMap 使用后台数组（backing array）作为桶，并使用链表（linked list）存储键／值对。 通过hash的方法，通过put和get存储和获取对象。存储对象时，我们将K/">
+<meta name="twitter:description" content="hashmap学习  HashMap是一个用于存储Key-Value键值对的集合，每一个键值对也叫做Entry。这些个键值对（Entry）分散存储在一个数组当中，这个数组就是HashMap的主干。 HashMap 使用后台数组（backing array）作为桶，并使用链表（linked list）存储键／值对。 通过hash的方法，通过put和get存储和获取对象。存储对象时，我们将K/V传给p">
 <meta name="twitter:image" content="http://www.victor123.cn/images/pasted-11.png">
 
 
@@ -416,7 +417,7 @@
       
 
       
-        <h1 id="hashmap内部原理学习"><a href="#hashmap内部原理学习" class="headerlink" title="hashmap内部原理学习"></a>hashmap内部原理学习</h1><p><img src="/images/pasted-11.png" alt="upload successful"></p>
+        <h1 id="hashmap学习"><a href="#hashmap学习" class="headerlink" title="hashmap学习"></a>hashmap学习</h1><p><img src="/images/pasted-11.png" alt="upload successful"></p>
 <ul>
 <li>HashMap是一个用于存储Key-Value键值对的集合，每一个键值对也叫做Entry。这些个键值对（Entry）分散存储在一个数组当中，这个数组就是HashMap的主干。</li>
 <li>HashMap 使用后台数组（backing array）作为桶，并使用链表（linked list）存储键／值对。</li>
@@ -505,7 +506,52 @@
 <li>HashMap采用的是数组+链表+红黑树的形式。</li>
 <li>什么时候链表转化为红黑树？当数组大小已经超过64并且链表中的元素个数超过默认设定（8个）时，将链表转化为红黑树</li>
 </ul>
-<h1 id="jdk-1-8ConcurrentHashMap"><a href="#jdk-1-8ConcurrentHashMap" class="headerlink" title="jdk 1.8ConcurrentHashMap"></a>jdk 1.8ConcurrentHashMap</h1><h1 id="优秀博客推荐"><a href="#优秀博客推荐" class="headerlink" title="优秀博客推荐"></a>优秀博客推荐</h1><p><a href="http://blog.csdn.net/u013256816/article/details/50912762" target="_blank" rel="noopener">http://blog.csdn.net/u013256816/article/details/50912762</a></p>
+<h1 id="jdk-1-8ConcurrentHashMap"><a href="#jdk-1-8ConcurrentHashMap" class="headerlink" title="jdk 1.8ConcurrentHashMap"></a>jdk 1.8ConcurrentHashMap</h1><h1 id="与hashTable的区别"><a href="#与hashTable的区别" class="headerlink" title="与hashTable的区别"></a>与hashTable的区别</h1><ul>
+<li>继承的父类不同:Hashtable继承自Dictionary类，而HashMap继承自AbstractMap类，</li>
+<li>线程安全性不同:Hashtable 中的方法是Synchronize的</li>
+<li>是否提供contains方法:HashMap把Hashtable的contains方法去掉了</li>
+<li>key和value是否允许null值:Hashtable中，key和value都不允许出现null值。HashMap中没有该键，也可能使该键所对应的值为null。因此，在HashMap中不能由get()方法来判断HashMap中是否存在某个键， 而应该用containsKey()方法来判断。</li>
+<li>两个遍历方式的内部实现上不同:Hashtable还使用了Enumeration的方式 。</li>
+<li>hash值不同:哈希值的使用不同，HashTable直接使用对象的hashCode。而HashMap重新计算hash值。</li>
+<li>内部实现使用的数组初始化和扩容方式不同:Hashtable和HashMap它们两个内部实现方式的数组的初始大小和扩容的方式。HashTable中hash数组默认大小是11，增加的方式是 old*2+1。HashMap中hash数组的默认大小是16，而且一定是2的指数。</li>
+</ul>
+<h1 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h1><p>要知道hashmap是什么，首先要搞清楚它的数据结构，在java编程语言中，最基本的结构就是两种，一个是数组，另外一个是模拟指针（引用），所有的数据结构都可以用这两个基本结构来构造的，hashmap也不例外。Hashmap实际上是一个数组和链表的结合体（在数据结构中，一般称之为“链表散列“）</p>
+<h1 id="哈希冲突"><a href="#哈希冲突" class="headerlink" title="哈希冲突"></a>哈希冲突</h1><h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><ul>
+<li>hashcode通过hash算法得到有限的地址区间</li>
+<li>哈希冲突：由于哈希算法被计算的数据是无限的，而计算后的结果范围有限，因此总会存在不同的数据经过计算后得到的值相同，这就是哈希冲突。</li>
+</ul>
+<h2 id="解决哈希冲突的方法"><a href="#解决哈希冲突的方法" class="headerlink" title="解决哈希冲突的方法"></a>解决哈希冲突的方法</h2><ul>
+<li>开放定址法<ul>
+<li>开放定址法需要的表长度要大于等于所需要存放的元素。</li>
+</ul>
+</li>
+<li>线行探查法<ul>
+<li>它从发生冲突的单元起，依次判断下一个单元是否为空，当达到最后一个单元时，再从表首依次判断。直到碰到空闲的单元或者探查完全部单元为止。</li>
+</ul>
+</li>
+<li>平方探查法</li>
+<li>双散列函数探查法</li>
+<li>链地址法（拉链法）<ul>
+<li>注：在java中，链接地址法也是HashMap解决哈希冲突的方法之一，jdk1.7完全采用单链表来存储同义词，jdk1.8则采用了一种混合模式，对于链表长度大于8的，会转换为红黑树存储。</li>
+</ul>
+</li>
+<li>再哈希法<ul>
+<li>就是同时构造多个不同的哈希函数,发生冲突时，再用H2 = RH2(key) 进行计算，直到冲突不再产生，这种方法不易产生聚集，但是增加了计算时间。</li>
+</ul>
+</li>
+<li>建立公共溢出区<ul>
+<li>将哈希表分为公共表和溢出表，当溢出发生时，将所有溢出数据统一放到溢出区。</li>
+</ul>
+</li>
+</ul>
+<h1 id="1-8源码"><a href="#1-8源码" class="headerlink" title="1.8源码"></a>1.8源码</h1><p>hash算法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">static final int hash(Object key) &#123;</span><br><span class="line">    int h;</span><br><span class="line">    return (key == null) ? 0 : (h = key.hashCode()) ^ (h &gt;&gt;&gt; 16);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><img src="/images/pasted-35.png" alt="upload successful"><br>混合高位和地位,以此来加大地位的随机性</p>
+<ul>
+<li>数组的位置:    (n - 1) &amp; hash</li>
+<li>确定数组后,链表中确定相同的方法: ((k = e.key) == key || (key != null &amp;&amp; key.equals(k))))</li>
+<li>数组的长度:因为16是2的整数次幂的原因,n-1 二进制中都是x个1,这样,更能减少key之间的碰撞</li>
+</ul>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://blog.csdn.net/u013256816/article/details/50912762" target="_blank" rel="noopener">http://blog.csdn.net/u013256816/article/details/50912762</a></p>
 
       
     </div>
@@ -655,7 +701,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">44</span>
+                  <span class="site-state-item-count">48</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -712,7 +758,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#hashmap内部原理学习"><span class="nav-number">1.</span> <span class="nav-text">hashmap内部原理学习</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#hash方法"><span class="nav-number">1.1.</span> <span class="nav-text">hash方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#indexFor方法"><span class="nav-number">1.2.</span> <span class="nav-text">indexFor方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#put方法"><span class="nav-number">1.3.</span> <span class="nav-text">put方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#位运算符"><span class="nav-number">1.4.</span> <span class="nav-text">位运算符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#get方法"><span class="nav-number">1.5.</span> <span class="nav-text">get方法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#hashmap的初始长度"><span class="nav-number">2.</span> <span class="nav-text">hashmap的初始长度</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#rehash"><span class="nav-number">3.</span> <span class="nav-text">rehash</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#小结"><span class="nav-number">4.</span> <span class="nav-text">小结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#并发问题"><span class="nav-number">5.</span> <span class="nav-text">并发问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ConcurrentHashMap"><span class="nav-number">6.</span> <span class="nav-text">ConcurrentHashMap</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#jdk-1-8hashmap"><span class="nav-number">7.</span> <span class="nav-text">jdk 1.8hashmap</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#jdk-1-8ConcurrentHashMap"><span class="nav-number">8.</span> <span class="nav-text">jdk 1.8ConcurrentHashMap</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#优秀博客推荐"><span class="nav-number">9.</span> <span class="nav-text">优秀博客推荐</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#hashmap学习"><span class="nav-number">1.</span> <span class="nav-text">hashmap学习</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#hash方法"><span class="nav-number">1.1.</span> <span class="nav-text">hash方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#indexFor方法"><span class="nav-number">1.2.</span> <span class="nav-text">indexFor方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#put方法"><span class="nav-number">1.3.</span> <span class="nav-text">put方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#位运算符"><span class="nav-number">1.4.</span> <span class="nav-text">位运算符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#get方法"><span class="nav-number">1.5.</span> <span class="nav-text">get方法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#hashmap的初始长度"><span class="nav-number">2.</span> <span class="nav-text">hashmap的初始长度</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#rehash"><span class="nav-number">3.</span> <span class="nav-text">rehash</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#小结"><span class="nav-number">4.</span> <span class="nav-text">小结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#并发问题"><span class="nav-number">5.</span> <span class="nav-text">并发问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ConcurrentHashMap"><span class="nav-number">6.</span> <span class="nav-text">ConcurrentHashMap</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#jdk-1-8hashmap"><span class="nav-number">7.</span> <span class="nav-text">jdk 1.8hashmap</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#jdk-1-8ConcurrentHashMap"><span class="nav-number">8.</span> <span class="nav-text">jdk 1.8ConcurrentHashMap</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#与hashTable的区别"><span class="nav-number">9.</span> <span class="nav-text">与hashTable的区别</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#数据结构"><span class="nav-number">10.</span> <span class="nav-text">数据结构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#哈希冲突"><span class="nav-number">11.</span> <span class="nav-text">哈希冲突</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#概念"><span class="nav-number">11.1.</span> <span class="nav-text">概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决哈希冲突的方法"><span class="nav-number">11.2.</span> <span class="nav-text">解决哈希冲突的方法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-8源码"><span class="nav-number">12.</span> <span class="nav-text">1.8源码</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">13.</span> <span class="nav-text">参考</span></a></li></ol></div>
             
 
           </div>

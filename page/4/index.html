@@ -322,6 +322,652 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/12/14/bugfix-2-1213/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/14/bugfix-2-1213/" itemprop="url">bugfix总结-12.13</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-14T08:00:00+08:00">
+                2017-12-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/12/14/bugfix-2-1213/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/12/14/bugfix-2-1213/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/12/14/bugfix-2-1213/" class="leancloud_visitors" data-flag-title="bugfix总结-12.13">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="bugfix1-redis相关"><a href="#bugfix1-redis相关" class="headerlink" title="bugfix1-redis相关"></a>bugfix1-redis相关</h1><ul>
+<li><p>快速定位问题</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">2017-12-13 18:33:39.688 DEBUG [http-bio-6000-exec-17][JdbcTemplate.java:875] - SQL update affected 1 rows</span><br><span class="line">2017-12-13 18:33:40.590 ERROR [http-bio-6000-exec-17][UniExceptionHandler.java:57] - 捕捉到技术异常: URI: /shop/insert  最大内存: 1012m  已分配内存: 1012m  已分配内存中的剩余空间: 532m  最大可用内存: 532m</span><br><span class="line">java.lang.RuntimeException: org.springframework.data.redis.RedisSystemException: Unknown redis exception; nested exception is java.lang.NullPointerException</span><br><span class="line">org.springframework.data.redis.RedisSystemException: Unknown redis exception; nested exception is java.lang.NullPointerException</span><br><span class="line">        at org.springframework.data.redis.FallbackExceptionTranslationStrategy.getFallback(FallbackExceptionTranslationStrategy.java:48)</span><br><span class="line">        at org.springframework.data.redis.FallbackExceptionTranslationStrategy.translate(FallbackExceptionTranslationStrategy.java:38)</span><br><span class="line">        at org.springframework.data.redis.connection.jedis.JedisConnection.convertJedisAccessException(JedisConnection.java:242)</span><br><span class="line">        at org.springframework.data.redis.connection.jedis.JedisConnection.set(JedisConnection.java:1236)</span><br><span class="line">        at org.springframework.data.redis.connection.DefaultStringRedisConnection.set(DefaultStringRedisConnection.java:744)</span><br><span class="line">        at org.springframework.data.redis.core.DefaultValueOperations$10.inRedis(DefaultValueOperations.java:172)</span><br><span class="line">        at org.springframework.data.redis.core.AbstractOperations$ValueDeserializingRedisCallback.doInRedis(AbstractOperations.java:57)</span><br><span class="line">        at org.springframework.data.redis.core.RedisTemplate.execute(RedisTemplate.java:207)</span><br><span class="line">        at org.springframework.data.redis.core.RedisTemplate.execute(RedisTemplate.java:169)</span><br><span class="line">        at org.springframework.data.redis.core.AbstractOperations.execute(AbstractOperations.java:91)</span><br><span class="line">        at org.springframework.data.redis.core.DefaultValueOperations.set(DefaultValueOperations.java:169)</span><br><span class="line">        at com.ejlerp.cache.redis.KVCacherImpl.set(KVCacherImpl.java:34)</span><br><span class="line">        at com.alibaba.dubbo.common.bytecode.Wrapper7.invokeMethod(Wrapper7.java)</span><br><span class="line">        at com.alibaba.dubbo.rpc.proxy.javassist.JavassistProxyFactory$1.doInvoke(JavassistProxyFactory.java:46)</span><br><span class="line">        at com.alibaba.dubbo.rpc.proxy.AbstractProxyInvoker.invoke(AbstractProxyInvoker.java:72)</span><br><span class="line">        at com.alibaba.dubbo.rpc.protocol.InvokerWrapper.invoke(InvokerWrapper.java:53)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>首先这个是一个没有见过的异常</p>
+</li>
+<li><p>解决途径:</p>
+<ul>
+<li>搜索自己公司包开头的代码,找到调用地方</li>
+<li>下载源码,底层依赖可能有真的有</li>
+<li>在本次bugfix中,由于是微服务调用,真正看出问题是在,controller层才看出的问题<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">@ApiOperation(value = &quot;新增&quot;)</span><br><span class="line">@RequestMapping(value = &quot;/insert&quot;, method = RequestMethod.POST)</span><br><span class="line">public JsonResult insert(@RequestBody String body) &#123;</span><br><span class="line">    Long id = IdGenerator.generate(getEntityName(), fetchTenantId()).getIdValue();</span><br><span class="line">    CommonVo vo = CommonVo.of(getEntityName(), WebHelper.parseJsonBody(body, false, false));</span><br><span class="line">    vo.put(&quot;shop_id&quot;, id);</span><br><span class="line">    getService().insert(fetchTenantId(), fetchUserId(), vo);</span><br><span class="line">    kvCacher.set(&quot;logistic_node_&quot; + id.toString(), vo.get(&quot;logistic_node&quot;));</span><br><span class="line">    return new JsonResult(JsonResult.SUCCESSFUL, null);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>vo可能别没有获取到</p>
+</li>
+<li>反思:at com.ejlerp.cache.redis.KVCacherImpl.set(KVCacherImpl.java:34),这个一句其实只有两个参数,一个是传入的key,一个是value,一定是其中一个入参发生了问题,才会导致底层出现问题的</li>
+<li>当然,也不排除是redis服务可能出现了问题,但是当时已经重启了reids,错误依旧存在</li>
+<li>最后,bug定位到了是前端一个select标签,由于数据库中的dict没有初始化,导致这个select标签的初始值没有初始化完成,当然表单提交时,便不会提交这个字段,</li>
+</ul>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><ul>
+<li>controller层的vo依然不要使用map,否则排查起来很费劲</li>
+</ul>
+<h1 id="bugfix2-分组问题"><a href="#bugfix2-分组问题" class="headerlink" title="bugfix2 分组问题"></a>bugfix2 分组问题</h1><ul>
+<li><p>这个bugfix,其实是这样的,条件写反导致的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">         Map&lt;Long, VSaleOrder&gt; orderMap = omsAgentService.findByIds(callerInfo, arriveMap.keySet());</span><br><span class="line">-        Set&lt;Long&gt; legalIds = orderMap.values().stream().filter(Objects::isNull).filter(v -&gt; &#123;</span><br><span class="line">+        Set&lt;Long&gt; legalIds = orderMap.values().stream().filter(Objects::nonNull).filter(v -&gt; &#123;</span><br><span class="line">             Integer courierPrintMarkState = v.getCourierPrintMarkState();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>问题是,历史数据的修复,其实应该在线上发现问题时,作为一套完整的方案,进行提交的,而不是部署到生产环境后,又发现历史数据有问题,在半夜升级后改数据,风险真是很大</p>
+</li>
+<li>对于一些合并操作,虽然业务上提出了操作,其实从逻辑上讲,应该出现拆分的反响逻辑预支对应</li>
+</ul>
+<h1 id="问题3-jvm参数设置"><a href="#问题3-jvm参数设置" class="headerlink" title="问题3 jvm参数设置"></a>问题3 jvm参数设置</h1>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/12/13/bugfix-voice-generate/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/13/bugfix-voice-generate/" itemprop="url">bugfix对接baidu语音合成</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-13T19:26:00+08:00">
+                2017-12-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/12/13/bugfix-voice-generate/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/12/13/bugfix-voice-generate/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/12/13/bugfix-voice-generate/" class="leancloud_visitors" data-flag-title="bugfix对接baidu语音合成">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>项目中使用了baidu的语音合成,原本的设计是,批量获取设置到redis中,用户每次使用时从redis中获取</p>
+<h1 id="空指针异常"><a href="#空指针异常" class="headerlink" title="空指针异常"></a>空指针异常</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">2017-12-13 16:34:30.076 ERROR [http-bio-6000-exec-45][DownloadVoiceFromBaiduYY.java:36] - DownloadVoiceFromBaiduYY error &#123;&#125;</span><br><span class="line">java.lang.NullPointerException</span><br><span class="line">    at com.baidu.aip.speech.AipSpeech.synthesis(AipSpeech.java:133) ~[java-sdk-3.2.0.jar:?]</span><br><span class="line">    at com.ejlerp.web.wms.voice.baidu.DownloadVoiceFromBaiduYY.downloadVoice(DownloadVoiceFromBaiduYY.java:33) [classes/:?]</span><br><span class="line">    at com.ejlerp.web.wms.voice.baidu.DownloadVoiceFromBaiduYY.downloadVoiceB64(DownloadVoiceFromBaiduYY.java:45) [classes/:?]</span><br><span class="line">    at com.ejlerp.web.wms.voice.VoiceController.getB64(VoiceController.java:233) [classes/:?]</span><br><span class="line">    at com.ejlerp.web.wms.voice.VoiceController.getVoiceData(VoiceController.java:149) [classes/:?]</span><br><span class="line">    at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:1.8.0_92]</span><br><span class="line">    at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) ~[?:1.8.0_92]</span><br><span class="line">    at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[?:1.8.0_92]</span><br><span class="line">    at java.lang.reflect.Method.invoke(Method.java:498) ~[?:1.8.0_92]</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>下载源码后debug返现返回的response Content-Type是大写,与sdk中get的string不一致,<br>于是查找github的源文件<br><img src="http://pic.victor123.cn/17-12-13/86911891.jpg"></p>
+</li>
+<li><p>发现了,这个bug已经fix了,<a href="https://github.com/Baidu-AIP/java-sdk/commit/c338bc71690f84351def0d64b311986c586763d2" target="_blank" rel="noopener">https://github.com/Baidu-AIP/java-sdk/commit/c338bc71690f84351def0d64b311986c586763d2</a></p>
+</li>
+</ul>
+<p><img src="http://pic.victor123.cn/17-12-13/31618622.jpg"></p>
+<h1 id="其他遇到的问题"><a href="#其他遇到的问题" class="headerlink" title="其他遇到的问题"></a>其他遇到的问题</h1><ul>
+<li><p>判断字符串写反</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">-            if (StringUtils.isEmpty(value)) &#123;</span><br><span class="line">+            if (!StringUtils.isEmpty(value)) &#123;</span><br><span class="line">                 redisMap.put(key, value);</span><br><span class="line">             &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>APPkey修改错了配置文件</p>
+</li>
+</ul>
+<h1 id="反思"><a href="#反思" class="headerlink" title="反思"></a>反思</h1><ul>
+<li><p>在与外部api进行接口对接时,一定要判断各种异常情况的发生,不能只考虑正常情况</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">try &#123;</span><br><span class="line">    TtsResponse res = client.synthesis(voice, &quot;zh&quot;, 1, options);</span><br><span class="line">    JSONObject result = res.getResult();</span><br><span class="line">    if (result != null) &#123;</span><br><span class="line">        LOGGER.warn(&quot;downloadVoice:&#123;&#125;&quot;, result);</span><br><span class="line">    &#125;</span><br><span class="line">    download = res.getData();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>删除掉无用的代码,放置误导自己和别人</p>
+</li>
+<li>本地充分测试后,再提交测试部署,否则害人害己,耽误时间</li>
+<li>应该充分利用各种调试工具或手段,如Btrace,(临时抱佛脚,来不及,自己有待提高)</li>
+<li>不能依靠测试发现程序问题,即使是别人的代码,也要认真研读,滤清思路,不能头疼医头,脚痛医脚</li>
+<li>要有自己的脚手架工程,方便自己后门程序的快速编写,和部署</li>
+</ul>
+<h1 id="待提高"><a href="#待提高" class="headerlink" title="待提高"></a>待提高</h1><ul>
+<li>应该充分利用各种调试工具或手段,如Btrace,(临时抱佛脚,来不及,自己有待提高)</li>
+<li>测试用例编写</li>
+<li>要有自己的脚手架工程,方便自己后门程序的快速编写,和部署</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/12/13/optime-156/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/13/optime-156/" itemprop="url">156服务器优化2:定位io高的原因mysql</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-13T13:39:00+08:00">
+                2017-12-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/12/13/optime-156/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/12/13/optime-156/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/12/13/optime-156/" class="leancloud_visitors" data-flag-title="156服务器优化2:定位io高的原因mysql">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>#重新定位问题<br>-%wa指CPU等待磁盘写入完成的时间</p>
+<p>首先看下%wa的解释：Percentage of time that the CPU or CPUs were idle during which the system had an outstanding disk I/O request.</p>
+<p>#iostat</p>
+<p>#pidstat 2 10 -d<br>发现mysql的读写量非常高<br><img src="http://pic.victor123.cn/17-12-13/27569242.jpg"></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/12/12/optimize-zookeeper/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/12/optimize-zookeeper/" itemprop="url">156服务器优化1:清理zookeeper过多的历史文件</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-12T14:51:00+08:00">
+                2017-12-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/12/12/optimize-zookeeper/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/12/12/optimize-zookeeper/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/12/12/optimize-zookeeper/" class="leancloud_visitors" data-flag-title="156服务器优化1:清理zookeeper过多的历史文件">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>156机器是本地开发环境上的机器<br>跑了如下服务:<br>mysql<br>zookeeper<br>dubbokeeper</p>
+<h1 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h1><p>从ssh登陆服务器就比较卡<br>top命令后,负载一直很高<br><img src="http://pic.victor123.cn/17-12-12/5122868.jpg"></p>
+<h1 id="排查"><a href="#排查" class="headerlink" title="排查"></a>排查</h1><p>iotop命令看到zookeeper的io比较高<br><a href="http://pic.victor123.cn/17-12-12/59575921.jpg" target="_blank" rel="noopener">http://pic.victor123.cn/17-12-12/59575921.jpg</a></p>
+<h1 id="操作步骤"><a href="#操作步骤" class="headerlink" title="操作步骤"></a>操作步骤</h1><ul>
+<li><a href="https://www.cnblogs.com/jxwch/p/6526271.html" target="_blank" rel="noopener">https://www.cnblogs.com/jxwch/p/6526271.html</a></li>
+<li>打开这两个参数<ul>
+<li>autopurge.snapRetainCount这个参数指定了需要保留的文件数目，默认保留3个；</li>
+<li>autopurge.purgeInterval这个参数指定了清理频率，单位是小时，需要填写一个1或者更大的数据，默认0表示不开启自动清理功能。</li>
+</ul>
+</li>
+<li>清空历史数据<br><img src="http://pic.victor123.cn/17-12-12/1580197.jpg"></li>
+</ul>
+<h1 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h1><p><img src="http://pic.victor123.cn/17-12-12/29291132.jpg"></p>
+<h1 id="相关知识"><a href="#相关知识" class="headerlink" title="相关知识"></a>相关知识</h1><p><a href="http://www.linuxidc.com/Linux/2016-03/129509.htm" target="_blank" rel="noopener">http://www.linuxidc.com/Linux/2016-03/129509.htm</a><br>dataDir用于存储Log（事务日志）与Snapshot（快照）数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">在后续的观察中发现,156的io高并不全是zookeeper的问题,so本次支持清楚了历史文件,对于156的io高问题目前定位是mysql问题,待续</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/12/10/error-pandas-date-range/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1306,797 +1952,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/11/30/error-pip-install-seaborn/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/30/error-pip-install-seaborn/" itemprop="url">mac安装seaborn遇到的问题</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-30T07:58:00+08:00">
-                2017-11-30
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/异常/" itemprop="url" rel="index">
-                    <span itemprop="name">异常</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/11/30/error-pip-install-seaborn/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/11/30/error-pip-install-seaborn/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2017/11/30/error-pip-install-seaborn/" class="leancloud_visitors" data-flag-title="mac安装seaborn遇到的问题">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="异常信息"><a href="#异常信息" class="headerlink" title="异常信息"></a>异常信息</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">pip install numpy</span><br><span class="line"></span><br><span class="line">MacBook-Pro:~ victor$ pip install seaborn</span><br><span class="line">Collecting seaborn</span><br><span class="line">  Downloading seaborn-0.8.1.tar.gz (178kB)</span><br><span class="line">    100% |████████████████████████████████| 184kB 666kB/s</span><br><span class="line">Collecting pandas (from seaborn)</span><br><span class="line">  Using cached pandas-0.21.0-cp27-cp27m-macosx_10_6_intel.macosx_10_9_intel.macosx_10_9_x86_64.macosx_10_10_intel.macosx_10_10_x86_64.whl</span><br><span class="line">Requirement already satisfied: python-dateutil in /System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python (from pandas-&gt;seaborn)</span><br><span class="line">Collecting numpy&gt;=1.9.0 (from pandas-&gt;seaborn)</span><br><span class="line">  Using cached numpy-1.13.3-cp27-cp27m-macosx_10_6_intel.macosx_10_9_intel.macosx_10_9_x86_64.macosx_10_10_intel.macosx_10_10_x86_64.whl</span><br><span class="line">Requirement already satisfied: pytz&gt;=2011k in /System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python (from pandas-&gt;seaborn)</span><br><span class="line">Installing collected packages: numpy, pandas, seaborn</span><br><span class="line">  Found existing installation: numpy 1.8.0rc1</span><br><span class="line">    DEPRECATION: Uninstalling a distutils installed project (numpy) has been deprecated and will be removed in a future version. This is due to the fact that uninstalling a distutils project will only partially uninstall the project.</span><br><span class="line">    Uninstalling numpy-1.8.0rc1:</span><br><span class="line">Exception:</span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/basecommand.py&quot;, line 215, in main</span><br><span class="line">    status = self.run(options, args)</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/commands/install.py&quot;, line 342, in run</span><br><span class="line">    prefix=options.prefix_path,</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/req/req_set.py&quot;, line 778, in install</span><br><span class="line">    requirement.uninstall(auto_confirm=True)</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/req/req_install.py&quot;, line 754, in uninstall</span><br><span class="line">    paths_to_remove.remove(auto_confirm)</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/req/req_uninstall.py&quot;, line 115, in remove</span><br><span class="line">    renames(path, new_path)</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/utils/__init__.py&quot;, line 267, in renames</span><br><span class="line">    shutil.move(old, new)</span><br><span class="line">  File &quot;/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/shutil.py&quot;, line 302, in move</span><br><span class="line">    copy2(src, real_dst)</span><br><span class="line">  File &quot;/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/shutil.py&quot;, line 131, in copy2</span><br><span class="line">    copystat(src, dst)</span><br><span class="line">  File &quot;/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/shutil.py&quot;, line 103, in copystat</span><br><span class="line">    os.chflags(dst, st.st_flags)</span><br><span class="line">OSError: [Errno 1] Operation not permitted: &apos;/var/folders/sk/hl26sn7n1pg9jrzgzqydvfq00000gn/T/pip-gOIIvZ-uninstall/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/numpy-1.8.0rc1-py2.7.egg-info&apos;</span><br></pre></td></tr></table></figure>
-<h1 id="发现卸载这个numpy都不行"><a href="#发现卸载这个numpy都不行" class="headerlink" title="发现卸载这个numpy都不行"></a>发现卸载这个numpy都不行</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">sudo -H pip uninstall  numpy</span><br><span class="line">DEPRECATION: Uninstalling a distutils installed project (numpy) has been deprecated and will be removed in a future version. This is due to the fact that uninstalling a distutils project will only partially uninstall the project.</span><br><span class="line">Uninstalling numpy-1.8.0rc1:</span><br><span class="line">  /System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/numpy-1.8.0rc1-py2.7.egg-info</span><br><span class="line">Proceed (y/n)? y</span><br><span class="line">Exception:</span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/basecommand.py&quot;, line 215, in main</span><br><span class="line">    status = self.run(options, args)</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/commands/uninstall.py&quot;, line 76, in run</span><br><span class="line">    requirement_set.uninstall(auto_confirm=options.yes)</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/req/req_set.py&quot;, line 346, in uninstall</span><br><span class="line">    req.uninstall(auto_confirm=auto_confirm)</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/req/req_install.py&quot;, line 754, in uninstall</span><br><span class="line">    paths_to_remove.remove(auto_confirm)</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/req/req_uninstall.py&quot;, line 115, in remove</span><br><span class="line">    renames(path, new_path)</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/utils/__init__.py&quot;, line 267, in renames</span><br><span class="line">    shutil.move(old, new)</span><br><span class="line">  File &quot;/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/shutil.py&quot;, line 302, in move</span><br><span class="line">    copy2(src, real_dst)</span><br><span class="line">  File &quot;/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/shutil.py&quot;, line 131, in copy2</span><br><span class="line">    copystat(src, dst)</span><br><span class="line">  File &quot;/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/shutil.py&quot;, line 103, in copystat</span><br><span class="line">    os.chflags(dst, st.st_flags)</span><br><span class="line">OSError: [Errno 1] Operation not permitted: &apos;/tmp/pip-Ez2DTF-uninstall/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/numpy-1.8.0rc1-py2.7.egg-info</span><br></pre></td></tr></table></figure>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p><a href="https://blog.wizchen.com/2016/06/17/Mac%E4%B8%8B%E6%9B%B4%E6%96%B0python%E7%A7%91%E5%AD%A6%E8%AE%A1%E7%AE%97%E5%BA%93numpy/" target="_blank" rel="noopener">https://blog.wizchen.com/2016/06/17/Mac%E4%B8%8B%E6%9B%B4%E6%96%B0python%E7%A7%91%E5%AD%A6%E8%AE%A1%E7%AE%97%E5%BA%93numpy/</a></p>
-<ul>
-<li><p>说是System Integrity Protection的问题，解决的办法是关闭SIP:</p>
-</li>
-<li><p>重启电脑，电脑启动的时候安住 command + R</p>
-</li>
-<li>等画面上出现 apple logo 的，你会看到 OS X 工具程式的窗口，选择终端，等待终端打开，直接输入csrutil disable，回车后重启即可</li>
-<li>重启完毕后，再次在终端输入</li>
-</ul>
-<h1 id="最后成功"><a href="#最后成功" class="headerlink" title="最后成功"></a>最后成功</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">pip install -U numpy</span><br><span class="line">Collecting numpy</span><br><span class="line">  Using cached numpy-1.13.3-cp27-cp27m-macosx_10_6_intel.macosx_10_9_intel.macosx_10_9_x86_64.macosx_10_10_intel.macosx_10_10_x86_64.whl</span><br><span class="line">Installing collected packages: numpy</span><br><span class="line">  Found existing installation: numpy 1.8.0rc1</span><br><span class="line">    DEPRECATION: Uninstalling a distutils installed project (numpy) has been deprecated and will be removed in a future version. This is due to the fact that uninstalling a distutils project will only partially uninstall the project.</span><br><span class="line">    Uninstalling numpy-1.8.0rc1:</span><br><span class="line">Exception:</span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/basecommand.py&quot;, line 215, in main</span><br><span class="line">    status = self.run(options, args)</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/commands/install.py&quot;, line 342, in run</span><br><span class="line">    prefix=options.prefix_path,</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/req/req_set.py&quot;, line 778, in install</span><br><span class="line">    requirement.uninstall(auto_confirm=True)</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/req/req_install.py&quot;, line 754, in uninstall</span><br><span class="line">    paths_to_remove.remove(auto_confirm)</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/req/req_uninstall.py&quot;, line 115, in remove</span><br><span class="line">    renames(path, new_path)</span><br><span class="line">  File &quot;/Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg/pip/utils/__init__.py&quot;, line 267, in renames</span><br><span class="line">    shutil.move(old, new)</span><br><span class="line">  File &quot;/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/shutil.py&quot;, line 302, in move</span><br><span class="line">    copy2(src, real_dst)</span><br><span class="line">  File &quot;/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/shutil.py&quot;, line 131, in copy2</span><br><span class="line">    copystat(src, dst)</span><br><span class="line">  File &quot;/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/shutil.py&quot;, line 103, in copystat</span><br><span class="line">    os.chflags(dst, st.st_flags)</span><br><span class="line">OSError: [Errno 1] Operation not permitted: &apos;/var/folders/sk/hl26sn7n1pg9jrzgzqydvfq00000gn/T/pip-rfPgIG-uninstall/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/numpy-1.8.0rc1-py2.7.egg-info&apos;</span><br><span class="line">shengsiyudeMacBook-Pro:~ victor$ sudo -H pip install -U numpy</span><br><span class="line">Password:</span><br><span class="line">Collecting numpy</span><br><span class="line">  Using cached numpy-1.13.3-cp27-cp27m-macosx_10_6_intel.macosx_10_9_intel.macosx_10_9_x86_64.macosx_10_10_intel.macosx_10_10_x86_64.whl</span><br><span class="line">Installing collected packages: numpy</span><br><span class="line">  Found existing installation: numpy 1.8.0rc1</span><br><span class="line">    DEPRECATION: Uninstalling a distutils installed project (numpy) has been deprecated and will be removed in a future version. This is due to the fact that uninstalling a distutils project will only partially uninstall the project.</span><br><span class="line">    Uninstalling numpy-1.8.0rc1:</span><br><span class="line">      Successfully uninstalled numpy-1.8.0rc1</span><br><span class="line">Successfully installed numpy-1.13.3</span><br></pre></td></tr></table></figure>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/11/28/code-blog-website/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/28/code-blog-website/" itemprop="url">技术搜索技巧</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-28T17:34:00+08:00">
-                2017-11-28
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/搜索技巧/" itemprop="url" rel="index">
-                    <span itemprop="name">搜索技巧</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/11/28/code-blog-website/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/11/28/code-blog-website/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2017/11/28/code-blog-website/" class="leancloud_visitors" data-flag-title="技术搜索技巧">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="结合搜索引擎语法-site-功能-可以高效的搜索出常见的技术类问题的解决方案"><a href="#结合搜索引擎语法-site-功能-可以高效的搜索出常见的技术类问题的解决方案" class="headerlink" title="结合搜索引擎语法 site:功能,可以高效的搜索出常见的技术类问题的解决方案"></a>结合搜索引擎语法 site:功能,可以高效的搜索出常见的技术类问题的解决方案</h1><p>常见的网址如下:</p>
-<h2 id="国内"><a href="#国内" class="headerlink" title="国内"></a>国内</h2><ul>
-<li>博客园       cnblogs.com</li>
-<li>CSDN        csdn.net</li>
-<li>开源中国      oschina.net</li>
-<li>简书         jianshu.com</li>
-<li>SegmentFault segmentfault.com</li>
-<li>掘金          juejin.im</li>
-</ul>
-<h2 id="国外"><a href="#国外" class="headerlink" title="国外"></a>国外</h2><ul>
-<li>stackoverflow</li>
-<li>Github</li>
-<li>GithubPage</li>
-</ul>
-<h2 id="知识分享"><a href="#知识分享" class="headerlink" title="知识分享"></a>知识分享</h2><ul>
-<li>知乎</li>
-<li>quora</li>
-</ul>
-<hr>
-<h1 id="而对于相对专业的技能"><a href="#而对于相对专业的技能" class="headerlink" title="而对于相对专业的技能"></a>而对于相对专业的技能</h1><ul>
-<li>api文档</li>
-<li>和官方文档</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/11/28/BI-show-tool/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/28/BI-show-tool/" itemprop="url">数据展现技术选型</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-28T16:36:00+08:00">
-                2017-11-28
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/技术选型/" itemprop="url" rel="index">
-                    <span itemprop="name">技术选型</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/11/28/BI-show-tool/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/11/28/BI-show-tool/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2017/11/28/BI-show-tool/" class="leancloud_visitors" data-flag-title="数据展现技术选型">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>数据展现技术选型<br><img src="http://pic.victor123.cn/17-11-28/27291686.jpg" alt=" image.png"></p>
-<p><img src="http://pic.victor123.cn/17-11-28/97879159.jpg" alt=" image.png"></p>
-<h2 id="阿里云Quick-Bi-试用过30天"><a href="#阿里云Quick-Bi-试用过30天" class="headerlink" title="阿里云Quick Bi(试用过30天)"></a>阿里云Quick Bi(试用过30天)</h2><p>Quick BI 是一个基于云计算的灵活的轻量级的自助 BI 工具服务平台。</p>
-<p>Quick BI 支持众多种类的数据源，既可以连接 MaxCompute（ODPS）、RDS、Analytic DB、HybridDB（Greenplum）等云数据源，也支持连接 ECS 上您自有的 MySQL 数据库，还支持上传本地文件到 Quick BI 内置的探索空间进行分析。</p>
-<h2 id="Tableau"><a href="#Tableau" class="headerlink" title="Tableau"></a>Tableau</h2><p><a href="https://www.tableau.com/" target="_blank" rel="noopener">https://www.tableau.com/</a></p>
-<hr>
-<h1 id="From-GitHub"><a href="#From-GitHub" class="headerlink" title="From GitHub"></a>From GitHub</h1><h2 id="Superset"><a href="#Superset" class="headerlink" title="Superset"></a>Superset</h2><ul>
-<li>Superset 是 Airbnb （知名在线房屋短租公司）开源的数据探查与可视化平台（曾用名Panoramix、Caravel），该工具在可视化、易用性和交互性上非常有特色，用户可以轻松对数据进行可视化分析。</li>
-</ul>
-<p><a href="https://github.com/apache/incubator-superset" target="_blank" rel="noopener">https://github.com/apache/incubator-superset</a><br><img src="https://cloud.githubusercontent.com/assets/130878/20371438/a703a2a0-ac19-11e6-80c4-00a47c2eb644.gif" alt="image"></p>
-<h2 id="Saiku"><a href="#Saiku" class="headerlink" title="Saiku"></a>Saiku</h2><p><img src="https://raw.githubusercontent.com/OSBI/saiku/assets/saiku-demo-1.jpg" alt="image"></p>
-<p><a href="https://github.com/OSBI/saiku" target="_blank" rel="noopener">https://github.com/OSBI/saiku</a></p>
-<hr>
-<p>另外一些是没有实际调研过的一些工具</p>
-<h3 id="Qlikview"><a href="#Qlikview" class="headerlink" title="Qlikview"></a>Qlikview</h3><h2 id="FineBI"><a href="#FineBI" class="headerlink" title="FineBI"></a>FineBI</h2><h2 id="BDP商业数据平台"><a href="#BDP商业数据平台" class="headerlink" title="BDP商业数据平台"></a>BDP商业数据平台</h2><h2 id="永洪"><a href="#永洪" class="headerlink" title="永洪"></a>永洪</h2>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/11/27/share-docker/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/27/share-docker/" itemprop="url">docker学习分型</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-27T22:36:00+08:00">
-                2017-11-27
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/docker/" itemprop="url" rel="index">
-                    <span itemprop="name">docker</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/11/27/share-docker/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/11/27/share-docker/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2017/11/27/share-docker/" class="leancloud_visitors" data-flag-title="docker学习分型">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><ul>
-<li><p>Docker 是个划时代的开源项目，它彻底释放了计算虚拟化的威力，极大提高了应用的运行效率，降低了云计算资源供应的成本！使用 Docker，可以让应用的部署、测试和分发都变得前所未有的高效和轻松！</p>
-</li>
-<li><p>无论是应用开发者、运维人员、还是其他信息技术从业人员，都有必要认识和掌握 Docker，节约有限的时间。</p>
-</li>
-</ul>
-<h1 id="docker的由来"><a href="#docker的由来" class="headerlink" title="docker的由来"></a>docker的由来</h1><ul>
-<li><p>Docker 是 PaaS 提供商 dotCloud 开源的一个基于 LXC 的高级容器引擎，由 Go 语言编写的，源代码托管在 github 而且居然只有 1W 行就完成了这些功能。</p>
-</li>
-<li><p>Docker自2013年以来非常火热，无论是从 github 上的代码活跃度，还是Redhat在RHEL6.5中集成对Docker的支持, 就连 Google 的 Compute Engine 也支持 docker 在其之上运行。</p>
-</li>
-<li><p>Docker设想是交付运行环境如同海运，OS如同一个货轮，每一个在OS基础上的软件都如同一个集装箱，用户可以通过标准化手段自由组装运行环境，同时集装箱的内容可以由用户自定义，也可以由专业人员制造。这样，交付一个软件，就是一系列标准化组件的集合的交付，如同乐高积木，用户只需要选择合适的积木组合，并且在最顶端署上自己的名字(最后个标准化组件是用户的app)。这也就是基于docker的PaaS产品的原型。</p>
-</li>
-</ul>
-<p><img src="http://pic.victor123.cn/17-12-1/22516184.jpg" alt=" image.png"></p>
-<h1 id="为什么要使用-Docker？"><a href="#为什么要使用-Docker？" class="headerlink" title="为什么要使用 Docker？"></a>为什么要使用 Docker？</h1><ul>
-<li>更高效的利用系统资源</li>
-<li>更快速的启动时间</li>
-<li>一致的运行环境</li>
-<li>持续交付和部署</li>
-<li>更轻松的迁移</li>
-<li>更轻松的维护和扩展</li>
-</ul>
-<h1 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h1><ul>
-<li>镜像（Image）<ul>
-<li>Docker 镜像是一个特殊的文件系统，除了提供容器运行时所需的程序、库、资源、配置等文件外，还包含了一些为运行时准备的一些配置参数（如匿名卷、环境变量、用户等）。镜像不包含任何动态数据，其内容在构建之后也不会被改变。</li>
-</ul>
-</li>
-<li>容器（Container）<ul>
-<li>镜像（Image）和容器（Container）的关系，就像是面向对象程序设计中的类和实例一样，镜像是静态的定义，容器是镜像运行时的实体。容器可以被创建、启动、停止、删除、暂停等。</li>
-<li>容器的实质是进程，但与直接在宿主执行的进程不同，容器进程运行于属于自己的独立的 命名空间。因此容器可以拥有自己的 root 文件系统、自己的网络配置、自己的进程空间，甚至自己的用户 ID 空间。容器内的进程是运行在一个隔离的环境里，使用起来，就好像是在一个独立于宿主的系统下操作一样。这种特性使得容器封装的应用比直接在宿主运行更加安全。也因为这种隔离的特性，很多人初学 Docker 时常常会混淆容器和虚拟机。</li>
-</ul>
-</li>
-<li>仓库（Repository）<ul>
-<li>一个 Docker Registry 中可以包含多个仓库（Repository）；每个仓库可以包含多个标签（Tag）；每个标签对应一个镜像。</li>
-</ul>
-</li>
-</ul>
-<h1 id="基本命令"><a href="#基本命令" class="headerlink" title="基本命令"></a>基本命令</h1><ul>
-<li>docker run busybox echo “hello world”</li>
-</ul>
-<p><img src="http://pic.victor123.cn/17-12-1/3097858.jpg"></p>
-<ul>
-<li>docker ps</li>
-</ul>
-<h1 id="官方仓库"><a href="#官方仓库" class="headerlink" title="官方仓库"></a>官方仓库</h1><p><a href="https://store.docker.com/" target="_blank" rel="noopener">https://store.docker.com/</a><br><img src="http://pic.victor123.cn/17-11-27/43305231.jpg" alt=" image.png"></p>
-<h1 id="mac版本图形化客户端-kitematic"><a href="#mac版本图形化客户端-kitematic" class="headerlink" title="mac版本图形化客户端:kitematic"></a>mac版本图形化客户端:kitematic</h1><p><img src="http://pic.victor123.cn/17-11-27/36671816.jpg" alt=" image.png"><br>Kitematic 完全自动化了 Docker 安装和设置过程，并提供了一个直观的图形用户接口（GUI）来在 Mac 上运行 Docker。Kitematic 集成了 Docker Machine 来在 Mac 上分发一个虚拟机并安装 Docker 引擎。</p>
-<p>一旦安装成功，Kitematic GUI 便会启动，紧接着你可以立刻运行控制台中的镜像。你仅仅只需要在 Kitematic 搜索框键入镜像名就可以搜索任何在 Docker Hub 上存在的镜像。通过 GUI 你可以非常容易的创建、运行和管理你的容器，不需要使用命令行或者是在 Docker CLI 和 GUI之间来回切换。</p>
-<h2 id="Kitematic-也让Docker的一些高级特性使用更加方便，比如管理端口和配置-volumes。你可以方便的修改环境变量、查看日志，单机终端就可以进入容器，这些特性GUI都支持。"><a href="#Kitematic-也让Docker的一些高级特性使用更加方便，比如管理端口和配置-volumes。你可以方便的修改环境变量、查看日志，单机终端就可以进入容器，这些特性GUI都支持。" class="headerlink" title="Kitematic 也让Docker的一些高级特性使用更加方便，比如管理端口和配置 volumes。你可以方便的修改环境变量、查看日志，单机终端就可以进入容器，这些特性GUI都支持。"></a>Kitematic 也让Docker的一些高级特性使用更加方便，比如管理端口和配置 volumes。你可以方便的修改环境变量、查看日志，单机终端就可以进入容器，这些特性GUI都支持。</h2><h1 id="dockerfile"><a href="#dockerfile" class="headerlink" title="dockerfile"></a>dockerfile</h1><p>Dockerfile是由一系列命令和参数构成的脚本，这些命令应用于基础镜像并最终创建一个新的镜像。<br>例如:<br><a href="https://hub.docker.com/r/haocen/docker-hexo-with-hexo-admin/" target="_blank" rel="noopener">https://hub.docker.com/r/haocen/docker-hexo-with-hexo-admin/</a></p>
-<h1 id="进阶"><a href="#进阶" class="headerlink" title="进阶"></a>进阶</h1><h2 id="数据卷"><a href="#数据卷" class="headerlink" title="数据卷"></a>数据卷</h2><ul>
-<li>数据卷 是一个可供一个或多个容器使用的特殊目录，它绕过 UFS，可以提供很多有用的特性:<ul>
-<li>数据卷 可以在容器之间共享和重用</li>
-<li>对 数据卷 的修改会立马生效</li>
-<li>对 数据卷 的更新，不会影响镜像</li>
-<li>数据卷 默认会一直存在，即使容器被删除</li>
-</ul>
-</li>
-</ul>
-<h2 id="网络管理"><a href="#网络管理" class="headerlink" title="网络管理"></a>网络管理</h2><p>Docker启动时，会自动在主机上创建一个docker0虚拟网桥，实际上是Linux的一个bridge,可以理解为一个软件交换机，它会而挂载到它的网口之间进行转发 当创建一个Docker容器的时候，同理会创建一对veth pair接口(当数据包发送到一个接口时，另外一个接口也可以收到相同的数据包)，这对接口一端在容器内，即eth0;另一端在本地并被挂载到docker0网桥，名称以veth开头。</p>
-<h2 id="容器安全"><a href="#容器安全" class="headerlink" title="容器安全"></a>容器安全</h2><ul>
-<li>内核命名空间</li>
-<li>控制组<br>控制组是 Linux 容器机制的另外一个关键组件，负责实现资源的审计和限制。<br>它提供了很多有用的特性；以及确保各个容器可以公平地分享主机的内存、CPU、磁盘 IO 等资源；当然，更重要的是，控制组确保了当容器内的资源使用产生压力时不会连累主机系统。</li>
-<li>内核能力机制<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">大部分情况下，容器并不需要“真正的” root 权限，容器只需要少数的能力即可。为了加强安全，容器可以禁用一些没必要的权限。</span><br><span class="line"></span><br><span class="line">    完全禁止任何 mount 操作；</span><br><span class="line">    禁止直接访问本地主机的套接字；</span><br><span class="line">    禁止访问一些文件系统的操作，比如创建新的设备、修改文件属性等；</span><br><span class="line">    禁止模块加载。</span><br><span class="line"></span><br><span class="line">这样，就算攻击者在容器中取得了 root 权限，也不能获得本地主机的较高权限，能进行的破坏也有限。</span><br><span class="line"></span><br><span class="line">默认情况下，Docker采用白名单机制，禁用必需功能之外的其它权限。 当然，用户也可以根据自身需求来为 Docker 容器启用额外的权限。</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h2 id="容器编排"><a href="#容器编排" class="headerlink" title="容器编排"></a>容器编排</h2><pre><code>编排是一个新的词汇，指的是容器的集群化和调度。另一类含义指的是容器管理，负责管理容器化应用和组件任务。
-&lt;img src=&quot;http://pic.victor123.cn/17-11-29/58239834.jpg&quot;&gt;
-</code></pre><p>Docker Swarm、Kubernetes、Marathon和Nomad</p>
-<hr>
-<h1 id="快速安装docker"><a href="#快速安装docker" class="headerlink" title="快速安装docker"></a>快速安装docker</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">useradd appusr</span><br><span class="line">passwd appusr</span><br><span class="line">groupadd docker</span><br><span class="line">usermod -aG docker appusr</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">yum install epel-release –y</span><br><span class="line">yum install docker-io –y</span><br><span class="line">systemctl start docker</span><br><span class="line">systemctl enable docker</span><br></pre></td></tr></table></figure>
-<h1 id="使用案例"><a href="#使用案例" class="headerlink" title="使用案例"></a>使用案例</h1><h2 id="本地的nginx"><a href="#本地的nginx" class="headerlink" title="本地的nginx"></a>本地的nginx</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">docker run -p 80:80 --name mynginx -v $PWD/www:/www -v $PWD/conf/nginx.conf:/etc/nginx/nginx.conf -v $PWD/logs:/wwwlogs -v $PWD/logs:/etc/nginx/logs -d nginx</span><br><span class="line"></span><br><span class="line">nginx配置文件:</span><br><span class="line">server &#123;</span><br><span class="line"></span><br><span class="line">    listen       80 default_server;</span><br><span class="line">    </span><br><span class="line">    location /api/iac &#123;</span><br><span class="line">        add_header &apos;Access-Control-Allow-Origin&apos; &quot;*&quot;;</span><br><span class="line">        add_header &apos;Access-Control-Allow-Credentials&apos; true;</span><br><span class="line">         proxy_pass http://192.168.0.222:9060;</span><br><span class="line">     &#125;</span><br><span class="line">    location /api/bi &#123;</span><br><span class="line">        add_header &apos;Access-Control-Allow-Origin&apos; &quot;*&quot;;</span><br><span class="line">        add_header &apos;Access-Control-Allow-Credentials&apos; true;</span><br><span class="line">         proxy_pass http://192.168.0.106:9991;</span><br><span class="line">     &#125;</span><br><span class="line">    location = / &#123;</span><br><span class="line">       proxy_connect_timeout 1800;</span><br><span class="line">       proxy_read_timeout 1800;</span><br><span class="line">       proxy_send_timeout 1800;</span><br><span class="line">       proxy_pass http://192.168.0.106:8888/page/index.html;</span><br><span class="line">    &#125;</span><br><span class="line">    location / &#123;</span><br><span class="line">    proxy_pass http://192.168.0.106:8099;</span><br><span class="line">    &#125;</span><br><span class="line">    location /page &#123;</span><br><span class="line">       proxy_pass http://192.168.0.106:8888;</span><br><span class="line">    &#125;</span><br><span class="line">    location /static &#123;</span><br><span class="line">       proxy_pass http://192.168.0.106:8888;</span><br><span class="line">    &#125;</span><br><span class="line">    location /main &#123;</span><br><span class="line">       proxy_pass http://192.168.0.106:8888/page/index.html;</span><br><span class="line">    &#125;</span><br><span class="line">    location /login&#123;</span><br><span class="line">       proxy_pass http://192.168.0.106:8888/page/login/index.html;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="用docker安装mysql数据库"><a href="#用docker安装mysql数据库" class="headerlink" title="用docker安装mysql数据库"></a>用docker安装mysql数据库</h2><p>准备工作<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">yum install git</span><br><span class="line">mkdir /docker</span><br><span class="line">chown -R appusr /docker</span><br><span class="line"></span><br><span class="line">sudo mkdir -p /etc/docker</span><br><span class="line">sudo tee /etc/docker/daemon.json &lt;&lt;-&apos;EOF&apos;</span><br><span class="line">&#123;</span><br><span class="line">  &quot;registry-mirrors&quot;: [&quot;https://cz3my8je.mirror.aliyuncs.com&quot;]</span><br><span class="line">&#125;</span><br><span class="line">EOF</span><br><span class="line">sudo systemctl daemon-reload</span><br><span class="line">sudo systemctl restart docker</span><br></pre></td></tr></table></figure></p>
-<p>启动<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">要复制conf到制定目录下</span><br><span class="line"></span><br><span class="line">docker run -p 3306:3306 --name mymysql -v /docker/mysql/conf/my.cnf:/etc/mysql/my.cnf -v /docker/mysql/logs:/logs -v /docker/mysql/data:/mysql_data -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.6</span><br><span class="line"></span><br><span class="line">docker ps -a</span><br><span class="line"></span><br><span class="line">docker run -it --link mymysql:mysql --rm mysql sh -c &apos;exec mysql -h 172.18.0.1 -P 3306 -u root -p123456&apos;</span><br><span class="line"></span><br><span class="line">CREATE USER &apos;pig&apos;@&apos;%&apos; IDENTIFIED BY &apos;123456&apos;;</span><br><span class="line">GRANT ALL ON *.* TO &apos;pig&apos;@&apos;%&apos;;</span><br></pre></td></tr></table></figure></p>
-<hr>
-<h1 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h1><h2 id="10张图带你深入理解Docker容器和镜像"><a href="#10张图带你深入理解Docker容器和镜像" class="headerlink" title="10张图带你深入理解Docker容器和镜像"></a>10张图带你深入理解Docker容器和镜像</h2><p><a href="http://dockone.io/article/783" target="_blank" rel="noopener">http://dockone.io/article/783</a></p>
-<h2 id="菜鸟网"><a href="#菜鸟网" class="headerlink" title="菜鸟网"></a>菜鸟网</h2><ul>
-<li><a href="http://www.runoob.com/docker/docker-hello-world.html" target="_blank" rel="noopener">http://www.runoob.com/docker/docker-hello-world.html</a></li>
-<li>Docker 安装 Nginx</li>
-<li>Docker 安装 PHP</li>
-<li>Docker 安装 MySQL</li>
-<li>Docker 安装 Tomcat</li>
-<li>Docker  安装 Python</li>
-<li>Docker 安装 Redis</li>
-<li>Docker 安装 MongoDB</li>
-<li>Docker 安装 Apache</li>
-</ul>
-<h2 id="学习资料"><a href="#学习资料" class="headerlink" title="学习资料"></a>学习资料</h2><ul>
-<li><a href="https://joshhu.gitbooks.io/docker_theory_install/content/" target="_blank" rel="noopener">https://joshhu.gitbooks.io/docker_theory_install/content/</a></li>
-<li><a href="https://docs.docker.com/" target="_blank" rel="noopener">https://docs.docker.com/</a></li>
-<li><a href="https://yeasy.gitbooks.io/docker_practice/content/introduction/why.html" target="_blank" rel="noopener">https://yeasy.gitbooks.io/docker_practice/content/introduction/why.html</a></li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2147,7 +2002,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">44</span>
+                  <span class="site-state-item-count">48</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
