@@ -1,9 +1,9 @@
----
 title: btrace-study
+date: 2018-01-18 07:21:23
 tags:
 categories:
 ---
-# 概念:
+# btrace概念:
 
 - Probe Point: 
     - “location” or “event” at which a set of tracing statements are executed. Probe point is “place” or “event” of interest where we want to execute some tracing statements.（探测点，就是我们想要执行一些追踪语句的地方或事件）
@@ -33,4 +33,3 @@ https://github.com/btraceio/btrace
 
 # 可运行包 下载地址
 https://github.com/btraceio/btrace/releases/tag/v1.3.10
-

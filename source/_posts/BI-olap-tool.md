@@ -3,6 +3,18 @@ date: 2018-01-05 19:31:54
 tags:
 categories:
 ---
+# 备选列表:
+- 阿里云-分析性数据库
+- GreePlum
+- Presto
+- Kylin
+<!--more-->
+
+# 阿里云-分析性数据库
+
+![upload successful](/images/pasted-18.png)
+
+
 # GreePlum
 
 ![upload successful](/images/pasted-9.png)

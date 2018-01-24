@@ -1,7 +1,7 @@
 title: study-red–black-tree
-date: 2018-01-05 11:16:42
-tags:
-categories:
+tags: []
+categories: []
+date: 2018-01-05 11:16:00
 ---
 # 二叉搜索树
 由于红黑树本质上就是一棵二叉查找树，所以在了解红黑树之前，咱们先来看下二叉查找树。

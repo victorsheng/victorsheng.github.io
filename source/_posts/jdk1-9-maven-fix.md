@@ -1,8 +1,10 @@
----
 title: jdk1.9-maven-fix
-date: 2018-01-08 13:59:36
 tags:
-categories:
+  - java
+  - maven
+  - JDK1.9
+categories: []
+date: 2018-01-08 13:59:00
 ---
 # 背景
 在安装了多个jdk版本后,发现maven命令不好使了
