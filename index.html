@@ -322,6 +322,624 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/24/mysql-debug/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/24/mysql-debug/" itemprop="url">mysql-debug</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T15:42:00+08:00">
+                2018-01-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/24/mysql-debug/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/24/mysql-debug/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/24/mysql-debug/" class="leancloud_visitors" data-flag-title="mysql-debug">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="问题sql"><a href="#问题sql" class="headerlink" title="问题sql"></a>问题sql</h1><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">  <span class="keyword">SELECT</span></span><br><span class="line">  *</span><br><span class="line"><span class="keyword">FROM</span> v_sale_order</span><br><span class="line"><span class="keyword">WHERE</span> <span class="number">1</span> = <span class="number">1</span> <span class="keyword">AND</span> v_sale_order.is_usable = <span class="number">1</span> <span class="keyword">AND</span> v_sale_order.tenant_id = <span class="number">100046</span> <span class="keyword">AND</span> <span class="number">1</span> = <span class="number">1</span> <span class="keyword">AND</span> archive_state <span class="keyword">IN</span> (<span class="number">0</span>, <span class="number">1</span>) <span class="keyword">AND</span></span><br><span class="line">#       v_sale_order.buyer_nick <span class="keyword">LIKE</span> <span class="string">'肆无忌惮演江山%'</span></span><br><span class="line">     v_sale_order.buyer_nick <span class="keyword">LIKE</span> <span class="string">'t_150175568%'</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> v_sale_order.last_update_time <span class="keyword">DESC</span>;</span><br></pre></td></tr></table></figure>
+<h1 id="如果查询内容带下划线"><a href="#如果查询内容带下划线" class="headerlink" title="如果查询内容带下划线"></a>如果查询内容带下划线</h1><html><br><head><br>  <title></title><br></head><br><body><br><table border="1" style="border-collapse:collapse"><br><tr><th>id</th><th>select_type</th><th>table</th><th>type</th><th>possible_keys</th><th>key</th><th>key_len</th><th>ref</th><th>rows</th><th>Extra</th></tr><br><tr><td>1</td><td>SIMPLE</td><td>sos</td><td>ref</td><td>idx_sale_order_id,IDX_ARCHIVE_SPLIT,oms_normal,oms_check,oms_suspend,oms_normal_v2,oms_check_v2,oms_suspend_v2,IX_SaleOrderStatus_SyncPlaystate,idx_pay_time,IDX_original_order_id</td><td>IDX_original_order_id</td><td>6</td><td>const,const</td><td>837216</td><td>Using where; Using filesort</td></tr><br><tr><td>1</td><td>SIMPLE</td><td>soc</td><td>ref</td><td>idx_sale_order_id</td><td>idx_sale_order_id</td><td>9</td><td>egenie_kn.sos.sale_order_id</td><td>1</td><td>NULL</td></tr><br><tr><td>1</td><td>SIMPLE</td><td>sow</td><td>ref</td><td>idx_sale_order_id</td><td>idx_sale_order_id</td><td>9</td><td>egenie_kn.sos.sale_order_id</td><td>1</td><td>NULL</td></tr><br><tr><td>1</td><td>SIMPLE</td><td>so</td><td>eq_ref</td><td>PRIMARY</td><td>PRIMARY</td><td>8</td><td>egenie_kn.sos.sale_order_id</td><td>1</td><td>NULL</td></tr><br><tr><td>1</td><td>SIMPLE</td><td>sof</td><td>ref</td><td>idx_sale_order_id</td><td>idx_sale_order_id</td><td>9</td><td>egenie_kn.sos.sale_order_id</td><td>1</td><td>NULL</td></tr><br><tr><td>1</td><td>SIMPLE</td><td>sor</td><td>ref</td><td>idx_sale_order_id,idx_buyer_nick</td><td>idx_sale_order_id</td><td>9</td><td>egenie_kn.sos.sale_order_id</td><td>1</td><td>Using where</td></tr><br><tr><td>1</td><td>SIMPLE</td><td>soi</td><td>ref</td><td>idx_sale_order_id</td><td>idx_sale_order_id</td><td>9</td><td>egenie_kn.sos.sale_order_id</td><td>1</td><td>NULL</td></tr></table><br></body><br></html>
+
+
+<h1 id="如果查询内容不带下划线"><a href="#如果查询内容不带下划线" class="headerlink" title="如果查询内容不带下划线"></a>如果查询内容不带下划线</h1><html><br><head><br>  <title></title><br></head><br><body><br><table border="1" style="border-collapse:collapse"><br><tr><th>id</th><th>select_type</th><th>table</th><th>type</th><th>possible_keys</th><th>key</th><th>key_len</th><th>ref</th><th>rows</th><th>Extra</th></tr><br><tr><td>1</td><td>SIMPLE</td><td>sor</td><td>range</td><td>idx_sale_order_id,idx_buyer_nick</td><td>idx_buyer_nick</td><td>303</td><td>NULL</td><td>7</td><td>Using index condition; Using where; Using temporary; Using filesort</td></tr><br><tr><td>1</td><td>SIMPLE</td><td>sos</td><td>eq_ref</td><td>idx_sale_order_id,IDX_ARCHIVE_SPLIT,oms_normal,oms_check,oms_suspend,oms_normal_v2,oms_check_v2,oms_suspend_v2,IX_SaleOrderStatus_SyncPlaystate,idx_pay_time,IDX_original_order_id</td><td>idx_sale_order_id</td><td>8</td><td>egenie_kn.sor.sale_order_id</td><td>1</td><td>Using where</td></tr><br><tr><td>1</td><td>SIMPLE</td><td>soc</td><td>ref</td><td>idx_sale_order_id</td><td>idx_sale_order_id</td><td>9</td><td>egenie_kn.sor.sale_order_id</td><td>1</td><td>NULL</td></tr><br><tr><td>1</td><td>SIMPLE</td><td>sow</td><td>ref</td><td>idx_sale_order_id</td><td>idx_sale_order_id</td><td>9</td><td>egenie_kn.sor.sale_order_id</td><td>1</td><td>NULL</td></tr><br><tr><td>1</td><td>SIMPLE</td><td>so</td><td>eq_ref</td><td>PRIMARY</td><td>PRIMARY</td><td>8</td><td>egenie_kn.sor.sale_order_id</td><td>1</td><td>NULL</td></tr><br><tr><td>1</td><td>SIMPLE</td><td>sof</td><td>ref</td><td>idx_sale_order_id</td><td>idx_sale_order_id</td><td>9</td><td>egenie_kn.sor.sale_order_id</td><td>1</td><td>NULL</td></tr><br><tr><td>1</td><td>SIMPLE</td><td>soi</td><td>ref</td><td>idx_sale_order_id</td><td>idx_sale_order_id</td><td>9</td><td>egenie_kn.sor.sale_order_id</td><td>1</td><td>NULL</td></tr></table><br></body><br></html>
+
+
+<h1 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h1><ul>
+<li>%代表任意多个字符</li>
+<li>_代表一个字符</li>
+<li>如果想搜索  _  就要用到转义符 “\” </li>
+</ul>
+<h1 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">value = value.replaceAll(<span class="string">"\\_"</span>, <span class="string">"\\\\_"</span>);</span><br></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/22/study-quick-sort/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/22/study-quick-sort/" itemprop="url">study_quick_sort</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-22T22:39:55+08:00">
+                2018-01-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/22/study-quick-sort/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/22/study-quick-sort/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/22/study-quick-sort/" class="leancloud_visitors" data-flag-title="study_quick_sort">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><img src="/images/pasted-41.png" alt="upload successful"></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/22/study-springboot-springmvc/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/22/study-springboot-springmvc/" itemprop="url">springboot配置FastJsonHttpMessageConverter(原理篇)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-22T17:18:00+08:00">
+                2018-01-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/22/study-springboot-springmvc/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/22/study-springboot-springmvc/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/22/study-springboot-springmvc/" class="leancloud_visitors" data-flag-title="springboot配置FastJsonHttpMessageConverter(原理篇)">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="springboot如何配置DispatcherServlet"><a href="#springboot如何配置DispatcherServlet" class="headerlink" title="springboot如何配置DispatcherServlet?"></a>springboot如何配置DispatcherServlet?</h1><p>org.springframework.boot.autoconfigure.web.DispatcherServletAutoConfiguration中完成的</p>
+<h1 id="在springboot项目中-进行springmvc配置的新的方式"><a href="#在springboot项目中-进行springmvc配置的新的方式" class="headerlink" title="在springboot项目中,进行springmvc配置的新的方式"></a>在springboot项目中,进行springmvc配置的新的方式</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">@Configuration</span><br><span class="line">public class SpringMvcConfigure extends WebMvcConfigurerAdapter &#123;</span><br><span class="line"></span><br><span class="line">    @Bean</span><br><span class="line">    public InternalResourceViewResolver viewResolver() &#123;</span><br><span class="line">        InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();</span><br><span class="line">        viewResolver.setPrefix(&quot;/WEB-INF/jsp/&quot;);</span><br><span class="line">        viewResolver.setSuffix(&quot;.jsp&quot;);</span><br><span class="line">        // viewResolver.setViewClass(JstlView.class); // 这个属性通常并不需要手动配置，高版本的Spring会自动检测</span><br><span class="line">        return viewResolver;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void addInterceptors(InterceptorRegistry registry) &#123;</span><br><span class="line">        registry.addInterceptor(new Interceptor1()).addPathPatterns(&quot;/**&quot;);</span><br><span class="line">        registry.addInterceptor(new Interceptor2()).addPathPatterns(&quot;/users&quot;).addPathPatterns(&quot;/users/**&quot;);</span><br><span class="line">        super.addInterceptors(registry);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void addResourceHandlers(ResourceHandlerRegistry registry) &#123;</span><br><span class="line">        // addResourceHandler指的是访问路径，addResourceLocations指的是文件放置的目录  </span><br><span class="line">        registry.addResourceHandler(&quot;/**&quot;).addResourceLocations(&quot;classpath:/res/&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="HTTP序列化-反序列化"><a href="#HTTP序列化-反序列化" class="headerlink" title="HTTP序列化/反序列化"></a>HTTP序列化/反序列化</h1><p>@RestController中有@ResponseBody，可以帮我们把User序列化到resp.body中。@RequestBody可以帮我们把req.body的内容转化为User对象。如果是开发Web应用，一般这两个注解对应的就是Json序列化和反序列化的操作。这里实际上已经体现了Http序列化/反序列化这个过程，只不过和普通的对象序列化有些不一样，Http序列化/反序列化的层次更高，属于一种Object2Object之间的转换。</p>
+<p>有过Netty使用经验的对这个应该比较了解，Netty中的Decoder和Encoder就有两种基本层次，层次低的一种是Byte &lt;—&gt; Message，二进制与程序内部消息对象之间的转换，就是常见的序列化/反序列化；另外一种是 Message &lt;—&gt; Message，程序内部对象之间的转换，比较高层次的序列化/反序列化。</p>
+<p>Http协议的处理过程，TCP字节流 &lt;—&gt; HttpRequest/HttpResponse &lt;—&gt; 内部对象，就涉及这两种序列化。在springmvc中第一步已经由Servlet容器（tomcat等等）帮我们处理了，第二步则主要由框架帮我们处理。上面所说的Http序列化/反序列化就是指的这第二个步骤，它是controller层框架的核心功能之一，有了这个功能，就能大大减少代码量，让controller的逻辑更简洁清晰，就像上面示意的代码那样，方法中只有一行代码。</p>
+<p>spirngmvc进行第二步操作，也就是Http序列化和反序列化的核心是HttpMessageConverter。用过老版本springmvc的可能有些印象，那时候需要在xml配置文件中注入MappingJackson2HttpMessageConverter这个类型的bean，告诉springmvc我们需要进行Json格式的转换，它就是HttpMessageConverter的一种实现。<br><img src="/images/pasted-39.png" alt="upload successful"></p>
+<h2 id="几种实现"><a href="#几种实现" class="headerlink" title="几种实现"></a>几种实现</h2><ul>
+<li>json:gson,fastjson,jackson</li>
+<li>Protobuf</li>
+<li>java序列化</li>
+</ul>
+<h1 id="HttpMessageConverter优先级"><a href="#HttpMessageConverter优先级" class="headerlink" title="HttpMessageConverter优先级"></a>HttpMessageConverter优先级</h1><p>另外有很重要的一点需要说明一下，springmvc可以同时配置多个Converter，根据一定的规则（主要是Content-Type、Accept、controller方法的consumes/produces、Converter.mediaType以及Converter的排列顺序这四个属性）来选择到底是使用哪一个，这使得springmvc能够一个接口支持多种报文格式。</p>
+<h1 id="默认的converters"><a href="#默认的converters" class="headerlink" title="默认的converters"></a>默认的converters</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">ByteArrayHttpMessageConverter – converts byte arrays</span><br><span class="line">StringHttpMessageConverter – converts Strings</span><br><span class="line">ResourceHttpMessageConverter – converts org.springframework.core.io.Resource for any type of octet stream</span><br><span class="line">SourceHttpMessageConverter – converts javax.xml.transform.Source</span><br><span class="line">FormHttpMessageConverter – converts form data to/from a MultiValueMap&lt;String, String&gt;.</span><br><span class="line">Jaxb2RootElementHttpMessageConverter – converts Java objects to/from XML (added only if JAXB2 is present on the classpath)</span><br><span class="line">MappingJackson2HttpMessageConverter – converts JSON (added only if Jackson 2 is present on the classpath)</span><br><span class="line">MappingJacksonHttpMessageConverter – converts JSON (added only if Jackson is present on the classpath)</span><br><span class="line">AtomFeedHttpMessageConverter – converts Atom feeds (added only if Rome is present on the classpath)</span><br><span class="line">RssChannelHttpMessageConverter – converts RSS feeds (added only if Rome is present on the classpath)</span><br></pre></td></tr></table></figure>
+<p><img src="/images/pasted-40.png" alt="upload successful"></p>
+<h1 id="源码中的调用栈"><a href="#源码中的调用栈" class="headerlink" title="源码中的调用栈"></a>源码中的调用栈</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter.write(FastJsonHttpMessageConverter.java:185)</span><br><span class="line">	  at org.springframework.web.servlet.mvc.method.annotation.AbstractMessageConverterMethodProcessor.writeWithMessageConverters(AbstractMessageConverterMethodProcessor.java:231)</span><br><span class="line">	  at org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor.handleReturnValue(HttpEntityMethodProcessor.java:203)</span><br><span class="line">	  at org.springframework.web.method.support.HandlerMethodReturnValueHandlerComposite.handleReturnValue(HandlerMethodReturnValueHandlerComposite.java:81)</span><br><span class="line">	  at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:113)</span><br><span class="line">	  at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:827)</span><br><span class="line">	  at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:738)</span><br><span class="line">	  at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:85)</span><br><span class="line">	  at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:967)</span><br><span class="line">	  at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:901)</span><br><span class="line">	  at</span><br></pre></td></tr></table></figure>
+<h1 id="常见的contentType"><a href="#常见的contentType" class="headerlink" title="常见的contentType"></a>常见的contentType</h1><ul>
+<li>1.text/html</li>
+<li>2.text/plain</li>
+<li>3.text/css</li>
+<li>4.text/javascript</li>
+<li>5.application/x-www-form-urlencoded</li>
+<li>6.multipart/form-data</li>
+<li>7.application/json</li>
+<li>8.application/xml</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/22/study-fastjson-formatter/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/22/study-fastjson-formatter/" itemprop="url">springboot配置FastJsonHttpMessageConverter(实战篇)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-22T15:12:00+08:00">
+                2018-01-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/22/study-fastjson-formatter/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/22/study-fastjson-formatter/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/22/study-fastjson-formatter/" class="leancloud_visitors" data-flag-title="springboot配置FastJsonHttpMessageConverter(实战篇)">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><h2 id="老的方式-controller的参数与返回值"><a href="#老的方式-controller的参数与返回值" class="headerlink" title="老的方式:controller的参数与返回值"></a>老的方式:controller的参数与返回值</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public JsonResult queryDrillDetail(@RequestBody String body) &#123;</span><br><span class="line">List&lt;Map&lt;String, Object&gt;&gt; detailMapList = new ArrayList&lt;&gt;();</span><br><span class="line">.......</span><br><span class="line">return new JsonResult(JsonResult.SUCCESSFUL, new PagedList&lt;&gt;(query.getPage() + 1, pageable.getPageSize(),</span><br><span class="line">                query.getTotalCount(), detailMapList));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="老的方式-问题"><a href="#老的方式-问题" class="headerlink" title="老的方式:问题"></a>老的方式:问题</h2><ul>
+<li>入参不明确</li>
+<li>返回值类型不明确</li>
+<li>Map的key只有在运行时,才会知道,且不知道类型</li>
+</ul>
+<h2 id="期望的方式-使用vo"><a href="#期望的方式-使用vo" class="headerlink" title="期望的方式:使用vo"></a>期望的方式:使用vo</h2><h1 id="改造步骤"><a href="#改造步骤" class="headerlink" title="改造步骤:"></a>改造步骤:</h1><p>1.在使用converters的最后一个优先级,添加FastJsonHttpMessageConverter</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">@Component</span><br><span class="line">public class MyWebAppConfigurer extends WebMvcConfigurerAdapter &#123;</span><br><span class="line"></span><br><span class="line">    // 添加converter的第三种方式</span><br><span class="line">    // 同一个WebMvcConfigurerAdapter中的configureMessageConverters方法先于extendMessageConverters方法执行</span><br><span class="line">    // 可以理解为是三种方式中最后执行的一种，不过这里可以通过add指定顺序来调整优先级，也可以使用remove/clear来删除converter，功能强大</span><br><span class="line">    // 使用converters.add(xxx)会放在最低优先级（List的尾部）</span><br><span class="line">    // 使用converters.add(0,xxx)会放在最高优先级（List的头部）</span><br><span class="line">    @Override</span><br><span class="line">    public void extendMessageConverters(List&lt;HttpMessageConverter&lt;?&gt;&gt; converters) &#123;</span><br><span class="line">        converters.add(new FastJsonHttpMessageConverter());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>2.model遵循老的接口原则,转为下划线分割的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">@JSONType(naming = PropertyNamingStrategy.SnakeCase)</span><br><span class="line">public class PurchaseDetailDrillVo &#123;</span><br><span class="line"></span><br><span class="line">    private Long pmsPurchaseOrderId;</span><br><span class="line">    private Long pmsPurchaseOrderDetailId;</span><br><span class="line">    private String pmsPurchaseOrderNo;</span><br><span class="line">    private Integer productType;</span><br><span class="line">    private String deliverAddress;</span><br><span class="line">    private Long provinceId;</span><br><span class="line">    ....</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>3.使用@RequestBody注解,类型改为vo</p>
+<p>测试,接受参数和返回参数都是vo,而接口的字段映射依然为下划线,</p>
+<hr>
+<p>以下为项目本身的问题<br>4.pom文件中排除jackson的依赖<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;com.ejlerp&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;ejlerp-common&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;3.2.0-SNAPSHOT&lt;/version&gt;</span><br><span class="line">    &lt;exclusions&gt;</span><br><span class="line">        &lt;exclusion&gt;</span><br><span class="line">            &lt;artifactId&gt;jackson-core&lt;/artifactId&gt;</span><br><span class="line">            &lt;groupId&gt;com.fasterxml.jackson.core&lt;/groupId&gt;</span><br><span class="line">        &lt;/exclusion&gt;</span><br><span class="line">    &lt;/exclusions&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure></p>
+<p>5.fastjason默认支持所有的contentType,及*, 与springmvc校验相冲突,so需要声明fastjason能支持的contentType,在初始化FastJsonHttpMessageConverter,注入参数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">public void extendMessageConverters(List&lt;HttpMessageConverter&lt;?&gt;&gt; converters) &#123;</span><br><span class="line">    FastJsonHttpMessageConverter fastJsonHttpMessageConverter = new FastJsonHttpMessageConverter();</span><br><span class="line">    ArrayList&lt;MediaType&gt; supportedMediaTypes = Lists.newArrayList();</span><br><span class="line">    supportedMediaTypes.add(MediaType.APPLICATION_FORM_URLENCODED);</span><br><span class="line">    supportedMediaTypes.add(MediaType.APPLICATION_JSON);</span><br><span class="line">    supportedMediaTypes.add(MediaType.TEXT_HTML);</span><br><span class="line">    supportedMediaTypes.add(MediaType.TEXT_PLAIN);</span><br><span class="line">    fastJsonHttpMessageConverter.setSupportedMediaTypes(supportedMediaTypes);</span><br><span class="line">    converters.add(fastJsonHttpMessageConverter);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="fastjson官网"><a href="#fastjson官网" class="headerlink" title="fastjson官网"></a>fastjson官网</h1><p><a href="https://github.com/alibaba/fastjson/issues/1555" target="_blank" rel="noopener">https://github.com/alibaba/fastjson/issues/1555</a><br><a href="https://github.com/alibaba/fastjson/wiki/PropertyNamingStrategy_cn" target="_blank" rel="noopener">https://github.com/alibaba/fastjson/wiki/PropertyNamingStrategy_cn</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/22/study-equals-and-hashCode/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -807,7 +1425,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/19/com-ejlerp-wms-api-stock-StockServi/">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/18/reivew-spring-mvc/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
@@ -826,7 +1444,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/01/19/com-ejlerp-wms-api-stock-StockServi/" itemprop="url">com.ejlerp.wms.api.stock.StockServi</a></h1>
+                <a class="post-title-link" href="/2018/01/18/reivew-spring-mvc/" itemprop="url">reivew_spring_mvc</a></h1>
         
 
         <div class="post-meta">
@@ -838,8 +1456,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-19T23:04:15+08:00">
-                2018-01-19
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-18T21:19:00+08:00">
+                2018-01-18
               </time>
             
 
@@ -857,9 +1475,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/01/19/com-ejlerp-wms-api-stock-StockServi/#comments" itemprop="discussionUrl">
+                <a href="/2018/01/18/reivew-spring-mvc/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/01/19/com-ejlerp-wms-api-stock-StockServi/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/01/18/reivew-spring-mvc/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -867,7 +1485,7 @@
 
           
           
-             <span id="/2018/01/19/com-ejlerp-wms-api-stock-StockServi/" class="leancloud_visitors" data-flag-title="com.ejlerp.wms.api.stock.StockServi">
+             <span id="/2018/01/18/reivew-spring-mvc/" class="leancloud_visitors" data-flag-title="reivew_spring_mvc">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -900,7 +1518,40 @@
       
         
           
-            
+            <h1 id="springmvc是什么"><a href="#springmvc是什么" class="headerlink" title="springmvc是什么"></a>springmvc是什么</h1><ul>
+<li>Spring Web MVC是一种基于Java的实现了Web MVC设计模式的请求驱动类型的轻量级Web框架</li>
+<li>将web层进行职责解耦</li>
+<li>工作者模式的实现???<h1 id="帮我们做什么"><a href="#帮我们做什么" class="headerlink" title="帮我们做什么"></a>帮我们做什么</h1></li>
+<li>让我们能非常简单的设计出干净的Web层和薄薄的Web层；</li>
+<li>进行更简洁的Web层的开发；</li>
+<li>天生与Spring框架集成（如IoC容器、AOP等）；</li>
+<li>提供强大的约定大于配置的契约式编程支持；</li>
+<li>能简单的进行Web层的单元测试；</li>
+<li>支持灵活的URL到页面控制器的映射；</li>
+<li>非常容易与其他视图技术集成，如Velocity、FreeMarker等等，因为模型数据不放在特定的API里，而是放在一个Model里（Map数据结构实现，因此很容易被其他框架使用）；</li>
+<li>非常灵活的数据验证、格式化和数据绑定机制，能使用任何对象进行数据绑定，不必实现特定框架的API；</li>
+<li>提供一套强大的JSP标签库，简化JSP开发；</li>
+<li>支持灵活的本地化、主题等解析；</li>
+<li>更加简单的异常处理；</li>
+<li>对静态资源的支持；</li>
+<li>支持Restful风格。</li>
+</ul>
+<h1 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h1><p><img src="/images/pasted-28.png" alt="upload successful"></p>
+<p><img src="/images/pasted-29.png" alt="upload successful"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line">//前端控制器分派方法  </span><br><span class="line">protected void doDispatch(HttpServletRequest request, HttpServletResponse response) throws Exception &#123;  </span><br><span class="line">        HttpServletRequest processedRequest = request;  </span><br><span class="line">        HandlerExecutionChain mappedHandler = null;  </span><br><span class="line">        int interceptorIndex = -1;  </span><br><span class="line">  </span><br><span class="line">        try &#123;  </span><br><span class="line">            ModelAndView mv;  </span><br><span class="line">            boolean errorView = false;  </span><br><span class="line">  </span><br><span class="line">            try &#123;  </span><br><span class="line">                   //检查是否是请求是否是multipart（如文件上传），如果是将通过MultipartResolver解析  </span><br><span class="line">                processedRequest = checkMultipart(request);  </span><br><span class="line">                   //步骤2、请求到处理器（页面控制器）的映射，通过HandlerMapping进行映射  </span><br><span class="line">                mappedHandler = getHandler(processedRequest, false);  </span><br><span class="line">                if (mappedHandler == null || mappedHandler.getHandler() == null) &#123;  </span><br><span class="line">                    noHandlerFound(processedRequest, response);  </span><br><span class="line">                    return;  </span><br><span class="line">                &#125;  </span><br><span class="line">                   //步骤3、处理器适配，即将我们的处理器包装成相应的适配器（从而支持多种类型的处理器）  </span><br><span class="line">                HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());  </span><br><span class="line">  </span><br><span class="line">                  // 304 Not Modified缓存支持  </span><br><span class="line">                //此处省略具体代码  </span><br><span class="line">  </span><br><span class="line">                // 执行处理器相关的拦截器的预处理（HandlerInterceptor.preHandle）  </span><br><span class="line">                //此处省略具体代码  </span><br><span class="line">  </span><br><span class="line">                // 步骤4、由适配器执行处理器（调用处理器相应功能处理方法）  </span><br><span class="line">                mv = ha.handle(processedRequest, response, mappedHandler.getHandler());  </span><br><span class="line">  </span><br><span class="line">                // Do we need view name translation?  </span><br><span class="line">                if (mv != null &amp;&amp; !mv.hasView()) &#123;  </span><br><span class="line">                    mv.setViewName(getDefaultViewName(request));  </span><br><span class="line">                &#125;  </span><br><span class="line">  </span><br><span class="line">                // 执行处理器相关的拦截器的后处理（HandlerInterceptor.postHandle）  </span><br><span class="line">                //此处省略具体代码  </span><br><span class="line">            &#125;  </span><br><span class="line">            catch (ModelAndViewDefiningException ex) &#123;  </span><br><span class="line">                logger.debug(&quot;ModelAndViewDefiningException encountered&quot;, ex);  </span><br><span class="line">                mv = ex.getModelAndView();  </span><br><span class="line">            &#125;  </span><br><span class="line">            catch (Exception ex) &#123;  </span><br><span class="line">                Object handler = (mappedHandler != null ? mappedHandler.getHandler() : null);  </span><br><span class="line">                mv = processHandlerException(processedRequest, response, handler, ex);  </span><br><span class="line">                errorView = (mv != null);  </span><br><span class="line">            &#125;  </span><br><span class="line">  </span><br><span class="line">            //步骤5 步骤6、解析视图并进行视图的渲染  </span><br><span class="line">//步骤5 由ViewResolver解析View（viewResolver.resolveViewName(viewName, locale)）  </span><br><span class="line">//步骤6 视图在渲染时会把Model传入（view.render(mv.getModelInternal(), request, response);）  </span><br><span class="line">            if (mv != null &amp;&amp; !mv.wasCleared()) &#123;  </span><br><span class="line">                render(mv, processedRequest, response);  </span><br><span class="line">                if (errorView) &#123;  </span><br><span class="line">                    WebUtils.clearErrorRequestAttributes(request);  </span><br><span class="line">                &#125;  </span><br><span class="line">            &#125;  </span><br><span class="line">            else &#123;  </span><br><span class="line">                if (logger.isDebugEnabled()) &#123;  </span><br><span class="line">                    logger.debug(&quot;Null ModelAndView returned to DispatcherServlet with name &apos;&quot; + getServletName() +  </span><br><span class="line">                            &quot;&apos;: assuming HandlerAdapter completed request handling&quot;);  </span><br><span class="line">                &#125;  </span><br><span class="line">            &#125;  </span><br><span class="line">  </span><br><span class="line">            // 执行处理器相关的拦截器的完成后处理（HandlerInterceptor.afterCompletion）  </span><br><span class="line">            //此处省略具体代码  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">        catch (Exception ex) &#123;  </span><br><span class="line">            // Trigger after-completion for thrown exception.  </span><br><span class="line">            triggerAfterCompletion(mappedHandler, interceptorIndex, processedRequest, response, ex);  </span><br><span class="line">            throw ex;  </span><br><span class="line">        &#125;  </span><br><span class="line">        catch (Error err) &#123;  </span><br><span class="line">            ServletException ex = new NestedServletException(&quot;Handler processing failed&quot;, err);  </span><br><span class="line">            // Trigger after-completion for thrown exception.  </span><br><span class="line">            triggerAfterCompletion(mappedHandler, interceptorIndex, processedRequest, response, ex);  </span><br><span class="line">            throw ex;  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">        finally &#123;  </span><br><span class="line">            // Clean up any resources used by a multipart request.  </span><br><span class="line">            if (processedRequest != request) &#123;  </span><br><span class="line">                cleanupMultipart(processedRequest);  </span><br><span class="line">            &#125;  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>核心架构的具体流程步骤如下：</p>
+<p>1、  首先用户发送请求——&gt;DispatcherServlet，前端控制器收到请求后自己不进行处理，而是委托给其他的解析器进行处理，作为统一访问点，进行全局的流程控制；</p>
+<p>2、  DispatcherServlet——&gt;<b>HandlerMapping</b>， HandlerMapping将会把请求映射为HandlerExecutionChain对象（包含一个Handler处理器（页面控制器）对象、多个HandlerInterceptor拦截器）对象，通过这种策略模式，很容易添加新的映射策略；</p>
+<p>3、  DispatcherServlet——&gt;HandlerAdapter，HandlerAdapter将会把处理器包装为适配器，从而支持多种类型的处理器，即适配器设计模式的应用，从而很容易支持很多类型的处理器；</p>
+<p>4、  HandlerAdapter——&gt;处理器功能处理方法的调用，HandlerAdapter将会根据适配的结果调用真正的处理器的功能处理方法，完成功能处理；并返回一个ModelAndView对象（包含模型数据、逻辑视图名）；</p>
+<p>5、  ModelAndView的逻辑视图名——&gt; ViewResolver， ViewResolver将把逻辑视图名解析为具体的View，通过这种策略模式，很容易更换其他视图技术；</p>
+<p>6、  View——&gt;渲染，View会根据传进来的Model模型数据进行渲染，此处的Model实际是一个Map数据结构，因此很容易支持其他视图技术；</p>
+<p>7、返回控制权给DispatcherServlet，由DispatcherServlet返回响应给用户，到此一个流程结束。</p>
+<p>此处我们只是讲了核心流程，没有考虑拦截器、本地解析、文件上传解析等，后边再细述。</p>
+<h1 id="hello-world"><a href="#hello-world" class="headerlink" title="hello world"></a>hello world</h1><p><img src="/images/pasted-30.png" alt="upload successful"></p>
+<h1 id="DispatcherServlet与HttpMessageConverter的关系"><a href="#DispatcherServlet与HttpMessageConverter的关系" class="headerlink" title="DispatcherServlet与HttpMessageConverter的关系"></a>DispatcherServlet与HttpMessageConverter的关系</h1><p>//TODO</p>
+<p><a href="http://sishuok.com/forum/blogPost/list/5160.html" target="_blank" rel="noopener">http://sishuok.com/forum/blogPost/list/5160.html</a></p>
+
           
         
       
@@ -1270,694 +1921,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/13/review-java-thread/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/13/review-java-thread/" itemprop="url">java-线程复习</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-13T10:13:27+08:00">
-                2018-01-13
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/01/13/review-java-thread/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/01/13/review-java-thread/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/01/13/review-java-thread/" class="leancloud_visitors" data-flag-title="java-线程复习">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h1><p>创建线程有两种方式：<br>一、继承 Thread 类，扩展线程。<br>二、实现 Runnable 接口。</p>
-<p>Callable接口<br>Future接口<br>FutureTask实现了 Future 接口<br>FutureTask 的好处是 FutureTask 是为了弥补 Thread 的不足而设计的，它可以让程序员准确地知道线程什么时候执行完成并获得到线程执行完成后返回的结果。FutureTask 是一种可以取消的异步的计算任务，它的计算是通过 Callable 实现的，它等价于可以携带结果的 Runnable，并且有三个状态：等待、运行和完成。完成包括所有计算以任意的方式结束，包括正常结束、取消和异常。</p>
-<h1 id="多线程"><a href="#多线程" class="headerlink" title="多线程"></a>多线程</h1><p>多线程的概念很好理解就是多条线程同时存在，但要用好多线程确不容易，涉及到多线程间通信，多线程共用一个资源等诸多问题。</p>
-<h2 id="synchronized"><a href="#synchronized" class="headerlink" title="synchronized"></a>synchronized</h2><p>解决多个线程之间访问资源的同步性</p>
-<ul>
-<li>对于同步方法，锁是当前实例对象。</li>
-<li>对于静态同步方法，锁是当前对象的Class对象。</li>
-<li>对于同步方法块，锁是Synchonized括号里配置的对象。<h2 id="volatile"><a href="#volatile" class="headerlink" title="volatile"></a>volatile</h2>解决变量在多个线程之间的可见性<h2 id="wait-、notify-、notifyAll"><a href="#wait-、notify-、notifyAll" class="headerlink" title="wait()、notify()、notifyAll()"></a>wait()、notify()、notifyAll()</h2>wait():我的部分已经做完了,等别人让我做的时候再做,释放锁<br>notify():等我做完了,释放锁后,让其他一个人做<br>wait() 与 Thread.sleep(long time) 的区别:sleep傻等,sleep不释放锁</li>
-</ul>
-<h2 id="ThreadLocal-变量"><a href="#ThreadLocal-变量" class="headerlink" title="ThreadLocal 变量"></a>ThreadLocal 变量</h2><p>线程隔离<br>InheritableTreadLocal让子线程获取父线程中取得值</p>
-<h2 id="join-方法"><a href="#join-方法" class="headerlink" title="join() 方法"></a>join() 方法</h2><p>等待线程对象销毁<br>等待子进程执行完,我再执行<br>Thread.yield() 方法</p>
-<h1 id="ReentrantLock"><a href="#ReentrantLock" class="headerlink" title="ReentrantLock"></a>ReentrantLock</h1><h2 id="lock"><a href="#lock" class="headerlink" title="lock()"></a>lock()</h2><h2 id="unlock"><a href="#unlock" class="headerlink" title="unlock()"></a>unlock()</h2><h2 id="condition"><a href="#condition" class="headerlink" title="condition"></a>condition</h2><h3 id="等待-通知"><a href="#等待-通知" class="headerlink" title="等待/通知"></a>等待/通知</h3><ul>
-<li>awiate() 相当于Object类中的wait()方法</li>
-<li>await(long time,TImeUnit unit) 相当于Object类中的wait()方法</li>
-<li>signal() 相当于Object类中的notify()方法</li>
-<li>sigalAll() 相当于Object类中的notifyAll()方法</li>
-</ul>
-<h3 id="通知部分线程"><a href="#通知部分线程" class="headerlink" title="通知部分线程"></a>通知部分线程</h3><p>Lock lock=new Reentrantock();<br>Condition conditionA=lock.newCondition();<br>Condition conditionB=lock.newCondition();</p>
-<h3 id="公平锁-非公平锁"><a href="#公平锁-非公平锁" class="headerlink" title="公平锁,非公平锁"></a>公平锁,非公平锁</h3><ul>
-<li>获取锁的顺序是按照线程加锁的顺序来分配的,及先来先得的FIFO先进先出顺序</li>
-</ul>
-<h3 id="getHoldCount-getQueueLength-getWaiteQueueLength"><a href="#getHoldCount-getQueueLength-getWaiteQueueLength" class="headerlink" title="getHoldCount(),getQueueLength(),getWaiteQueueLength()"></a>getHoldCount(),getQueueLength(),getWaiteQueueLength()</h3><ul>
-<li>getHoldCount()查询当前线程保持此锁定的个数,调用lock()方法的次数</li>
-<li>getQueueLength()返回正在等待次锁定的线程估计数</li>
-<li>getWaiteQueueLength(Condition condition)返回等待与此锁定翔安的给定条件Condition的线程估计数</li>
-</ul>
-<h1 id="线程池"><a href="#线程池" class="headerlink" title="线程池"></a>线程池</h1><h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><ul>
-<li>如果并发的线程数量很多，并且每个线程都是执行一个时间很短的任务就结束了，</li>
-<li>频繁创建线程就会大大降低系统的效率，因为频繁创建线程和销毁线程需要时间。</li>
-<li>请求频繁，但是连接上以后读/写很少量的数据就断开连接。考虑到服务的并发问题，如果每个请求来到以后服务都为它启动一个线程，那么这对服务的资源可能会造成很大的浪费。</li>
-</ul>
-<h1 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h1><ul>
-<li>第一：降低资源消耗。通过重复利用已创建的线程降低线程创建和销毁造成的消耗。</li>
-<li>第二：提高响应速度。当任务到达时，任务可以不需要等到线程创建就能立即执行。</li>
-<li>第三：提高线程的可管理性。线程是稀缺资源，如果无限制的创建，不仅会消耗系统资源，还会降低系统的稳定性，使用线程池可以进行统一的分配，调优和监控。</li>
-</ul>
-<h2 id="核心接口ExecutorService-Executor"><a href="#核心接口ExecutorService-Executor" class="headerlink" title="核心接口ExecutorService,Executor"></a>核心接口ExecutorService,Executor</h2><p><img src="/images/pasted-19.png" alt="upload successful"></p>
-<h2 id="类"><a href="#类" class="headerlink" title="类"></a>类</h2><ul>
-<li>ExecutorService：真正的线程池接口。</li>
-<li>ScheduledExecutorService:能和Timer/TimerTask类似，解决那些需要任务重复执行的问题。</li>
-<li>ThreadPoolExecutor:ExecutorService的默认实现。</li>
-<li>ScheduledThreadPoolExecutor:继承ThreadPoolExecutor的- - ScheduledExecutorService接口实现，周期性任务调度的类实现。</li>
-<li>Executors类里面提供了一些静态工厂，生成一些常用的线程池。</li>
-</ul>
-<h2 id="Executors-提供四种线程池"><a href="#Executors-提供四种线程池" class="headerlink" title="Executors 提供四种线程池"></a>Executors 提供四种线程池</h2><ul>
-<li><p>1）newCachedThreadPool 是一个可根据需要创建新线程的线程池，但是在以前构造的线程可用时将重用它们。对于执行很多短期异步任务的程序而言，这些线程池通常可提高程序性能。调用 execute() 将重用以前构造的线程（如果线程可用）。如果现有线程没有可用的，则创建一个新线程并添加到池中。终止并从缓存中移除那些已有 60 秒钟未被使用的线程。因此，长时间保持空闲的线程池不会使用任何资源。注意，可以使用 ThreadPoolExecutor 构造方法创建具有类似属性但细节不同（例如超时参数）的线程池。</p>
-</li>
-<li><p>2）newSingleThreadExecutor 创建是一个单线程池，也就是该线程池只有一个线程在工作，所有的任务是串行执行的，如果这个唯一的线程因为异常结束，那么会有一个新的线程来替代它，此线程池保证所有任务的执行顺序按照任务的提交顺序执行。</p>
-</li>
-<li><p>3）newFixedThreadPool 创建固定大小的线程池，每次提交一个任务就创建一个线程，直到线程达到线程池的最大大小，线程池的大小一旦达到最大值就会保持不变，如果某个线程因为执行异常而结束，那么线程池会补充一个新线程。</p>
-</li>
-<li><p>4）newScheduledThreadPool 创建一个大小无限的线程池，此线程池支持定时以及周期性执行任务的需求。</p>
-</li>
-</ul>
-<h2 id="程池相关参数"><a href="#程池相关参数" class="headerlink" title="程池相关参数"></a>程池相关参数</h2><ul>
-<li><p>1）corePoolSize：线程池的核心线程数，一般情况下不管有没有任务都会一直在线程池中一直存活，只有在 ThreadPoolExecutor 中的方法 allowCoreThreadTimeOut(boolean value) 设置为 true 时，闲置的核心线程会存在超时机制，如果在指定时间没有新任务来时，核心线程也会被终止，而这个时间间隔由第3个属性 keepAliveTime 指定。</p>
-</li>
-<li><p>2）maximumPoolSize：线程池所能容纳的最大线程数，当活动的线程数达到这个值后，后续的新任务将会被<b>阻塞</b>。</p>
-</li>
-<li><p>3）keepAliveTime：控制线程闲置时的超时时长，超过则终止该线程。一般情况下用于非核心线程，只有在 ThreadPoolExecutor 中的方法 allowCoreThreadTimeOut(boolean value) 设置为 true时，也作用于核心线程。</p>
-</li>
-<li><p>4）unit：用于指定 keepAliveTime 参数的时间单位，TimeUnit 是个 enum 枚举类型，常用的有：TimeUnit.HOURS(小时)、TimeUnit.MINUTES(分钟)、TimeUnit.SECONDS(秒) 和 TimeUnit.MILLISECONDS(毫秒)等。</p>
-</li>
-<li><p>5）workQueue：线程池的任务队列，通过线程池的 execute(Runnable command) 方法会将任务 Runnable 存储在队列中。</p>
-</li>
-<li><p>6）threadFactory：线程工厂，它是一个接口，用来为线程池创建新线程的。</p>
-</li>
-</ul>
-<h2 id="线程池的关闭"><a href="#线程池的关闭" class="headerlink" title="线程池的关闭"></a>线程池的关闭</h2><ul>
-<li><p>ThreadPoolExecutor 提供了两个方法，用于线程池的关闭，分别是 shutdown() 和 shutdownNow()。</p>
-</li>
-<li><p>shutdown()：不会立即的终止线程池，而是要等所有任务缓存队列中的任务都执行完后才终止，但再也不会接受新的任务。</p>
-</li>
-<li>shutdownNow()：立即终止线程池，并尝试打断正在执行的任务，并且清空任务缓存队列，返回尚未执行的任务。</li>
-</ul>
-<h2 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"> void execute(Runnable task) </span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line"> Future&lt;?&gt; submit(Runnable task)</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line"> &lt;T&gt; Future&lt;T&gt; submit(Callable&lt;T&gt; task)</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">&lt;T&gt; T invokeAny(Collection&lt;? extends Callable&lt;T&gt;&gt; tasks) throws InterruptedException, ExecutionException;</span><br><span class="line"> 全部执行,其中一个执行结束,或异常,则取消其他Callable的运行</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">&lt;T&gt; List&lt;Future&lt;T&gt;&gt; invokeAll(Collection&lt;? extends Callable&lt;T&gt;&gt; tasks) throws InterruptedException;</span><br><span class="line"> 方法 invokeAll() 会调用存在于参数集合中的所有 Callable 对象，并且返回壹個包含 Future 对象的集合</span><br></pre></td></tr></table></figure>
-<h2 id="实际案例"><a href="#实际案例" class="headerlink" title="实际案例"></a>实际案例</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">ExecutorService slaver = Executors.newSingleThreadExecutor();</span><br><span class="line">FutureTask&lt;List&lt;Map&lt;String, Object&gt;&gt;&gt; lastFuture = new FutureTask&lt;&gt;(countCallable);</span><br><span class="line">slaver.execute(lastFuture);</span><br><span class="line">slaver.shutdown();</span><br><span class="line"></span><br><span class="line">List&lt;Map&lt;String, Object&gt;&gt; stockFirst = jdbcTemplate.queryForList(contentSql);</span><br><span class="line">List&lt;Map&lt;String, Object&gt;&gt; stockLast = null;</span><br><span class="line">try &#123;</span><br><span class="line">    stockLast = lastFuture.get();</span><br><span class="line">&#125; catch (Exception e) &#123;</span><br><span class="line">    logger.error(&quot;错误&quot;, e);</span><br><span class="line">&#125; finally &#123;</span><br><span class="line">    lastFuture.cancel(true);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="CompletionService接口"><a href="#CompletionService接口" class="headerlink" title="CompletionService接口"></a>CompletionService接口</h2><ul>
-<li><p>根据上面的介绍我们知道，现在在Java中使用多线程通常不会再使用Thread对象了。而是会用到java.util.concurrent包下的ExecutorService来初始化一个线程池供我们使用。使用ExecutorService类的时候，我们常维护一个list保存submit的callable task所返回的Future对象。然后在主线程中遍历这个list并调用Future的get()方法取到Task的返回值。</p>
-</li>
-<li><p>其实除了使用ExecutorService外，还可通过CompletionService包装ExecutorService，然后调用其take()方法去取Future对象。</p>
-</li>
-<li><p>CompletionService和ExecutorService的主要的区别在于submit的task不一定是按照加入自己维护的list顺序完成的。</p>
-</li>
-<li><p>ExecutorService中从list中遍历的每个Future对象并不一定处于完成状态，这时调用get()方法就会被阻塞住，如果系统是设计成每个线程完成后就能根据其结果继续做后面的事，这样对于处于list后面的但是先完成的线程就会增加了额外的等待时间。</p>
-</li>
-<li><p>而CompletionService的实现是维护一个保存Future对象的BlockingQueue。只有当这个Future对象状态是结束的时候，才会加入到这个Queue中，take()方法其实就是Producer-Consumer中的Consumer。它会从Queue中取出Future对象，如果Queue是空的，就会阻塞在那里，直到有完成的Future对象加入到Queue中。所以，先完成的必定先被取出。这样就减少了不必要的等待时间。</p>
-</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/08/jdk1-9-maven-fix/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/08/jdk1-9-maven-fix/" itemprop="url">jdk1.9-maven-fix</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-08T13:59:00+08:00">
-                2018-01-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/01/08/jdk1-9-maven-fix/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/01/08/jdk1-9-maven-fix/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/01/08/jdk1-9-maven-fix/" class="leancloud_visitors" data-flag-title="jdk1.9-maven-fix">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>在安装了多个jdk版本后,发现maven命令不好使了</p>
-<h1 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h1><ul>
-<li>maven-compiler-plugin:3.1:compile (default-compile) @ report 出现异常<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ report ---</span><br><span class="line">[INFO] Changes detected - recompiling the module!</span><br><span class="line">[INFO] Compiling 60 source files to /Users/victor/code/egenieProjects/report/target/classes</span><br><span class="line">WARNING: An illegal reflective access operation has occurred</span><br><span class="line">WARNING: Illegal reflective access by lombok.javac.apt.Processor to field com.sun.tools.javac.processing.JavacProcessingEnvironment.processorClassLoader</span><br><span class="line">WARNING: Please consider reporting this to the maintainers of lombok.javac.apt.Processor</span><br><span class="line">WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations</span><br><span class="line">WARNING: All illegal access operations will be denied in a future release</span><br><span class="line">[INFO] ------------------------------------------------------------------------</span><br><span class="line">[INFO] BUILD FAILURE</span><br><span class="line">[INFO] ------------------------------------------------------------------------</span><br><span class="line">[INFO] Total time: 5.198 s</span><br><span class="line">[INFO] Finished at: 2018-01-08T14:04:55+08:00</span><br><span class="line">[INFO] Final Memory: 35M/115M</span><br><span class="line">[INFO] ------------------------------------------------------------------------</span><br><span class="line">[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.1:compile (default-compile) on project report: Fatal error compiling: java.lang.NoSuchFieldError: pid -&gt; [Help 1]</span><br><span class="line">[ERROR]</span><br><span class="line">[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.</span><br><span class="line">[ERROR] Re-run Maven using the -X switch to enable full debug logging.</span><br><span class="line">[ERROR]</span><br><span class="line">[ERROR] For more information about the errors and possible solutions, please read the following articles:</span><br><span class="line">[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h1 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h1><ul>
-<li><p>1.9</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">victordeMacBook-Pro:report victor$ mvn -v</span><br><span class="line">Apache Maven 3.5.2 (138edd61fd100ec658bfa2d307c43b76940a5d7d; 2017-10-18T15:58:13+08:00)</span><br><span class="line">Maven home: /usr/local/Cellar/maven/3.5.2/libexec</span><br><span class="line">Java version: 9.0.1, vendor: Oracle Corporation</span><br><span class="line">Java home: /Library/Java/JavaVirtualMachines/jdk-9.0.1.jdk/Contents/Home</span><br><span class="line">Default locale: zh_CN, platform encoding: UTF-8</span><br><span class="line">OS name: &quot;mac os x&quot;, version: &quot;10.13.2&quot;, arch: &quot;x86_64&quot;, family: &quot;mac&quot;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>执行命令</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo -n &quot;JAVA_HOME=`/usr/libexec/java_home -v 1.8`&quot; &gt; ~/.mavenrc</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>1.8</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">victordeMacBook-Pro:report victor$ mvn -v</span><br><span class="line">Apache Maven 3.5.2 (138edd61fd100ec658bfa2d307c43b76940a5d7d; 2017-10-18T15:58:13+08:00)</span><br><span class="line">Maven home: /usr/local/Cellar/maven/3.5.2/libexec</span><br><span class="line">Java version: 1.8.0_151, vendor: Oracle Corporation</span><br><span class="line">Java home: /Library/Java/JavaVirtualMachines/jdk1.8.0_151.jdk/Contents/Home/jre</span><br><span class="line">Default locale: zh_CN, platform encoding: UTF-8</span><br><span class="line">OS name: &quot;mac os x&quot;, version: &quot;10.13.2&quot;, arch: &quot;x86_64&quot;, family: &quot;mac&quot;</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h1 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h1><p>虽然此种方法解决了这个问题,但具体是什么原因导致的此问题,还需进一步研究</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://geeekr.com/fix-maven-java-version-mac-osx/" target="_blank" rel="noopener">http://geeekr.com/fix-maven-java-version-mac-osx/</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/06/error-sql-update-lock/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/06/error-sql-update-lock/" itemprop="url">error-sql-update-lock</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-06T14:53:37+08:00">
-                2018-01-06
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/01/06/error-sql-update-lock/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/01/06/error-sql-update-lock/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/01/06/error-sql-update-lock/" class="leancloud_visitors" data-flag-title="error-sql-update-lock">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>com.mysql.jdbc.exceptions.jdbc4.MySQLTransactionRollbackException: Lock wait timeout exceeded; try restarting transaction</p>
-<p>事务没有提交导致 锁等待</p>
-<p><a href="https://www.jianshu.com/p/0b4aaa93e7f6" target="_blank" rel="noopener">https://www.jianshu.com/p/0b4aaa93e7f6</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/06/install-jenv/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/06/install-jenv/" itemprop="url">jenv安装(管理多个jdk版本)</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-06T08:03:10+08:00">
-                2018-01-06
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/01/06/install-jenv/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/01/06/install-jenv/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/01/06/install-jenv/" class="leancloud_visitors" data-flag-title="jenv安装(管理多个jdk版本)">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>1.安装jenv<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">brew install jenv</span><br></pre></td></tr></table></figure></p>
-<p>2.oracle官网下载各版本jdk</p>
-<p>3.安装本地<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">jenv add /Library/Java/JavaVirtualMachines/jdk-9.0.1.jdk/Contents/Home</span><br><span class="line">jenv add /Library/Java/JavaVirtualMachines/jdk1.8.0_151.jdk/Contents/Home</span><br><span class="line">jenv add /Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home</span><br></pre></td></tr></table></figure></p>
-<p>4.列表jdk<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jenv versions</span><br></pre></td></tr></table></figure></p>
-<ul>
-<li>system (set by /Users/victor/.jenv/version)<br>1.7<br>1.7.0.80<br>1.8<br>1.8.0.151<br>9.0<br>9.0.1<br>oracle64-1.7.0.80<br>oracle64-1.8.0.151<br>oracle64-9.0.1</li>
-</ul>
-<p>5.选择jdk<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">jenv global 1.7</span><br><span class="line">java -version</span><br></pre></td></tr></table></figure></p>
-<p>java version “1.7.0_80”<br>Java(TM) SE Runtime Environment (build 1.7.0_80-b15)<br>Java HotSpot(TM) 64-Bit Server VM (build 24.80-b11, mixed mode)</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2003,7 +1971,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">49</span>
+                  <span class="site-state-item-count">53</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -2025,7 +1993,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">44</span>
+                  <span class="site-state-item-count">49</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
