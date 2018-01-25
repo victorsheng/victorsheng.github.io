@@ -66,6 +66,13 @@ Condition conditionB=lock.newCondition();
 - getWaiteQueueLength(Condition condition)返回等待与此锁定翔安的给定条件Condition的线程估计数
 
 
+# 线程状态切换
+
+![upload successful](/images/pasted-42.png)
+- 监视器代表synchronized
+- lock代表锁
+
+
 # 线程池
 ## 背景
 - 如果并发的线程数量很多，并且每个线程都是执行一个时间很短的任务就结束了，
@@ -73,7 +80,7 @@ Condition conditionB=lock.newCondition();
 - 请求频繁，但是连接上以后读/写很少量的数据就断开连接。考虑到服务的并发问题，如果每个请求来到以后服务都为它启动一个线程，那么这对服务的资源可能会造成很大的浪费。
 
 
-# 优点
+## 优点
 
 - 第一：降低资源消耗。通过重复利用已创建的线程降低线程创建和销毁造成的消耗。
 - 第二：提高响应速度。当任务到达时，任务可以不需要等到线程创建就能立即执行。
@@ -140,7 +147,8 @@ Condition conditionB=lock.newCondition();
  方法 invokeAll() 会调用存在于参数集合中的所有 Callable 对象，并且返回壹個包含 Future 对象的集合
 ```
 
-
+- future.isDone() //return true,false 无阻塞
+- future.get() // return 返回值，阻塞直到该线程运行结束
 
 
 ## 实际案例
@@ -171,3 +179,7 @@ Condition conditionB=lock.newCondition();
 - ExecutorService中从list中遍历的每个Future对象并不一定处于完成状态，这时调用get()方法就会被阻塞住，如果系统是设计成每个线程完成后就能根据其结果继续做后面的事，这样对于处于list后面的但是先完成的线程就会增加了额外的等待时间。
 
 - 而CompletionService的实现是维护一个保存Future对象的BlockingQueue。只有当这个Future对象状态是结束的时候，才会加入到这个Queue中，take()方法其实就是Producer-Consumer中的Consumer。它会从Queue中取出Future对象，如果Queue是空的，就会阻塞在那里，直到有完成的Future对象加入到Queue中。所以，先完成的必定先被取出。这样就减少了不必要的等待时间。
+
+# AtomicInteger类
+
+# ReentrantReadWriteLock
