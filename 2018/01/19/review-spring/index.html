@@ -86,12 +86,14 @@
 <meta property="og:site_name" content="Victor的博客">
 <meta property="og:description" content="spring生命周期 1.Spring对Bean进行实例化（相当于程序中的new Xx()） 2.Spring将值和Bean的引用注入进Bean对应的属性中 3.如果Bean实现了BeanNameAware接口，Spring将Bean的ID传递给setBeanName()方法（实现BeanNameAware清主要是为了通过Bean的引用来获得Bean的ID，一般业务中是很少有用到Bean的ID的）">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://www.victor123.cn/images/pasted-45.png">
+<meta property="og:image" content="http://www.victor123.cn/images/pasted-46.png">
 <meta property="og:image" content="http://www.victor123.cn/images/pasted-36.png">
-<meta property="og:updated_time" content="2018-01-24T14:05:44.209Z">
+<meta property="og:updated_time" content="2018-01-25T14:23:41.705Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="review_spring">
 <meta name="twitter:description" content="spring生命周期 1.Spring对Bean进行实例化（相当于程序中的new Xx()） 2.Spring将值和Bean的引用注入进Bean对应的属性中 3.如果Bean实现了BeanNameAware接口，Spring将Bean的ID传递给setBeanName()方法（实现BeanNameAware清主要是为了通过Bean的引用来获得Bean的ID，一般业务中是很少有用到Bean的ID的）">
-<meta name="twitter:image" content="http://www.victor123.cn/images/pasted-36.png">
+<meta name="twitter:image" content="http://www.victor123.cn/images/pasted-45.png">
 
 
 
@@ -435,8 +437,12 @@
 <p>2、Bean级生命周期接口方法　　：　　这个包括了BeanNameAware、BeanFactoryAware、InitializingBean和DiposableBean这些接口的方法</p>
 <p>3、容器级生命周期接口方法　　：　　这个包括了InstantiationAwareBeanPostProcessor 和 BeanPostProcessor 这两个接口实现，一般称它们的实现类为“后处理器”。</p>
 <p>4、工厂后处理器接口方法　　：　　这个包括了AspectJWeavingEnabler, ConfigurationClassPostProcessor, CustomAutowireConfigurer等等非常有用的工厂后处理器　　接口的方法。工厂后处理器也是容器级的。在应用上下文装配配置文件之后立即调用。</p>
+<h1 id="由AbstractBeanFactory控制"><a href="#由AbstractBeanFactory控制" class="headerlink" title="由AbstractBeanFactory控制"></a>由AbstractBeanFactory控制</h1><h2 id="Aware接口"><a href="#Aware接口" class="headerlink" title="Aware接口"></a>Aware接口</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">private void invokeAwareMethods(final String beanName, final Object bean) &#123;</span><br><span class="line">	if (bean instanceof Aware) &#123;</span><br><span class="line">		if (bean instanceof BeanNameAware) &#123;</span><br><span class="line">			((BeanNameAware) bean).setBeanName(beanName);</span><br><span class="line">		&#125;</span><br><span class="line">		if (bean instanceof BeanClassLoaderAware) &#123;</span><br><span class="line">			((BeanClassLoaderAware) bean).setBeanClassLoader(getBeanClassLoader());</span><br><span class="line">		&#125;</span><br><span class="line">		if (bean instanceof BeanFactoryAware) &#123;</span><br><span class="line">			((BeanFactoryAware) bean).setBeanFactory(AbstractAutowireCapableBeanFactory.this);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="BeanPostProcessor接口"><a href="#BeanPostProcessor接口" class="headerlink" title="BeanPostProcessor接口"></a>BeanPostProcessor接口</h2><h2 id="InitializingBean接口"><a href="#InitializingBean接口" class="headerlink" title="InitializingBean接口"></a>InitializingBean接口</h2><h2 id="DisposableBean接口"><a href="#DisposableBean接口" class="headerlink" title="DisposableBean接口"></a>DisposableBean接口</h2><p><img src="/images/pasted-45.png" alt="upload successful"></p>
+<p><img src="/images/pasted-46.png" alt="upload successful"></p>
+<p><a href="https://www.cnblogs.com/zrtqsk/p/3735273.html" target="_blank" rel="noopener">https://www.cnblogs.com/zrtqsk/p/3735273.html</a></p>
 <hr>
-<p>我们交由Spring管理的大多数对象其实都是一些无状态的对象，这种不会因为多线程而导致状态被破坏的对象很适合Spring的默认scope，每个单例的无状态对象都是线程安全的（也可以说只要是无状态的对象，不管单例多例都是线程安全的，不过单例毕竟节省了不断创建对象与GC的开销）。</p>
+<h1 id="springbean是否线程安全"><a href="#springbean是否线程安全" class="headerlink" title="springbean是否线程安全"></a>springbean是否线程安全</h1><p>我们交由Spring管理的大多数对象其实都是一些无状态的对象，这种不会因为多线程而导致状态被破坏的对象很适合Spring的默认scope，每个单例的无状态对象都是线程安全的（也可以说只要是无状态的对象，不管单例多例都是线程安全的，不过单例毕竟节省了不断创建对象与GC的开销）。</p>
 <p>无状态的对象即是自身没有状态的对象，自然也就不会因为多个线程的交替调度而破坏自身状态导致线程安全问题。无状态对象包括我们经常使用的DO、DTO、VO这些只作为数据的实体模型的贫血对象，还有Service、DAO和Controller，这些对象并没有自己的状态，它们只是用来执行某些操作的。例如，每个DAO提供的函数都只是对数据库的CRUD，而且每个数据库Connection都作为函数的局部变量（局部变量是在用户栈中的，而且用户栈本身就是线程私有的内存区域，所以不存在线程安全问题），用完即关（或交还给连接池）。</p>
 <p><img src="/images/pasted-36.png" alt="upload successful"></p>
 
@@ -637,7 +643,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#spring生命周期"><span class="nav-number">1.</span> <span class="nav-text">spring生命周期</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#spring生命周期"><span class="nav-number">1.</span> <span class="nav-text">spring生命周期</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#由AbstractBeanFactory控制"><span class="nav-number">2.</span> <span class="nav-text">由AbstractBeanFactory控制</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Aware接口"><span class="nav-number">2.1.</span> <span class="nav-text">Aware接口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BeanPostProcessor接口"><span class="nav-number">2.2.</span> <span class="nav-text">BeanPostProcessor接口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#InitializingBean接口"><span class="nav-number">2.3.</span> <span class="nav-text">InitializingBean接口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DisposableBean接口"><span class="nav-number">2.4.</span> <span class="nav-text">DisposableBean接口</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#springbean是否线程安全"><span class="nav-number">3.</span> <span class="nav-text">springbean是否线程安全</span></a></li></ol></div>
             
 
           </div>
