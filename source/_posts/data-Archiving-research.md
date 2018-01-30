@@ -1,7 +1,8 @@
----
 title: data-Archiving-research
 tags:
-categories:
+  - MySQL
+categories: []
+date: 2018-01-25 10:42:00
 ---
 # 归档需求
 - 主要处于性能考虑,减少查找的范围
@@ -10,6 +11,7 @@ categories:
 - 目前:订单(平行表,主子表),售后单(主子表),发货单(主子表),日志表...
 - 已经归档过一次
 
+< !--more-->
 
 
 # 归档流程梳理
@@ -101,10 +103,12 @@ https://github.com/Sunshow/JavaDataArchiver
 
 # 目标库
 - 冗余信息,nogsql
-- mysql
+- mysql my
 - maxcompute
 
-# 汇总订单表
+# 废弃分表策略,对于v_sale_order和v_sale_order_detail
 
-# 汇总
-http://www.xablgt.cn/s/mysql%E6%95%B0%E6%8D%AE%E5%BA%93%E5%BD%92%E6%A1%A3
+# 结论
+- 采用阿里云数据集成,跑归档任务
+- 在数据集成任务结束后的回调函数,可以配置删除归档数据的任务
+- 暂时目标库,还是mysql,后续的查询采用ElasticSearch进行查询,(阿里云提供1个月的免费试用,待研究确认后执行)

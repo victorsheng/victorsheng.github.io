@@ -1,7 +1,10 @@
 title: java-线程复习
 date: 2018-01-13 10:13:27
 tags:
+    - java
+    - 多线程
 categories:
+    - java
 ---
 # 线程
 创建线程有两种方式：

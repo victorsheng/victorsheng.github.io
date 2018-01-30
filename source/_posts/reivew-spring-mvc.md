@@ -1,6 +1,8 @@
 title: reivew_spring_mvc
-tags: []
-categories: []
+tags: 
+    - springmvc
+categories: 
+    - springmvc
 date: 2018-01-18 21:19:00
 ---
 # springmvc是什么

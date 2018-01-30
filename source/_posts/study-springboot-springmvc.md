@@ -3,7 +3,8 @@ tags:
   - springboot
   - http
   - springMVC
-categories: []
+categories: 
+    - spring
 date: 2018-01-22 17:18:00
 ---
 # springboot如何配置DispatcherServlet?

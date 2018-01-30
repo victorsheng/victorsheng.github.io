@@ -2,7 +2,8 @@ title: jvm崩溃
 tags:
   - jvm
   - OOM
-categories: []
+categories: 
+    - jvm
 date: 2017-12-14 14:14:00
 ---
 # 日常日志及错误

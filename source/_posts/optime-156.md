@@ -3,7 +3,8 @@ tags:
   - io高
   - 优化
   - mysql
-categories: []
+categories: 
+    - mysql
 date: 2017-12-13 13:39:00
 ---
 #重新定位问题

@@ -2,7 +2,8 @@ title: 线上redis崩溃记录
 tags:
   - redis
   - breakdown
-categories: []
+categories: 
+    - redis
 date: 2017-12-14 09:39:00
 ---
 # 错误日志

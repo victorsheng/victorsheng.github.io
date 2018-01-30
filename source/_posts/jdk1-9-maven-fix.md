@@ -3,7 +3,8 @@ tags:
   - java
   - maven
   - JDK1.9
-categories: []
+categories: 
+    java
 date: 2018-01-08 13:59:00
 ---
 # 背景

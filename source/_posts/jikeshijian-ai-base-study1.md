@@ -2,7 +2,8 @@ title: 极客时间-学习笔记-人工智能基础课1
 author: Victor
 tags:
   - 极客时间
-categories: []
+categories: 
+    - 人工智能
 date: 2017-12-19 19:03:00
 ---
 # 最优化方法

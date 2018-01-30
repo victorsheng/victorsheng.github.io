@@ -3,6 +3,7 @@ title: opitimize_git_clone
 date: 2017-12-20 10:09:27
 tags:
 categories:
+    - git
 ---
 # 找到自己代理的端口
 <img src="http://pic.victor123.cn/17-12-20/69754851.jpg">

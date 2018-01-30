@@ -2,7 +2,8 @@ title: mysql-debug
 tags:
   - mysql
   - like
-categories: []
+categories: 
+    - mysql
 date: 2018-01-24 15:42:00
 ---
 # 问题sql

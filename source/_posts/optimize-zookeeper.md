@@ -2,7 +2,8 @@ title: '156服务器优化1:清理zookeeper过多的历史文件'
 tags:
   - zookeeper
   - io高
-categories: []
+categories: 
+    - zookeeper
 date: 2017-12-12 14:51:00
 ---
 # 背景

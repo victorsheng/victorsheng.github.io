@@ -3,7 +3,8 @@ tags:
   - dubbo
   - reference
   - xml
-categories: []
+categories: 
+  - dubbo
 date: 2017-12-14 17:04:00
 ---
 # dubbo服务引用

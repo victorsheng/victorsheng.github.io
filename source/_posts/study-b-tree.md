@@ -1,7 +1,9 @@
 title: study-b-tree
 tags:
   - 数据结构
-categories: []
+  - b-tree
+categories: 
+    - 数据结构
 date: 2018-01-05 11:16:00
 ---
 # b-树

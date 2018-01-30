@@ -3,6 +3,7 @@ title: pandas中read_csv方法的学习
 date: 2017-12-05 23:24:55
 tags:
 categories:
+    - 机器学习
 ---
 #read_csv内容过大的处理方式:
 ```

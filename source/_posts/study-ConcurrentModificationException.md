@@ -1,7 +1,9 @@
 title: java集合并发修改
 tags:
   - java
-categories: []
+  - 并发修改
+categories: 
+    - java
 date: 2018-01-05 11:21:00
 ---
 # 并发修改

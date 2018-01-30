@@ -1,7 +1,9 @@
 title: jenv安装(管理多个jdk版本)
 date: 2018-01-06 08:03:10
 tags:
+    - jenv
 categories:
+    - java
 ---
 1.安装jenv
 ``` shell

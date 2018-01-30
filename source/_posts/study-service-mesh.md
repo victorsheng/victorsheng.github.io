@@ -3,7 +3,8 @@ tags:
   - kubernetes
   - service-mesh
   - 微服务
-categories: []
+categories: 
+    - docker
 author: ''
 date: 2017-12-20 21:47:00
 ---

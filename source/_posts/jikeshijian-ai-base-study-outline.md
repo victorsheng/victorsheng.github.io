@@ -1,6 +1,8 @@
 title: 极客时间-学习笔记-人工智能基础课-机器学习概率
-tags: []
-categories: []
+tags: 
+    - 概率
+categories: 
+    - 人工智能
 date: 2018-01-02 07:25:00
 ---
 # 概念

@@ -1,6 +1,5 @@
 title: 智能采购实现逻辑梳理
 tags:
-  - ''
   - 采购
 categories:
   - 业务梳理

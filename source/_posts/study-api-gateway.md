@@ -1,7 +1,8 @@
 title: api网关学习
 tags:
   - spring cloud
-categories: []
+categories: 
+    - 微服务
 date: 2017-12-18 19:42:00
 ---
 # 什么是api网关

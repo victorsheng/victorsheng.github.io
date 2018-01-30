@@ -2,6 +2,7 @@ title: 单板滑雪笔记
 date: 2017-12-26 19:34:32
 tags:
 categories:
+    - 滑雪
 ---
 # goski视频教学
 ## 走刃练习
