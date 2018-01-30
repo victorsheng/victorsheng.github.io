@@ -32,11 +32,6 @@
       </tags>
   </entry>
   <entry>
-    <title><![CDATA[study_quick_sort]]></title>
-    <url>%2F2018%2F01%2F22%2Fstudy-quick-sort%2F</url>
-    <content type="text"><![CDATA[视频地址:https://visualgo.net/en/sorting 代码:12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152public class QuickSort &#123; public static void main(String[] args) throws Exception &#123; int[] ints = &#123;5, 3, 9, 1, 6, 7, 2, 4, 0, 8&#125;; int[] result = new QuickSort().sort(ints); System.out.println(Arrays.toString(result)); &#125; public int[] sort(int[] sourceArray) throws Exception &#123; // 对 arr 进行拷贝，不改变参数内容 int[] arr = Arrays.copyOf(sourceArray, sourceArray.length); return quickSort(arr, 0, arr.length - 1); &#125; private int[] quickSort(int[] arr, int left, int right) &#123; if (left &lt; right) &#123; int partitionIndex = partition(arr, left, right); System.out.println(partitionIndex); quickSort(arr, left, partitionIndex - 1); quickSort(arr, partitionIndex + 1, right); &#125; return arr; &#125; private int partition(int[] arr, int left, int right) &#123; // 设定基准值（pivot） int pivot = left; int index = pivot + 1; for (int i = index; i &lt;= right; i++) &#123; if (arr[i] &lt; arr[pivot]) &#123; swap(arr, i, index); index++; &#125; &#125; swap(arr, pivot, index - 1); return index - 1; &#125; private void swap(int[] arr, int i, int j) &#123; if (i == j) &#123; return; &#125; System.out.println(&quot;swap&quot; + i + &quot;----&quot; + j); int temp = arr[i]; arr[i] = arr[j]; arr[j] = temp; &#125;&#125;]]></content>
-  </entry>
-  <entry>
     <title><![CDATA[springboot配置FastJsonHttpMessageConverter(原理篇)]]></title>
     <url>%2F2018%2F01%2F22%2Fstudy-springboot-springmvc%2F</url>
     <content type="text"><![CDATA[springboot如何配置DispatcherServlet?org.springframework.boot.autoconfigure.web.DispatcherServletAutoConfiguration中完成的 在springboot项目中,进行springmvc配置的新的方式12345678910111213141516171819202122232425@Configurationpublic class SpringMvcConfigure extends WebMvcConfigurerAdapter &#123; @Bean public InternalResourceViewResolver viewResolver() &#123; InternalResourceViewResolver viewResolver = new InternalResourceViewResolver(); viewResolver.setPrefix(&quot;/WEB-INF/jsp/&quot;); viewResolver.setSuffix(&quot;.jsp&quot;); // viewResolver.setViewClass(JstlView.class); // 这个属性通常并不需要手动配置，高版本的Spring会自动检测 return viewResolver; &#125; @Override public void addInterceptors(InterceptorRegistry registry) &#123; registry.addInterceptor(new Interceptor1()).addPathPatterns(&quot;/**&quot;); registry.addInterceptor(new Interceptor2()).addPathPatterns(&quot;/users&quot;).addPathPatterns(&quot;/users/**&quot;); super.addInterceptors(registry); &#125; @Override public void addResourceHandlers(ResourceHandlerRegistry registry) &#123; // addResourceHandler指的是访问路径，addResourceLocations指的是文件放置的目录 registry.addResourceHandler(&quot;/**&quot;).addResourceLocations(&quot;classpath:/res/&quot;); &#125;&#125; HTTP序列化/反序列化@RestController中有@ResponseBody，可以帮我们把User序列化到resp.body中。@RequestBody可以帮我们把req.body的内容转化为User对象。如果是开发Web应用，一般这两个注解对应的就是Json序列化和反序列化的操作。这里实际上已经体现了Http序列化/反序列化这个过程，只不过和普通的对象序列化有些不一样，Http序列化/反序列化的层次更高，属于一种Object2Object之间的转换。 有过Netty使用经验的对这个应该比较了解，Netty中的Decoder和Encoder就有两种基本层次，层次低的一种是Byte &lt;—&gt; Message，二进制与程序内部消息对象之间的转换，就是常见的序列化/反序列化；另外一种是 Message &lt;—&gt; Message，程序内部对象之间的转换，比较高层次的序列化/反序列化。 Http协议的处理过程，TCP字节流 &lt;—&gt; HttpRequest/HttpResponse &lt;—&gt; 内部对象，就涉及这两种序列化。在springmvc中第一步已经由Servlet容器（tomcat等等）帮我们处理了，第二步则主要由框架帮我们处理。上面所说的Http序列化/反序列化就是指的这第二个步骤，它是controller层框架的核心功能之一，有了这个功能，就能大大减少代码量，让controller的逻辑更简洁清晰，就像上面示意的代码那样，方法中只有一行代码。 spirngmvc进行第二步操作，也就是Http序列化和反序列化的核心是HttpMessageConverter。用过老版本springmvc的可能有些印象，那时候需要在xml配置文件中注入MappingJackson2HttpMessageConverter这个类型的bean，告诉springmvc我们需要进行Json格式的转换，它就是HttpMessageConverter的一种实现。 几种实现 json:gson,fastjson,jackson Protobuf java序列化 HttpMessageConverter优先级另外有很重要的一点需要说明一下，springmvc可以同时配置多个Converter，根据一定的规则（主要是Content-Type、Accept、controller方法的consumes/produces、Converter.mediaType以及Converter的排列顺序这四个属性）来选择到底是使用哪一个，这使得springmvc能够一个接口支持多种报文格式。 默认的converters12345678910ByteArrayHttpMessageConverter – converts byte arraysStringHttpMessageConverter – converts StringsResourceHttpMessageConverter – converts org.springframework.core.io.Resource for any type of octet streamSourceHttpMessageConverter – converts javax.xml.transform.SourceFormHttpMessageConverter – converts form data to/from a MultiValueMap&lt;String, String&gt;.Jaxb2RootElementHttpMessageConverter – converts Java objects to/from XML (added only if JAXB2 is present on the classpath)MappingJackson2HttpMessageConverter – converts JSON (added only if Jackson 2 is present on the classpath)MappingJacksonHttpMessageConverter – converts JSON (added only if Jackson is present on the classpath)AtomFeedHttpMessageConverter – converts Atom feeds (added only if Rome is present on the classpath)RssChannelHttpMessageConverter – converts RSS feeds (added only if Rome is present on the classpath) 源码中的调用栈1234567891011com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter.write(FastJsonHttpMessageConverter.java:185) at org.springframework.web.servlet.mvc.method.annotation.AbstractMessageConverterMethodProcessor.writeWithMessageConverters(AbstractMessageConverterMethodProcessor.java:231) at org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor.handleReturnValue(HttpEntityMethodProcessor.java:203) at org.springframework.web.method.support.HandlerMethodReturnValueHandlerComposite.handleReturnValue(HandlerMethodReturnValueHandlerComposite.java:81) at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:113) at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:827) at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:738) at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:85) at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:967) at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:901) at 常见的contentType 1.text/html 2.text/plain 3.text/css 4.text/javascript 5.application/x-www-form-urlencoded 6.multipart/form-data 7.application/json 8.application/xml]]></content>
@@ -211,17 +206,6 @@
       </tags>
   </entry>
   <entry>
-    <title><![CDATA[study-red–black-tree]]></title>
-    <url>%2F2018%2F01%2F05%2Fstudy-red%E2%80%93black-tree%2F</url>
-    <content type="text"><![CDATA[二叉搜索树由于红黑树本质上就是一棵二叉查找树，所以在了解红黑树之前，咱们先来看下二叉查找树。 二叉查找树（Binary Search Tree），也称有序二叉树（ordered binary tree）,排序二叉树（sorted binary tree），是指一棵空树或者具有下列性质的二叉树： 若任意结点的左子树不空，则左子树上所有结点的值均小于它的根结点的值； 若任意结点的右子树不空，则右子树上所有结点的值均大于它的根结点的值； 任意结点的左、右子树也分别为二叉查找树。 没有键值相等的结点（no duplicate nodes）。 因为，一棵由n个结点，随机构造的二叉查找树的高度为lgn，所以顺理成章，一般操作的执行时间为O（lgn）.（至于n个结点的二叉树高度为lgn的证明，可参考算法导论 第12章 二叉查找树 第12.4节）。 但二叉树若退化成了一棵具有n个结点的线性链后，则此些操作最坏情况运行时间为O（n）。后面我们会看到一种基于二叉查找树-红黑树，它通过一些性质使得树相对平衡，使得最终查找、插入、删除的时间复杂度最坏情况下依然为O（lgn）。 红黑树特性前面我们已经说过，红黑树，本质上来说就是一棵二叉查找树，但它在二叉查找树的基础上增加了着色和相关的性质使得红黑树相对平衡，从而保证了红黑树的查找、插入、删除的时间复杂度最坏为O(log n)。 但它是如何保证一棵n个结点的红黑树的高度始终保持在h = logn的呢？这就引出了红黑树的5条性质： 1）每个结点要么是红的，要么是黑的。 2）根结点是黑的。 3）每个叶结点（叶结点即指树尾端NIL指针或NULL结点）是黑的。 4）如果一个结点是红的，那么它的俩个儿子都是黑的。 5）对于任一结点而言，其到叶结点树尾端NIL指针的每一条路径都包含相同数目的黑结点。 正是红黑树的这5条性质，使得一棵n个结点是红黑树始终保持了logn的高度，从而也就解释了上面我们所说的“红黑树的查找、插入、删除的时间复杂度最坏为O(log n)”这一结论的原因。 如下图所示，即是一颗红黑树(下图引自wikipedia：http://t.cn/hgvH1l)： 应用 treemap treeset 1.8中的hashset https://github.com/julycoding/The-Art-Of-Programming-By-July/blob/master/ebook/zh/03.01.md https://zh.wikipedia.org/wiki/%E7%BA%A2%E9%BB%91%E6%A0%91]]></content>
-      <categories>
-        <category>java</category>
-      </categories>
-      <tags>
-        <tag>红黑树</tag>
-      </tags>
-  </entry>
-  <entry>
     <title><![CDATA[study-b-tree]]></title>
     <url>%2F2018%2F01%2F05%2Fstudy-b-tree%2F</url>
     <content type="text"><![CDATA[b-树 数据库索引使用b-树 二叉树查找的时间复杂度O(logN) 问题:磁盘IO 最坏的情况下,磁盘IO等于索引树的高度 把原来”瘦高”的树结构变得”矮胖”就是b-树的特征之一 B树是一种多路平衡查找树 B树与红黑树最大的不同在于，B树的结点可以有许多子女，从几个到几千个。 定义 树中每个结点最多含有m个孩子（m&gt;=2）； 除根结点和叶子结点外，其它每个结点至少有[ceil(m / 2)]个孩子（其中ceil(x)是一个取上限的函数）； 根结点至少有2个孩子（除非B树只包含一个结点：根结点）； 所有叶子结点都出现在同一层，叶子结点不包含任何关键字信息(可以看做是外部结点或查询失败的结点，指向这些结点的指针都为null)；（注：叶子节点只是没有孩子和指向孩子的指针，这些节点也存在，也有元素。类似红黑树中，每一个NULL指针即当做叶子结点，只是没画出来而已）。 每个非终端结点中包含有n个关键字信息： (n，P0，K1，P1，K2，P2，……，Kn，Pn)。其中：a) Ki (i=1…n)为关键字，且关键字按顺序升序排序K(i-1)&lt; Ki。b) Pi为指向子树根的结点，且指针P(i-1)指向子树种所有结点的关键字均小于Ki，但都大于K(i-1)。c) 关键字的个数n必须满足： [ceil(m / 2)-1]&lt;= n &lt;= m-1。比如有j个孩子的非叶结点恰好有j-1个关键码。 应用 文件系统 数据库索引 b+树 1.有k个子树的中间节点包含有k个元素（B树中是k-1个元素），每个元素不保存数据，只用来索引，所有数据都保存在叶子节点。 2.所有的叶子结点中包含了全部元素的信息，及指向含这些元素记录的指针，且叶子结点本身依关键字的大小自小而大顺序链接。 3.所有的中间节点元素都同时存在于子节点，在子节点元素中是最大（或最小）元素。 b+树种,只有叶子节点带有卫星信息,其余中间节点仅仅是索引,没有任何数据关联 在数据库的聚集索引（Clustered Index）中，叶子节点直接包含卫星数据。在非聚集索引（NonClustered Index）中，叶子节点带有指向卫星数据的指针。 B+树的优势：1.单一节点存储更多的元素，使得查询的IO次数更少。2.所有查询都要查找到叶子节点，查询性能稳定。3.所有叶子节点形成有序链表，便于范围查询。 引用 mysql的b树索引的物理文件 B*树 B-tree是B+-tree的变体，在B+树的基础上(所有的叶子结点中包含了全部关键字的信息，及指向含有这些关键字记录的指针)，B树中非根和非叶子结点再增加指向兄弟的指针；B树定义了非叶子结点关键字个数至少为(2/3)M，即块的最低使用率为2/3（代替B+树的1/2）。 B+树的分裂：当一个结点满时，分配一个新的结点，并将原结点中1/2的数据复制到新结点，最后在父结点中增加新结点的指针；B+树的分裂只影响原结点和父结点，而不会影响兄弟结点，所以它不需要指向兄弟的指针。 B*树的分裂：当一个结点满时，如果它的下一个兄弟结点未满，那么将一部分数据移到兄弟结点中，再在原结点插入关键字，最后修改父结点中兄弟结点的关键字（因为兄弟结点的关键字范围改变了）；如果兄弟也满了，则在原结点与兄弟结点之间增加新结点，并各复制1/3的数据到新结点，最后在父结点增加新结点的指针。 所以，B*树分配新结点的概率比B+树要低，空间使用率更高； 总结通过以上介绍，大致将B树，B+树，B*树总结如下： B树：有序数组+平衡多叉树； B+树：有序数组链表+平衡多叉树； B*树：一棵丰满的B+树。 顺便说一句，无论是B树，还是B+树、b树，由于根或者树的上面几层被反复查询，所以这几块可以存在内存中，换言之，B树、B+树、B树的根结点和部分顶层数据在内存中，大部分下层数据在磁盘上。 mysql中InnoDB索引和MyISAM索引的区别： 主索引的区别，InnoDB的数据文件本身就是索引文件。而MyISAM的索引和数据是分开的。 辅助索引的区别：InnoDB的辅助索引data域存储相应记录主键的值而不是地址。而MyISAM的辅助索引和主索引没有多大区别。 聚簇索引 非聚簇索引 聚集索引这种实现方式使得按主键的搜索十分高效，但是辅助索引搜索需要检索两遍索引：首先检索辅助索引获得主键，然后用主键到主索引中检索获得记录。 https://github.com/julycoding/The-Art-Of-Programming-By-July/blob/master/ebook/zh/03.02.md]]></content>
@@ -231,6 +215,17 @@
       <tags>
         <tag>数据结构</tag>
         <tag>b-tree</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[study-red–black-tree]]></title>
+    <url>%2F2018%2F01%2F05%2Fstudy-red%E2%80%93black-tree%2F</url>
+    <content type="text"><![CDATA[二叉搜索树由于红黑树本质上就是一棵二叉查找树，所以在了解红黑树之前，咱们先来看下二叉查找树。 二叉查找树（Binary Search Tree），也称有序二叉树（ordered binary tree）,排序二叉树（sorted binary tree），是指一棵空树或者具有下列性质的二叉树： 若任意结点的左子树不空，则左子树上所有结点的值均小于它的根结点的值； 若任意结点的右子树不空，则右子树上所有结点的值均大于它的根结点的值； 任意结点的左、右子树也分别为二叉查找树。 没有键值相等的结点（no duplicate nodes）。 因为，一棵由n个结点，随机构造的二叉查找树的高度为lgn，所以顺理成章，一般操作的执行时间为O（lgn）.（至于n个结点的二叉树高度为lgn的证明，可参考算法导论 第12章 二叉查找树 第12.4节）。 但二叉树若退化成了一棵具有n个结点的线性链后，则此些操作最坏情况运行时间为O（n）。后面我们会看到一种基于二叉查找树-红黑树，它通过一些性质使得树相对平衡，使得最终查找、插入、删除的时间复杂度最坏情况下依然为O（lgn）。 红黑树特性前面我们已经说过，红黑树，本质上来说就是一棵二叉查找树，但它在二叉查找树的基础上增加了着色和相关的性质使得红黑树相对平衡，从而保证了红黑树的查找、插入、删除的时间复杂度最坏为O(log n)。 但它是如何保证一棵n个结点的红黑树的高度始终保持在h = logn的呢？这就引出了红黑树的5条性质： 1）每个结点要么是红的，要么是黑的。 2）根结点是黑的。 3）每个叶结点（叶结点即指树尾端NIL指针或NULL结点）是黑的。 4）如果一个结点是红的，那么它的俩个儿子都是黑的。 5）对于任一结点而言，其到叶结点树尾端NIL指针的每一条路径都包含相同数目的黑结点。 正是红黑树的这5条性质，使得一棵n个结点是红黑树始终保持了logn的高度，从而也就解释了上面我们所说的“红黑树的查找、插入、删除的时间复杂度最坏为O(log n)”这一结论的原因。 如下图所示，即是一颗红黑树(下图引自wikipedia：http://t.cn/hgvH1l)： 应用 treemap treeset 1.8中的hashset https://github.com/julycoding/The-Art-Of-Programming-By-July/blob/master/ebook/zh/03.01.md https://zh.wikipedia.org/wiki/%E7%BA%A2%E9%BB%91%E6%A0%91]]></content>
+      <categories>
+        <category>java</category>
+      </categories>
+      <tags>
+        <tag>红黑树</tag>
       </tags>
   </entry>
   <entry>
@@ -438,9 +433,9 @@
         <category>mysql</category>
       </categories>
       <tags>
+        <tag>mysql</tag>
         <tag>io高</tag>
         <tag>优化</tag>
-        <tag>mysql</tag>
       </tags>
   </entry>
   <entry>
@@ -451,8 +446,8 @@
         <category>zookeeper</category>
       </categories>
       <tags>
-        <tag>io高</tag>
         <tag>zookeeper</tag>
+        <tag>io高</tag>
       </tags>
   </entry>
   <entry>
