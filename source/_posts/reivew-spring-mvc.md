@@ -1,8 +1,8 @@
 title: reivew_spring_mvc
-tags: 
-    - springmvc
-categories: 
-    - springmvc
+tags:
+  - springmvc
+categories:
+  - springmvc
 date: 2018-01-18 21:19:00
 ---
 # springmvc是什么
@@ -145,6 +145,15 @@ protected void doDispatch(HttpServletRequest request, HttpServletResponse respon
 # hello world
 
 ![upload successful](/images/pasted-30.png)
+
+
+![upload successful](/images/pasted-60.png)
+
+- DispatcherServlet：Spring提供的前端控制器，所有的请求都有经过它来统一分发。在DispatcherServlet将请求分发给Spring Controller之前，需要借助于Spring提供的HandlerMapping定位到具体的Controller。
+- HandlerMapping：能够完成客户请求到Controller映射。
+- Controller：需要为并发用户处理上述请求，因此实现Controller接口时，必须保证线程安全并且可重用。Controller将处理用户请求，这和Struts Action扮演的角色是一致的。一旦Controller处理完用户请求，则返回ModelAndView对象给DispatcherServlet前端控制器，ModelAndView中包含了模型（Model）和视图（View）。从宏观角度考虑，DispatcherServlet是整个Web应用的控制器；从微观考虑，Controller是单个Http请求处理过程中的控制器，而ModelAndView是Http请求过程中返回的模型（Model）和视图（View）。
+- ViewResolver：Spring提供的视图解析器（ViewResolver）在Web应用中查找View对象，从而将相应结果渲染给客户。
+
  
 # DispatcherServlet与HttpMessageConverter的关系
 //TODO

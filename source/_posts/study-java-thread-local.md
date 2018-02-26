@@ -1,8 +1,15 @@
 title: study-java-thread-local
-date: 2018-01-24 23:21:43
 tags:
+  - 引用
 categories:
+  - java
+date: 2018-01-24 23:21:00
 ---
+# Thread Local的作用
+
+提供了一种将实例绑定到当前线程的机制，类似于隔离的效果.
+
+
 # SoftReference、Weak Reference和PhantomRefrence
 
 ## 强引用
@@ -55,6 +62,16 @@ gc收集弱可及对象的执行过程和软可及一样，只是gc不会根据�
   
 弱引用可以和一个引用队列（ReferenceQueue）联合使用，如果弱引用所引用的对象被垃圾回收，Java虚拟机就会把这个弱引用加入到与之关联的引用队列中。
     
+    
+---------
+```
+C c = new C(b);
+b = null;
+```
+当 b 被设置成null时，那么是否意味这一段时间后GC工作可以回收 b 所分配的内存空间呢？答案是否定的，因为即使 b 被设置成null，但 c 仍然持有对 b 的引用，而且还是强引用，所以GC不会回收 b 原先所分配的空间，既不能回收，又不能使用，这就造成了 内存泄露。
+可以通过c = null;，也可以使用弱引用WeakReference w = new WeakReference(b);。因为使用了弱引用WeakReference，GC是可以回收 b 原先所分配的空间的。
+如果是强引用,且thread依旧存活, Thread Ref -> Thread -> ThreaLocalMap -> Entry -> value 永远无法回收，造成内存泄漏。
+ThreadLocalMap的设计中已经考虑到这种情况，也加上了一些防护措施：在ThreadLocal的get(),set(),remove()的时候都会清除线程ThreadLocalMap里所有key为null的value。
 
 
 ## 虚引用
@@ -102,41 +119,38 @@ gc收集弱可及对象的执行过程和软可及一样，只是gc不会根据�
 # 内部结构
 存储在Thread中的 java.lang.ThreadLocal.ThreadLocalMap类型的内部成员变量
 其中 的Entry是弱引用:
-static class Entry extends WeakReference<ThreadLocal<?>>
 
+static class Entry extends WeakReference<ThreadLocal<?>>
 
 
 # ThreadLocal为什么使用WeakReference
 
+![upload successful](/images/pasted-44.png)
 
-```
-C c = new C(b);
-b = null;
-```
-当 b 被设置成null时，那么是否意味这一段时间后GC工作可以回收 b 所分配的内存空间呢？答案是否定的，因为即使 b 被设置成null，但 c 仍然持有对 b 的引用，而且还是强引用，所以GC不会回收 b 原先所分配的空间，既不能回收，又不能使用，这就造成了 内存泄露。
-可以通过c = null;，也可以使用弱引用WeakReference w = new WeakReference(b);。因为使用了弱引用WeakReference，GC是可以回收 b 原先所分配的空间的。
-如果是强引用,且thread依旧存活, Thread Ref -> Thread -> ThreaLocalMap -> Entry -> value 永远无法回收，造成内存泄漏。
-ThreadLocalMap的设计中已经考虑到这种情况，也加上了一些防护措施：在ThreadLocal的get(),set(),remove()的时候都会清除线程ThreadLocalMap里所有key为null的value。
+ThreadLocalMap使用ThreadLocal的弱引用作为key，如果一个ThreadLocal没有外部强引用来引用它，那么系统 GC 的时候，这个ThreadLocal势必会被回收，这样一来，ThreadLocalMap中就会出现key为null的Entry，就没有办法访问这些key为null的Entry的value，如果当前线程再迟迟不结束的话，这些key为null的Entry的value就会一直存在一条强引用链：Thread Ref -> Thread -> ThreaLocalMap -> Entry -> value永远无法回收，造成内存泄漏。
+
+其实，ThreadLocalMap的设计中已经考虑到这种情况，也加上了一些防护措施：在ThreadLocal的get(),set(),remove()的时候都会清除线程ThreadLocalMap里所有key为null的value。
+
 但是这些被动的预防措施并不能保证不会内存泄漏：
-* 使用static的ThreadLocal，延长了ThreadLocal的生命周期，可能导致的内存泄漏（参考ThreadLocal 内存泄露的实例分析）。
-* 分配使用了ThreadLocal又不再调用get(),set(),remove()方法，那么就会导致内存泄漏。
-下面我们分两种情况讨论：
-* key 使用强引用：引用的ThreadLocal的对象被回收了，但是ThreadLocalMap还持有ThreadLocal的强引用，如果没有手动删除，ThreadLocal不会被回收，导致Entry内存泄漏。
-* key 使用弱引用：引用的ThreadLocal的对象被回收了，由于ThreadLocalMap持有ThreadLocal的弱引用，即使没有手动删除，ThreadLocal也会被回收。value在下一次ThreadLocalMap调用get(),set(),remove()的时候会被清除。
-* 比较两种情况，我们可以发现：由于ThreadLocalMap的生命周期跟Thread一样长，如果都没有手动删除对应key，都会导致内存泄漏，但是使用弱引用可以多一层保障：弱引用ThreadLocal不会内存泄漏，对应的value在下一次ThreadLocalMap调用get(),set(),remove()的时候会被清除。
-因此，ThreadLocal内存泄漏的根源是：由于ThreadLocalMap的生命周期跟Thread一样长，如果没有手动删除对应key就会导致内存泄漏，而不是因为弱引用。
-综合上面的分析，我们可以理解ThreadLocal内存泄漏的前因后果，那么怎么避免内存泄漏呢？
-每次使用完ThreadLocal，都调用它的remove()方法，清除数据。
-在使用线程池的情况下，没有及时清理ThreadLocal，不仅是内存泄漏的问题，更严重的是可能导致业务逻辑出现问题。所以，使用ThreadLocal就跟加锁完要解锁一样，用完就清理。
+
+- 使用static的ThreadLocal，延长了ThreadLocal的生命周期，可能导致的内存泄漏（参考ThreadLocal 内存泄露的实例分析）。
+- 分配使用了ThreadLocal又不再调用get(),set(),remove()方法，那么就会导致内存泄漏。
 
 -----
 
-![upload successful](/images/pasted-44.png)
 
-在上文中我们发现了ThreadLocalMap的key是一个弱引用，那么为什么使用弱引用呢？使用强引用key与弱引用key的差别如下：
+- 如果使用强引用则会,不remove,一直引用着key无法回收掉
+- 第一步WeakReference弱引用,的使得ey可以被回收为null
+- 在ThreadLocal的get(),set(),remove()的时候都会清除线程ThreadLocalMap里所有key为null的value
+- 但是如果不get(),set(),remove()就会出问题
 
-- 强引用key：ThreadLocal被设置为null，由于ThreadLocalMap持有ThreadLocal的强引用，如果不手动删除，那么ThreadLocal将不会回收，产生内存泄漏。
-- 弱引用key：ThreadLocal被设置为null，由于ThreadLocalMap持有ThreadLocal的弱引用，即便不手动删除，ThreadLocal仍会被回收，ThreadLocalMap在之后调用set()、getEntry()和remove()函数时会清除所有key为null的Entry。
+so:
 
-但要注意的是，ThreadLocalMap仅仅含有这些被动措施来补救内存泄漏问题。如果你在之后没有调用ThreadLocalMap的set()、getEntry()和remove()函数的话，那么仍然会存在内存泄漏问题。
-在使用线程池的情况下，如果不及时进行清理，内存泄漏问题事小，甚至还会产生程序逻辑上的问题。所以，为了安全地使用ThreadLocal，必须要像每次使用完锁就解锁一样，在每次使用完ThreadLocal后都要调用remove()来清理无用的Entry。
+- 弱引用,解决了无其他引用时,有get(),set(),remove()调用的问题
+- 每次使用完ThreadLocal，都调用它的remove()方法，清除数据。
+
+即使设计上最大程度上减少了内存泄漏发生的概率,但是仍然不能100%保证,还是得靠程序员来协调
+
+-----
+
+

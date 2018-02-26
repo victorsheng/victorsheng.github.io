@@ -1,7 +1,9 @@
-title: study-dubbo
-date: 2018-01-17 07:43:50
+title: dubbo需求
 tags:
+  - dubbo
 categories:
+  - dubbo
+date: 2018-01-17 07:43:00
 ---
 # 需求
 ### 流程图

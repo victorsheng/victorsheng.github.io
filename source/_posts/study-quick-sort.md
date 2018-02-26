@@ -2,7 +2,7 @@ title: study_quick_sort
 date: 2018-01-22 22:39:55
 tags:
     - 排序
-categories
+categories:
     - java
 ---
 ![upload successful](/images/pasted-41.png)
@@ -11,6 +11,8 @@ categories
 https://visualgo.net/en/sorting
 
 代码:
+
+
 ```
 public class QuickSort {
 
@@ -62,6 +64,6 @@ public class QuickSort {
         arr[i] = arr[j];
         arr[j] = temp;
     }
-
 }
+
 ```

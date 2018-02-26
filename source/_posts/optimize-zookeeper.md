@@ -2,8 +2,8 @@ title: '156服务器优化1:清理zookeeper过多的历史文件'
 tags:
   - zookeeper
   - io高
-categories: 
-    - zookeeper
+categories:
+  - zookeeper
 date: 2017-12-12 14:51:00
 ---
 # 背景
@@ -37,10 +37,8 @@ http://pic.victor123.cn/17-12-12/59575921.jpg
 http://www.linuxidc.com/Linux/2016-03/129509.htm
 dataDir用于存储Log（事务日志）与Snapshot（快照）数据
 
+http://blog.51cto.com/nileader/932156
 
 ```
-在后续的观察中发现,156的io高并不全是zookeeper的问题,so本次支持清楚了历史文件,对于156的io高问题目前定位是mysql问题,待续
+在后续的观察中发现,156的io高并不全是zookeeper的问题,so本次只是清除了历史文件,对于156的io高问题目前定位是mysql问题,待续
 ```
-
-
-

@@ -3,8 +3,8 @@ tags:
   - 数据结构
   - java
   - HashMap
-categories: 
-    - java
+categories:
+  - java
 date: 2018-01-05 11:14:00
 ---
 # hashmap数据结构
@@ -327,6 +327,8 @@ hash算法
 6转换为二进制：0000 0000 0000 0000 0000 0000 0000 0110
 
 ```
+
+
 
 # 参考
 http://blog.csdn.net/u013256816/article/details/50912762
