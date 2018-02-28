@@ -33,3 +33,29 @@ categories:
 本来转载自公众号  占小狼的博客
 作者占小狼   来自 美团点评 基础架构组
 ```
+
+
+Java 虚拟机中的同步(Synchronization)基于进入和退出管程(Monitor)对象实现
+
+ACC_SYNCHRONIZED
+
+<table>
+<thead>
+<tr>
+  <th align="center">虚拟机位数</th>
+  <th align="center">头对象结构</th>
+  <th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+  <td align="center">32/64bit</td>
+  <td align="center">Mark Word</td>
+  <td>存储对象的hashCode、锁信息或分代年龄或GC标志等信息</td>
+</tr>
+<tr>
+  <td align="center">32/64bit</td>
+  <td align="center">Class Metadata Address</td>
+  <td>类型指针指向对象的类元数据，JVM通过这个指针确定该对象是哪个类的实例。</td>
+</tr>
+</tbody></table>
+

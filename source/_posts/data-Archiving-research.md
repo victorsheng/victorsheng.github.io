@@ -70,37 +70,69 @@ INSERT INTO lime_survey_549656_20151001 select * from lime_survey_549656  where 
 
 ## 存储过程来归档
 
+### 问题
 
-## 程序来归档
-###  pt-archvier
+无法跨数据库备份
+
+
+## 分区实现
+### 问题
+-  表中有全文索引,无法分区
+- 分区的话,需要修改业务sql,改动较大-->待确定
+
+
+##  pt-archvier(mysql percona工具集)
+- 基础教程
+
 https://yq.aliyun.com/articles/277145
-###  python实现
+
+- 是否可归档多表
+
+https://www.percona.com/forums/questions-discussions/percona-toolkit/32449-pt-archiver-multiple-dependent-tables
+
+- 可以多表条件,但是无法如果中途失败,无法继续归档
+
+https://stackoverflow.com/questions/47203831/turn-mysql-query-into-percona-pt-archiver-string
+
+
+##  mysql_archiver (python实现+pt-archvier)
 https://github.com/dbarun/mysql_archiver
 - MySQL_archiver基本上实现了数据归档的自动运转，统一的归档任务调度管理、自动监控和预警、自动生成报表。在一定程度上节约了生产力，提高了运维效率。
 - 要知道每个归档任务成功与否、跑了多长时间、归档了多少数据
-###   java实现
+##   JavaDataArchiver (java实现)
 https://github.com/Sunshow/JavaDataArchiver
 
+### 问题
+下载源码后,发现未实现
 
 ## 阿里云maxcompute
-有误删除的风险,只做数据加工
 
-## 阿里云数据迁移(复制)
-相对稳定,成本低
+### 优点
+相对稳定,成本低,多数据源,可视化直接操作,无需开发,只需要配置
+### 问题
+- 多表之间的id无法直接传递,需要使用join 同时过滤主表和字表的条件,例如sale_order和sale_order_detail(严重) 0226
+- delete的条件传递 in (ids)
+- delete的效率问题(性能) 0226
 
-
-
-
-# 利弊权衡
-- 对现有业务sql的影响
-- 对归档查询实现的难易
-
-## 分区实现
-- 表中有全文索引,无法分区
-- 分区的话,需要修改业务sql,改动较大-->待确定
-
-## mysql脚本实现
 - 是否需要跨数据库备份
+
+
+## 阿里云maxcompute+归档字段
+- 先多表关联,将要归档的记录设置上需归档的状态
+- 各表根据归档状态,单标归档
+- 删除原表
+
+### 问题
+数据量太大,可能update会锁表
+
+## 阿里云maxcompute+归档记录
+- 先多表关联,将要归档的记录设置上需归档的状态
+- 各表根据归档状态,单标归档
+- 删除原表
+
+
+### 问题
+待试验
 
 ## 外部程序实现
 
@@ -110,8 +142,8 @@ https://github.com/Sunshow/JavaDataArchiver
 - !!!!!!后续开发读取归档数据,同时不能影响生产库的性能(最好先定下来,否则目标 会不是mysql)
 - target 也需要分区
 
-# 目标库
-- 冗余信息,nogsql
+# 目标库选择
+- nogsql
 - mysql my
 - maxcompute
 
@@ -122,15 +154,7 @@ https://github.com/Sunshow/JavaDataArchiver
 - 在数据集成任务结束后的回调函数,可以配置删除归档数据的任务
 - 暂时目标库,还是mysql,后续的查询采用ElasticSearch进行查询,(阿里云提供1个月的免费试用,待研究确认后执行)
 
-# 后续
-- v_sale_order视图的修改
-- 开发
 
-------
-# 问题
-- 多表之间的id无法直接传递,需要使用join 同时过滤主表和字表的条件,例如sale_order和sale_order_detail(严重) 0226
-- delete的条件传递
-- delete的效率问题(性能) 0226
 
 
 
