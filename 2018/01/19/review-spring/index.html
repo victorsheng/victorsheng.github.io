@@ -87,14 +87,17 @@
 <meta property="og:site_name" content="Victor的博客">
 <meta property="og:description" content="Spring的优点 轻量级：相较于EJB容器，Spring采用的IoC容器非常的轻量级，基础版本的Spring框架大约只有2MB。Spring可以让开发者们仅仅使用POJO(Plain Old Java Object，相对于EJB)就能够开发出企业级的应用。这样做的好处是，你不需要使用臃肿庞大的 EJB容器(应用服务器)，你只需要轻量的servlet容器(如Tomcat)。尤其在一些开发当中，很稀">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://www.victor123.cn/images/pasted-80.png">
+<meta property="og:image" content="http://www.victor123.cn/images/pasted-81.png">
+<meta property="og:image" content="http://www.victor123.cn/images/pasted-82.png">
 <meta property="og:image" content="http://www.victor123.cn/images/pasted-45.png">
 <meta property="og:image" content="http://www.victor123.cn/images/pasted-46.png">
 <meta property="og:image" content="http://www.victor123.cn/images/pasted-36.png">
-<meta property="og:updated_time" content="2018-02-25T14:15:34.461Z">
+<meta property="og:updated_time" content="2018-03-11T08:08:40.546Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="review_spring">
 <meta name="twitter:description" content="Spring的优点 轻量级：相较于EJB容器，Spring采用的IoC容器非常的轻量级，基础版本的Spring框架大约只有2MB。Spring可以让开发者们仅仅使用POJO(Plain Old Java Object，相对于EJB)就能够开发出企业级的应用。这样做的好处是，你不需要使用臃肿庞大的 EJB容器(应用服务器)，你只需要轻量的servlet容器(如Tomcat)。尤其在一些开发当中，很稀">
-<meta name="twitter:image" content="http://www.victor123.cn/images/pasted-45.png">
+<meta name="twitter:image" content="http://www.victor123.cn/images/pasted-80.png">
 
 
 
@@ -453,6 +456,17 @@
 <li>异常处理：由于Java的JDBC，Hibernate等API中有很多方法抛出的是checked exception，而很多开发者并不能很好的处理异常。Spring提供了统一的API将这些checked exception的异常转换成Spring的unchecked exception。</li>
 <li>单元测试：Spring写出来的代码非常容易做单元测试，可以采用依赖注射(Dependency Injection)将测试的数据注射到程序中。</li>
 </ul>
+<p>IOC就是典型的工厂模式，通过sessionfactory去注入实例。</p>
+<p>AOP就是典型的代理模式的体现。</p>
+<h1 id="IOC概念"><a href="#IOC概念" class="headerlink" title="IOC概念"></a>IOC概念</h1><p><img src="/images/pasted-80.png" alt="upload successful"><br>IOC解耦<br><img src="/images/pasted-81.png" alt="upload successful"><br>引进了中间位置的“第三方”，也就是IOC容器，使得A、B、C、D这4个对象没有了耦合关系，齿轮之间的传动全部依靠“第三方”了</p>
+<p>通过引入IOC容器，利用依赖关系注入的方式，实现对象之间的解耦。</p>
+<p><img src="/images/pasted-82.png" alt="upload successful"></p>
+<h2 id="IOC为我们带来了什么好处"><a href="#IOC为我们带来了什么好处" class="headerlink" title="IOC为我们带来了什么好处"></a>IOC为我们带来了什么好处</h2><p>我们还是从USB的例子说起，使用USB外部设备比使用内置硬盘，到底带来什么好处？</p>
+<p>第一、USB设备作为电脑主机的外部设备，在插入主机之前，与电脑主机没有任何的关系，只有被我们连接在一起之后，两者才发生联系，具有相关性。所以，无论两者中的任何一方出现什么的问题，都不会影响另一方的运行。这种特性体现在软件工程中，就是可维护性比较好，非常便于进行单元测试，便于调试程序和诊断故障。代码中的每一个Class都可以单独测试，彼此之间互不影响，只要保证自身的功能无误即可，这就是组件之间低耦合或者无耦合带来的好处。</p>
+<p>第二、USB设备和电脑主机的之间无关性，还带来了另外一个好处，生产USB设备的厂商和生产电脑主机的厂商完全可以是互不相干的人，各干各事，他们之间唯一需要遵守的就是USB接口标准。这种特性体现在软件开发过程中，好处可是太大了。每个开发团队的成员都只需要关心实现自身的业务逻辑，完全不用去关心其它的人工作进展，因为你的任务跟别人没有任何关系，你的任务可以单独测试，你的任务也不用依赖于别人的组件，再也不用扯不清责任了。所以，在一个大中型项目中，团队成员分工明确、责任明晰，很容易将一个大的任务划分为细小的任务，开发效率和产品质量必将得到大幅度的提高。</p>
+<p>第三、同一个USB外部设备可以插接到任何支持USB的设备，可以插接到电脑主机，也可以插接到DV机，USB外部设备可以被反复利用。在软件工程中，这种特性就是可复用性好，我们可以把具有普遍性的常用组件独立出来，反复利用到项目中的其它部分，或者是其它项目，当然这也是面向对象的基本特征。显然，IOC不仅更好地贯彻了这个原则，提高了模块的可复用性。符合接口标准的实现，都可以插接到支持此标准的模块中。</p>
+<p>第四、同USB外部设备一样，模块具有热插拔特性。IOC生成对象的方式转为外置方式，也就是把对象生成放在配置文件里进行定义，这样，当我们更换一个实现子类将会变得很简单，只要修改配置文件就可以了，完全具有热插拨的特性。</p>
+<h2 id="IOC容器的一些产品"><a href="#IOC容器的一些产品" class="headerlink" title="IOC容器的一些产品"></a>IOC容器的一些产品</h2><p>spring EJB</p>
 <h1 id="Spring的IOC-将一个类实例化成对象的技术"><a href="#Spring的IOC-将一个类实例化成对象的技术" class="headerlink" title="Spring的IOC(将一个类实例化成对象的技术)"></a>Spring的IOC(将一个类实例化成对象的技术)</h1><p>IOC技术第一个解释叫做控制反转(IOC)，它还有个解释就是依赖注入(DI)，这两个名字很难从字面理解，但是当你理解它的原理后就会发现它们的描述是何等准确。IOC技术的本质就是构建对象的技术换句话说就是将一个类实例化成对象的技术。</p>
 <p>耦合具有两面性。一方面，紧密耦合的代码难以测试，难以复用，难以理解，并且表现出“打地鼠”式的bug特性（修复一个bug，导致出现一个新的或者甚至更多的bug）。另一方面，一定程度的耦合又是必须的，完全没有耦合的代码什么也做不了。为了完成有实际意义的工作，不同的类必须以适当的方式进行交互。总而言之，耦合是必须的，但应当小心谨慎的管理它。通过控制反转或者依赖注入，对象的依赖关系将由负责协调系统中各个对象的第三方组件在创建对象时设定。对象无需自行创建或管理它们的依赖关系，依赖关系将被自动注入到需要它们的对象中去。</p>
 <p>我们通过实际生活中的一个例子来解释一下IOC：</p>
@@ -523,6 +537,16 @@
 <h1 id="springbean是否线程安全"><a href="#springbean是否线程安全" class="headerlink" title="springbean是否线程安全"></a>springbean是否线程安全</h1><p>我们交由Spring管理的大多数对象其实都是一些无状态的对象，这种不会因为多线程而导致状态被破坏的对象很适合Spring的默认scope，每个单例的无状态对象都是线程安全的（也可以说只要是无状态的对象，不管单例多例都是线程安全的，不过单例毕竟节省了不断创建对象与GC的开销）。</p>
 <p>无状态的对象即是自身没有状态的对象，自然也就不会因为多个线程的交替调度而破坏自身状态导致线程安全问题。无状态对象包括我们经常使用的DO、DTO、VO这些只作为数据的实体模型的贫血对象，还有Service、DAO和Controller，这些对象并没有自己的状态，它们只是用来执行某些操作的。例如，每个DAO提供的函数都只是对数据库的CRUD，而且每个数据库Connection都作为函数的局部变量（局部变量是在用户栈中的，而且用户栈本身就是线程私有的内存区域，所以不存在线程安全问题），用完即关（或交还给连接池）。</p>
 <p><img src="/images/pasted-36.png" alt="upload successful"></p>
+<h1 id="spring-的优点？"><a href="#spring-的优点？" class="headerlink" title="spring 的优点？"></a>spring 的优点？</h1><p>1.降低了组件之间的耦合性 ，实现了软件各层之间的解耦 </p>
+<p>2.可以使用容易提供的众多服务，如事务管理，消息服务等 </p>
+<p>3.容器提供单例模式支持 </p>
+<p>4.容器提供了AOP技术，利用它很容易实现如权限拦截，运行期监控等功能 </p>
+<p>5.容器提供了众多的辅助类，能加快应用的开发 </p>
+<p>6.spring对于主流的应用框架提供了集成支持，如hibernate，JPA，Struts等 </p>
+<p>7.spring属于低侵入式设计，代码的污染极低 </p>
+<p>8.独立于各种应用服务器 </p>
+<p>9.spring的DI机制降低了业务对象替换的复杂性 </p>
+<p>10.Spring的高度开放性，并不强制应用完全依赖于Spring，开发者可以自由选择spring的部分或全部 </p>
 
       
     </div>
@@ -670,7 +694,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-count">82</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -727,7 +751,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Spring的优点"><span class="nav-number">1.</span> <span class="nav-text">Spring的优点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Spring的IOC-将一个类实例化成对象的技术"><span class="nav-number">2.</span> <span class="nav-text">Spring的IOC(将一个类实例化成对象的技术)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Spring的AOP"><span class="nav-number">3.</span> <span class="nav-text">Spring的AOP</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#AOP术语"><span class="nav-number">3.1.</span> <span class="nav-text">AOP术语</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#静态代理"><span class="nav-number">3.2.</span> <span class="nav-text">静态代理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Spring的AOP代理对象的生成"><span class="nav-number">3.3.</span> <span class="nav-text">Spring的AOP代理对象的生成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#jdkProxy"><span class="nav-number">3.4.</span> <span class="nav-text">jdkProxy</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#实现"><span class="nav-number">3.4.1.</span> <span class="nav-text">实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cglib"><span class="nav-number">3.5.</span> <span class="nav-text">cglib</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#spring生命周期"><span class="nav-number">4.</span> <span class="nav-text">spring生命周期</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#由AbstractBeanFactory控制"><span class="nav-number">5.</span> <span class="nav-text">由AbstractBeanFactory控制</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Aware接口"><span class="nav-number">5.1.</span> <span class="nav-text">Aware接口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BeanPostProcessor接口的postProcessBeforeInitialization方法"><span class="nav-number">5.2.</span> <span class="nav-text">BeanPostProcessor接口的postProcessBeforeInitialization方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#InitializingBean接口"><span class="nav-number">5.3.</span> <span class="nav-text">InitializingBean接口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BeanPostProcessor接口的postProcessAfterInitialization方法"><span class="nav-number">5.4.</span> <span class="nav-text">BeanPostProcessor接口的postProcessAfterInitialization方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DisposableBean接口"><span class="nav-number">5.5.</span> <span class="nav-text">DisposableBean接口</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#springbean是否线程安全"><span class="nav-number">6.</span> <span class="nav-text">springbean是否线程安全</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Spring的优点"><span class="nav-number">1.</span> <span class="nav-text">Spring的优点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#IOC概念"><span class="nav-number">2.</span> <span class="nav-text">IOC概念</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#IOC为我们带来了什么好处"><span class="nav-number">2.1.</span> <span class="nav-text">IOC为我们带来了什么好处</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IOC容器的一些产品"><span class="nav-number">2.2.</span> <span class="nav-text">IOC容器的一些产品</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Spring的IOC-将一个类实例化成对象的技术"><span class="nav-number">3.</span> <span class="nav-text">Spring的IOC(将一个类实例化成对象的技术)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Spring的AOP"><span class="nav-number">4.</span> <span class="nav-text">Spring的AOP</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#AOP术语"><span class="nav-number">4.1.</span> <span class="nav-text">AOP术语</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#静态代理"><span class="nav-number">4.2.</span> <span class="nav-text">静态代理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Spring的AOP代理对象的生成"><span class="nav-number">4.3.</span> <span class="nav-text">Spring的AOP代理对象的生成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#jdkProxy"><span class="nav-number">4.4.</span> <span class="nav-text">jdkProxy</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#实现"><span class="nav-number">4.4.1.</span> <span class="nav-text">实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cglib"><span class="nav-number">4.5.</span> <span class="nav-text">cglib</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#spring生命周期"><span class="nav-number">5.</span> <span class="nav-text">spring生命周期</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#由AbstractBeanFactory控制"><span class="nav-number">6.</span> <span class="nav-text">由AbstractBeanFactory控制</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Aware接口"><span class="nav-number">6.1.</span> <span class="nav-text">Aware接口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BeanPostProcessor接口的postProcessBeforeInitialization方法"><span class="nav-number">6.2.</span> <span class="nav-text">BeanPostProcessor接口的postProcessBeforeInitialization方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#InitializingBean接口"><span class="nav-number">6.3.</span> <span class="nav-text">InitializingBean接口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BeanPostProcessor接口的postProcessAfterInitialization方法"><span class="nav-number">6.4.</span> <span class="nav-text">BeanPostProcessor接口的postProcessAfterInitialization方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DisposableBean接口"><span class="nav-number">6.5.</span> <span class="nav-text">DisposableBean接口</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#springbean是否线程安全"><span class="nav-number">7.</span> <span class="nav-text">springbean是否线程安全</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#spring-的优点？"><span class="nav-number">8.</span> <span class="nav-text">spring 的优点？</span></a></li></ol></div>
             
 
           </div>
