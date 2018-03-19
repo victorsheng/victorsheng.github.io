@@ -1,6 +1,9 @@
 title: interview-question
 tags: []
 categories: []
+password: welcome
+abstract: 'Welcome to my blog, enter password to read.'
+message: 'Welcome to my blog, enter password to read.'
 date: 2018-03-06 21:35:00
 ---
 # 自我介绍
@@ -58,6 +61,7 @@ date: 2018-03-06 21:35:00
 -  索引失效的情况有哪些?范围查询一定会失效么?
  
 # redis
+https://victorsheng.gitbooks.io/interview-bible-java/content/
 -  redis 的原理和优势 
 -  redis 常用数据类型
 -  分布式 redis 怎么实现?
@@ -135,6 +139,7 @@ date: 2018-03-06 21:35:00
 
 
 # linux
+https://victorsheng.gitbooks.io/interview-bible-java/content/
 
 - 进程之间通信的几种方式，使用信号量的优缺点
 - 硬连接和软连接的区别
@@ -153,6 +158,7 @@ date: 2018-03-06 21:35:00
 - Linux，一个文件中全部是 url+次数，怎么得到所有的次数和
 - linux 系统的特点是什么?
 - linux 系统是不是用的非常熟?你常用的命令说一些?(说了十几个之后面 试官说可以了。。)
+
 
 
 # 算法
@@ -402,6 +408,7 @@ date: 2018-03-06 21:35:00
 - threadLocal 的实现?
 - 介绍数据仓库
 - 阿里云，亚马逊云提供哪些服务
+- 跨域
  
 
 # 加密
