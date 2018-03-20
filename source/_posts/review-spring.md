@@ -84,6 +84,18 @@ AOP将应用系统分为两部分，核心业务逻辑（Core business concerns�
 
 实现AOP的技术，主要分为两大类：一是采用动态代理技术，利用截取消息的方式，对该消息进行装饰，以取代原有对象行为的执行；二是采用静态织入的方式，引入特定的语法创建“方面”，从而使得编译器可以在编译期间织入有关“方面”的代码。
 
+## 过程
+
+### 1. 初始化
+大致单步跟了下Spring IOC的初始化过程，整个脉络很庞大，初始化的过程主要就是读取XML资源，并解析，最终注册到Bean Factory中：
+![upload successful](/images/pasted-83.png)
+
+### 2. 注入依赖
+当完成初始化IOC容器后，如果bean没有设置lazy-init(延迟加载)属性，那么bean的实例就会在初始化IOC完成之后，及时地进行初始化。初始化时会先建立实例，然后根据配置利用反射对实例进行进一步操作，具体流程如下所示：
+
+![upload successful](/images/pasted-84.png)
+- 创建bean的实例
+- 注入bean的属性
 
 ## AOP术语
 
@@ -365,35 +377,19 @@ Bean的完整生命周期经历了各种方法调用，这些方法可以划分�
 4、工厂后处理器接口方法　　：　　这个包括了AspectJWeavingEnabler, ConfigurationClassPostProcessor, CustomAutowireConfigurer等等非常有用的工厂后处理器　　接口的方法。工厂后处理器也是容器级的。在应用上下文装配配置文件之后立即调用。
 
 
-# 由AbstractBeanFactory控制
-## Aware接口
-
-```
-	private void invokeAwareMethods(final String beanName, final Object bean) {
-		if (bean instanceof Aware) {
-			if (bean instanceof BeanNameAware) {
-				((BeanNameAware) bean).setBeanName(beanName);
-			}
-			if (bean instanceof BeanClassLoaderAware) {
-				((BeanClassLoaderAware) bean).setBeanClassLoader(getBeanClassLoader());
-			}
-			if (bean instanceof BeanFactoryAware) {
-				((BeanFactoryAware) bean).setBeanFactory(AbstractAutowireCapableBeanFactory.this);
-			}
-		}
-	}
-```
-
-## BeanPostProcessor接口的postProcessBeforeInitialization方法
-
-
-## InitializingBean接口
-
-
-## BeanPostProcessor接口的postProcessAfterInitialization方法
-
-## DisposableBean接口
-
+## 1.类级别生命周期回调
+- 1.1 init-method xml配置
+- 1.2 InitializingBean接口
+- 1.3 PostConstruct注解
+## 2.容器级别扩展
+- 2.1BeanPostProcessor接口
+bean实例初始化后处理器及后处理器链
+实例初始化后处理器多用于对实例的一些代理操作。Spring中一些使用到AOP的特性也是通过后处理器的方式实现的。
+实例初始化后处理器链 是多个后处理器，就会有执行顺序的问题，可以通过实现Ordered接口，指定后处理的执行顺序，Ordered接口声明了getOrder方法，方法返回值越小，后处理的优先级越高，越早执行。
+在通过实现BeanPostProcessor接口自定义实例初始化后处理器的时候，建议也实现Ordered接口，指定优先级。
+- 2.2 BeanFactoryPostProcessor接口
+2.2.1 bean factory后处理器
+BeanFactoryPostProcessors接口在bean实例化前处理bean的配置元数据，BeanPostProcessor接口在bean实例化后处理bean的实例
 
 ![upload successful](/images/pasted-45.png)
 
@@ -431,5 +427,4 @@ https://www.cnblogs.com/zrtqsk/p/3735273.html
 
 9.spring的DI机制降低了业务对象替换的复杂性 
 
-10.Spring的高度开放性，并不强制应用完全依赖于Spring，开发者可以自由选择spring的部分或全部 
-
+10.Spring的高度开放性，并不强制应用完全依赖于Spring，开发者可以自由选择spring的部分或全部
