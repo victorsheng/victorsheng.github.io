@@ -90,10 +90,12 @@
 <meta property="og:image" content="http://www.victor123.cn/images/pasted-80.png">
 <meta property="og:image" content="http://www.victor123.cn/images/pasted-81.png">
 <meta property="og:image" content="http://www.victor123.cn/images/pasted-82.png">
+<meta property="og:image" content="http://www.victor123.cn/images/pasted-83.png">
+<meta property="og:image" content="http://www.victor123.cn/images/pasted-84.png">
 <meta property="og:image" content="http://www.victor123.cn/images/pasted-45.png">
 <meta property="og:image" content="http://www.victor123.cn/images/pasted-46.png">
 <meta property="og:image" content="http://www.victor123.cn/images/pasted-36.png">
-<meta property="og:updated_time" content="2018-03-11T08:08:40.546Z">
+<meta property="og:updated_time" content="2018-03-20T01:42:29.002Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="review_spring">
 <meta name="twitter:description" content="Spring的优点 轻量级：相较于EJB容器，Spring采用的IoC容器非常的轻量级，基础版本的Spring框架大约只有2MB。Spring可以让开发者们仅仅使用POJO(Plain Old Java Object，相对于EJB)就能够开发出企业级的应用。这样做的好处是，你不需要使用臃肿庞大的 EJB容器(应用服务器)，你只需要轻量的servlet容器(如Tomcat)。尤其在一些开发当中，很稀">
@@ -477,6 +479,13 @@
 <h1 id="Spring的AOP"><a href="#Spring的AOP" class="headerlink" title="Spring的AOP"></a>Spring的AOP</h1><p>在设计模式里有一种代理模式，代理模式将继承模式和关联模式结合在一起使用，代理模式就是继承模式和关联模式的综合体，不过这个综合体的作用倒不是解决对象注入的问题，而是为具体操作对象找到一个保姆或者是秘书，这就和小说里的二号首长一样，这个二号首长对外代表了具体的实例对象，实例对象的入口和出口都是通过这个二号首长，具体的实例对象是一号首长，一号首长是要干大事的，所以一些事务性，重复性的工作例如泡茶，安排车子，这样的工作是不用劳烦一号首长的大驾，而是二号首长帮忙解决的，这就是AOP的思想。AOP解决程序开发里事务性，和核心业务无关的问题，但这些问题对于业务场景的实现是很有必要的，在实际开发里AOP也是节省代码的一种方式。</p>
 <p>AOP将应用系统分为两部分，核心业务逻辑（Core business concerns）及横向的通用逻辑，也就是所谓的方面Crosscutting enterprise concerns，例如，所有大中型应用都要涉及到的持久化管理（Persistent）、事务管理（Transaction Management）、安全管理（Security）、日志管理（Logging）和调试管理（Debugging）等。</p>
 <p>实现AOP的技术，主要分为两大类：一是采用动态代理技术，利用截取消息的方式，对该消息进行装饰，以取代原有对象行为的执行；二是采用静态织入的方式，引入特定的语法创建“方面”，从而使得编译器可以在编译期间织入有关“方面”的代码。</p>
+<h2 id="过程"><a href="#过程" class="headerlink" title="过程"></a>过程</h2><h3 id="1-初始化"><a href="#1-初始化" class="headerlink" title="1. 初始化"></a>1. 初始化</h3><p>大致单步跟了下Spring IOC的初始化过程，整个脉络很庞大，初始化的过程主要就是读取XML资源，并解析，最终注册到Bean Factory中：<br><img src="/images/pasted-83.png" alt="upload successful"></p>
+<h3 id="2-注入依赖"><a href="#2-注入依赖" class="headerlink" title="2. 注入依赖"></a>2. 注入依赖</h3><p>当完成初始化IOC容器后，如果bean没有设置lazy-init(延迟加载)属性，那么bean的实例就会在初始化IOC完成之后，及时地进行初始化。初始化时会先建立实例，然后根据配置利用反射对实例进行进一步操作，具体流程如下所示：</p>
+<p><img src="/images/pasted-84.png" alt="upload successful"></p>
+<ul>
+<li>创建bean的实例</li>
+<li>注入bean的属性</li>
+</ul>
 <h2 id="AOP术语"><a href="#AOP术语" class="headerlink" title="AOP术语"></a>AOP术语</h2><ul>
 <li><p>Join Point: Spring AOP中，join point就是一个方法。（通俗来讲就是起作用的那个方法）。</p>
 </li>
@@ -529,8 +538,14 @@
 <p>2、Bean级生命周期接口方法　　：　　这个包括了BeanNameAware、BeanFactoryAware、InitializingBean和DiposableBean这些接口的方法</p>
 <p>3、容器级生命周期接口方法　　：　　这个包括了InstantiationAwareBeanPostProcessor 和 BeanPostProcessor 这两个接口实现，一般称它们的实现类为“后处理器”。</p>
 <p>4、工厂后处理器接口方法　　：　　这个包括了AspectJWeavingEnabler, ConfigurationClassPostProcessor, CustomAutowireConfigurer等等非常有用的工厂后处理器　　接口的方法。工厂后处理器也是容器级的。在应用上下文装配配置文件之后立即调用。</p>
-<h1 id="由AbstractBeanFactory控制"><a href="#由AbstractBeanFactory控制" class="headerlink" title="由AbstractBeanFactory控制"></a>由AbstractBeanFactory控制</h1><h2 id="Aware接口"><a href="#Aware接口" class="headerlink" title="Aware接口"></a>Aware接口</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">private void invokeAwareMethods(final String beanName, final Object bean) &#123;</span><br><span class="line">	if (bean instanceof Aware) &#123;</span><br><span class="line">		if (bean instanceof BeanNameAware) &#123;</span><br><span class="line">			((BeanNameAware) bean).setBeanName(beanName);</span><br><span class="line">		&#125;</span><br><span class="line">		if (bean instanceof BeanClassLoaderAware) &#123;</span><br><span class="line">			((BeanClassLoaderAware) bean).setBeanClassLoader(getBeanClassLoader());</span><br><span class="line">		&#125;</span><br><span class="line">		if (bean instanceof BeanFactoryAware) &#123;</span><br><span class="line">			((BeanFactoryAware) bean).setBeanFactory(AbstractAutowireCapableBeanFactory.this);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="BeanPostProcessor接口的postProcessBeforeInitialization方法"><a href="#BeanPostProcessor接口的postProcessBeforeInitialization方法" class="headerlink" title="BeanPostProcessor接口的postProcessBeforeInitialization方法"></a>BeanPostProcessor接口的postProcessBeforeInitialization方法</h2><h2 id="InitializingBean接口"><a href="#InitializingBean接口" class="headerlink" title="InitializingBean接口"></a>InitializingBean接口</h2><h2 id="BeanPostProcessor接口的postProcessAfterInitialization方法"><a href="#BeanPostProcessor接口的postProcessAfterInitialization方法" class="headerlink" title="BeanPostProcessor接口的postProcessAfterInitialization方法"></a>BeanPostProcessor接口的postProcessAfterInitialization方法</h2><h2 id="DisposableBean接口"><a href="#DisposableBean接口" class="headerlink" title="DisposableBean接口"></a>DisposableBean接口</h2><p><img src="/images/pasted-45.png" alt="upload successful"></p>
+<h2 id="1-类级别生命周期回调"><a href="#1-类级别生命周期回调" class="headerlink" title="1.类级别生命周期回调"></a>1.类级别生命周期回调</h2><ul>
+<li>1.1 init-method xml配置</li>
+<li>1.2 InitializingBean接口</li>
+<li>1.3 PostConstruct注解<h2 id="2-容器级别扩展"><a href="#2-容器级别扩展" class="headerlink" title="2.容器级别扩展"></a>2.容器级别扩展</h2></li>
+<li>2.1BeanPostProcessor接口<br>bean实例初始化后处理器及后处理器链<br>实例初始化后处理器多用于对实例的一些代理操作。Spring中一些使用到AOP的特性也是通过后处理器的方式实现的。<br>实例初始化后处理器链 是多个后处理器，就会有执行顺序的问题，可以通过实现Ordered接口，指定后处理的执行顺序，Ordered接口声明了getOrder方法，方法返回值越小，后处理的优先级越高，越早执行。<br>在通过实现BeanPostProcessor接口自定义实例初始化后处理器的时候，建议也实现Ordered接口，指定优先级。</li>
+<li>2.2 BeanFactoryPostProcessor接口<br>2.2.1 bean factory后处理器<br>BeanFactoryPostProcessors接口在bean实例化前处理bean的配置元数据，BeanPostProcessor接口在bean实例化后处理bean的实例</li>
+</ul>
+<p><img src="/images/pasted-45.png" alt="upload successful"></p>
 <p><img src="/images/pasted-46.png" alt="upload successful"></p>
 <p><a href="https://www.cnblogs.com/zrtqsk/p/3735273.html" target="_blank" rel="noopener">https://www.cnblogs.com/zrtqsk/p/3735273.html</a></p>
 <hr>
@@ -546,7 +561,7 @@
 <p>7.spring属于低侵入式设计，代码的污染极低 </p>
 <p>8.独立于各种应用服务器 </p>
 <p>9.spring的DI机制降低了业务对象替换的复杂性 </p>
-<p>10.Spring的高度开放性，并不强制应用完全依赖于Spring，开发者可以自由选择spring的部分或全部 </p>
+<p>10.Spring的高度开放性，并不强制应用完全依赖于Spring，开发者可以自由选择spring的部分或全部</p>
 
       
     </div>
@@ -694,7 +709,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">82</span>
+                  <span class="site-state-item-count">85</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -751,7 +766,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Spring的优点"><span class="nav-number">1.</span> <span class="nav-text">Spring的优点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#IOC概念"><span class="nav-number">2.</span> <span class="nav-text">IOC概念</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#IOC为我们带来了什么好处"><span class="nav-number">2.1.</span> <span class="nav-text">IOC为我们带来了什么好处</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IOC容器的一些产品"><span class="nav-number">2.2.</span> <span class="nav-text">IOC容器的一些产品</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Spring的IOC-将一个类实例化成对象的技术"><span class="nav-number">3.</span> <span class="nav-text">Spring的IOC(将一个类实例化成对象的技术)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Spring的AOP"><span class="nav-number">4.</span> <span class="nav-text">Spring的AOP</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#AOP术语"><span class="nav-number">4.1.</span> <span class="nav-text">AOP术语</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#静态代理"><span class="nav-number">4.2.</span> <span class="nav-text">静态代理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Spring的AOP代理对象的生成"><span class="nav-number">4.3.</span> <span class="nav-text">Spring的AOP代理对象的生成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#jdkProxy"><span class="nav-number">4.4.</span> <span class="nav-text">jdkProxy</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#实现"><span class="nav-number">4.4.1.</span> <span class="nav-text">实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cglib"><span class="nav-number">4.5.</span> <span class="nav-text">cglib</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#spring生命周期"><span class="nav-number">5.</span> <span class="nav-text">spring生命周期</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#由AbstractBeanFactory控制"><span class="nav-number">6.</span> <span class="nav-text">由AbstractBeanFactory控制</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Aware接口"><span class="nav-number">6.1.</span> <span class="nav-text">Aware接口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BeanPostProcessor接口的postProcessBeforeInitialization方法"><span class="nav-number">6.2.</span> <span class="nav-text">BeanPostProcessor接口的postProcessBeforeInitialization方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#InitializingBean接口"><span class="nav-number">6.3.</span> <span class="nav-text">InitializingBean接口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BeanPostProcessor接口的postProcessAfterInitialization方法"><span class="nav-number">6.4.</span> <span class="nav-text">BeanPostProcessor接口的postProcessAfterInitialization方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DisposableBean接口"><span class="nav-number">6.5.</span> <span class="nav-text">DisposableBean接口</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#springbean是否线程安全"><span class="nav-number">7.</span> <span class="nav-text">springbean是否线程安全</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#spring-的优点？"><span class="nav-number">8.</span> <span class="nav-text">spring 的优点？</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Spring的优点"><span class="nav-number">1.</span> <span class="nav-text">Spring的优点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#IOC概念"><span class="nav-number">2.</span> <span class="nav-text">IOC概念</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#IOC为我们带来了什么好处"><span class="nav-number">2.1.</span> <span class="nav-text">IOC为我们带来了什么好处</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IOC容器的一些产品"><span class="nav-number">2.2.</span> <span class="nav-text">IOC容器的一些产品</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Spring的IOC-将一个类实例化成对象的技术"><span class="nav-number">3.</span> <span class="nav-text">Spring的IOC(将一个类实例化成对象的技术)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Spring的AOP"><span class="nav-number">4.</span> <span class="nav-text">Spring的AOP</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#过程"><span class="nav-number">4.1.</span> <span class="nav-text">过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-初始化"><span class="nav-number">4.1.1.</span> <span class="nav-text">1. 初始化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-注入依赖"><span class="nav-number">4.1.2.</span> <span class="nav-text">2. 注入依赖</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AOP术语"><span class="nav-number">4.2.</span> <span class="nav-text">AOP术语</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#静态代理"><span class="nav-number">4.3.</span> <span class="nav-text">静态代理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Spring的AOP代理对象的生成"><span class="nav-number">4.4.</span> <span class="nav-text">Spring的AOP代理对象的生成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#jdkProxy"><span class="nav-number">4.5.</span> <span class="nav-text">jdkProxy</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#实现"><span class="nav-number">4.5.1.</span> <span class="nav-text">实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cglib"><span class="nav-number">4.6.</span> <span class="nav-text">cglib</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#spring生命周期"><span class="nav-number">5.</span> <span class="nav-text">spring生命周期</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-类级别生命周期回调"><span class="nav-number">5.1.</span> <span class="nav-text">1.类级别生命周期回调</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-容器级别扩展"><span class="nav-number">5.2.</span> <span class="nav-text">2.容器级别扩展</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#springbean是否线程安全"><span class="nav-number">6.</span> <span class="nav-text">springbean是否线程安全</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#spring-的优点？"><span class="nav-number">7.</span> <span class="nav-text">spring 的优点？</span></a></li></ol></div>
             
 
           </div>
