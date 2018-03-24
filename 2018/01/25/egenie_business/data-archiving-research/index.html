@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="MySQL," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="归档目的 主要处于性能考虑,减少查找的范围  归档需求 同时要求系统中可以查询到之前的数据,不能归档到非结构化系统中 要求条件需要多表进行关联,并添加自定义条件,保证业务 要求主子表归档具有一致性,主子表不能分离 已经归档过一次 稳定性 可追溯 数据一致性 定时自动执行 跨数据库,最好支持到不同的数据源  &amp;l">
+<meta name="keywords" content="MySQL">
+<meta property="og:type" content="article">
+<meta property="og:title" content="data-Archiving-research">
+<meta property="og:url" content="http://www.victor123.cn/2018/01/25/egenie_business/data-archiving-research/index.html">
+<meta property="og:site_name" content="Victor的博客">
+<meta property="og:description" content="归档目的 主要处于性能考虑,减少查找的范围  归档需求 同时要求系统中可以查询到之前的数据,不能归档到非结构化系统中 要求条件需要多表进行关联,并添加自定义条件,保证业务 要求主子表归档具有一致性,主子表不能分离 已经归档过一次 稳定性 可追溯 数据一致性 定时自动执行 跨数据库,最好支持到不同的数据源  &amp;lt; !–more–&amp;gt; 归档流程梳理 复制指定条件的旧数据 删除旧数据(是否需要人">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-02-27T05:32:29.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="data-Archiving-research">
+<meta name="twitter:description" content="归档目的 主要处于性能考虑,减少查找的范围  归档需求 同时要求系统中可以查询到之前的数据,不能归档到非结构化系统中 要求条件需要多表进行关联,并添加自定义条件,保证业务 要求主子表归档具有一致性,主子表不能分离 已经归档过一次 稳定性 可追溯 数据一致性 定时自动执行 跨数据库,最好支持到不同的数据源  &amp;lt; !–more–&amp;gt; 归档流程梳理 复制指定条件的旧数据 删除旧数据(是否需要人">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.victor123.cn/2018/01/25/egenie_business/data-archiving-research/"/>
+
+
+
+
+
+  <title>data-Archiving-research | Victor的博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?2342180055c7117a644c0e88269f1028";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Victor的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br />
+            
+            日程表
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/sitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />
+            
+            站点地图
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/25/egenie_business/data-archiving-research/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">data-Archiving-research</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-25T10:42:00+08:00">
+                2018-01-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/25/egenie_business/data-archiving-research/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/25/egenie_business/data-archiving-research/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/25/egenie_business/data-archiving-research/" class="leancloud_visitors" data-flag-title="data-Archiving-research">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="归档目的"><a href="#归档目的" class="headerlink" title="归档目的"></a>归档目的</h1><ul>
+<li>主要处于性能考虑,减少查找的范围</li>
+</ul>
+<h1 id="归档需求"><a href="#归档需求" class="headerlink" title="归档需求"></a>归档需求</h1><ul>
+<li>同时要求系统中可以查询到之前的数据,不能归档到非结构化系统中</li>
+<li>要求条件需要多表进行关联,并添加自定义条件,保证业务</li>
+<li>要求主子表归档具有一致性,主子表不能分离</li>
+<li>已经归档过一次</li>
+<li>稳定性</li>
+<li>可追溯</li>
+<li>数据一致性</li>
+<li>定时自动执行</li>
+<li>跨数据库,最好支持到不同的数据源</li>
+</ul>
+<p>&lt; !–more–&gt;</p>
+<h1 id="归档流程梳理"><a href="#归档流程梳理" class="headerlink" title="归档流程梳理"></a>归档流程梳理</h1><ul>
+<li>复制指定条件的旧数据</li>
+<li>删除旧数据(是否需要人工介入?)后续自动</li>
+<li>读取归档数据</li>
+</ul>
+<h1 id="归档方案思路"><a href="#归档方案思路" class="headerlink" title="归档方案思路:"></a>归档方案思路:</h1><h2 id="1-建立归档表-archive"><a href="#1-建立归档表-archive" class="headerlink" title="1.建立归档表_archive"></a>1.建立归档表_archive</h2><p>这种方式是通过建立一个以_archive结尾的归档表来实施的。如果使用这种方式，那么一般需要在业务层进行查询的分离改造，比如基于我们的特定归档规则 ，对业务端核心代码改造或者使用proxy方案等来决定是使用主表还是归档表。同时我们还需要一个数据归档过程，当数据过时或者变成冷数据时，将该数据从主表迁移到归档表中。</p>
+<p>在业务层查询时，我们可以通过时间字段来进行查询判断，例如将90天之前的数据在归档表中查询，否则就在主表查询。另一种方式可以通过增加status列去判断查询主表还是归档表，如果是inactive则查询归档表，否则就在主表查询。</p>
+<h2 id="mysql分区"><a href="#mysql分区" class="headerlink" title="mysql分区"></a>mysql分区</h2><p>为了让优化器能将查询发送到正确的分区键，在创建分区表的时候，我们需要将分区键添加到主键里，并且理想情况下，该分区键能被包含在所有select/update/delete等语句的where条件里面，否则的话，你的查询将会按照顺序查找表对应的每个分区，这种情况下查询性能就没有那么好了。</p>
+<h3 id="根据日期进行分区"><a href="#根据日期进行分区" class="headerlink" title="根据日期进行分区"></a>根据日期进行分区</h3><p>这种方式是通过对表进行分区来实现，虽然这是一种不同的物理数据模型，但是确实有助于将表的数据进行拆分到不同的物理磁盘，并且不需要代码的任何改造。作为DBA，一般对表进行分区是比较常用的方式，我们可以通过日期字段很容易确定哪些是冷数据，并根据日期将不同日期的时间分配到不同的分区中，在查询的时候，我们可以通过日期来从分区中快速定位到对应的数据，同时建立分区表也比较利于DBA对大表进行管理操作。</p>
+<p>我们根据数据行的创建时间，按年将数据放入到不同的分区，这里需要注意的是在2020年以后，我们还需要在表里添加新的年份，当然我们可以提前加更多的分区或者部署脚本来自动化创建新的分区。</p>
+<h3 id="通过状态进行分区"><a href="#通过状态进行分区" class="headerlink" title="通过状态进行分区"></a>通过状态进行分区</h3><p>我们也可以通过status状态列来进行分区，这种情况下，通常状态列会包含active/inactive两种状态，然后通过update进行状态列的更新（使用replace或者insert+delete也是可以的），将数据放入到正确的分区当中。请看下面的示例</p>
+<h2 id="通过ID进行分区"><a href="#通过ID进行分区" class="headerlink" title="通过ID进行分区"></a>通过ID进行分区</h2><h1 id="具体方案"><a href="#具体方案" class="headerlink" title="具体方案"></a>具体方案</h1><h2 id="复制表并且按照条件插入数据（此种方法除了主键索引不包括其他索引）–-gt-手动sql"><a href="#复制表并且按照条件插入数据（此种方法除了主键索引不包括其他索引）–-gt-手动sql" class="headerlink" title="复制表并且按照条件插入数据（此种方法除了主键索引不包括其他索引）–&gt;手动sql"></a>复制表并且按照条件插入数据（此种方法除了主键索引不包括其他索引）–&gt;手动sql</h2><p><a href="http://blog.csdn.net/bluestarf/article/details/49641047" target="_blank" rel="noopener">http://blog.csdn.net/bluestarf/article/details/49641047</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE lime_survey_549656_20151001 as select * from lime_survey_549656  where submitdate &lt; &quot;2015-10-01 00:00:00&quot;;  </span><br><span class="line">   </span><br><span class="line">ALTER TABLE lime_survey_549656_20151001 change id id int primary key auto_increment;</span><br></pre></td></tr></table></figure>
+<h2 id="创建一张空表，结构和索引和原表一样-–-gt-手动sql"><a href="#创建一张空表，结构和索引和原表一样-–-gt-手动sql" class="headerlink" title="创建一张空表，结构和索引和原表一样 –&gt;手动sql"></a>创建一张空表，结构和索引和原表一样 –&gt;手动sql</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">create table lime_survey_549656_20151001 like lime_survey_549656;   </span><br><span class="line">INSERT INTO lime_survey_549656_20151001 select * from lime_survey_549656  where submitdate &lt; &quot;2015-10-01 00:00:00&quot;;</span><br></pre></td></tr></table></figure>
+<h2 id="存储过程来归档"><a href="#存储过程来归档" class="headerlink" title="存储过程来归档"></a>存储过程来归档</h2><h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>无法跨数据库备份</p>
+<h2 id="分区实现"><a href="#分区实现" class="headerlink" title="分区实现"></a>分区实现</h2><h3 id="问题-1"><a href="#问题-1" class="headerlink" title="问题"></a>问题</h3><ul>
+<li>表中有全文索引,无法分区</li>
+<li>分区的话,需要修改业务sql,改动较大–&gt;待确定</li>
+</ul>
+<h2 id="pt-archvier-mysql-percona工具集"><a href="#pt-archvier-mysql-percona工具集" class="headerlink" title="pt-archvier(mysql percona工具集)"></a>pt-archvier(mysql percona工具集)</h2><ul>
+<li>基础教程</li>
+</ul>
+<p><a href="https://yq.aliyun.com/articles/277145" target="_blank" rel="noopener">https://yq.aliyun.com/articles/277145</a></p>
+<ul>
+<li>是否可归档多表</li>
+</ul>
+<p><a href="https://www.percona.com/forums/questions-discussions/percona-toolkit/32449-pt-archiver-multiple-dependent-tables" target="_blank" rel="noopener">https://www.percona.com/forums/questions-discussions/percona-toolkit/32449-pt-archiver-multiple-dependent-tables</a></p>
+<ul>
+<li>可以多表条件,但是无法如果中途失败,无法继续归档</li>
+</ul>
+<p><a href="https://stackoverflow.com/questions/47203831/turn-mysql-query-into-percona-pt-archiver-string" target="_blank" rel="noopener">https://stackoverflow.com/questions/47203831/turn-mysql-query-into-percona-pt-archiver-string</a></p>
+<h2 id="mysql-archiver-python实现-pt-archvier"><a href="#mysql-archiver-python实现-pt-archvier" class="headerlink" title="mysql_archiver (python实现+pt-archvier)"></a>mysql_archiver (python实现+pt-archvier)</h2><p><a href="https://github.com/dbarun/mysql_archiver" target="_blank" rel="noopener">https://github.com/dbarun/mysql_archiver</a></p>
+<ul>
+<li>MySQL_archiver基本上实现了数据归档的自动运转，统一的归档任务调度管理、自动监控和预警、自动生成报表。在一定程度上节约了生产力，提高了运维效率。</li>
+<li>要知道每个归档任务成功与否、跑了多长时间、归档了多少数据<h2 id="JavaDataArchiver-java实现"><a href="#JavaDataArchiver-java实现" class="headerlink" title="JavaDataArchiver (java实现)"></a>JavaDataArchiver (java实现)</h2><a href="https://github.com/Sunshow/JavaDataArchiver" target="_blank" rel="noopener">https://github.com/Sunshow/JavaDataArchiver</a></li>
+</ul>
+<h3 id="问题-2"><a href="#问题-2" class="headerlink" title="问题"></a>问题</h3><p>下载源码后,发现未实现</p>
+<h2 id="阿里云maxcompute"><a href="#阿里云maxcompute" class="headerlink" title="阿里云maxcompute"></a>阿里云maxcompute</h2><h3 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h3><p>相对稳定,成本低,多数据源,可视化直接操作,无需开发,只需要配置</p>
+<h3 id="问题-3"><a href="#问题-3" class="headerlink" title="问题"></a>问题</h3><ul>
+<li>多表之间的id无法直接传递,需要使用join 同时过滤主表和字表的条件,例如sale_order和sale_order_detail(严重) 0226</li>
+<li>delete的条件传递 in (ids)</li>
+<li><p>delete的效率问题(性能) 0226</p>
+</li>
+<li><p>是否需要跨数据库备份</p>
+</li>
+</ul>
+<h2 id="阿里云maxcompute-归档字段"><a href="#阿里云maxcompute-归档字段" class="headerlink" title="阿里云maxcompute+归档字段"></a>阿里云maxcompute+归档字段</h2><ul>
+<li>先多表关联,将要归档的记录设置上需归档的状态</li>
+<li>各表根据归档状态,单标归档</li>
+<li>删除原表</li>
+</ul>
+<h3 id="问题-4"><a href="#问题-4" class="headerlink" title="问题"></a>问题</h3><p>数据量太大,可能update会锁表</p>
+<h2 id="阿里云maxcompute-归档记录"><a href="#阿里云maxcompute-归档记录" class="headerlink" title="阿里云maxcompute+归档记录"></a>阿里云maxcompute+归档记录</h2><ul>
+<li>先多表关联,将要归档的记录设置上需归档的状态</li>
+<li>各表根据归档状态,单标归档</li>
+<li>删除原表</li>
+</ul>
+<h3 id="问题-5"><a href="#问题-5" class="headerlink" title="问题"></a>问题</h3><p>待试验</p>
+<h2 id="外部程序实现"><a href="#外部程序实现" class="headerlink" title="外部程序实现"></a>外部程序实现</h2><h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><ul>
+<li>使用: mysql_archiver</li>
+<li>!!!!!!后续开发读取归档数据,同时不能影响生产库的性能(最好先定下来,否则目标 会不是mysql)</li>
+<li>target 也需要分区</li>
+</ul>
+<h1 id="目标库选择"><a href="#目标库选择" class="headerlink" title="目标库选择"></a>目标库选择</h1><ul>
+<li>nogsql</li>
+<li>mysql my</li>
+<li>maxcompute</li>
+</ul>
+<h1 id="废弃分表策略-对于v-sale-order和v-sale-order-detail"><a href="#废弃分表策略-对于v-sale-order和v-sale-order-detail" class="headerlink" title="废弃分表策略,对于v_sale_order和v_sale_order_detail"></a>废弃分表策略,对于v_sale_order和v_sale_order_detail</h1><h1 id="结论-1"><a href="#结论-1" class="headerlink" title="结论"></a>结论</h1><ul>
+<li>采用阿里云数据集成,跑归档任务</li>
+<li>在数据集成任务结束后的回调函数,可以配置删除归档数据的任务</li>
+<li>暂时目标库,还是mysql,后续的查询采用ElasticSearch进行查询,(阿里云提供1个月的免费试用,待研究确认后执行)</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Victor
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://www.victor123.cn/2018/01/25/egenie_business/data-archiving-research/" title="data-Archiving-research">http://www.victor123.cn/2018/01/25/egenie_business/data-archiving-research/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/MySQL/" rel="tag"># MySQL</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/01/24/java_thread/study-java-thread-local/" rel="next" title="study-java-thread-local">
+                <i class="fa fa-chevron-left"></i> study-java-thread-local
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/01/29/java_data_structure/study-java-queue/" rel="prev" title="java-study-BlockingQueue">
+                java-study-BlockingQueue <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Victor</p>
+              <p class="site-description motion-element" itemprop="description">victor的个人博客,作为一枚后端开发工程师,写本博客目的,旨在记录自己在工作生活中的点点滴滴,形成自己的知识体系</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">95</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">75</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#归档目的"><span class="nav-number">1.</span> <span class="nav-text">归档目的</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#归档需求"><span class="nav-number">2.</span> <span class="nav-text">归档需求</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#归档流程梳理"><span class="nav-number">3.</span> <span class="nav-text">归档流程梳理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#归档方案思路"><span class="nav-number">4.</span> <span class="nav-text">归档方案思路:</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-建立归档表-archive"><span class="nav-number">4.1.</span> <span class="nav-text">1.建立归档表_archive</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mysql分区"><span class="nav-number">4.2.</span> <span class="nav-text">mysql分区</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#根据日期进行分区"><span class="nav-number">4.2.1.</span> <span class="nav-text">根据日期进行分区</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过状态进行分区"><span class="nav-number">4.2.2.</span> <span class="nav-text">通过状态进行分区</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#通过ID进行分区"><span class="nav-number">4.3.</span> <span class="nav-text">通过ID进行分区</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#具体方案"><span class="nav-number">5.</span> <span class="nav-text">具体方案</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#复制表并且按照条件插入数据（此种方法除了主键索引不包括其他索引）–-gt-手动sql"><span class="nav-number">5.1.</span> <span class="nav-text">复制表并且按照条件插入数据（此种方法除了主键索引不包括其他索引）–>手动sql</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建一张空表，结构和索引和原表一样-–-gt-手动sql"><span class="nav-number">5.2.</span> <span class="nav-text">创建一张空表，结构和索引和原表一样 –>手动sql</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#存储过程来归档"><span class="nav-number">5.3.</span> <span class="nav-text">存储过程来归档</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#问题"><span class="nav-number">5.3.1.</span> <span class="nav-text">问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分区实现"><span class="nav-number">5.4.</span> <span class="nav-text">分区实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#问题-1"><span class="nav-number">5.4.1.</span> <span class="nav-text">问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pt-archvier-mysql-percona工具集"><span class="nav-number">5.5.</span> <span class="nav-text">pt-archvier(mysql percona工具集)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mysql-archiver-python实现-pt-archvier"><span class="nav-number">5.6.</span> <span class="nav-text">mysql_archiver (python实现+pt-archvier)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JavaDataArchiver-java实现"><span class="nav-number">5.7.</span> <span class="nav-text">JavaDataArchiver (java实现)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#问题-2"><span class="nav-number">5.7.1.</span> <span class="nav-text">问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#阿里云maxcompute"><span class="nav-number">5.8.</span> <span class="nav-text">阿里云maxcompute</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#优点"><span class="nav-number">5.8.1.</span> <span class="nav-text">优点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#问题-3"><span class="nav-number">5.8.2.</span> <span class="nav-text">问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#阿里云maxcompute-归档字段"><span class="nav-number">5.9.</span> <span class="nav-text">阿里云maxcompute+归档字段</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#问题-4"><span class="nav-number">5.9.1.</span> <span class="nav-text">问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#阿里云maxcompute-归档记录"><span class="nav-number">5.10.</span> <span class="nav-text">阿里云maxcompute+归档记录</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#问题-5"><span class="nav-number">5.10.1.</span> <span class="nav-text">问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#外部程序实现"><span class="nav-number">5.11.</span> <span class="nav-text">外部程序实现</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#结论"><span class="nav-number">6.</span> <span class="nav-text">结论</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#目标库选择"><span class="nav-number">7.</span> <span class="nav-text">目标库选择</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#废弃分表策略-对于v-sale-order和v-sale-order-detail"><span class="nav-number">8.</span> <span class="nav-text">废弃分表策略,对于v_sale_order和v_sale_order_detail</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#结论-1"><span class="nav-number">9.</span> <span class="nav-text">结论</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Victor</span>
+  
+  <!--以下3行为一条竖线和Coding Page-->
+  <div class="powered-by">
+  </div>
+  <span>Hosted by <a href="https://pages.coding.me" style="font-weight: bold">Coding Pages</a></span>
+  
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://victor123-cn.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://www.victor123.cn/2018/01/25/egenie_business/data-archiving-research/';
+          this.page.identifier = '2018/01/25/egenie_business/data-archiving-research/';
+          this.page.title = 'data-Archiving-research';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://victor123-cn.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("QdvsGi5rrGt05B6T1cP9buCX-gzGzoHsz", "IPzdnLkdvxDPxh2zyHn82bWk");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
