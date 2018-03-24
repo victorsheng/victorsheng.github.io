@@ -1,5 +1,5 @@
 ---
-title: manual-sql-separate-purchase-group
+title: 手工合并采购单分组的sql
 date: 2018-02-26 16:34:41
 tags:
 categories:
