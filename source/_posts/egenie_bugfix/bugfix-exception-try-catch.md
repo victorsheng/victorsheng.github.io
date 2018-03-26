@@ -113,3 +113,51 @@ org.springframework.transaction.UnexpectedRollbackException: Transaction rolled 
 	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
 	at java.lang.Thread.run(Thread.java:748)
 ```
+
+# 原理
+
+ spring 具备多种事务传播机制，最常用的是REQUIRED，即如果不存在事务，则新建一个事务；如果存在事务，则加入现存的事务中。
+` public void A() {
+    querySomething(...)；
+    try {
+      B()
+    } catch () {
+    }
+    saveSomethinf()；
+}
+
+public void B() {
+    throw Exception()
+}`
+此时B会和A存在一个事务中。如果B抛出异常没有捕获，即使在A中捕获并处理，仍会发生异常：Transaction rolled back because it has been marked as rollback-only 因为spring会在A捕获异常之前提前捕获到异常，并将当前事务设置为rollback-only，而A觉得对异常进行了捕获，它仍然继续commit，当TransactionManager发现状态为设置为rollback-only时， 则会抛出UnexpectedRollbackException 相关代码在AbstractPlatformTransactonManager.java中：
+
+`public final void commit(TransactionStatus status) throws TransactionException {
+		if (status.isCompleted()) {
+			throw new IllegalTransactionStateException(
+					"Transaction is already completed - do not call commit or rollback more than once per transaction");
+		}
+
+		DefaultTransactionStatus defStatus = (DefaultTransactionStatus) status;
+		if (defStatus.isLocalRollbackOnly()) {
+			if (defStatus.isDebug()) {
+				logger.debug("Transactional code has requested rollback");
+			}
+			processRollback(defStatus);
+			return;
+		}
+		if (!shouldCommitOnGlobalRollbackOnly() && defStatus.isGlobalRollbackOnly()) {
+			if (defStatus.isDebug()) {
+				logger.debug("Global transaction is marked as rollback-only but transactional code requested commit");
+			}
+			processRollback(defStatus);
+			// Throw UnexpectedRollbackException only at outermost transaction boundary
+			// or if explicitly asked to.
+			if (status.isNewTransaction() || isFailEarlyOnGlobalRollbackOnly()) {
+				throw new UnexpectedRollbackException(
+						"Transaction rolled back because it has been marked as rollback-only");
+			}
+			return;
+		}
+
+		processCommit(defStatus);
+	}`

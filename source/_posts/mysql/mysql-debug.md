@@ -1,8 +1,8 @@
-title: mysql-debug
+title: mysql下划线关键字
 tags:
   - mysql
   - like
-categories: 
+categories:
     - mysql
 date: 2018-01-24 15:42:00
 ---
@@ -50,7 +50,7 @@ ORDER BY v_sale_order.last_update_time DESC;
 # 原因
 - %代表任意多个字符
 - _代表一个字符
-- 如果想搜索  _  就要用到转义符 “\” 
+- 如果想搜索  _  就要用到转义符 “\”
 
 # 解决
 ``` java

@@ -1,4 +1,4 @@
-title: study-sharding-mysql
+title: mysql分库分表
 date: 2018-03-21 13:53:45
 tags:
 categories:
