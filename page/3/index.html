@@ -326,6 +326,148 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/02/26/egenie_business/manual-sql-separate-purchase-group/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/02/26/egenie_business/manual-sql-separate-purchase-group/" itemprop="url">手工合并采购单分组的sql</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-26T16:34:41+08:00">
+                2018-02-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/02/26/egenie_business/manual-sql-separate-purchase-group/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/02/26/egenie_business/manual-sql-separate-purchase-group/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/02/26/egenie_business/manual-sql-separate-purchase-group/" class="leancloud_visitors" data-flag-title="手工合并采购单分组的sql">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></td><td class="code"><pre><span class="line">-- 查询出问题的采购单</span><br><span class="line">SELECT *</span><br><span class="line">FROM pms_purchase_order</span><br><span class="line">WHERE pms_purchase_order_no IN (&apos;CG2018-02100061021&apos;, &apos;CG2018-02100061023&apos;);</span><br><span class="line"></span><br><span class="line">-- 订单为主表,先将要处理的订单,抽出到一个表中</span><br><span class="line">CREATE TABLE `tmp_0226_mlj` AS</span><br><span class="line">  SELECT DISTINCT</span><br><span class="line">    sale_order_id,</span><br><span class="line">    &quot;XXXX&quot; AS group_no</span><br><span class="line">  FROM pms_daily_purchase_detail</span><br><span class="line">  WHERE pms_purchase_order_id IN (216606, 216608) AND single = 0;</span><br><span class="line"></span><br><span class="line">-- 由于create table的语法限制,如果 group_no 为null,无法进行update,so 先放一个长的字符串XXXX进去</span><br><span class="line">DESC tmp_0226_mlj;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">-- 手动更新组号</span><br><span class="line">UPDATE tmp_0226_mlj</span><br><span class="line">SET group_no = &apos;C&apos;</span><br><span class="line">WHERE group_no = &quot;XXXX&quot;</span><br><span class="line">LIMIT 200;</span><br><span class="line">UPDATE tmp_0226_mlj</span><br><span class="line">SET group_no = &apos;D&apos;</span><br><span class="line">WHERE group_no = &quot;XXXX&quot;</span><br><span class="line">LIMIT 200;</span><br><span class="line">UPDATE tmp_0226_mlj</span><br><span class="line">SET group_no = &apos;E&apos;</span><br><span class="line">WHERE group_no = &quot;XXXX&quot;</span><br><span class="line">LIMIT 200;</span><br><span class="line">UPDATE tmp_0226_mlj</span><br><span class="line">SET group_no = &apos;F&apos;</span><br><span class="line">WHERE group_no = &quot;XXXX&quot;</span><br><span class="line">LIMIT 200;</span><br><span class="line">UPDATE tmp_0226_mlj</span><br><span class="line">SET group_no = &apos;G&apos;</span><br><span class="line">WHERE group_no = &quot;XXXX&quot;</span><br><span class="line">LIMIT 200;</span><br><span class="line">UPDATE tmp_0226_mlj</span><br><span class="line">SET group_no = &apos;H&apos;</span><br><span class="line">WHERE group_no = &quot;XXXX&quot;</span><br><span class="line">LIMIT 200;</span><br><span class="line">UPDATE tmp_0226_mlj</span><br><span class="line">SET group_no = &apos;M&apos;</span><br><span class="line">WHERE group_no = &quot;XXXX&quot;</span><br><span class="line">LIMIT 200;</span><br><span class="line">UPDATE tmp_0226_mlj</span><br><span class="line">SET group_no = &apos;N&apos;</span><br><span class="line">WHERE group_no = &quot;XXXX&quot;</span><br><span class="line">LIMIT 200;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">-- 预览手动分配的组号</span><br><span class="line">SELECT</span><br><span class="line">  count(1),</span><br><span class="line">  group_no</span><br><span class="line">FROM tmp_0226_mlj</span><br><span class="line">GROUP BY group_no;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">SELECT * from pms_daily_purchase_detail WHERE pms_purchase_order_id IN (216606, 216608) AND single = 0;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">-- 更新采购单明细</span><br><span class="line">UPDATE pms_daily_purchase_detail, tmp_0226_mlj</span><br><span class="line">SET pms_daily_purchase_detail.group_no = tmp_0226_mlj.group_no</span><br><span class="line">WHERE tmp_0226_mlj.sale_order_id = pms_daily_purchase_detail.sale_order_id</span><br><span class="line">      AND pms_purchase_order_id IN (216606, 216608) AND single = 0;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">-- 更新订单</span><br><span class="line">UPDATE sale_order, tmp_0226_mlj</span><br><span class="line">SET sale_order.group_no = tmp_0226_mlj.group_no</span><br><span class="line">WHERE tmp_0226_mlj.sale_order_id = sale_order.sale_order_id;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">-- 更新发货单</span><br><span class="line">UPDATE wms_order, tmp_0226_mlj</span><br><span class="line">SET wms_order.group_no = tmp_0226_mlj.group_no</span><br><span class="line">WHERE tmp_0226_mlj.sale_order_id = wms_order.sale_order_id;</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/02/18/java_jvm/jvm-gc/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2033,196 +2175,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/02/02/java_jvm/jvm-jstack/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/02/02/java_jvm/jvm-jstack/" itemprop="url">jvm-jstack</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-02T23:16:05+08:00">
-                2018-02-02
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/jvm/" itemprop="url" rel="index">
-                    <span itemprop="name">jvm</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/02/02/java_jvm/jvm-jstack/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/02/02/java_jvm/jvm-jstack/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/02/02/java_jvm/jvm-jstack/" class="leancloud_visitors" data-flag-title="jvm-jstack">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="jstack"><a href="#jstack" class="headerlink" title="jstack"></a>jstack</h1><p>jstack命令的语法格式： jstack  <pid>。可以用jps查看java进程id。这里要注意的是：</pid></p>
-<ol>
-<li><p>不同的 JAVA虚机的线程 DUMP的创建方法和文件格式是不一样的，不同的 JVM版本， dump信息也有差别。</p>
-</li>
-<li><p>在实际运行中，往往一次 dump的信息，还不足以确认问题。建议产生三次 dump信息，如果每次 dump都指向同一个问题，我们才确定问题的典型性。</p>
-</li>
-</ol>
-<h1 id="jstack-Dump-日志文件中的线程状态"><a href="#jstack-Dump-日志文件中的线程状态" class="headerlink" title="jstack Dump 日志文件中的线程状态"></a>jstack Dump 日志文件中的线程状态</h1><h2 id="dump-文件里，值得关注的线程状态有"><a href="#dump-文件里，值得关注的线程状态有" class="headerlink" title="dump 文件里，值得关注的线程状态有"></a>dump 文件里，值得关注的线程状态有</h2><ul>
-<li>死锁， Deadlock（重点关注） </li>
-<li>执行中，Runnable   </li>
-<li>等待资源， Waiting on condition（重点关注） </li>
-<li>等待获取监视器， Waiting on monitor entry（重点关注）</li>
-<li>暂停，Suspended</li>
-<li>对象等待中，Object.wait() 或 TIMED_WAITING</li>
-<li>阻塞， Blocked（重点关注）  </li>
-<li>停止，Parked</li>
-</ul>
-<h2 id="Dump文件中的线程状态含义及注意事项"><a href="#Dump文件中的线程状态含义及注意事项" class="headerlink" title="Dump文件中的线程状态含义及注意事项"></a>Dump文件中的线程状态含义及注意事项</h2><ul>
-<li>Deadlock：死锁线程，一般指多个线程调用间，进入相互资源占用，导致一直等待无法释放的情况。</li>
-<li>Runnable：一般指该线程正在执行状态中，该线程占用了资源，正在处理某个请求，有可能正在传递SQL到数据库执行，有可能在对某个文件操作，有可能进行数据类型等转换。</li>
-<li><p>Waiting on condition：该状态出现在线程等待某个条件的发生。具体是什么原因，可以结合 stacktrace来分析。最常见的情况是线程在等待网络的读写，比如当网络数据没有准备好读时，线程处于这种等待状态，而一旦有数据准备好读之后，线程会重新激活，读取并处理数据。在 Java引入 NewIO之前，对于每个网络连接，都有一个对应的线程来处理网络的读写操作，即使没有可读写的数据，线程仍然阻塞在读写操作上，这样有可能造成资源浪费，而且给操作系统的线程调度也带来压力。在 NewIO里采用了新的机制，编写的服务器程序的性能和可扩展性都得到提高。</p>
-<p>如果发现有大量的线程都在处在 Wait on condition，从线程 stack看， 正等待网络读写，这可能是一个网络瓶颈的征兆。因为网络阻塞导致线程无法执行。一种情况是网络非常忙，几 乎消耗了所有的带宽，仍然有大量数据等待网络读 写；另一种情况也可能是网络空闲，但由于路由等问题，导致包无法正常的到达。所以要结合系统的一些性能观察工具来综合分析，比如 netstat统计单位时间的发送包的数目，如果很明显超过了所在网络带宽的限制 ; 观察 cpu的利用率，如果系统态的 CPU时间，相对于用户态的 CPU时间比例较高；如果程序运行在 Solaris 10平台上，可以用 dtrace工具看系统调用的情况，如果观察到 read/write的系统调用的次数或者运行时间遥遥领先；这些都指向由于网络带宽所限导致的网络瓶颈。另外一种出现 Wait on condition的常见情况是该线程在 sleep，等待 sleep的时间到了时候，将被唤醒。</p>
-</li>
-<li>locked：线程阻塞，是指当前线程执行过程中，所需要的资源长时间等待却一直未能获取到，被容器的线程管理器标识为阻塞状态，可以理解为等待资源超时的线程。</li>
-<li>Waiting for monitor entry 和 in Object.wait()：Monitor是 Java中用以实现线程之间的互斥与协作的主要手段，它可以看成是对象或者 Class的锁。每一个对象都有，也仅有一个 monitor。</li>
-</ul>
-<h1 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h1><h1 id="使用案例"><a href="#使用案例" class="headerlink" title="使用案例"></a>使用案例</h1><h2 id="案例1"><a href="#案例1" class="headerlink" title="案例1"></a>案例1</h2><p>1.使用jps命令，获取需要调优的进程id为46924.<br>2.使用top -Hp 46924命令获得最耗费资源的线程号(pid), TIME列就是各个Java线程耗费的CPU时间,这里我们选58767线程作为例子.<br>3.使用printf “%x\n”，获得十六进制值。<br>4.使用jstack命令，它用来输出进程46924的堆栈信息，然后根据线程ID(58767)的十六进制值grep，如下：<br>这里就知道了最耗费时间的类是com.mchange.v2.async.ThreadPoolAsynchronousRunner$PoolThread-#2，Tomcat的线程池，方法是Object.wait()。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2273,7 +2225,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">95</span>
+                  <span class="site-state-item-count">96</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
