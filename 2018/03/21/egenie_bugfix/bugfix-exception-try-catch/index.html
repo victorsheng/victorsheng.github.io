@@ -86,7 +86,7 @@
 <meta property="og:site_name" content="Victor的博客">
 <meta property="og:description" content="上代码方式1:1234567891011public void insert() &amp;#123;    long insuranceId = IdGenerator.generateId(&amp;quot;insurance&amp;quot;);    String sql = String.format(&amp;quot;insert into a (id) values(%s)&amp;quot;, insuranceI">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-03-24T09:58:49.865Z">
+<meta property="og:updated_time" content="2018-03-26T14:32:25.277Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="catch异常但是仍然回滚">
 <meta name="twitter:description" content="上代码方式1:1234567891011public void insert() &amp;#123;    long insuranceId = IdGenerator.generateId(&amp;quot;insurance&amp;quot;);    String sql = String.format(&amp;quot;insert into a (id) values(%s)&amp;quot;, insuranceI">
@@ -421,7 +421,34 @@
 <h1 id="测试结果"><a href="#测试结果" class="headerlink" title="测试结果"></a>测试结果</h1><p>看似同样的逻辑,但是对于事务的回滚影响却截然不同</p>
 <p>方式1:未回滚+一个异常日志<br>方式2:回滚:两个异常日志+<code>Transaction rolled back because it has been marked as rollback-only</code></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">20861 [http-nio-9991-exec-1] ERROR o.a.c.c.C.[.[.[.[dispatcherServlet] - Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed; nested exception is org.springframework.transaction.UnexpectedRollbackException: Transaction rolled back because it has been marked as rollback-only] with root cause</span><br><span class="line">org.springframework.transaction.UnexpectedRollbackException: Transaction rolled back because it has been marked as rollback-only</span><br><span class="line">	at org.springframework.transaction.support.AbstractPlatformTransactionManager.commit(AbstractPlatformTransactionManager.java:724)</span><br><span class="line">	at org.springframework.transaction.interceptor.TransactionAspectSupport.commitTransactionAfterReturning(TransactionAspectSupport.java:485)</span><br><span class="line">	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:291)</span><br><span class="line">	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:96)</span><br><span class="line">	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)</span><br><span class="line">	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:655)</span><br><span class="line">	at cn.egenie.admin.domain.controller.ExService$$EnhancerBySpringCGLIB$$c69282d3.insert(&lt;generated&gt;)</span><br><span class="line">	at cn.egenie.admin.domain.controller.ExceptionController.info(ExceptionController.java:25)</span><br><span class="line">	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)</span><br><span class="line">	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)</span><br><span class="line">	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)</span><br><span class="line">	at java.lang.reflect.Method.invoke(Method.java:498)</span><br><span class="line">	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:221)</span><br><span class="line">	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:136)</span><br><span class="line">	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:110)</span><br><span class="line">	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:832)</span><br><span class="line">	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:743)</span><br><span class="line">	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:85)</span><br><span class="line">	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:961)</span><br><span class="line">	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:895)</span><br><span class="line">	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:967)</span><br><span class="line">	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:858)</span><br><span class="line">	at javax.servlet.http.HttpServlet.service(HttpServlet.java:622)</span><br><span class="line">	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:843)</span><br><span class="line">	at javax.servlet.http.HttpServlet.service(HttpServlet.java:729)</span><br><span class="line">	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:292)</span><br><span class="line">	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:207)</span><br><span class="line">	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:52)</span><br><span class="line">	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:240)</span><br><span class="line">	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:207)</span><br><span class="line">	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:121)</span><br><span class="line">	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)</span><br><span class="line">	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:240)</span><br><span class="line">	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:207)</span><br><span class="line">	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:212)</span><br><span class="line">	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:106)</span><br><span class="line">	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:502)</span><br><span class="line">	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:141)</span><br><span class="line">	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:79)</span><br><span class="line">	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:88)</span><br><span class="line">	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:522)</span><br><span class="line">	at org.apache.coyote.http11.AbstractHttp11Processor.process(AbstractHttp11Processor.java:1095)</span><br><span class="line">	at org.apache.coyote.AbstractProtocol$AbstractConnectionHandler.process(AbstractProtocol.java:672)</span><br><span class="line">	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1502)</span><br><span class="line">	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.run(NioEndpoint.java:1458)</span><br><span class="line">	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)</span><br><span class="line">	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)</span><br><span class="line">	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)</span><br><span class="line">	at java.lang.Thread.run(Thread.java:748)</span><br></pre></td></tr></table></figure>
+<h1 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h1><p> spring 具备多种事务传播机制，最常用的是REQUIRED，即如果不存在事务，则新建一个事务；如果存在事务，则加入现存的事务中。<br>` public void A() {<br>    querySomething(…)；<br>    try {<br>      B()<br>    } catch () {<br>    }<br>    saveSomethinf()；<br>}</p>
+<p>public void B() {<br>    throw Exception()<br>}`<br>此时B会和A存在一个事务中。如果B抛出异常没有捕获，即使在A中捕获并处理，仍会发生异常：Transaction rolled back because it has been marked as rollback-only 因为spring会在A捕获异常之前提前捕获到异常，并将当前事务设置为rollback-only，而A觉得对异常进行了捕获，它仍然继续commit，当TransactionManager发现状态为设置为rollback-only时， 则会抛出UnexpectedRollbackException 相关代码在AbstractPlatformTransactonManager.java中：</p>
+<p>`public final void commit(TransactionStatus status) throws TransactionException {<br>        if (status.isCompleted()) {<br>            throw new IllegalTransactionStateException(<br>                    “Transaction is already completed - do not call commit or rollback more than once per transaction”);<br>        }</p>
+<pre><code>    DefaultTransactionStatus defStatus = (DefaultTransactionStatus) status;
+    if (defStatus.isLocalRollbackOnly()) {
+        if (defStatus.isDebug()) {
+            logger.debug(&quot;Transactional code has requested rollback&quot;);
+        }
+        processRollback(defStatus);
+        return;
+    }
+    if (!shouldCommitOnGlobalRollbackOnly() &amp;&amp; defStatus.isGlobalRollbackOnly()) {
+        if (defStatus.isDebug()) {
+            logger.debug(&quot;Global transaction is marked as rollback-only but transactional code requested commit&quot;);
+        }
+        processRollback(defStatus);
+        // Throw UnexpectedRollbackException only at outermost transaction boundary
+        // or if explicitly asked to.
+        if (status.isNewTransaction() || isFailEarlyOnGlobalRollbackOnly()) {
+            throw new UnexpectedRollbackException(
+                    &quot;Transaction rolled back because it has been marked as rollback-only&quot;);
+        }
+        return;
+    }
 
+    processCommit(defStatus);
+}`
+</code></pre>
       
     </div>
     
@@ -463,8 +490,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/03/21/mysql/study-sharding-mysql/" rel="next" title="study-sharding-mysql">
-                <i class="fa fa-chevron-left"></i> study-sharding-mysql
+              <a href="/2018/03/21/mysql/study-sharding-mysql/" rel="next" title="mysql分库分表">
+                <i class="fa fa-chevron-left"></i> mysql分库分表
               </a>
             
           </div>
@@ -562,7 +589,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">96</span>
+                  <span class="site-state-item-count">102</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -619,7 +646,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#上代码"><span class="nav-number">1.</span> <span class="nav-text">上代码</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#方式1"><span class="nav-number">1.1.</span> <span class="nav-text">方式1:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#方式2"><span class="nav-number">1.2.</span> <span class="nav-text">方式2:</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#测试结果"><span class="nav-number">2.</span> <span class="nav-text">测试结果</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#上代码"><span class="nav-number">1.</span> <span class="nav-text">上代码</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#方式1"><span class="nav-number">1.1.</span> <span class="nav-text">方式1:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#方式2"><span class="nav-number">1.2.</span> <span class="nav-text">方式2:</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#测试结果"><span class="nav-number">2.</span> <span class="nav-text">测试结果</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#原理"><span class="nav-number">3.</span> <span class="nav-text">原理</span></a></li></ol></div>
             
 
           </div>

@@ -326,6 +326,1082 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/08/java_tools/jdk1-9-maven-fix/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/08/java_tools/jdk1-9-maven-fix/" itemprop="url">jdk1.9-maven-fix</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-08T13:59:00+08:00">
+                2018-01-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/08/java_tools/jdk1-9-maven-fix/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/08/java_tools/jdk1-9-maven-fix/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/08/java_tools/jdk1-9-maven-fix/" class="leancloud_visitors" data-flag-title="jdk1.9-maven-fix">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>在安装了多个jdk版本后,发现maven命令不好使了</p>
+<h1 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h1><ul>
+<li>maven-compiler-plugin:3.1:compile (default-compile) @ report 出现异常<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ report ---</span><br><span class="line">[INFO] Changes detected - recompiling the module!</span><br><span class="line">[INFO] Compiling 60 source files to /Users/victor/code/egenieProjects/report/target/classes</span><br><span class="line">WARNING: An illegal reflective access operation has occurred</span><br><span class="line">WARNING: Illegal reflective access by lombok.javac.apt.Processor to field com.sun.tools.javac.processing.JavacProcessingEnvironment.processorClassLoader</span><br><span class="line">WARNING: Please consider reporting this to the maintainers of lombok.javac.apt.Processor</span><br><span class="line">WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations</span><br><span class="line">WARNING: All illegal access operations will be denied in a future release</span><br><span class="line">[INFO] ------------------------------------------------------------------------</span><br><span class="line">[INFO] BUILD FAILURE</span><br><span class="line">[INFO] ------------------------------------------------------------------------</span><br><span class="line">[INFO] Total time: 5.198 s</span><br><span class="line">[INFO] Finished at: 2018-01-08T14:04:55+08:00</span><br><span class="line">[INFO] Final Memory: 35M/115M</span><br><span class="line">[INFO] ------------------------------------------------------------------------</span><br><span class="line">[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.1:compile (default-compile) on project report: Fatal error compiling: java.lang.NoSuchFieldError: pid -&gt; [Help 1]</span><br><span class="line">[ERROR]</span><br><span class="line">[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.</span><br><span class="line">[ERROR] Re-run Maven using the -X switch to enable full debug logging.</span><br><span class="line">[ERROR]</span><br><span class="line">[ERROR] For more information about the errors and possible solutions, please read the following articles:</span><br><span class="line">[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h1 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h1><ul>
+<li><p>1.9</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">victordeMacBook-Pro:report victor$ mvn -v</span><br><span class="line">Apache Maven 3.5.2 (138edd61fd100ec658bfa2d307c43b76940a5d7d; 2017-10-18T15:58:13+08:00)</span><br><span class="line">Maven home: /usr/local/Cellar/maven/3.5.2/libexec</span><br><span class="line">Java version: 9.0.1, vendor: Oracle Corporation</span><br><span class="line">Java home: /Library/Java/JavaVirtualMachines/jdk-9.0.1.jdk/Contents/Home</span><br><span class="line">Default locale: zh_CN, platform encoding: UTF-8</span><br><span class="line">OS name: &quot;mac os x&quot;, version: &quot;10.13.2&quot;, arch: &quot;x86_64&quot;, family: &quot;mac&quot;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>执行命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo -n &quot;JAVA_HOME=`/usr/libexec/java_home -v 1.8`&quot; &gt; ~/.mavenrc</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>1.8</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">victordeMacBook-Pro:report victor$ mvn -v</span><br><span class="line">Apache Maven 3.5.2 (138edd61fd100ec658bfa2d307c43b76940a5d7d; 2017-10-18T15:58:13+08:00)</span><br><span class="line">Maven home: /usr/local/Cellar/maven/3.5.2/libexec</span><br><span class="line">Java version: 1.8.0_151, vendor: Oracle Corporation</span><br><span class="line">Java home: /Library/Java/JavaVirtualMachines/jdk1.8.0_151.jdk/Contents/Home/jre</span><br><span class="line">Default locale: zh_CN, platform encoding: UTF-8</span><br><span class="line">OS name: &quot;mac os x&quot;, version: &quot;10.13.2&quot;, arch: &quot;x86_64&quot;, family: &quot;mac&quot;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h1 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h1><p>虽然此种方法解决了这个问题,但具体是什么原因导致的此问题,还需进一步研究</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://geeekr.com/fix-maven-java-version-mac-osx/" target="_blank" rel="noopener">http://geeekr.com/fix-maven-java-version-mac-osx/</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/06/egenie_bugfix/error-sql-update-lock/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/06/egenie_bugfix/error-sql-update-lock/" itemprop="url">error-sql-update-lock</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-06T14:53:37+08:00">
+                2018-01-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mysql/" itemprop="url" rel="index">
+                    <span itemprop="name">mysql</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/06/egenie_bugfix/error-sql-update-lock/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/06/egenie_bugfix/error-sql-update-lock/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/06/egenie_bugfix/error-sql-update-lock/" class="leancloud_visitors" data-flag-title="error-sql-update-lock">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>com.mysql.jdbc.exceptions.jdbc4.MySQLTransactionRollbackException: Lock wait timeout exceeded; try restarting transaction</p>
+<p>事务没有提交导致 锁等待</p>
+<p><a href="https://www.jianshu.com/p/0b4aaa93e7f6" target="_blank" rel="noopener">https://www.jianshu.com/p/0b4aaa93e7f6</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/06/java_tools/install-jenv/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/06/java_tools/install-jenv/" itemprop="url">jenv安装(管理多个jdk版本)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-06T08:03:10+08:00">
+                2018-01-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/06/java_tools/install-jenv/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/06/java_tools/install-jenv/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/06/java_tools/install-jenv/" class="leancloud_visitors" data-flag-title="jenv安装(管理多个jdk版本)">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>1.安装jenv<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">brew install jenv</span><br></pre></td></tr></table></figure></p>
+<p>2.oracle官网下载各版本jdk</p>
+<p>3.安装本地<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">jenv add /Library/Java/JavaVirtualMachines/jdk-9.0.1.jdk/Contents/Home</span><br><span class="line">jenv add /Library/Java/JavaVirtualMachines/jdk1.8.0_151.jdk/Contents/Home</span><br><span class="line">jenv add /Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home</span><br></pre></td></tr></table></figure></p>
+<p>4.列表jdk<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jenv versions</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>system (set by /Users/victor/.jenv/version)<br>1.7<br>1.7.0.80<br>1.8<br>1.8.0.151<br>9.0<br>9.0.1<br>oracle64-1.7.0.80<br>oracle64-1.8.0.151<br>oracle64-9.0.1</li>
+</ul>
+<p>5.选择jdk<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">jenv global 1.7</span><br><span class="line">java -version</span><br></pre></td></tr></table></figure></p>
+<p>java version “1.7.0_80”<br>Java(TM) SE Runtime Environment (build 1.7.0_80-b15)<br>Java HotSpot(TM) 64-Bit Server VM (build 24.80-b11, mixed mode)</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/05/data_warehouse/BI-olap-tool/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/05/data_warehouse/BI-olap-tool/" itemprop="url">BI-olap技术选型</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-05T19:31:54+08:00">
+                2018-01-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/BI/" itemprop="url" rel="index">
+                    <span itemprop="name">BI</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/05/data_warehouse/BI-olap-tool/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/05/data_warehouse/BI-olap-tool/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/05/data_warehouse/BI-olap-tool/" class="leancloud_visitors" data-flag-title="BI-olap技术选型">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h1 id="备选列表"><a href="#备选列表" class="headerlink" title="备选列表:"></a>备选列表:</h1><ul>
+<li>阿里云-分析性数据库</li>
+<li>GreePlum</li>
+<li>Presto</li>
+<li>Kylin
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/01/05/data_warehouse/BI-olap-tool/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/05/java_common/study-ConcurrentModificationException/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/05/java_common/study-ConcurrentModificationException/" itemprop="url">java集合并发修改</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-05T11:21:00+08:00">
+                2018-01-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/05/java_common/study-ConcurrentModificationException/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/05/java_common/study-ConcurrentModificationException/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/05/java_common/study-ConcurrentModificationException/" class="leancloud_visitors" data-flag-title="java集合并发修改">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="并发修改"><a href="#并发修改" class="headerlink" title="并发修改"></a>并发修改</h1><p>当一个或多个线程正在遍历一个集合Collection，此时另一个线程修改了这个集合的内容（添加，删除或者修改）.这就是并发修改</p>
+<h1 id="快速失败（fail—fast）"><a href="#快速失败（fail—fast）" class="headerlink" title="快速失败（fail—fast）"></a>快速失败（fail—fast）</h1><ul>
+<li>“快速失败”，它是Java集合的一种错误检测机制。当多个线程对集合进行结构上的改变的操作时，有可能会产生fail-fast机制。记住是有可能，而不是一定。例如：假设存在两个线程（线程1、线程2），线程1通过Iterator在遍历集合A中的元素，在某个时候线程2修改了集合A的结构（是结构上面的修改，而不是简单的修改集合元素的内容），那么这个时候程序就会抛出ConcurrentModificationException 异常，从而产生fail-fast机制。</li>
+</ul>
+<h1 id="何时触发快速失败"><a href="#何时触发快速失败" class="headerlink" title="何时触发快速失败"></a>何时触发快速失败</h1><ul>
+<li>无论add、remove、clear方法只要是涉及了改变ArrayList元素的个数的方法都会导致modCount的改变。所以我们这里可以初步判断由于expectedModCount得值与modCount的改变不同步，导致两者之间不等从而产生fail-fast机制。</li>
+</ul>
+<h1 id="安全失败（fail—safe）"><a href="#安全失败（fail—safe）" class="headerlink" title="安全失败（fail—safe）"></a>安全失败（fail—safe）</h1><ul>
+<li>采用安全失败机制的集合容器，在遍历时不是直接在集合内容上访问的，而是先复制原有集合内容，在拷贝的集合上进行遍历。</li>
+<li>p.s.迭代器遍历的是开始遍历那一刻拿到的集合拷贝，在遍历期间原集合发生的修改迭代器是不知道的</li>
+</ul>
+<h1 id="快速失败和安全失败的比较"><a href="#快速失败和安全失败的比较" class="headerlink" title="快速失败和安全失败的比较"></a>快速失败和安全失败的比较</h1><table>
+<thead>
+<tr>
+<th></th>
+<th style="text-align:center">Fail Fast Iterator</th>
+<th style="text-align:right">Fail Safe Iterator</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Throw ConcurrentModification Exception</td>
+<td style="text-align:center">Yes</td>
+<td style="text-align:right">No</td>
+</tr>
+<tr>
+<td>Clone object</td>
+<td style="text-align:center">No</td>
+<td style="text-align:right">Yes</td>
+</tr>
+<tr>
+<td>Memory Overhead</td>
+<td style="text-align:center">No</td>
+<td style="text-align:right">Yes</td>
+</tr>
+<tr>
+<td>Examples</td>
+<td style="text-align:center">HashMap,Vector,ArrayList,HashSet</td>
+<td style="text-align:right">CopyOnWriteArrayList,ConcurrentHashMap</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>产生fail-fast的是在java.util包中的collection实现类；产生fail-safe的是在java.util.concurrent包中的collection实现类</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/05/java_data_structure/study-skip-list/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/05/java_data_structure/study-skip-list/" itemprop="url">study-skip-list</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-05T11:16:40+08:00">
+                2018-01-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/05/java_data_structure/study-skip-list/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/05/java_data_structure/study-skip-list/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/05/java_data_structure/study-skip-list/" class="leancloud_visitors" data-flag-title="study-skip-list">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="跳跃表"><a href="#跳跃表" class="headerlink" title="跳跃表"></a>跳跃表</h1><ul>
+<li>一种基于有序链表的扩展</li>
+<li>利用类似索引的思想,找到关键点</li>
+<li><img src="http://pic.victor123.cn/18-1-4/93090030.jpg"></li>
+</ul>
+<h1 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h1><ul>
+<li>自上而下，查找第一次出现节点的索引，并逐层找到每一层对应的节点。O（logN）</li>
+<li>删除每一层查找到的节点，如果该层只剩下1个节点，删除整个一层（原链表除外）。O（logN）</li>
+</ul>
+<h1 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h1><ul>
+<li>跳跃表 维持平衡的成本较低,完全靠随机</li>
+<li>二叉树需要靠rebalance来重新调整结构</li>
+</ul>
+<h1 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h1><p>Redis当中的Sorted-set</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/05/java_data_structure/study-red–black-tree/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1230,1246 +2306,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/02/机器学习/jikeshijian-ai-base-study-outline/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/02/机器学习/jikeshijian-ai-base-study-outline/" itemprop="url">极客时间-学习笔记-人工智能基础课-机器学习概率</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-02T07:25:00+08:00">
-                2018-01-02
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/人工智能/" itemprop="url" rel="index">
-                    <span itemprop="name">人工智能</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/01/02/机器学习/jikeshijian-ai-base-study-outline/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/01/02/机器学习/jikeshijian-ai-base-study-outline/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/01/02/机器学习/jikeshijian-ai-base-study-outline/" class="leancloud_visitors" data-flag-title="极客时间-学习笔记-人工智能基础课-机器学习概率">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><ul>
-<li>经验学习:从大量现象中提取反复出现的规律和模式</li>
-<li>计算机给予数据构建概率统计模型并与应用模型对数据进行预测与分析的学科</li>
-</ul>
-<h1 id="根据输入输出类型的不行-预测问题分为三类"><a href="#根据输入输出类型的不行-预测问题分为三类" class="headerlink" title="根据输入输出类型的不行,预测问题分为三类"></a>根据输入输出类型的不行,预测问题分为三类</h1><ul>
-<li>分类问题:输出离散变量</li>
-<li>回归问题:连续变量</li>
-<li>标注问题:序列</li>
-</ul>
-<h1 id="实际中就会存在误差-机器学习也是一样-误差性能"><a href="#实际中就会存在误差-机器学习也是一样-误差性能" class="headerlink" title="实际中就会存在误差,机器学习也是一样(误差性能)"></a>实际中就会存在误差,机器学习也是一样(误差性能)</h1><ul>
-<li>误差并定义为学习器的实际预测与样本真实输出之间的差异</li>
-<li>误差分为训练误差和测试误差</li>
-<li>典型的过拟合现象:训练误差较低,但是训练误差较低</li>
-<li>欠拟合:学习能力太弱</li>
-<li>整体来看,测试误差与模型复杂度之间呈现得是抛物线的关系</li>
-<li>交叉验证法,重复利用有限的样本,不同模型中平均测试误差最小的模型就是最有模型</li>
-<li>调参:性能和效率之间的这种</li>
-</ul>
-<h1 id="根据训练数据是否有标签信息-可以将机器学习的任务分为三类"><a href="#根据训练数据是否有标签信息-可以将机器学习的任务分为三类" class="headerlink" title="根据训练数据是否有标签信息,可以将机器学习的任务分为三类"></a>根据训练数据是否有标签信息,可以将机器学习的任务分为三类</h1><ul>
-<li>监督学习</li>
-<li>无监督学习</li>
-<li>半监督学习</li>
-<li>监督学习分为:<ul>
-<li>生成方法:更快的收敛速度和更广的应用范围</li>
-<li>判别方法:更高的准确性和更简单的使用方式</li>
-</ul>
-</li>
-</ul>
-<hr>
-<h1 id="生成-判别方法"><a href="#生成-判别方法" class="headerlink" title="生成/判别方法"></a>生成/判别方法</h1><ul>
-<li><a href="https://www.zhihu.com/question/20446337" target="_blank" rel="noopener">https://www.zhihu.com/question/20446337</a></li>
-<li>有监督机器学习方法可以分为生成方法和判别方法<ul>
-<li>常见的生成方法有混合高斯模型、朴素贝叶斯法和隐形马尔科夫模型等</li>
-<li>常见的判别方法有SVM、LR等</li>
-<li>生成模型的求解思路是：联合分布——-&gt;求解类别先验概率和类别条件概率</li>
-<li>判别模型求解的思路是：条件分布——&gt;模型参数后验概率最大——-&gt;（似然函数\cdot 参数先验）最大——-&gt;最大似然</li>
-<li>生成模型:要知道原始数据的概率密度（或者估计参数得到），然后习惯用bayes理论去做预测</li>
-<li>判别模型是不需要知道原始数据概率密度，比较粗线条</li>
-</ul>
-</li>
-</ul>
-<p><img src="/images/pasted-2.png" alt="upload successful"></p>
-<p><img src="/images/pasted-6.png" alt="upload successful"></p>
-<ul>
-<li>wiki例子<ul>
-<li>假设有四个samples：<br><img src="/images/pasted-3.png" alt="upload successful"></li>
-<li>生成式模型的世界是这个样子：<br><img src="/images/pasted-4.png" alt="upload successful"></li>
-<li>而判定式模型的世界是这个样子：<br><img src="/images/pasted-5.png" alt="upload successful"></li>
-</ul>
-</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/12/28/egenie_bugfix/error-saleorder/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/28/egenie_bugfix/error-saleorder/" itemprop="url">error-saleorder</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-28T15:17:58+08:00">
-                2017-12-28
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/异常/" itemprop="url" rel="index">
-                    <span itemprop="name">异常</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/12/28/egenie_bugfix/error-saleorder/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/12/28/egenie_bugfix/error-saleorder/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2017/12/28/egenie_bugfix/error-saleorder/" class="leancloud_visitors" data-flag-title="error-saleorder">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">#</span><br><span class="line"># A fatal error has been detected by the Java Runtime Environment:</span><br><span class="line">#</span><br><span class="line">#  SIGSEGV (0xb) at pc=0x000000010146e882, pid=65032, tid=0x0000000000005303</span><br><span class="line">#</span><br><span class="line"># JRE version: Java(TM) SE Runtime Environment (8.0_151-b12) (build 1.8.0_151-b12)</span><br><span class="line"># Java VM: Java HotSpot(TM) 64-Bit Server VM (25.151-b12 mixed mode bsd-amd64 compressed oops)</span><br><span class="line"># Problematic frame:</span><br><span class="line"># V  [libjvm.dylib+0x534882]  Symbol::decrement_refcount()+0x4</span><br><span class="line">#</span><br><span class="line"># Failed to write core dump. Core dumps have been disabled. To enable core dumping, try &quot;ulimit -c unlimited&quot; before starting Java again</span><br><span class="line">#</span><br><span class="line"># An error report file with more information is saved as:</span><br><span class="line"># /Users/victor/code/egenieProjects/ejlerp-saleorder/hs_err_pid65032.log</span><br><span class="line">#</span><br><span class="line"># If you would like to submit a bug report, please visit:</span><br><span class="line">#   http://bugreport.java.com/bugreport/crash.jsp</span><br><span class="line">#</span><br><span class="line"></span><br><span class="line">Process finished with exit code 134 (interrupted by signal 6: SIGABRT)</span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/12/28/egenie_bugfix/error-saleorder/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/12/28/egenie_bugfix/error-web-zookeeper/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/28/egenie_bugfix/error-web-zookeeper/" itemprop="url">error-web-zookeeper</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-28T14:46:11+08:00">
-                2017-12-28
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/zookeeper/" itemprop="url" rel="index">
-                    <span itemprop="name">zookeeper</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/12/28/egenie_bugfix/error-web-zookeeper/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/12/28/egenie_bugfix/error-web-zookeeper/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2017/12/28/egenie_bugfix/error-web-zookeeper/" class="leancloud_visitors" data-flag-title="error-web-zookeeper">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">2017-12-26 19:42:40.907 WARN [localhost-startStop-1-SendThread(10.26.235.193:2181)][ClientCnxn.java:1162] - Session 0x15e05c1c95a0370 for server 10.26.235.193/10.26.235.193:2181, unexpected error, closing socket connection and attempting reconnect</span><br><span class="line">java.lang.NoClassDefFoundError: org/apache/zookeeper/proto/SetWatches</span><br><span class="line">        at org.apache.zookeeper.ClientCnxn$SendThread.primeConnection(ClientCnxn.java:926) ~[zookeeper-3.4.8.jar:3.4.8--1]</span><br><span class="line">        at org.apache.zookeeper.ClientCnxnSocketNIO.doTransport(ClientCnxnSocketNIO.java:363) ~[zookeeper-3.4.8.jar:3.4.8--1]</span><br><span class="line">        at org.apache.zookeeper.ClientCnxn$SendThread.run(ClientCnxn.java:1141) [zookeeper-3.4.8.jar:3.4.8--1]</span><br></pre></td></tr></table></figure>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><ul>
-<li>问题1:一直包上面的错误</li>
-<li>问题2:26号把25号的日志给覆盖了,同时15号的错误日志也写到了9号的文件中</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/12/26/爱好/study-snowboard/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/26/爱好/study-snowboard/" itemprop="url">单板滑雪笔记</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-26T19:34:32+08:00">
-                2017-12-26
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/滑雪/" itemprop="url" rel="index">
-                    <span itemprop="name">滑雪</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/12/26/爱好/study-snowboard/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/12/26/爱好/study-snowboard/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2017/12/26/爱好/study-snowboard/" class="leancloud_visitors" data-flag-title="单板滑雪笔记">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="goski视频教学"><a href="#goski视频教学" class="headerlink" title="goski视频教学"></a>goski视频教学</h1><h2 id="走刃练习"><a href="#走刃练习" class="headerlink" title="走刃练习"></a>走刃练习</h2><ul>
-<li>前刃,后刃(不间断的跳,掌握重心重心和支撑的感觉)</li>
-</ul>
-<h2 id="向刃上加压力"><a href="#向刃上加压力" class="headerlink" title="向刃上加压力"></a>向刃上加压力</h2><ul>
-<li>直线加速,然后骤停 用刃向上跳。(前后刃)</li>
-</ul>
-<h2 id="换刃转身练习"><a href="#换刃转身练习" class="headerlink" title="换刃转身练习"></a>换刃转身练习</h2><ul>
-<li>双手抓裤子</li>
-</ul>
-<h2 id="防止搓雪太多"><a href="#防止搓雪太多" class="headerlink" title="防止搓雪太多"></a>防止搓雪太多</h2><ul>
-<li>回山动作 如果能上去 代表 中心 不止是在前脚</li>
-</ul>
-<h2 id="两种转弯技巧"><a href="#两种转弯技巧" class="headerlink" title="两种转弯技巧"></a>两种转弯技巧</h2><ul>
-<li>刻滑和扫雪</li>
-</ul>
-<h1 id="央视视频教学"><a href="#央视视频教学" class="headerlink" title="央视视频教学"></a>央视视频教学</h1><h2 id="连续小回转"><a href="#连续小回转" class="headerlink" title="连续小回转"></a>连续小回转</h2><ul>
-<li>如羚羊一般自如</li>
-</ul>
-<h2 id="换刃平稳性检测"><a href="#换刃平稳性检测" class="headerlink" title="换刃平稳性检测"></a>换刃平稳性检测</h2><p>双手背上放学块,不掉下来,说明稳定性高</p>
-<h1 id="滑雪助手视频教学"><a href="#滑雪助手视频教学" class="headerlink" title="滑雪助手视频教学"></a>滑雪助手视频教学</h1><h2 id="换刃"><a href="#换刃" class="headerlink" title="换刃"></a>换刃</h2><ul>
-<li>重心前脚。身体站起。    直滑降</li>
-<li>重心中心。下蹲。      走刃</li>
-<li>换刃的开始 是靠膝盖的下降</li>
-</ul>
-<h1 id="YouTuBe-Snowboard-Addiction"><a href="#YouTuBe-Snowboard-Addiction" class="headerlink" title="YouTuBe Snowboard Addiction"></a>YouTuBe Snowboard Addiction</h1><ul>
-<li>前后刃刹车,一定要蹲下去,不能直腿,否则会chachacha</li>
-<li>板头平衡/板尾平衡/后刃横向两侧平衡/后刃横向两侧平衡</li>
-<li>Eurocarve 可以贴在地上</li>
-<li>练习反脚<ul>
-<li>重心靠前,巧记后脚板子3下</li>
-<li>连续转4个360度(慢慢的做)</li>
-</ul>
-</li>
-</ul>
-<h1 id="其他视频"><a href="#其他视频" class="headerlink" title="其他视频"></a>其他视频</h1><ul>
-<li>搓雪转弯:后刃减速,因为能看到前面,前刃比较自然</li>
-<li>换刃:<ul>
-<li>用后面的板子的刃,向两边搓雪减速,</li>
-<li>更快的转弯,(利用膝盖),陡坡管用</li>
-<li>后刃,后手往前伸</li>
-<li>前刃,后手往后伸,可以保持身体直立</li>
-</ul>
-</li>
-<li>走刃:<ul>
-<li>前刃时,弯曲膝盖;身体要直,不能太前倾,否则卡不住雪;重心在中间</li>
-<li>后刃时,坐的越深;身体越要向前倾斜,否则卡不住雪;重心在中间</li>
-</ul>
-</li>
-</ul>
-<hr>
-<h1 id="滑雪笔记"><a href="#滑雪笔记" class="headerlink" title="滑雪笔记"></a>滑雪笔记</h1><h2 id="历史视频"><a href="#历史视频" class="headerlink" title="历史视频"></a>历史视频</h2><ul>
-<li><a href="https://v.qq.com/x/page/y0374rcpz1y.html" target="_blank" rel="noopener">https://v.qq.com/x/page/y0374rcpz1y.html</a></li>
-<li><a href="https://v.qq.com/x/page/p0374j04u5p.html" target="_blank" rel="noopener">https://v.qq.com/x/page/p0374j04u5p.html</a></li>
-<li><a href="https://v.qq.com/x/page/e0374vazd55.html" target="_blank" rel="noopener">https://v.qq.com/x/page/e0374vazd55.html</a></li>
-</ul>
-<h2 id="2017年11月30日-怀北-2017年冬天第一次滑单板"><a href="#2017年11月30日-怀北-2017年冬天第一次滑单板" class="headerlink" title="2017年11月30日-怀北-2017年冬天第一次滑单板"></a>2017年11月30日-怀北-2017年冬天第一次滑单板</h2><ul>
-<li>正脚：身体跟随刃一起动,可以保持不搓雪，压刃，重心中心;总体感觉较好,有时候后任会chachacha,应该是立刃不足,或者身体太直</li>
-<li>反脚: 总体不是很流畅,</li>
-<li><a href="https://v.qq.com/x/page/p0527pxet7b.html" target="_blank" rel="noopener">https://v.qq.com/x/page/p0527pxet7b.html</a></li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/12/26/爱好/study-ski/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/26/爱好/study-ski/" itemprop="url">双板滑雪笔记</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-26T19:27:06+08:00">
-                2017-12-26
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/滑雪/" itemprop="url" rel="index">
-                    <span itemprop="name">滑雪</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/12/26/爱好/study-ski/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/12/26/爱好/study-ski/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2017/12/26/爱好/study-ski/" class="leancloud_visitors" data-flag-title="双板滑雪笔记">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="犁式直降"><a href="#犁式直降" class="headerlink" title="犁式直降"></a>犁式直降</h1><h1 id="动作"><a href="#动作" class="headerlink" title="动作"></a>动作</h1><p>成v字</p>
-<h1 id="犁式转弯"><a href="#犁式转弯" class="headerlink" title="犁式转弯"></a>犁式转弯</h1><h2 id="练习方案"><a href="#练习方案" class="headerlink" title="练习方案"></a>练习方案</h2><ul>
-<li>平举双手,转弯时,双手放到山下腿,其中山下退要承受重量,让身体靠近山下腿</li>
-<li>重心的转移很重要</li>
-<li>山上腿,打开(解锁)膝盖,很自然的并板子</li>
-<li>动作要流畅,s形,而不是z形</li>
-</ul>
-<h1 id="平行式"><a href="#平行式" class="headerlink" title="平行式"></a>平行式</h1><ul>
-<li>之前是入弯后们转为平行</li>
-<li>打开膝盖,提早并腿</li>
-<li>转换重心时,同时换刃</li>
-<li>转弯一个弯,再下一个(控制好速度,再转下一个)</li>
-<li>转弯时拧板,会出现型</li>
-<li>两个阶段:<ul>
-<li>准备入弯</li>
-<li>控制速度</li>
-<li>避免过早结束转弯</li>
-</ul>
-</li>
-<li>立刃,类似于单板的推坡(垂直方向)<ul>
-<li>练习:立刃,放平,来回切换</li>
-<li>练习”直线,立刃,转弯,停</li>
-</ul>
-</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/12/21/docker/study-ubernetes-install/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/21/docker/study-ubernetes-install/" itemprop="url">mac安装kubernetes</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-21T07:17:00+08:00">
-                2017-12-21
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/docker/" itemprop="url" rel="index">
-                    <span itemprop="name">docker</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/12/21/docker/study-ubernetes-install/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/12/21/docker/study-ubernetes-install/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2017/12/21/docker/study-ubernetes-install/" class="leancloud_visitors" data-flag-title="mac安装kubernetes">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p><a href="https://github.com/jolestar/kubernetes-complete-course" target="_blank" rel="noopener">https://github.com/jolestar/kubernetes-complete-course</a></p>
-<hr>
-<h1 id="容器的特性"><a href="#容器的特性" class="headerlink" title="容器的特性"></a>容器的特性</h1><ul>
-<li>让不标准的物品标准化（杂物，水，应用）</li>
-<li>给上层工具提供标准化的操作方式，屏蔽细节<ul>
-<li>包装，运输</li>
-<li>add/remove/iterator（复用算法）</li>
-<li>应用管理和调度</li>
-</ul>
-</li>
-</ul>
-<hr>
-<h1 id="Docker-Moby-如何实现应用标准化"><a href="#Docker-Moby-如何实现应用标准化" class="headerlink" title="Docker (Moby)  如何实现应用标准化"></a>Docker (Moby)  如何实现应用标准化</h1><table>
-<thead>
-<tr>
-<th>问题</th>
-<th>现状</th>
-<th style="text-align:left">Docker 的方案</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>安装包</td>
-<td>war/jar，rpm/deb, src, bin</td>
-<td style="text-align:left">Image/Image Layer</td>
-</tr>
-<tr>
-<td>运行环境</td>
-<td>jvm，php, ruby, python</td>
-<td style="text-align:left">Image/Image Layer</td>
-</tr>
-<tr>
-<td>进程启动方式</td>
-<td>web container, cmd, script</td>
-<td style="text-align:left">Image ENTRYPOINT/CMD</td>
-</tr>
-<tr>
-<td>进程资源隔离限制</td>
-<td></td>
-<td style="text-align:left">Namespace/CGroup</td>
-</tr>
-<tr>
-<td>进程文件路径冲突</td>
-<td></td>
-<td style="text-align:left">Chroot</td>
-</tr>
-<tr>
-<td>端口冲突</td>
-<td>修改配置</td>
-<td style="text-align:left">Network（IP per Container）</td>
-</tr>
-<tr>
-<td>日志输出</td>
-<td>文件</td>
-<td style="text-align:left">stderr/stdout</td>
-</tr>
-<tr>
-<td>安装包的仓库</td>
-<td>nexus, rpm rep，ftp</td>
-<td style="text-align:left">Docker Registry</td>
-</tr>
-</tbody>
-</table>
-<hr>
-<h1 id="Kubernetes-为何而生-云发展到一个新阶段"><a href="#Kubernetes-为何而生-云发展到一个新阶段" class="headerlink" title="Kubernetes 为何而生 - 云发展到一个新阶段"></a>Kubernetes 为何而生 - 云发展到一个新阶段</h1><h2 id="IaaS-云解决了哪些问题"><a href="#IaaS-云解决了哪些问题" class="headerlink" title="IaaS 云解决了哪些问题"></a>IaaS 云解决了哪些问题</h2><p>按需购买<br>接管硬件资源的运维<br>提供可编程接口来管理资源<br>提供 SDN，SDS 模拟硬件网络以及存储</p>
-<h2 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h2><p>对应用无侵入<br>面向资源</p>
-<blockquote>
-<p><strong>用户从关注资源的运维转向关注应用的开发运维成本</strong></p>
-</blockquote>
-<hr>
-<h1 id="Kubernetes-为何而生-容器的成熟奠定了基础"><a href="#Kubernetes-为何而生-容器的成熟奠定了基础" class="headerlink" title="Kubernetes 为何而生 - 容器的成熟奠定了基础"></a>Kubernetes 为何而生 - 容器的成熟奠定了基础</h1><h2 id="容器（Docker-Moby）-解决了哪些问题"><a href="#容器（Docker-Moby）-解决了哪些问题" class="headerlink" title="容器（Docker/Moby） 解决了哪些问题"></a>容器（Docker/Moby） 解决了哪些问题</h2><p>应用安装包的标准化（Image）<br>应用进程的标准化（Container）</p>
-<h2 id="特点-1"><a href="#特点-1" class="headerlink" title="特点"></a>特点</h2><p>单进程标准化</p>
-<hr>
-<h1 id="容器编排系统应运而生"><a href="#容器编排系统应运而生" class="headerlink" title="容器编排系统应运而生"></a>容器编排系统应运而生</h1><p>我们需要一种 <strong>面向应用（Application Oriented）</strong> 的系统来降低服务端应用的开发部署和运维成本</p>
-<blockquote>
-<p>We wanted people to be able to <strong>program</strong> for the data center just like they program for their laptop –Ben Hindman</p>
-</blockquote>
-<p>我们再引申一下，从开发延伸到部署运维</p>
-<blockquote>
-<p>We wanted people to be able to manager app for the data center just like they manager app on their laptop</p>
-</blockquote>
-<hr>
-<h1 id="官网地址"><a href="#官网地址" class="headerlink" title="官网地址"></a>官网地址</h1><p><a href="http://kubernetes.kansea.com/docs/whatisk8s/" target="_blank" rel="noopener">http://kubernetes.kansea.com/docs/whatisk8s/</a></p>
-<hr>
-<h1 id="mac本地安装kubernetes-minikube"><a href="#mac本地安装kubernetes-minikube" class="headerlink" title="mac本地安装kubernetes(minikube)"></a>mac本地安装kubernetes(minikube)</h1><p><a href="http://kubernetes.kansea.com/docs/getting-started-guides/minikube/" target="_blank" rel="noopener">http://kubernetes.kansea.com/docs/getting-started-guides/minikube/</a></p>
-<ul>
-<li>virtualBox安装</li>
-<li>minikube安装</li>
-<li>kubectl安装</li>
-<li>需要ss的的代理,否则google的镜像无法下载<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">minikube delete</span><br><span class="line"></span><br><span class="line">minikube start --docker-env HTTP_PROXY=http://192.168.99.1:1087 --docker-env HTTPS_PROXY=http://192.168.99.1:1087 --docker-env NO_PROXY=192.168.99.0/24</span><br><span class="line"></span><br><span class="line">kubectl get pods --all-namespaces</span><br><span class="line"></span><br><span class="line">等待ready</span><br><span class="line"></span><br><span class="line">kubectl get nodes</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<p><img src="http://pic.victor123.cn/17-12-21/46187591.jpg"></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">victordeMacBook-Pro:~ victor$ kubectl run nginx --image=nginx --port=80</span><br><span class="line">deployment &quot;nginx&quot; created</span><br><span class="line">victordeMacBook-Pro:~ victor$ kubectl expose deployment nginx --port=80 --type=NodePort --name=nginx-http</span><br><span class="line">service &quot;nginx-http&quot; exposed</span><br><span class="line">victordeMacBook-Pro:~ victor$ kubectl get pods</span><br><span class="line">NAME                     READY     STATUS              RESTARTS   AGE</span><br><span class="line">nginx-85dfb4bc54-72fbk   0/1       ContainerCreating   0          17s</span><br><span class="line">victordeMacBook-Pro:~ victor$ kubectl get services</span><br><span class="line">NAME         TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)        AGE</span><br><span class="line">kubernetes   ClusterIP   10.96.0.1     &lt;none&gt;        443/TCP        20m</span><br><span class="line">nginx-http   NodePort    10.99.7.195   &lt;none&gt;        80:32562/TCP   12s</span><br><span class="line">victordeMacBook-Pro:~ victor$ minikube service nginx-http --url</span><br><span class="line">Waiting, endpoint for service is not ready yet...</span><br><span class="line">Waiting, endpoint for service is not ready yet...</span><br><span class="line">Waiting, endpoint for service is not ready yet...</span><br><span class="line">Waiting, endpoint for service is not ready yet...</span><br><span class="line">^C</span><br><span class="line">victordeMacBook-Pro:~ victor$ kubectl get nodes</span><br><span class="line">NAME       STATUS    ROLES     AGE       VERSION</span><br><span class="line">minikube   Ready     &lt;none&gt;    22m       v1.8.0</span><br><span class="line">victordeMacBook-Pro:~ victor$ kubectl get pods</span><br><span class="line">NAME                     READY     STATUS    RESTARTS   AGE</span><br><span class="line">nginx-85dfb4bc54-72fbk   1/1       Running   0          2m</span><br><span class="line">victordeMacBook-Pro:~ victor$ minikube service nginx-http --url</span><br><span class="line">http://192.168.99.100:32562</span><br></pre></td></tr></table></figure>
-<ul>
-<li>tips:</li>
-<li>本地的ss需要设置http代理,其中监听的地址从127.0.0.1改为0.0.0.0,这样虚拟机就可以访问到了,在这步卡了很久</li>
-</ul>
-<h1 id="docker安装"><a href="#docker安装" class="headerlink" title="docker安装"></a>docker安装</h1><p><a href="https://yeasy.gitbooks.io/docker_practice/content/kubernetes/quickstart.html" target="_blank" rel="noopener">https://yeasy.gitbooks.io/docker_practice/content/kubernetes/quickstart.html</a></p>
-<p><img src="/images/pasted-0.png" alt="upload successful"></p>
-<p>这些服务大概分为三类：主节点服务、工作节点服务和其它服务。</p>
-<h2 id="主节点服务"><a href="#主节点服务" class="headerlink" title="主节点服务"></a>主节点服务</h2><p>apiserver 是整个系统的对外接口，提供 RESTful 方式供客户端和其它组件调用；</p>
-<p>scheduler 负责对资源进行调度，分配某个 pod 到某个节点上；</p>
-<p>controller-manager 负责管理控制器，包括 endpoint-controller（刷新服务和 pod 的关联信息）和 replication-controller（维护某个 pod 的复制为配置的数值）。</p>
-<h2 id="工作节点服务"><a href="#工作节点服务" class="headerlink" title="工作节点服务"></a>工作节点服务</h2><p>kubelet 是工作节点执行操作的 agent，负责具体的容器生命周期管理，根据从数据库中获取的信息来管理容器，并上报 pod 运行状态等；</p>
-<p>proxy 为 pod 上的服务提供访问的代理。</p>
-<h2 id="其它服务"><a href="#其它服务" class="headerlink" title="其它服务"></a>其它服务</h2><p>Etcd 是所有状态的存储数据库；</p>
-<p>gcr.io/google_containers/pause:0.8.0 是 Kubernetes 启动后自动 pull 下来的测试镜像。</p>
-<hr>
-<p><a href="https://yeasy.gitbooks.io/docker_practice/content/kubernetes/concepts.html" target="_blank" rel="noopener">https://yeasy.gitbooks.io/docker_practice/content/kubernetes/concepts.html</a></p>
-<p><img src="/images/pasted-1.png" alt="upload successful"></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/6/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/page/8/">8</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><a class="extend next" rel="next" href="/page/8/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/6/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/page/8/">8</a><span class="space">&hellip;</span><a class="page-number" href="/page/11/">11</a><a class="extend next" rel="next" href="/page/8/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2515,7 +2356,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">96</span>
+                  <span class="site-state-item-count">102</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
