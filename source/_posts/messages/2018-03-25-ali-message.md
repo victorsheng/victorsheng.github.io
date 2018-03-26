@@ -1,6 +1,6 @@
 ---
 layout: "post"
-title: "ali-message"
+title: "阿里消息队列服务"
 date: "2018-03-25 02:14"
 ---
 # 顺序消息

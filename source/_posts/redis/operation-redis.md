@@ -1,8 +1,9 @@
+---
 title: 线上redis崩溃记录
 tags:
   - redis
   - breakdown
-categories: 
+categories:
     - redis
 date: 2017-12-14 09:39:00
 ---
@@ -46,13 +47,13 @@ org.springframework.dao.InvalidDataAccessApiUsageException: ERR READONLY You can
 ## nest exception学习
 http://www.iteye.com/problems/87876
 
-- 即调用顺序是 action--->service--->dao---->hibernate--->jdbc 
-- 抛出异常顺序是 jdbc---->hibernate---->dao--抛出-->service--继续抛出-->action 
-- 异常其实是栈调用的快照 
+- 即调用顺序是 action--->service--->dao---->hibernate--->jdbc
+- 抛出异常顺序是 jdbc---->hibernate---->dao--抛出-->service--继续抛出-->action
+- 异常其实是栈调用的快照
 
-- 1、最下层的异常是出错的原因，上边的异常是对下边的封装，目的是一致性 和 更可读；（即下边异常是引起上边异常的原因，每一个Exception都有一个cause，如hibernate异常的cause就是jdbc的异常） 
+- 1、最下层的异常是出错的原因，上边的异常是对下边的封装，目的是一致性 和 更可读；（即下边异常是引起上边异常的原因，每一个Exception都有一个cause，如hibernate异常的cause就是jdbc的异常）
 - 2、对于每一段异常，方法调用顺序是从下往上
-- 3、想知道是由于前面创建的错误导致后边的异常，还是后边的异常导致前面的创建错误，后边导致前面，，，前面对后面的进行了封装，，目的是提供一致的异常（并且把原始错误显示出来 就是 nested exception 后边部分） 
+- 3、想知道是由于前面创建的错误导致后边的异常，还是后边的异常导致前面的创建错误，后边导致前面，，，前面对后面的进行了封装，，目的是提供一致的异常（并且把原始错误显示出来 就是 nested exception 后边部分）
 
 ## NestedRuntimeException 例子
 我们最熟悉的就是 DataAccessException
