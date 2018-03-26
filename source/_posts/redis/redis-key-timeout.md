@@ -1,5 +1,5 @@
 ---
-layout: "post"
+
 title: "Redis过期淘汰机制"
 date: "2018-03-26 18:21"
 ---

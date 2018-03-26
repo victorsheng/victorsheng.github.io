@@ -1,5 +1,5 @@
 ---
-layout: "post"
+
 title: "Redis 快的原因"
 date: "2018-03-26 18:21"
 ---

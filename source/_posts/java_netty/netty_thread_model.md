@@ -1,5 +1,5 @@
 ---
-layout: "post"
+
 title: "netty线程模型"
 date: "2018-03-25 02:14"
 ---

@@ -1,5 +1,5 @@
 ---
-layout: "post"
+
 title: "Redis持久化方式"
 date: "2018-03-26 18:21"
 ---

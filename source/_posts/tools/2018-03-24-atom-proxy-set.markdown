@@ -1,5 +1,5 @@
 ---
-layout: "post"
+
 title: "atom设置本地代理"
 date: "2018-03-24 17:46"
 ---
