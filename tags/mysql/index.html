@@ -82,7 +82,7 @@
 <meta name="description" content="victor的个人博客,作为一枚后端开发工程师,写本博客目的,旨在记录自己在工作生活中的点点滴滴,形成自己的知识体系">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Victor的博客">
-<meta property="og:url" content="http://www.victor123.cn/tags/mysql/index.html">
+<meta property="og:url" content="http://www.victor123.cn/tags/MySQL/index.html">
 <meta property="og:site_name" content="Victor的博客">
 <meta property="og:description" content="victor的个人博客,作为一枚后端开发工程师,写本博客目的,旨在记录自己在工作生活中的点点滴滴,形成自己的知识体系">
 <meta property="og:locale" content="zh-Hans">
@@ -118,13 +118,13 @@
 
 
 
-  <link rel="canonical" href="http://www.victor123.cn/tags/mysql/"/>
+  <link rel="canonical" href="http://www.victor123.cn/tags/MySQL/"/>
 
 
 
 
 
-  <title>标签: mysql | Victor的博客</title>
+  <title>标签: MySQL | Victor的博客</title>
   
 
 
@@ -318,7 +318,7 @@
 
     <div id="posts" class="posts-collapse">
       <div class="collection-title">
-        <h1>mysql<small>标签</small>
+        <h1>MySQL<small>标签</small>
         </h1>
       </div>
 
@@ -330,37 +330,9 @@
 
       <h2 class="post-title">
         
-            <a class="post-title-link" href="/2018/03/10/egenie_bugfix/bugfix-mysql-lock-timeout/" itemprop="url">
+            <a class="post-title-link" href="/2018/01/25/egenie_business/data-archiving-research/" itemprop="url">
               
-                <span itemprop="name">mysql锁超时处理</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-03-10T12:12:00+08:00"
-              content="2018-03-10" >
-          03-10
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-      
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/01/24/mysql/mysql-debug/" itemprop="url">
-              
-                <span itemprop="name">mysql下划线关键字</span>
+                <span itemprop="name">data-Archiving-research</span>
               
             </a>
         
@@ -368,65 +340,9 @@
 
       <div class="post-meta">
         <time class="post-time" itemprop="dateCreated"
-              datetime="2018-01-24T15:42:00+08:00"
-              content="2018-01-24" >
-          01-24
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-      
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/01/06/egenie_bugfix/error-sql-update-lock/" itemprop="url">
-              
-                <span itemprop="name">error-sql-update-lock</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-01-06T14:53:37+08:00"
-              content="2018-01-06" >
-          01-06
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-      
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2017/12/13/egenie_bugfix/optime-156/" itemprop="url">
-              
-                <span itemprop="name">156服务器优化2:定位io高的原因mysql</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-12-13T13:39:00+08:00"
-              content="2017-12-13" >
-          12-13
+              datetime="2018-01-25T10:42:00+08:00"
+              content="2018-01-25" >
+          01-25
         </time>
       </div>
 
@@ -486,7 +402,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">102</span>
+                  <span class="site-state-item-count">109</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -497,7 +413,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-count">27</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -508,7 +424,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">75</span>
+                  <span class="site-state-item-count">77</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -1089,6 +1005,81 @@
     function addCount(Counter) {
       var $visitors = $(".leancloud_visitors");
       var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+r('id').trim();
       var title = $visitors.attr('data-flag-title').trim();
       var query = new AV.Query(Counter);
 

@@ -86,7 +86,7 @@
 <meta property="og:site_name" content="Victor的博客">
 <meta property="og:description" content="CAP（Consistency一致性、Availability可用性、Partition-tolerance分区可容忍性）理论普遍被看成是大数据技术的理论基础。同时，凭据该理论，业界有一种极度流行、极度“专业”的认识，那就是：关系型数据库设计选择了C（一致性）与A（可用性），NoSQL数据库设计则差别。其中，HBase选择了C（一致性）与P（分区可容忍性），Cassandra选择了A（可用性）与P">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-03-23T15:26:48.164Z">
+<meta property="og:updated_time" content="2018-03-27T09:47:48.859Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="study-cap">
 <meta name="twitter:description" content="CAP（Consistency一致性、Availability可用性、Partition-tolerance分区可容忍性）理论普遍被看成是大数据技术的理论基础。同时，凭据该理论，业界有一种极度流行、极度“专业”的认识，那就是：关系型数据库设计选择了C（一致性）与A（可用性），NoSQL数据库设计则差别。其中，HBase选择了C（一致性）与P（分区可容忍性），Cassandra选择了A（可用性）与P">
@@ -606,6 +606,15 @@
 <p>分布式系统分区容忍肯定是要保证的，因为总会有网络延迟，网络波动导致每个节点互相有短暂或长时间的通讯不通。所以我们在这个基础上，如果我们解决了一致性问题，也就是我们在网络波动和延迟的时候也让每个节点的数据是一样的，保证同时从任意节点取到的数据是一样的。</p>
 <p>那么我们就得舍弃可用性，也就是说我们在网络波动或者延迟的时候让整个分布式系统不可用，等到数据都同步完了，每个节点的数据都一样了，这时候我们在让分布式系统可用。这就是舍弃了可用性。</p>
 <p>那什么是舍弃一致性呢？就是在有网络延迟的时候，我整个的分布式系统还对外提供服务，这时就有可能短暂的出现获取的数据不是一致的。这就是舍弃了一致性。所以一般来说我们都是保证可用性，虽然有短暂的数据不一致，但我们只要最终保证了一致性在有些时候也是可以满足需要的。</p>
+<h1 id="解读"><a href="#解读" class="headerlink" title="解读"></a>解读</h1><p><a href="http://kongchen.github.io/how-cap-defines-avaiability/" target="_blank" rel="noopener">http://kongchen.github.io/how-cap-defines-avaiability/</a><br>C容易理解，所有节点上的数据都一样。<br>P是说一旦集群因为内部通信故障发生分裂，集群还能正常运转。</p>
+<p>关键是这个A。</p>
+<p>说白了就是，CAP里的A指的是，只要是活着的节点能返回响应，那么就认为它是availability的。</p>
+<p>用汽车来做个比喻：<br>汽车一切良好，故障灯一个都不亮，能开能刹，这是我们理解的传统的Available。只要是出了任何问题，例如车胎爆了，发动机坏了，或者是没油开不动了，这都已经是不可用了。</p>
+<p>CAP理论里，车不能开不要紧，只要是这车车门还能打开，那就是Available的：车胎破了能从胎压监测里看到，发动机坏了打火打不着，没油了油表灯会亮……这都是车返回的response，只要是有response，那么就是”可用的“。</p>
+<p>理解了A的真正含义以后再来看CAP。</p>
+<h2 id="只满足CA的系统"><a href="#只满足CA的系统" class="headerlink" title="只满足CA的系统"></a>只满足CA的系统</h2><p>根据P的定义： 一旦集群因为内部通信故障发生分裂，集群还能正常运转。 舍弃P意味着一旦集群发生分裂，整个集群都将无法运转。这是符合A的，因为这是的节点是fail的，不需要给任何响应。<br>单机服务器显然是CA的，只要结点活着，那自然是C+A。而结点一旦挂了，整个集群也就没了，符合舍弃P的选择。</p>
+<h2 id="只满足CP的系统"><a href="#只满足CP的系统" class="headerlink" title="只满足CP的系统"></a>只满足CP的系统</h2><p>一旦集群内部因为内部通信故障发生分裂（假设分裂成两部分），为了满足P，集群需要提供服务。而为了满足C，只能保留其中一部分提供服务，让另一部分整体退役。</p>
+<h2 id="只满足AP的系统"><a href="#只满足AP的系统" class="headerlink" title="只满足AP的系统"></a>只满足AP的系统</h2><p>整个最容易理解，一旦集群内部因为内部通信故障发生分裂（假设分裂成两部分），为了满足P，而又不需要满足C，那么可以让分裂出来的两部分都提供服务，因为暂时数据不一致没关系。</p>
 
       
     </div>
@@ -722,8 +731,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -738,7 +756,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">102</span>
+                  <span class="site-state-item-count">109</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -749,7 +767,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-count">27</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -760,7 +778,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">75</span>
+                  <span class="site-state-item-count">77</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -785,6 +803,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#解读"><span class="nav-number">1.</span> <span class="nav-text">解读</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#只满足CA的系统"><span class="nav-number">1.1.</span> <span class="nav-text">只满足CA的系统</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#只满足CP的系统"><span class="nav-number">1.2.</span> <span class="nav-text">只满足CP的系统</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#只满足AP的系统"><span class="nav-number">1.3.</span> <span class="nav-text">只满足AP的系统</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
