@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="参考https://www.jianshu.com/p/91e398d5d17c 基本类型各种类型分别占多少个字节(bytes)： 计算方式：对象头+实例数据+对齐填充对象头:mark word+类型指针    类型 64位（无压缩） 64位（压缩）     boolean 1 1   byte 1 1   short">
+<meta name="description" content="参考https://www.jianshu.com/p/91e398d5d17chttps://www.jianshu.com/p/12a3c97dc2b7 对象内存结构各种类型分别占多少个字节(bytes)： 计算方式： ① 对象头（Header）② 实例数据（Instance Data）③ 对齐填充 （Paddin">
 <meta property="og:type" content="article">
 <meta property="og:title" content="java对象字节码占用计算">
 <meta property="og:url" content="http://www.victor123.cn/2018/03/27/java_jvm/java-object-menory-compute/index.html">
 <meta property="og:site_name" content="Victor的博客">
-<meta property="og:description" content="参考https://www.jianshu.com/p/91e398d5d17c 基本类型各种类型分别占多少个字节(bytes)： 计算方式：对象头+实例数据+对齐填充对象头:mark word+类型指针    类型 64位（无压缩） 64位（压缩）     boolean 1 1   byte 1 1   short 2 2   char 2 2   int 4 4   float 4 4">
+<meta property="og:description" content="参考https://www.jianshu.com/p/91e398d5d17chttps://www.jianshu.com/p/12a3c97dc2b7 对象内存结构各种类型分别占多少个字节(bytes)： 计算方式： ① 对象头（Header）② 实例数据（Instance Data）③ 对齐填充 （Padding） 对象头（Header）HotSpot 虚拟机的对象头包括两部分信息：Mar">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://www.victor123.cn/images/pasted-104.png">
-<meta property="og:updated_time" content="2018-03-28T00:55:05.670Z">
+<meta property="og:updated_time" content="2018-03-28T02:02:12.018Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="java对象字节码占用计算">
-<meta name="twitter:description" content="参考https://www.jianshu.com/p/91e398d5d17c 基本类型各种类型分别占多少个字节(bytes)： 计算方式：对象头+实例数据+对齐填充对象头:mark word+类型指针    类型 64位（无压缩） 64位（压缩）     boolean 1 1   byte 1 1   short 2 2   char 2 2   int 4 4   float 4 4">
+<meta name="twitter:description" content="参考https://www.jianshu.com/p/91e398d5d17chttps://www.jianshu.com/p/12a3c97dc2b7 对象内存结构各种类型分别占多少个字节(bytes)： 计算方式： ① 对象头（Header）② 实例数据（Instance Data）③ 对齐填充 （Padding） 对象头（Header）HotSpot 虚拟机的对象头包括两部分信息：Mar">
 <meta name="twitter:image" content="http://www.victor123.cn/images/pasted-104.png">
 
 
@@ -417,72 +417,148 @@
       
 
       
-        <h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://www.jianshu.com/p/91e398d5d17c" target="_blank" rel="noopener">https://www.jianshu.com/p/91e398d5d17c</a></p>
-<h1 id="基本类型"><a href="#基本类型" class="headerlink" title="基本类型"></a>基本类型</h1><p><img src="/images/pasted-104.png" alt="upload successful"><br>各种类型分别占多少个字节(bytes)：</p>
-<p>计算方式：对象头+实例数据+对齐填充<br>对象头:mark word+类型指针</p>
+        <h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://www.jianshu.com/p/91e398d5d17c" target="_blank" rel="noopener">https://www.jianshu.com/p/91e398d5d17c</a><br><a href="https://www.jianshu.com/p/12a3c97dc2b7" target="_blank" rel="noopener">https://www.jianshu.com/p/12a3c97dc2b7</a></p>
+<h1 id="对象内存结构"><a href="#对象内存结构" class="headerlink" title="对象内存结构"></a>对象内存结构</h1><p><img src="/images/pasted-104.png" alt="upload successful"><br>各种类型分别占多少个字节(bytes)：</p>
+<p>计算方式：</p>
+<p>① 对象头（Header）<br>② 实例数据（Instance Data）<br>③ 对齐填充 （Padding）</p>
+<h2 id="对象头（Header）"><a href="#对象头（Header）" class="headerlink" title="对象头（Header）"></a>对象头（Header）</h2><p>HotSpot 虚拟机的对象头包括两部分信息：Mark Word 和 类型指针；如果是数组对象的话，还有第三部分（option）信息：数组长度</p>
+<h2 id="Mark-Word"><a href="#Mark-Word" class="headerlink" title="Mark Word"></a>Mark Word</h2><p>这部分数据的长度在32位和64位的虚拟机（未开启压缩指针）中分别为32bit 和64bit。Mark Word用于存储对象自身的运行时数据，如哈希码（HashCode）、GC分代年龄、锁状态标志、线程持有的锁、偏向线程ID、偏向时间戳等。<br>对象头信息是与对象定义的数据无关的额外存储成本，考虑到虚拟机的空间效率，Mark Word被设计成一个非固定的数据结构以便在极小的空间内存存储尽量多的信息，它会根据对象的状态复用自己的存储空间。</p>
+<h3 id="类型指针（Class-Pointer）"><a href="#类型指针（Class-Pointer）" class="headerlink" title="类型指针（Class Pointer）"></a>类型指针（Class Pointer）</h3><p>是对象指向它的类元数据的指针，虚拟机通过这个指针来确定这个对象是哪个类的实例。</p>
+<h3 id="数组长度（Length）-option"><a href="#数组长度（Length）-option" class="headerlink" title="数组长度（Length）[option]"></a>数组长度（Length）[option]</h3><p>如果对象时一个Java数组，那在对象头中还必须有一块用于记录数组长度的数据。因为虚拟机可以通过普通Java对象的元数据信息确定Java对象的大小，但是从数组的元数据中无法确定数组的大小。</p>
+<h2 id="实例数据（Instance-Data）"><a href="#实例数据（Instance-Data）" class="headerlink" title="实例数据（Instance Data）"></a>实例数据（Instance Data）</h2><p>实例数据部分是对象真正存储的有效信息，也是在程序代码中所定义的各种类型的字段内容，无论是从父类继承下来的，还是在子类中定义的，都需要记录起来。</p>
+<p>HotSpot虚拟机默认的分配策略为longs/doubles、ints、shorts/chars、bytes/booleans、oops（Ordinary Object Pointers），从分配策略中可以看出，相同宽度的字段总是被分配到一起。在满足这个前提条件的情况下，在父类中定义的变量会出现在子类之前。如果CompactFields参数值为true（默认为true），那子类之中较窄的变量也可能会插入到父类变量的空隙之中。</p>
+<h2 id="对齐填充-（Padding）"><a href="#对齐填充-（Padding）" class="headerlink" title="对齐填充 （Padding）"></a>对齐填充 （Padding）</h2><p>对齐填充并不是必然存在的，也没有特别的含义，它仅仅起着占位符的作用。由于HotSpot VM的自动内存管理系统要求对象起始地址必须是8字节的整数倍，换句话说就是对象的大小必须是8字节的整数倍。</p>
+<h2 id="占用空间"><a href="#占用空间" class="headerlink" title="占用空间"></a>占用空间</h2><p>普通对象占用内存情况：</p>
 <table>
 <thead>
 <tr>
-<th style="text-align:left">类型</th>
-<th style="text-align:left">64位（无压缩）</th>
-<th style="text-align:left">64位（压缩）</th>
+<th style="text-align:left"></th>
+<th style="text-align:left">32 位系统</th>
+<th style="text-align:left">64 位系统(+UseCompressedOops)</th>
+<th style="text-align:left">64 位系统(-UseCompressedOops)</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">boolean</td>
-<td style="text-align:left">1</td>
-<td style="text-align:left">1</td>
+<td style="text-align:left">Mark Word</td>
+<td style="text-align:left">4 bytes</td>
+<td style="text-align:left">8 bytes</td>
+<td style="text-align:left">8 bytes</td>
 </tr>
 <tr>
-<td style="text-align:left">byte</td>
-<td style="text-align:left">1</td>
-<td style="text-align:left">1</td>
+<td style="text-align:left">Class Pointer</td>
+<td style="text-align:left">4 bytes</td>
+<td style="text-align:left">4 bytes</td>
+<td style="text-align:left">8 bytes</td>
 </tr>
 <tr>
-<td style="text-align:left">short</td>
-<td style="text-align:left">2</td>
-<td style="text-align:left">2</td>
+<td style="text-align:left">对象头</td>
+<td style="text-align:left">8 bytes</td>
+<td style="text-align:left">12 bytes</td>
+<td style="text-align:left">16 bytes</td>
+</tr>
+</tbody>
+</table>
+<p>数组对象占用内存情况：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left">32 位系统</th>
+<th style="text-align:left">64 位系统(+UseCompressedOops)</th>
+<th style="text-align:left">64 位系统(-UseCompressedOops)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Mark Word</td>
+<td style="text-align:left">4 bytes</td>
+<td style="text-align:left">8 bytes</td>
+<td style="text-align:left">8 bytes</td>
 </tr>
 <tr>
-<td style="text-align:left">char</td>
-<td style="text-align:left">2</td>
-<td style="text-align:left">2</td>
+<td style="text-align:left">Class Pointer</td>
+<td style="text-align:left">4 bytes</td>
+<td style="text-align:left">4 bytes</td>
+<td style="text-align:left">8 bytes</td>
 </tr>
 <tr>
-<td style="text-align:left">int</td>
-<td style="text-align:left">4</td>
-<td style="text-align:left">4</td>
+<td style="text-align:left">Length</td>
+<td style="text-align:left">4 bytes</td>
+<td style="text-align:left">4 bytes</td>
+<td style="text-align:left">4 bytes</td>
 </tr>
 <tr>
-<td style="text-align:left">float</td>
-<td style="text-align:left">4</td>
-<td style="text-align:left">4</td>
+<td style="text-align:left">对象头</td>
+<td style="text-align:left">12 bytes</td>
+<td style="text-align:left">16 bytes</td>
+<td style="text-align:left">20 bytes</td>
+</tr>
+</tbody>
+</table>
+<h1 id="基本类型"><a href="#基本类型" class="headerlink" title="基本类型"></a>基本类型</h1><table>
+<thead>
+<tr>
+<th style="text-align:left">Type</th>
+<th style="text-align:left">32 位系统</th>
+<th style="text-align:left">64 位系统(+UseCompressedOops)</th>
+<th style="text-align:left">64 位系统(-UseCompressedOops)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">double</td>
+<td style="text-align:left">8 bytes</td>
+<td style="text-align:left">8 bytes</td>
+<td style="text-align:left">8 bytes</td>
 </tr>
 <tr>
 <td style="text-align:left">long</td>
-<td style="text-align:left">8</td>
-<td style="text-align:left">8</td>
+<td style="text-align:left">8 bytes</td>
+<td style="text-align:left">8 bytes</td>
+<td style="text-align:left">8 bytes</td>
 </tr>
 <tr>
-<td style="text-align:left">double</td>
-<td style="text-align:left">8</td>
-<td style="text-align:left">8</td>
+<td style="text-align:left">float</td>
+<td style="text-align:left">4 bytes</td>
+<td style="text-align:left">4 bytes</td>
+<td style="text-align:left">4 bytes</td>
 </tr>
 <tr>
-<td style="text-align:left">普通对象头</td>
-<td style="text-align:left">16</td>
-<td style="text-align:left">12</td>
+<td style="text-align:left">int</td>
+<td style="text-align:left">4 bytes</td>
+<td style="text-align:left">4 bytes</td>
+<td style="text-align:left">4 bytes</td>
 </tr>
 <tr>
-<td style="text-align:left">数组对象头</td>
-<td style="text-align:left">24</td>
-<td style="text-align:left">16</td>
+<td style="text-align:left">char</td>
+<td style="text-align:left">2 bytes</td>
+<td style="text-align:left">2 bytes</td>
+<td style="text-align:left">2 bytes</td>
 </tr>
 <tr>
-<td style="text-align:left">reference（引用类型）</td>
-<td style="text-align:left">8</td>
-<td style="text-align:left">4</td>
+<td style="text-align:left">short</td>
+<td style="text-align:left">2 bytes</td>
+<td style="text-align:left">2 bytes</td>
+<td style="text-align:left">2 bytes</td>
+</tr>
+<tr>
+<td style="text-align:left">byte</td>
+<td style="text-align:left">1 bytes</td>
+<td style="text-align:left">1 bytes</td>
+<td style="text-align:left">1 bytes</td>
+</tr>
+<tr>
+<td style="text-align:left">boolean</td>
+<td style="text-align:left">1 bytes</td>
+<td style="text-align:left">1 bytes</td>
+<td style="text-align:left">1 bytes</td>
+</tr>
+<tr>
+<td style="text-align:left">oops(ordinary object pointers)</td>
+<td style="text-align:left">4 bytes</td>
+<td style="text-align:left">4 bytes</td>
+<td style="text-align:left">8 bytes</td>
 </tr>
 </tbody>
 </table>
@@ -662,7 +738,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -719,7 +795,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">1.</span> <span class="nav-text">参考</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#基本类型"><span class="nav-number">2.</span> <span class="nav-text">基本类型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#包装类型"><span class="nav-number">3.</span> <span class="nav-text">包装类型</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">1.</span> <span class="nav-text">参考</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#对象内存结构"><span class="nav-number">2.</span> <span class="nav-text">对象内存结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#对象头（Header）"><span class="nav-number">2.1.</span> <span class="nav-text">对象头（Header）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Mark-Word"><span class="nav-number">2.2.</span> <span class="nav-text">Mark Word</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#类型指针（Class-Pointer）"><span class="nav-number">2.2.1.</span> <span class="nav-text">类型指针（Class Pointer）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数组长度（Length）-option"><span class="nav-number">2.2.2.</span> <span class="nav-text">数组长度（Length）[option]</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实例数据（Instance-Data）"><span class="nav-number">2.3.</span> <span class="nav-text">实例数据（Instance Data）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对齐填充-（Padding）"><span class="nav-number">2.4.</span> <span class="nav-text">对齐填充 （Padding）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#占用空间"><span class="nav-number">2.5.</span> <span class="nav-text">占用空间</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#基本类型"><span class="nav-number">3.</span> <span class="nav-text">基本类型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#包装类型"><span class="nav-number">4.</span> <span class="nav-text">包装类型</span></a></li></ol></div>
             
 
           </div>
