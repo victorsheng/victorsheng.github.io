@@ -2,6 +2,9 @@
 
 title: "atom设置本地代理"
 date: "2018-03-24 17:46"
+tags:
+  - 代理
+  
 ---
 atom设置proxy
 ```

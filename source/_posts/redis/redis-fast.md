@@ -2,6 +2,10 @@
 
 title: "Redis 快的原因"
 date: "2018-03-26 18:21"
+tags:
+    - redis
+categories:
+    - redis
 ---
 R
 edis 采用的是基于内存的采用的是单进程单线程模型的 KV 数据库，由 C 语言编写。官方提供的数据是可以达到100000+的 qps。这个数据不比采用单进程多线程的同样基于内存的 KV 数据库 Memcached 差。

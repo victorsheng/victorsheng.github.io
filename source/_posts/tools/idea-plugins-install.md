@@ -1,3 +1,4 @@
+---
 title: 优化idea插件安装
 tags:
   - 代理

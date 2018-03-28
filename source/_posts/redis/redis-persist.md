@@ -1,7 +1,10 @@
+---
 title: "Redis持久化方式"
 date: "2018-03-26 18:21"
 tags:
+    - redis
 categories:
+    - redis
 ---
 为防止数据丢失，需要将 Redis 中的数据从内存中 dump 到磁盘，这就是持久化。Redis 提供两种持久化方式：RDB 和 AOF。Redis 允许两者结合，也允许两者同时关闭。
 
