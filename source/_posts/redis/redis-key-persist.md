@@ -1,10 +1,9 @@
----
-title: redis-persist
-date: 2018-03-27 13:05:30
+title: redis移除过期时间的命令
 tags:
-    - redis
+  - redis
 categories:
-    - redis
+  - redis
+date: 2018-03-27 13:05:30
 ---
 # PERSIST mykey
 ```

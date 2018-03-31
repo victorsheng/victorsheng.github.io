@@ -1,5 +1,4 @@
----
-title: 多个线程如何同时启动
+title: 赛跑比赛实现
 date: 2018-03-27 22:02:00
 tags:
 categories:
@@ -34,16 +33,15 @@ public class Car implements Runnable {
     }
 }
 
-public class CarCompetion {
-    
-    public static final int CAR_NUM = 10;
-    
     public static void main(String[] args) {
-	CountDownLatch competion = new CountDownLatch(10);
-	for (int i = 0; i < CarCompetion.CAR_NUM; i++) {
-	competion.countDown();
-	competion.await();
-	}
+        // 构造同步量
+        final CompetionLatch latch = new CompetionLatch(CarCompetion.CAR_NUM);
+        final ExecutorService carPool = 
+            Executors.newFixedThreadPool(CarCompetion.CAR_NUM);
+        for (int i = 0; i < CarCompetion.CAR_NUM; i++) {
+            carPool.execute(new Car(i, latch));
+        }
+    }
 }
 
 ```
