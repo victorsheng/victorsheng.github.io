@@ -326,7 +326,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/06/java_tools/install-jenv/">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/22/java_common/study-fastjson-formatter/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
@@ -345,7 +345,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/01/06/java_tools/install-jenv/" itemprop="url">jenv安装(管理多个jdk版本)</a></h1>
+                <a class="post-title-link" href="/2018/01/22/java_common/study-fastjson-formatter/" itemprop="url">springboot配置FastJsonHttpMessageConverter(实战篇)</a></h1>
         
 
         <div class="post-meta">
@@ -357,8 +357,187 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-06T08:03:10+08:00">
-                2018-01-06
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-22T15:12:00+08:00">
+                2018-01-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring/" itemprop="url" rel="index">
+                    <span itemprop="name">spring</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/22/java_common/study-fastjson-formatter/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/22/java_common/study-fastjson-formatter/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/22/java_common/study-fastjson-formatter/" class="leancloud_visitors" data-flag-title="springboot配置FastJsonHttpMessageConverter(实战篇)">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><h2 id="老的方式-controller的参数与返回值"><a href="#老的方式-controller的参数与返回值" class="headerlink" title="老的方式:controller的参数与返回值"></a>老的方式:controller的参数与返回值</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public JsonResult queryDrillDetail(@RequestBody String body) &#123;</span><br><span class="line">List&lt;Map&lt;String, Object&gt;&gt; detailMapList = new ArrayList&lt;&gt;();</span><br><span class="line">.......</span><br><span class="line">return new JsonResult(JsonResult.SUCCESSFUL, new PagedList&lt;&gt;(query.getPage() + 1, pageable.getPageSize(),</span><br><span class="line">                query.getTotalCount(), detailMapList));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="老的方式-问题"><a href="#老的方式-问题" class="headerlink" title="老的方式:问题"></a>老的方式:问题</h2><ul>
+<li>入参不明确</li>
+<li>返回值类型不明确</li>
+<li>Map的key只有在运行时,才会知道,且不知道类型</li>
+</ul>
+<h2 id="期望的方式-使用vo"><a href="#期望的方式-使用vo" class="headerlink" title="期望的方式:使用vo"></a>期望的方式:使用vo</h2><h1 id="改造步骤"><a href="#改造步骤" class="headerlink" title="改造步骤:"></a>改造步骤:</h1><p>1.在使用converters的最后一个优先级,添加FastJsonHttpMessageConverter</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">@Component</span><br><span class="line">public class MyWebAppConfigurer extends WebMvcConfigurerAdapter &#123;</span><br><span class="line"></span><br><span class="line">    // 添加converter的第三种方式</span><br><span class="line">    // 同一个WebMvcConfigurerAdapter中的configureMessageConverters方法先于extendMessageConverters方法执行</span><br><span class="line">    // 可以理解为是三种方式中最后执行的一种，不过这里可以通过add指定顺序来调整优先级，也可以使用remove/clear来删除converter，功能强大</span><br><span class="line">    // 使用converters.add(xxx)会放在最低优先级（List的尾部）</span><br><span class="line">    // 使用converters.add(0,xxx)会放在最高优先级（List的头部）</span><br><span class="line">    @Override</span><br><span class="line">    public void extendMessageConverters(List&lt;HttpMessageConverter&lt;?&gt;&gt; converters) &#123;</span><br><span class="line">        converters.add(new FastJsonHttpMessageConverter());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>2.model遵循老的接口原则,转为下划线分割的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">@JSONType(naming = PropertyNamingStrategy.SnakeCase)</span><br><span class="line">public class PurchaseDetailDrillVo &#123;</span><br><span class="line"></span><br><span class="line">    private Long pmsPurchaseOrderId;</span><br><span class="line">    private Long pmsPurchaseOrderDetailId;</span><br><span class="line">    private String pmsPurchaseOrderNo;</span><br><span class="line">    private Integer productType;</span><br><span class="line">    private String deliverAddress;</span><br><span class="line">    private Long provinceId;</span><br><span class="line">    ....</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>3.使用@RequestBody注解,类型改为vo</p>
+<p>测试,接受参数和返回参数都是vo,而接口的字段映射依然为下划线,</p>
+<hr>
+<p>以下为项目本身的问题<br>4.pom文件中排除jackson的依赖<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;com.ejlerp&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;ejlerp-common&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;3.2.0-SNAPSHOT&lt;/version&gt;</span><br><span class="line">    &lt;exclusions&gt;</span><br><span class="line">        &lt;exclusion&gt;</span><br><span class="line">            &lt;artifactId&gt;jackson-core&lt;/artifactId&gt;</span><br><span class="line">            &lt;groupId&gt;com.fasterxml.jackson.core&lt;/groupId&gt;</span><br><span class="line">        &lt;/exclusion&gt;</span><br><span class="line">    &lt;/exclusions&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure></p>
+<p>5.fastjason默认支持所有的contentType,及*, 与springmvc校验相冲突,so需要声明fastjason能支持的contentType,在初始化FastJsonHttpMessageConverter,注入参数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">public void extendMessageConverters(List&lt;HttpMessageConverter&lt;?&gt;&gt; converters) &#123;</span><br><span class="line">    FastJsonHttpMessageConverter fastJsonHttpMessageConverter = new FastJsonHttpMessageConverter();</span><br><span class="line">    ArrayList&lt;MediaType&gt; supportedMediaTypes = Lists.newArrayList();</span><br><span class="line">    supportedMediaTypes.add(MediaType.APPLICATION_FORM_URLENCODED);</span><br><span class="line">    supportedMediaTypes.add(MediaType.APPLICATION_JSON);</span><br><span class="line">    supportedMediaTypes.add(MediaType.TEXT_HTML);</span><br><span class="line">    supportedMediaTypes.add(MediaType.TEXT_PLAIN);</span><br><span class="line">    fastJsonHttpMessageConverter.setSupportedMediaTypes(supportedMediaTypes);</span><br><span class="line">    converters.add(fastJsonHttpMessageConverter);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="fastjson官网"><a href="#fastjson官网" class="headerlink" title="fastjson官网"></a>fastjson官网</h1><p><a href="https://github.com/alibaba/fastjson/issues/1555" target="_blank" rel="noopener">https://github.com/alibaba/fastjson/issues/1555</a><br><a href="https://github.com/alibaba/fastjson/wiki/PropertyNamingStrategy_cn" target="_blank" rel="noopener">https://github.com/alibaba/fastjson/wiki/PropertyNamingStrategy_cn</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/22/java_common/study-equals-and-hashCode/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/22/java_common/study-equals-and-hashCode/" itemprop="url">study_equals_and_hashCode</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-22T12:36:24+08:00">
+                2018-01-22
               </time>
             
 
@@ -398,9 +577,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/01/06/java_tools/install-jenv/#comments" itemprop="discussionUrl">
+                <a href="/2018/01/22/java_common/study-equals-and-hashCode/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/01/06/java_tools/install-jenv/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/01/22/java_common/study-equals-and-hashCode/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -408,7 +587,7 @@
 
           
           
-             <span id="/2018/01/06/java_tools/install-jenv/" class="leancloud_visitors" data-flag-title="jenv安装(管理多个jdk版本)">
+             <span id="/2018/01/22/java_common/study-equals-and-hashCode/" class="leancloud_visitors" data-flag-title="study_equals_and_hashCode">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -441,15 +620,42 @@
       
         
           
-            <p>1.安装jenv<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">brew install jenv</span><br></pre></td></tr></table></figure></p>
-<p>2.oracle官网下载各版本jdk</p>
-<p>3.安装本地<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">jenv add /Library/Java/JavaVirtualMachines/jdk-9.0.1.jdk/Contents/Home</span><br><span class="line">jenv add /Library/Java/JavaVirtualMachines/jdk1.8.0_151.jdk/Contents/Home</span><br><span class="line">jenv add /Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home</span><br></pre></td></tr></table></figure></p>
-<p>4.列表jdk<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jenv versions</span><br></pre></td></tr></table></figure></p>
-<ul>
-<li>system (set by /Users/victor/.jenv/version)<br>1.7<br>1.7.0.80<br>1.8<br>1.8.0.151<br>9.0<br>9.0.1<br>oracle64-1.7.0.80<br>oracle64-1.8.0.151<br>oracle64-9.0.1</li>
+            <p><a href="https://www.ibm.com/developerworks/cn/java/j-jtp05273/index.html" target="_blank" rel="noopener">https://www.ibm.com/developerworks/cn/java/j-jtp05273/index.html</a></p>
+<h1 id="为什么-Override-equals-和hashCode"><a href="#为什么-Override-equals-和hashCode" class="headerlink" title="为什么 Override equals()和hashCode()?"></a>为什么 Override equals()和hashCode()?</h1><ul>
+<li><p>如果 Integer 不 Override equals() 和 hashCode() 情况又将如何?如果我们从未在 HashMap 或其它基于散列的集合中使用 Integer 作为关键字的话，什么也不会发生。但是，如果我们在 HashMap中 使用这类 Integer 对象作为关键字，我们将不能够可靠地检索相关的值，除非我们在 get() 调用中使用与 put() 调用中极其类似的 Integer 实例。这要求确保在我们的整个程序中，只能使用对应于特定整数值的 Integer 对象的一个实例。不用说，这种方法极不方便而且错误频频。</p>
+</li>
+<li><p>Object 的interface contract要求如果根据 equals() 两个对象是相等的，那么它们必须有相同的 hashCode() 值。当其识别能力整个包含在 equals() 中时，为什么我们的根对象类需要 hashCode() ？ </p>
+</li>
+<li>如果重写了equals方法，则一定要重写hashCode方法。</li>
+<li>hashCode() 方法纯粹用于提高效率。Java平台设计人员预计到了典型Java应用程序中基于散列的集合类（Collection Class)的重要性–如 Hashtable 、 HashMap 和 HashSet ，并且使用 equals() 与许多对象进行比较在计算方面非常昂贵。使所有Java对象都能够支持 hashCode() 并结合使用基于散列的集合，可以实现有效的存储和检索。</li>
 </ul>
-<p>5.选择jdk<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">jenv global 1.7</span><br><span class="line">java -version</span><br></pre></td></tr></table></figure></p>
-<p>java version “1.7.0_80”<br>Java(TM) SE Runtime Environment (build 1.7.0_80-b15)<br>Java HotSpot(TM) 64-Bit Server VM (build 24.80-b11, mixed mode)</p>
+<h1 id="hashCode方法"><a href="#hashCode方法" class="headerlink" title="hashCode方法"></a>hashCode方法</h1><ul>
+<li><p>如果重写了equals方法，则一定要重写hashCode方法。</p>
+</li>
+<li><p>重写hashCode方法的原则如下：</p>
+<ul>
+<li>在程序执行期间，只要equals方法的比较操作用到的信息没有被修改，那么对这同一个对象调用多次，hashCode方法必须始终如一地返回同一个整数</li>
+<li>如果两个对象通过equals方法比较得到的结果是相等的，那么对这两个对象进行hashCode得到的值应该相同</li>
+<li>两个不同的对象，hashCode的结果可能是相同的，这就是哈希表中的冲突。为了保证哈希表的效率，哈希算法应尽可能的避免冲突</li>
+</ul>
+</li>
+<li><p>关于相应的哈希算法，一个简单的算法如下:</p>
+<ul>
+<li>永远不要让哈希算法返回一个常值，这时哈希表将退化成链表，查找时间复杂度也从 O(1)O(1) 退化到 O(N)O(N)</li>
+<li>如果参数是boolean型，计算(f ? 1 : 0)</li>
+<li>如果参数是byte, char, short或者int型，计算(int) f</li>
+<li>如果参数是long型，计算(int) (f ^ (f &gt;&gt;&gt; 32))</li>
+<li>如果参数是float型，计算Float.floatToIntBits(f)</li>
+<li>如果参数是double型，计算Double.doubleToLongBits(f)得到long类型的值，再根据公式计算出相应的hash值</li>
+<li>如果参数是Object型，那么应计算其有用的成员变量的hash值，并按照下面的公式计算最终的hash值</li>
+<li>如果参数是个数组，那么把数组中的每个值都当做单独的值，分别按照上面的方法单独计算hash值，最后按照下面的公式计算最终的hash值</li>
+<li>组合公式：result = 31 * result + c</li>
+</ul>
+</li>
+</ul>
+<h2 id="String类的hashCode方法如下（JDK-1-8）："><a href="#String类的hashCode方法如下（JDK-1-8）：" class="headerlink" title="String类的hashCode方法如下（JDK 1.8）："></a>String类的hashCode方法如下（JDK 1.8）：</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">public int hashCode() &#123;</span><br><span class="line">        int h = hash;</span><br><span class="line">        if (h == 0 &amp;&amp; value.length &gt; 0) &#123;</span><br><span class="line">            char val[] = value;</span><br><span class="line">            for (int i = 0; i &lt; value.length; i++) &#123;</span><br><span class="line">                h = 31 * h + val[i];</span><br><span class="line">            &#125;</span><br><span class="line">            hash = h;</span><br><span class="line">        &#125;</span><br><span class="line">        return h;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="举个自定义类的hashCode例子："><a href="#举个自定义类的hashCode例子：" class="headerlink" title="举个自定义类的hashCode例子："></a>举个自定义类的hashCode例子：</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">class Duck &#123;</span><br><span class="line">    private int id;</span><br><span class="line">    private String name;</span><br><span class="line">    private double weight;</span><br><span class="line">    private float height;</span><br><span class="line">    private String note;</span><br><span class="line">    @Override</span><br><span class="line">    public boolean equals(Object o) &#123;</span><br><span class="line">        if (this == o) return true;</span><br><span class="line">        if (o == null || getClass() != o.getClass()) return false;</span><br><span class="line">        Duck duck = (Duck) o;</span><br><span class="line">        if (id != duck.id) return false;</span><br><span class="line">        if (Double.compare(duck.weight, weight) != 0) return false;</span><br><span class="line">        if (Float.compare(duck.height, height) != 0) return false;</span><br><span class="line">        if (name != null ? !name.equals(duck.name) : duck.name != null) return false;</span><br><span class="line">        return !(note != null ? !note.equals(duck.note) : duck.note != null);</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public int hashCode() &#123;</span><br><span class="line">        int result;</span><br><span class="line">        long temp;</span><br><span class="line">        result = id;</span><br><span class="line">        result = 31 * result + (name != null ? name.hashCode() : 0);</span><br><span class="line">        temp = Double.doubleToLongBits(weight);</span><br><span class="line">        result = 31 * result + (int) (temp ^ (temp &gt;&gt;&gt; 32));</span><br><span class="line">        result = 31 * result + (height != +0.0f ? Float.floatToIntBits(height) : 0);</span><br><span class="line">        result = 31 * result + (note != null ? note.hashCode() : 0);</span><br><span class="line">        return result;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="BTW-回顾一下-hashmap内部的实现"><a href="#BTW-回顾一下-hashmap内部的实现" class="headerlink" title="BTW 回顾一下 hashmap内部的实现"></a>BTW 回顾一下 hashmap内部的实现</h1><p>e.hash == hash &amp;&amp; ((k = e.key) == key || (key != null &amp;&amp; key.equals(k)))</p>
 
           
         
@@ -498,7 +704,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/05/data_warehouse/BI-olap-tool/">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/19/java_spring/review-spring/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
@@ -517,7 +723,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/01/05/data_warehouse/BI-olap-tool/" itemprop="url">BI-olap技术选型</a></h1>
+                <a class="post-title-link" href="/2018/01/19/java_spring/review-spring/" itemprop="url">review_spring</a></h1>
         
 
         <div class="post-meta">
@@ -529,8 +735,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-05T19:31:54+08:00">
-                2018-01-05
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-19T23:20:53+08:00">
+                2018-01-19
               </time>
             
 
@@ -552,8 +758,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/BI/" itemprop="url" rel="index">
-                    <span itemprop="name">BI</span>
+                  <a href="/categories/spring/" itemprop="url" rel="index">
+                    <span itemprop="name">spring</span>
                   </a>
                 </span>
 
@@ -570,9 +776,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/01/05/data_warehouse/BI-olap-tool/#comments" itemprop="discussionUrl">
+                <a href="/2018/01/19/java_spring/review-spring/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/01/05/data_warehouse/BI-olap-tool/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/01/19/java_spring/review-spring/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -580,179 +786,7 @@
 
           
           
-             <span id="/2018/01/05/data_warehouse/BI-olap-tool/" class="leancloud_visitors" data-flag-title="BI-olap技术选型">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h1 id="备选列表"><a href="#备选列表" class="headerlink" title="备选列表:"></a>备选列表:</h1><ul>
-<li>阿里云-分析性数据库</li>
-<li>GreePlum</li>
-<li>Presto</li>
-<li>Kylin
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2018/01/05/data_warehouse/BI-olap-tool/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/05/java_common/study-ConcurrentModificationException/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/05/java_common/study-ConcurrentModificationException/" itemprop="url">java集合并发修改</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-05T11:21:00+08:00">
-                2018-01-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/01/05/java_common/study-ConcurrentModificationException/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/01/05/java_common/study-ConcurrentModificationException/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/01/05/java_common/study-ConcurrentModificationException/" class="leancloud_visitors" data-flag-title="java集合并发修改">
+             <span id="/2018/01/19/java_spring/review-spring/" class="leancloud_visitors" data-flag-title="review_spring">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -785,1359 +819,121 @@
       
         
           
-            <h1 id="并发修改"><a href="#并发修改" class="headerlink" title="并发修改"></a>并发修改</h1><p>当一个或多个线程正在遍历一个集合Collection，此时另一个线程修改了这个集合的内容（添加，删除或者修改）.这就是并发修改</p>
-<h1 id="快速失败（fail—fast）"><a href="#快速失败（fail—fast）" class="headerlink" title="快速失败（fail—fast）"></a>快速失败（fail—fast）</h1><ul>
-<li>“快速失败”，它是Java集合的一种错误检测机制。当多个线程对集合进行结构上的改变的操作时，有可能会产生fail-fast机制。记住是有可能，而不是一定。例如：假设存在两个线程（线程1、线程2），线程1通过Iterator在遍历集合A中的元素，在某个时候线程2修改了集合A的结构（是结构上面的修改，而不是简单的修改集合元素的内容），那么这个时候程序就会抛出ConcurrentModificationException 异常，从而产生fail-fast机制。</li>
+            <h1 id="Spring的优点"><a href="#Spring的优点" class="headerlink" title="Spring的优点"></a>Spring的优点</h1><ul>
+<li>轻量级：相较于EJB容器，Spring采用的IoC容器非常的轻量级，基础版本的Spring框架大约只有2MB。Spring可以让开发者们仅仅使用POJO(Plain Old Java Object，相对于EJB)就能够开发出企业级的应用。这样做的好处是，你不需要使用臃肿庞大的 EJB容器(应用服务器)，你只需要轻量的servlet容器(如Tomcat)。尤其在一些开发当中，很稀缺内存和CPU资源时，采用Spring比EJB无论是开发还是部署应用都更节约资源。</li>
+<li>控制反转(IOC)：Spring使用控制反转技术实现了松耦合。依赖被注入到对象，而不是创建或寻找依赖对象。</li>
+<li>面向切面编程(AOP)： Spring支持面向切面编程，同时把应用的业务逻辑与系统的服务分离开来。</li>
+<li>MVC框架：Spring MVC是一个非常好的MVC框架，可以替换其他web框架诸如Struts。</li>
+<li>集成性：Spring非常容易和其他的流行框架一起集成开发，这些框架包括：ORM框架，logging框架，JEE, Quartz，以及Struts等表现层框架。</li>
+<li>事务管理：Spring强大的事务管理功能，能够处理本地事务(一个数据库)或是全局事务(多个数据，采用JTA)。</li>
+<li>模块分离：Spring框架是由模块构成的。虽然已经有太多的包和类了，但它们都按照模块分好类了，你只需要考虑你会用到的模块，而不用理其他的模块。</li>
+<li>异常处理：由于Java的JDBC，Hibernate等API中有很多方法抛出的是checked exception，而很多开发者并不能很好的处理异常。Spring提供了统一的API将这些checked exception的异常转换成Spring的unchecked exception。</li>
+<li>单元测试：Spring写出来的代码非常容易做单元测试，可以采用依赖注射(Dependency Injection)将测试的数据注射到程序中。</li>
 </ul>
-<h1 id="何时触发快速失败"><a href="#何时触发快速失败" class="headerlink" title="何时触发快速失败"></a>何时触发快速失败</h1><ul>
-<li>无论add、remove、clear方法只要是涉及了改变ArrayList元素的个数的方法都会导致modCount的改变。所以我们这里可以初步判断由于expectedModCount得值与modCount的改变不同步，导致两者之间不等从而产生fail-fast机制。</li>
-</ul>
-<h1 id="安全失败（fail—safe）"><a href="#安全失败（fail—safe）" class="headerlink" title="安全失败（fail—safe）"></a>安全失败（fail—safe）</h1><ul>
-<li>采用安全失败机制的集合容器，在遍历时不是直接在集合内容上访问的，而是先复制原有集合内容，在拷贝的集合上进行遍历。</li>
-<li>p.s.迭代器遍历的是开始遍历那一刻拿到的集合拷贝，在遍历期间原集合发生的修改迭代器是不知道的</li>
-</ul>
-<h1 id="快速失败和安全失败的比较"><a href="#快速失败和安全失败的比较" class="headerlink" title="快速失败和安全失败的比较"></a>快速失败和安全失败的比较</h1><table>
-<thead>
-<tr>
-<th></th>
-<th style="text-align:center">Fail Fast Iterator</th>
-<th style="text-align:right">Fail Safe Iterator</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Throw ConcurrentModification Exception</td>
-<td style="text-align:center">Yes</td>
-<td style="text-align:right">No</td>
-</tr>
-<tr>
-<td>Clone object</td>
-<td style="text-align:center">No</td>
-<td style="text-align:right">Yes</td>
-</tr>
-<tr>
-<td>Memory Overhead</td>
-<td style="text-align:center">No</td>
-<td style="text-align:right">Yes</td>
-</tr>
-<tr>
-<td>Examples</td>
-<td style="text-align:center">HashMap,Vector,ArrayList,HashSet</td>
-<td style="text-align:right">CopyOnWriteArrayList,ConcurrentHashMap</td>
-</tr>
-</tbody>
-</table>
+<p>IOC就是典型的工厂模式，通过sessionfactory去注入实例。</p>
+<p>AOP就是典型的代理模式的体现。</p>
+<h1 id="IOC概念"><a href="#IOC概念" class="headerlink" title="IOC概念"></a>IOC概念</h1><p><img src="/images/pasted-80.png" alt="upload successful"><br>IOC解耦<br><img src="/images/pasted-81.png" alt="upload successful"><br>引进了中间位置的“第三方”，也就是IOC容器，使得A、B、C、D这4个对象没有了耦合关系，齿轮之间的传动全部依靠“第三方”了</p>
+<p>通过引入IOC容器，利用依赖关系注入的方式，实现对象之间的解耦。</p>
+<p><img src="/images/pasted-82.png" alt="upload successful"></p>
+<h2 id="IOC为我们带来了什么好处"><a href="#IOC为我们带来了什么好处" class="headerlink" title="IOC为我们带来了什么好处"></a>IOC为我们带来了什么好处</h2><p>我们还是从USB的例子说起，使用USB外部设备比使用内置硬盘，到底带来什么好处？</p>
+<p>第一、USB设备作为电脑主机的外部设备，在插入主机之前，与电脑主机没有任何的关系，只有被我们连接在一起之后，两者才发生联系，具有相关性。所以，无论两者中的任何一方出现什么的问题，都不会影响另一方的运行。这种特性体现在软件工程中，就是可维护性比较好，非常便于进行单元测试，便于调试程序和诊断故障。代码中的每一个Class都可以单独测试，彼此之间互不影响，只要保证自身的功能无误即可，这就是组件之间低耦合或者无耦合带来的好处。</p>
+<p>第二、USB设备和电脑主机的之间无关性，还带来了另外一个好处，生产USB设备的厂商和生产电脑主机的厂商完全可以是互不相干的人，各干各事，他们之间唯一需要遵守的就是USB接口标准。这种特性体现在软件开发过程中，好处可是太大了。每个开发团队的成员都只需要关心实现自身的业务逻辑，完全不用去关心其它的人工作进展，因为你的任务跟别人没有任何关系，你的任务可以单独测试，你的任务也不用依赖于别人的组件，再也不用扯不清责任了。所以，在一个大中型项目中，团队成员分工明确、责任明晰，很容易将一个大的任务划分为细小的任务，开发效率和产品质量必将得到大幅度的提高。</p>
+<p>第三、同一个USB外部设备可以插接到任何支持USB的设备，可以插接到电脑主机，也可以插接到DV机，USB外部设备可以被反复利用。在软件工程中，这种特性就是可复用性好，我们可以把具有普遍性的常用组件独立出来，反复利用到项目中的其它部分，或者是其它项目，当然这也是面向对象的基本特征。显然，IOC不仅更好地贯彻了这个原则，提高了模块的可复用性。符合接口标准的实现，都可以插接到支持此标准的模块中。</p>
+<p>第四、同USB外部设备一样，模块具有热插拔特性。IOC生成对象的方式转为外置方式，也就是把对象生成放在配置文件里进行定义，这样，当我们更换一个实现子类将会变得很简单，只要修改配置文件就可以了，完全具有热插拨的特性。</p>
+<h2 id="IOC容器的一些产品"><a href="#IOC容器的一些产品" class="headerlink" title="IOC容器的一些产品"></a>IOC容器的一些产品</h2><p>spring EJB</p>
+<h1 id="Spring的IOC-将一个类实例化成对象的技术"><a href="#Spring的IOC-将一个类实例化成对象的技术" class="headerlink" title="Spring的IOC(将一个类实例化成对象的技术)"></a>Spring的IOC(将一个类实例化成对象的技术)</h1><p>IOC技术第一个解释叫做控制反转(IOC)，它还有个解释就是依赖注入(DI)，这两个名字很难从字面理解，但是当你理解它的原理后就会发现它们的描述是何等准确。IOC技术的本质就是构建对象的技术换句话说就是将一个类实例化成对象的技术。</p>
+<p>耦合具有两面性。一方面，紧密耦合的代码难以测试，难以复用，难以理解，并且表现出“打地鼠”式的bug特性（修复一个bug，导致出现一个新的或者甚至更多的bug）。另一方面，一定程度的耦合又是必须的，完全没有耦合的代码什么也做不了。为了完成有实际意义的工作，不同的类必须以适当的方式进行交互。总而言之，耦合是必须的，但应当小心谨慎的管理它。通过控制反转或者依赖注入，对象的依赖关系将由负责协调系统中各个对象的第三方组件在创建对象时设定。对象无需自行创建或管理它们的依赖关系，依赖关系将被自动注入到需要它们的对象中去。</p>
+<p>我们通过实际生活中的一个例子来解释一下IOC：</p>
+<p>例如我们有个roo对象作用是完成打猎的操作，那么打猎这个对象内部包含两个辅助对象：人和枪，只有人和枪赋予了打猎这个对象，那么打猎对象才能完成打猎的操作，但是构建一个人和枪的对象并不是看起来那么简单，这里以枪为例，要创造一把枪我们需要金属，需要机床，需要子弹，而机床和子弹又是两个新对象，这些对象一个个相互嵌套相互关联，大伙试想下如果我们在java代码里构建一个枪的对象那是何其的复杂，假如我们要构造的不是简单的枪对象而是更加复杂的航空母舰，那么构造这个对象的成本之高是让人难以想象的，怎么来消除这种对象相互嵌套相互依赖的关系了？</p>
+<p>Spring提供了一种方式，这种方式就是Spring提供一个容器，我们在xml文件里定义各个对象的依赖关系，由容器完成对象的构建，当我们Java代码里需要使用某个实例的时候就可以从容器里获取，那么对象的构建操作就被Spring容器接管，所以它被称为控制反转。</p>
+<p><font color="#0099ff" size="5" face="黑体">控制反转的意思就是本来属于java程序里构建对象的功能交由容器接管，依赖注入就是当程序要使用某个对象时候，容器会把它注入到程序里。</font>在Java开发里我们想使用某个类提供的功能，有两种方式：一种就是构造一个新的类，新的类继承该类，另一种方式则是将某个类定义在新类里，那么两个类之间就建立一种关联关系，Spring的IOC容器就是实现了这种关联关系。</p>
+<p>通过上面这段内容，相信大家应该会对IOC有个比较清晰的了解了。关于Spring中IOC部分是如何实现以及使用，就不进行讨论了，本文的目的也是能从整体上把握一下。但可以稍微提一点，<font color="#0099ff" size="5" face="黑体">Spring的IOC功能其实就是依赖于Java的反射机制</font>。直白点说，当你在xml文件中配置好了bean（bean需要提供全类名）之后，Spring通过自己的类对xml文件进行解析，然后利用反射机制将对象创建出来，然后放到自己的数据结构中，比如Map。然后键就是bean中的id属性的值，值就是创建的对象。</p>
+<h1 id="Spring的AOP"><a href="#Spring的AOP" class="headerlink" title="Spring的AOP"></a>Spring的AOP</h1><p>在设计模式里有一种代理模式，代理模式将继承模式和关联模式结合在一起使用，代理模式就是继承模式和关联模式的综合体，不过这个综合体的作用倒不是解决对象注入的问题，而是为具体操作对象找到一个保姆或者是秘书，这就和小说里的二号首长一样，这个二号首长对外代表了具体的实例对象，实例对象的入口和出口都是通过这个二号首长，具体的实例对象是一号首长，一号首长是要干大事的，所以一些事务性，重复性的工作例如泡茶，安排车子，这样的工作是不用劳烦一号首长的大驾，而是二号首长帮忙解决的，这就是AOP的思想。AOP解决程序开发里事务性，和核心业务无关的问题，但这些问题对于业务场景的实现是很有必要的，在实际开发里AOP也是节省代码的一种方式。</p>
+<p>AOP将应用系统分为两部分，核心业务逻辑（Core business concerns）及横向的通用逻辑，也就是所谓的方面Crosscutting enterprise concerns，例如，所有大中型应用都要涉及到的持久化管理（Persistent）、事务管理（Transaction Management）、安全管理（Security）、日志管理（Logging）和调试管理（Debugging）等。</p>
+<p>实现AOP的技术，主要分为两大类：一是采用动态代理技术，利用截取消息的方式，对该消息进行装饰，以取代原有对象行为的执行；二是采用静态织入的方式，引入特定的语法创建“方面”，从而使得编译器可以在编译期间织入有关“方面”的代码。</p>
+<h2 id="过程"><a href="#过程" class="headerlink" title="过程"></a>过程</h2><h3 id="1-初始化"><a href="#1-初始化" class="headerlink" title="1. 初始化"></a>1. 初始化</h3><p>大致单步跟了下Spring IOC的初始化过程，整个脉络很庞大，初始化的过程主要就是读取XML资源，并解析，最终注册到Bean Factory中：<br><img src="/images/pasted-83.png" alt="upload successful"></p>
+<h3 id="2-注入依赖"><a href="#2-注入依赖" class="headerlink" title="2. 注入依赖"></a>2. 注入依赖</h3><p>当完成初始化IOC容器后，如果bean没有设置lazy-init(延迟加载)属性，那么bean的实例就会在初始化IOC完成之后，及时地进行初始化。初始化时会先建立实例，然后根据配置利用反射对实例进行进一步操作，具体流程如下所示：</p>
+<p><img src="/images/pasted-84.png" alt="upload successful"></p>
 <ul>
-<li>产生fail-fast的是在java.util包中的collection实现类；产生fail-safe的是在java.util.concurrent包中的collection实现类</li>
+<li>创建bean的实例</li>
+<li>注入bean的属性</li>
 </ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/05/java_data_structure/study-skip-list/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/05/java_data_structure/study-skip-list/" itemprop="url">study-skip-list</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-05T11:16:40+08:00">
-                2018-01-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/01/05/java_data_structure/study-skip-list/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/01/05/java_data_structure/study-skip-list/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/01/05/java_data_structure/study-skip-list/" class="leancloud_visitors" data-flag-title="study-skip-list">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="跳跃表"><a href="#跳跃表" class="headerlink" title="跳跃表"></a>跳跃表</h1><ul>
-<li>一种基于有序链表的扩展</li>
-<li>利用类似索引的思想,找到关键点</li>
-<li><img src="http://pic.victor123.cn/18-1-4/93090030.jpg"></li>
+<h2 id="AOP术语"><a href="#AOP术语" class="headerlink" title="AOP术语"></a>AOP术语</h2><ul>
+<li><p>Join Point: Spring AOP中，join point就是一个方法。（通俗来讲就是起作用的那个方法）。</p>
+</li>
+<li><p>Pointcut: 用来指定join point（通俗来讲就是描述的一组符合某个条件的join point）。通常使用pointcut表达式来限定joint point，Spring默认使用AspectJ pointcut expression language。</p>
+</li>
+<li><p>Advice: 在join point上特定的时刻执行的操作，Advice有几种不同类型，下文将会讨论（通俗地来讲就是起作用的内容和时间点）。</p>
+</li>
+<li><p>Introduction：给对象增加方法或者属性。</p>
+</li>
+<li><p>Target object: Advice起作用的那个对象。</p>
+</li>
+<li><p>AOP proxy: 为实现AOP所生成的代理。在Spring中有两种方式生成代理:JDK代理和CGLIB代理。</p>
+</li>
+<li><p>Aspect: 组合了Pointcut与Advice，在Spring中有时候也称为Advisor。某些资料说Advisor是一种特殊的Aspect，其区别是Advisor只能包含一对pointcut和advice，但是aspect可以包含多对。AOP中的aspect可以类比于OOP中的class。</p>
+</li>
+<li><p>Weaving：将Advice织入join point的这个过程。</p>
+</li>
 </ul>
-<h1 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h1><ul>
-<li>自上而下，查找第一次出现节点的索引，并逐层找到每一层对应的节点。O（logN）</li>
-<li>删除每一层查找到的节点，如果该层只剩下1个节点，删除整个一层（原链表除外）。O（logN）</li>
-</ul>
-<h1 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h1><ul>
-<li>跳跃表 维持平衡的成本较低,完全靠随机</li>
-<li>二叉树需要靠rebalance来重新调整结构</li>
-</ul>
-<h1 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h1><p>Redis当中的Sorted-set</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/05/java_data_structure/study-red–black-tree/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/05/java_data_structure/study-red–black-tree/" itemprop="url">study-red–black-tree</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-05T11:16:00+08:00">
-                2018-01-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/01/05/java_data_structure/study-red–black-tree/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/01/05/java_data_structure/study-red–black-tree/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/01/05/java_data_structure/study-red–black-tree/" class="leancloud_visitors" data-flag-title="study-red–black-tree">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="二叉搜索树"><a href="#二叉搜索树" class="headerlink" title="二叉搜索树"></a>二叉搜索树</h1><p>由于红黑树本质上就是一棵二叉查找树，所以在了解红黑树之前，咱们先来看下二叉查找树。</p>
-<p>二叉查找树（Binary Search Tree），也称有序二叉树（ordered binary tree）,排序二叉树（sorted binary tree），是指一棵空树或者具有下列性质的二叉树：</p>
+<h2 id="静态代理"><a href="#静态代理" class="headerlink" title="静态代理"></a>静态代理</h2><p>静态代理是编译阶段生成AOP代理类，也就是说生成的字节码就织入了增强后的AOP对象；动态代理则不会修改字节码，而是在内存中临时生成一个AOP对象，这个AOP对象包含了目标对象的全部方法，并且在特定的切点做了增强处理，并回调原对象的方法。<br>实现静态代理常用的方法是通过AspectJ，AspectJ 是一个基于 Java 语言的 AOP 框架，提供了强大的 AOP 功能，主要包含两个部分，第一个部分定义了如何表达、定义 AOP 编程中的语法规范；另一个部分是工具部分，包括编译器、调试工具等。<br>Aspectj实现了独有的编译器，在编译时生成代理类文件</p>
+<h2 id="Spring的AOP代理对象的生成"><a href="#Spring的AOP代理对象的生成" class="headerlink" title="Spring的AOP代理对象的生成"></a>Spring的AOP代理对象的生成</h2><p>spring支持AspectJ风格的AOP还是动态的，标注中用到的JoinPoint等类都来自aspectj包</p>
+<p>Spring提供了两种方式来生成代理对象: JDKProxy和Cglib，具体使用哪种方式生成由AopProxyFactory根据AdvisedSupport对象的配置来决定。默认的策略是如果目标类是接口，则使用JDK动态代理技术，否则使用Cglib来生成代理。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">import org.aspectj.lang.JoinPoint;</span><br><span class="line">import org.aspectj.lang.ProceedingJoinPoint;</span><br><span class="line">import org.aspectj.lang.annotation.After;</span><br><span class="line">import org.aspectj.lang.annotation.AfterReturning;</span><br><span class="line">import org.aspectj.lang.annotation.AfterThrowing;</span><br><span class="line">import org.aspectj.lang.annotation.Around;</span><br><span class="line">import org.aspectj.lang.annotation.Aspect;</span><br><span class="line">import org.aspectj.lang.annotation.Before;</span><br><span class="line">import org.aspectj.lang.annotation.Pointcut;</span><br><span class="line">import org.springframework.stereotype.Component;</span><br><span class="line"></span><br><span class="line">@Component</span><br><span class="line">@Aspect</span><br><span class="line">public class SimpleAspect &#123;</span><br><span class="line">	@Pointcut(&quot;execution(* cn.outofmemory.spring_aop_aspect.*Service*.*(..))&quot;)</span><br><span class="line">	public void pointCut() &#123;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	@After(&quot;pointCut()&quot;)</span><br><span class="line">	public void after(JoinPoint joinPoint) &#123;</span><br><span class="line">		System.out.println(&quot;after aspect executed&quot;);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	@Before(&quot;pointCut()&quot;)</span><br><span class="line">	public void before(JoinPoint joinPoint) &#123;</span><br><span class="line">		//如果需要这里可以取出参数进行处理</span><br><span class="line">		//Object[] args = joinPoint.getArgs();</span><br><span class="line">		System.out.println(&quot;before aspect executing&quot;);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	@AfterReturning(pointcut = &quot;pointCut()&quot;, returning = &quot;returnVal&quot;)</span><br><span class="line">	public void afterReturning(JoinPoint joinPoint, Object returnVal) &#123;</span><br><span class="line">		System.out.println(&quot;afterReturning executed, return result is &quot;</span><br><span class="line">				+ returnVal);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	@Around(&quot;pointCut()&quot;)</span><br><span class="line">	public void around(ProceedingJoinPoint pjp) throws Throwable &#123;</span><br><span class="line">		System.out.println(&quot;around start..&quot;);</span><br><span class="line">		try &#123;</span><br><span class="line">			pjp.proceed();</span><br><span class="line">		&#125; catch (Throwable ex) &#123;</span><br><span class="line">			System.out.println(&quot;error in around&quot;);</span><br><span class="line">			throw ex;</span><br><span class="line">		&#125;</span><br><span class="line">		System.out.println(&quot;around end&quot;);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	@AfterThrowing(pointcut = &quot;pointCut()&quot;, throwing = &quot;error&quot;)</span><br><span class="line">	public void afterThrowing(JoinPoint jp, Throwable error) &#123;</span><br><span class="line">		System.out.println(&quot;error:&quot; + error);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="jdkProxy"><a href="#jdkProxy" class="headerlink" title="jdkProxy"></a>jdkProxy</h2><p>JDK动态代理通过反射来接收被代理的类，并且要求被代理的类必须实现一个接口。</p>
+<p>核心是InvocationHandler接口和Proxy类。</p>
 <ul>
-<li>若任意结点的左子树不空，则左子树上所有结点的值均小于它的根结点的值；</li>
-<li>若任意结点的右子树不空，则右子树上所有结点的值均大于它的根结点的值；</li>
-<li>任意结点的左、右子树也分别为二叉查找树。</li>
-<li>没有键值相等的结点（no duplicate nodes）。</li>
+<li>java.lang.reflect.Proxy，这是Java动态代理机制生成的所有动态代理类的父类，它提供静态方法来为一组接口动态地生成代理类及其对象。</li>
+<li>java.lang.reflect.InvocationHandler，这是调用处理器接口，它自定义了一个invoke方法，用于实现代理逻辑、转发请求给对原始类对象。</li>
 </ul>
-<p>因为，一棵由n个结点，随机构造的二叉查找树的高度为lgn，所以顺理成章，一般操作的执行时间为O（lgn）.（至于n个结点的二叉树高度为lgn的证明，可参考算法导论 第12章 二叉查找树 第12.4节）。</p>
-<p>但二叉树若退化成了一棵具有n个结点的线性链后，则此些操作最坏情况运行时间为O（n）。后面我们会看到一种基于二叉查找树-红黑树，它通过一些性质使得树相对平衡，使得最终查找、插入、删除的时间复杂度最坏情况下依然为O（lgn）。</p>
-<h1 id="红黑树特性"><a href="#红黑树特性" class="headerlink" title="红黑树特性"></a>红黑树特性</h1><p>前面我们已经说过，红黑树，本质上来说就是一棵二叉查找树，但它在二叉查找树的基础上增加了着色和相关的性质使得红黑树相对平衡，从而保证了红黑树的查找、插入、删除的时间复杂度最坏为O(log n)。</p>
-<p>但它是如何保证一棵n个结点的红黑树的高度始终保持在h = logn的呢？这就引出了红黑树的5条性质：</p>
-<pre><code>1）每个结点要么是红的，要么是黑的。  
-2）根结点是黑的。  
-3）每个叶结点（叶结点即指树尾端NIL指针或NULL结点）是黑的。  
-4）如果一个结点是红的，那么它的俩个儿子都是黑的。  
-5）对于任一结点而言，其到叶结点树尾端NIL指针的每一条路径都包含相同数目的黑结点。  
-</code></pre><p>正是红黑树的这5条性质，使得一棵n个结点是红黑树始终保持了logn的高度，从而也就解释了上面我们所说的“红黑树的查找、插入、删除的时间复杂度最坏为O(log n)”这一结论的原因。</p>
-<p>如下图所示，即是一颗红黑树(下图引自wikipedia：<a href="http://t.cn/hgvH1l" target="_blank" rel="noopener">http://t.cn/hgvH1l</a>)：</p>
-<h1 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h1><ul>
-<li>treemap</li>
-<li>treeset</li>
-<li><p>1.8中的hashset</p>
-</li>
-<li><p><a href="https://github.com/julycoding/The-Art-Of-Programming-By-July/blob/master/ebook/zh/03.01.md" target="_blank" rel="noopener">https://github.com/julycoding/The-Art-Of-Programming-By-July/blob/master/ebook/zh/03.01.md</a></p>
-</li>
-<li><a href="https://zh.wikipedia.org/wiki/%E7%BA%A2%E9%BB%91%E6%A0%91" target="_blank" rel="noopener">https://zh.wikipedia.org/wiki/%E7%BA%A2%E9%BB%91%E6%A0%91</a></li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/05/java_data_structure/study-b-tree/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/05/java_data_structure/study-b-tree/" itemprop="url">study-b-tree</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-05T11:16:00+08:00">
-                2018-01-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/数据结构/" itemprop="url" rel="index">
-                    <span itemprop="name">数据结构</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/01/05/java_data_structure/study-b-tree/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/01/05/java_data_structure/study-b-tree/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/01/05/java_data_structure/study-b-tree/" class="leancloud_visitors" data-flag-title="study-b-tree">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="b-树"><a href="#b-树" class="headerlink" title="b-树"></a>b-树</h1><ul>
-<li>数据库索引使用b-树</li>
-<li>二叉树查找的时间复杂度O(logN)</li>
-<li>问题:磁盘IO</li>
-<li>最坏的情况下,磁盘IO等于索引树的高度</li>
-<li>把原来”瘦高”的树结构变得”矮胖”就是b-树的特征之一</li>
-<li>B树是一种<b>多路</b>平衡查找树</li>
-<li>B树与红黑树最大的不同在于，B树的结点可以有许多子女，从几个到几千个。</li>
-</ul>
-<p><img src="/images/pasted-12.png" alt="upload successful"></p>
-<h1 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h1><ol>
-<li>树中每个结点最多含有m个孩子（m&gt;=2）；</li>
-<li>除根结点和叶子结点外，其它每个结点至少有[ceil(m / 2)]个孩子（其中ceil(x)是一个取上限的函数）；</li>
-<li>根结点至少有2个孩子（除非B树只包含一个结点：根结点）；</li>
-<li>所有叶子结点都出现在同一层，叶子结点不包含任何关键字信息(可以看做是外部结点或查询失败的结点，指向这些结点的指针都为null)；（注：叶子节点只是没有孩子和指向孩子的指针，这些节点也存在，也有元素。类似红黑树中，每一个NULL指针即当做叶子结点，只是没画出来而已）。</li>
-<li>每个非终端结点中包含有n个关键字信息： (n，P0，K1，P1，K2，P2，……，Kn，Pn)。其中：<br>a) Ki (i=1…n)为关键字，且关键字按顺序升序排序K(i-1)&lt; Ki。<br>b) Pi为指向子树根的结点，且指针P(i-1)指向子树种所有结点的关键字均小于Ki，但都大于K(i-1)。<br>c) 关键字的个数n必须满足： [ceil(m / 2)-1]&lt;= n &lt;= m-1。比如有j个孩子的非叶结点恰好有j-1个关键码。</li>
-</ol>
-<h1 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h1><ul>
-<li>文件系统</li>
-<li>数据库索引</li>
-</ul>
-<h1 id="b-树-1"><a href="#b-树-1" class="headerlink" title="b+树"></a>b+树</h1><ul>
-<li>1.有k个子树的中间节点包含有k个元素（B树中是k-1个元素），每个元素不保存数据，只用来索引，所有数据都保存在叶子节点。</li>
-<li>2.所有的叶子结点中包含了全部元素的信息，及指向含这些元素记录的指针，且叶子结点本身依关键字的大小自小而大顺序链接。</li>
-<li>3.所有的中间节点元素都同时存在于子节点，在子节点元素中是最大（或最小）元素。</li>
-<li>b+树种,只有叶子节点带有卫星信息,其余中间节点仅仅是索引,没有任何数据关联</li>
-<li>在数据库的聚集索引（Clustered Index）中，叶子节点直接包含卫星数据。在非聚集索引（NonClustered Index）中，叶子节点带有指向卫星数据的指针。</li>
-</ul>
-<p><img src="/images/pasted-13.png" alt="upload successful"></p>
-<h1 id="B-树的优势："><a href="#B-树的优势：" class="headerlink" title="B+树的优势："></a>B+树的优势：</h1><p>1.单一节点存储更多的元素，使得查询的IO次数更少。<br>2.所有查询都要查找到叶子节点，查询性能稳定。<br>3.所有叶子节点形成有序链表，便于范围查询。</p>
-<h1 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h1><ul>
-<li>mysql的b树索引的物理文件</li>
-</ul>
-<h1 id="B-树"><a href="#B-树" class="headerlink" title="B*树"></a>B*树</h1><ul>
-<li>B<em>-tree是B+-tree的变体，在B+树的基础上(所有的叶子结点中包含了全部关键字的信息，及指向含有这些关键字记录的指针)，B</em>树中非根和非叶子结点再增加指向兄弟的指针；B<em>树定义了非叶子结点关键字个数至少为(2/3)</em>M，即块的最低使用率为2/3（代替B+树的1/2）。</li>
-</ul>
-<p><img src="/images/pasted-14.png" alt="upload successful"></p>
-<p>B+树的分裂：当一个结点满时，分配一个新的结点，并将原结点中1/2的数据复制到新结点，最后在父结点中增加新结点的指针；B+树的分裂只影响原结点和父结点，而不会影响兄弟结点，所以它不需要指向兄弟的指针。</p>
-<p>B*树的分裂：当一个结点满时，如果它的下一个兄弟结点未满，那么将一部分数据移到兄弟结点中，再在原结点插入关键字，最后修改父结点中兄弟结点的关键字（因为兄弟结点的关键字范围改变了）；如果兄弟也满了，则在原结点与兄弟结点之间增加新结点，并各复制1/3的数据到新结点，最后在父结点增加新结点的指针。</p>
-<p>所以，B*树分配新结点的概率比B+树要低，空间使用率更高；</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>通过以上介绍，大致将B树，B+树，B*树总结如下：</p>
-<ul>
-<li>B树：有序数组+平衡多叉树；</li>
-<li>B+树：有序数组链表+平衡多叉树；</li>
-<li>B*树：一棵丰满的B+树。</li>
-</ul>
-<p>顺便说一句，无论是B树，还是B+树、b<em>树，由于根或者树的上面几层被反复查询，所以这几块可以存在内存中，换言之，B树、B+树、B</em>树的根结点和部分顶层数据在内存中，大部分下层数据在磁盘上。</p>
-<h1 id="mysql中InnoDB索引和MyISAM索引的区别："><a href="#mysql中InnoDB索引和MyISAM索引的区别：" class="headerlink" title="mysql中InnoDB索引和MyISAM索引的区别："></a>mysql中InnoDB索引和MyISAM索引的区别：</h1><ul>
-<li>myISAM索引实现<br>MyISAM引擎使用B+Tree作为索引结构，叶节点的data域存放的是数据记录的地址。下图是MyISAM索引的原理图：</li>
-</ul>
-<p><img src="/images/pasted-77.png" alt="upload successful"></p>
-<p>在MyISAM中，主索引和辅助索引（Secondary key）在结构上没有任何区别，只是主索引要求key是唯一的，而辅助索引的key可以重复。</p>
-<p>MyISAM的索引方式也叫做“非聚集”的，之所以这么称呼是为了与InnoDB的聚集索引区分。</p>
-<ul>
-<li>InnoDB索引实现<br>虽然InnoDB也使用B+Tree作为索引结构，但具体实现方式却与MyISAM截然不同。</li>
-</ul>
-<p>第一个重大区别是InnoDB的数据文件本身就是索引文件。从上文知道，MyISAM索引文件和数据文件是分离的，索引文件仅保存数据记录的地址。而在InnoDB中，表数据文件本身就是按B+Tree组织的一个索引结构，这棵树的叶节点data域保存了完整的数据记录。这个索引的key是数据表的主键，因此InnoDB表数据文件本身就是主索引。</p>
-<p><img src="/images/pasted-78.png" alt="upload successful"></p>
-<p>第二个与MyISAM索引的不同是InnoDB的辅助索引data域存储相应记录主键的值而不是地址。换句话说，InnoDB的所有辅助索引都引用主键作为data域。使用辅助索引需要查找 两次索引。聚集索引这种实现方式使得按主键的搜索十分高效，但是辅助索引搜索需要检索两遍索引：首先检索辅助索引获得主键，然后用主键到主索引中检索获得记录。</p>
-<p>MySQL中的索引可以以一定顺序引用多个列，这种索引叫做联合索引，一般的，一个联合索引是一个有序元组<a1, a2,="" …,="" an="">，其中各个元素均为数据表的一列。</a1,></p>
-<ul>
-<li>主索引的区别，InnoDB的数据文件本身就是索引文件。而MyISAM的索引和数据是分开的。</li>
-<li>辅助索引的区别：InnoDB的辅助索引data域存储相应记录主键的值而不是地址。而MyISAM的辅助索引和主索引没有多大区别。</li>
-<li>聚簇索引<br><img src="/images/pasted-15.png" alt="upload successful"></li>
-<li>非聚簇索引<br><img src="/images/pasted-17.png" alt="upload successful"></li>
-<li>聚集索引这种实现方式使得按主键的搜索十分高效，但是辅助索引搜索需要检索两遍索引：首先检索辅助索引获得主键，然后用主键到主索引中检索获得记录。</li>
-</ul>
-<p><a href="https://github.com/julycoding/The-Art-Of-Programming-By-July/blob/master/ebook/zh/03.02.md" target="_blank" rel="noopener">https://github.com/julycoding/The-Art-Of-Programming-By-July/blob/master/ebook/zh/03.02.md</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/05/java_common/study-hashmap/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/05/java_common/study-hashmap/" itemprop="url">JDK- MashMap 学习</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-05T11:14:00+08:00">
-                2018-01-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/01/05/java_common/study-hashmap/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/01/05/java_common/study-hashmap/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/01/05/java_common/study-hashmap/" class="leancloud_visitors" data-flag-title="JDK- MashMap 学习">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="hashmap数据结构"><a href="#hashmap数据结构" class="headerlink" title="hashmap数据结构"></a>hashmap数据结构</h1><p><img src="/images/pasted-11.png" alt="upload successful"><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">//链表</span><br><span class="line">static class Node&lt;K,V&gt; implements Map.Entry&lt;K,V&gt; &#123;</span><br><span class="line">        final int hash;</span><br><span class="line">        final K key;</span><br><span class="line">        V value;</span><br><span class="line">        Node&lt;K,V&gt; next;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">//数组</span><br><span class="line">transient Node&lt;K,V&gt;[] table;</span><br></pre></td></tr></table></figure></p>
-<ul>
-<li>HashMap是一个用于存储Key-Value键值对的集合，每一个键值对也叫做Entry。这些个键值对（Entry）分散存储在一个数组当中，这个数组就是HashMap的主干。</li>
-<li>HashMap 使用后台数组（backing array）作为桶，并使用链表（linked list）存储键／值对。</li>
-<li>通过hash的方法，通过put和get存储和获取对象。存储对象时，我们将K/V传给put方法时，它调用hashCode计算hash从而得到bucket位置，进一步存储，HashMap会根据当前bucket的占用情况自动调整容量(超过Load Factor则resize为原来的2倍)。</li>
-<li>获取对象时，我们将K传给get，它调用hashCode计算hash从而得到bucket位置，并进一步调用equals()方法确定键值对。</li>
-<li>如果发生碰撞的时候，Hashmap通过链表将产生碰撞冲突的元素组织起来，在Java 8中，如果一个bucket中碰撞冲突的元素超过某个限制(默认是8)，则使用红黑树来替换链表，从而提高速度。 </li>
-<li>基于Map接口实现、允许null键/值、非同步、不保证有序(比如插入的顺序)、也不保证序不随时间变化。HashMap存储着Entry(hash, key, value, next)对象。 </li>
-<li>当key==null时，存在table[0]即第一个桶中，hash值为0。HashMap对key==null的键值对会做单独处理</li>
-<li>Capacity的默认值为16： <ul>
-<li>static final int DEFAULT_INITIAL_CAPACITY = 1 &lt;&lt; 4; </li>
-</ul>
-</li>
-<li>负载因子的默认值为0.75： <ul>
-<li>static final float DEFAULT_LOAD_FACTOR = 0.75f; </li>
-</ul>
-</li>
-<li>简单的说，Capacity就是bucket的大小，Load factor就是bucket填满程度的最大比例。如果对迭代性能要求很高的话不要把Capacity设置过大，也不要把load factor设置过小。当bucket中的entries的数目大于capacity*load factor时就需要调整bucket的大小为当前的2倍。 </li>
-<li>可以设置初始容量Capacity，但是在HashMap处理过程中，是会把Capacity扩充成2的倍数</li>
-<li>HashMap中有一个成员变量modCount，这个用来实现“fast-fail”机制（也就是快速失败）。所谓快速失败就是在并发集合中，其进行迭代操作时，若有其他线程对其结构性的修改，这是迭代器会立马感知到，并且立刻抛出ConcurrentModificationException异常，而不是等待迭代完成之后才告诉你已经出错。</li>
-</ul>
-<h1 id="get方法"><a href="#get方法" class="headerlink" title="get方法"></a>get方法</h1><ul>
-<li>取key的hashCode值</li>
-<li>高位运算</li>
-<li>取模运算<h2 id="jdk1-7的hash方法"><a href="#jdk1-7的hash方法" class="headerlink" title="jdk1.7的hash方法"></a>jdk1.7的hash方法</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">final int hash(Object k) &#123;</span><br><span class="line">        int h = hashSeed;</span><br><span class="line">        if (0 != h &amp;&amp; k instanceof String) &#123;</span><br><span class="line">            return sun.misc.Hashing.stringHash32((String) k);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        h ^= k.hashCode();</span><br><span class="line">        h ^= (h &gt;&gt;&gt; 20) ^ (h &gt;&gt;&gt; 12);</span><br><span class="line">        return h ^ (h &gt;&gt;&gt; 7) ^ (h &gt;&gt;&gt; 4);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h2 id="jdk1-8的hash方法"><a href="#jdk1-8的hash方法" class="headerlink" title="jdk1.8的hash方法"></a>jdk1.8的hash方法</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">static final int hash(Object key) &#123;</span><br><span class="line">        int h;</span><br><span class="line">        return (key == null) ? 0 : (h = key.hashCode()) ^ (h &gt;&gt;&gt; 16);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>混合原始哈希码的高位和低位，以此来加大低位的随机性</li>
-<li>而且混合后的低位掺杂了高位的部分特征，这样高位的信息也被变相保留下来</li>
-</ul>
-<p><img src="/images/pasted-10.png" alt="upload successful"><br>图片出处:<a href="https://www.zhihu.com/question/20733617" target="_blank" rel="noopener">https://www.zhihu.com/question/20733617</a></p>
-<h2 id="indexFor方法-根据上一步hash结果-计算数组的下表"><a href="#indexFor方法-根据上一步hash结果-计算数组的下表" class="headerlink" title="indexFor方法(根据上一步hash结果,计算数组的下表)"></a>indexFor方法(根据上一步hash结果,计算数组的下表)</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">static int indexFor(int h, int length) &#123;</span><br><span class="line">        // assert Integer.bitCount(length) == 1 : &quot;length must be a non-zero power of 2&quot;;</span><br><span class="line">        return h &amp; (length-1);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<h2 id="getNode-getEntry–在链表中确定元素"><a href="#getNode-getEntry–在链表中确定元素" class="headerlink" title="getNode/getEntry–在链表中确定元素"></a>getNode/getEntry–在链表中确定元素</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">final Entry&lt;K,V&gt; getEntry(Object key) &#123;</span><br><span class="line">    if (size == 0) &#123;</span><br><span class="line">        return null;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    int hash = (key == null) ? 0 : hash(key);</span><br><span class="line">    for (Entry&lt;K,V&gt; e = table[indexFor(hash, table.length)];</span><br><span class="line">         e != null;</span><br><span class="line">         e = e.next) &#123;</span><br><span class="line">        Object k;</span><br><span class="line">        if (e.hash == hash &amp;&amp;</span><br><span class="line">            ((k = e.key) == key || (key != null &amp;&amp; key.equals(k))))</span><br><span class="line">            return e;</span><br><span class="line">    &#125;</span><br><span class="line">    return null;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h1 id="hashmap的初始长度"><a href="#hashmap的初始长度" class="headerlink" title="hashmap的初始长度"></a>hashmap的初始长度</h1><ul>
-<li>16,长度必须是2的幂</li>
-<li>之所以16是为了服务于哈希函数</li>
-<li>index =  HashCode（Key） &amp;  （Length - 1） </li>
-<li>与运算，101110001110101110 1001 &amp; 1111 = 1001，十进制是9，所以 index=9。</li>
-<li>Hash算法最终得到的index结果，完全取决于Key的Hashcode值的最后几位</li>
-<li>效果上等同于取模,而且大大提高了性能</li>
-</ul>
-<h1 id="put方法"><a href="#put方法" class="headerlink" title="put方法"></a>put方法</h1><ul>
-<li>先插找<ul>
-<li>如果已存在,则替换</li>
-<li>如果不存在,插入<ul>
-<li>检查是否需要rehash</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h2 id="rehash"><a href="#rehash" class="headerlink" title="rehash"></a>rehash</h2><p>用一个新的数组代替已有的容量小的数组，就像我们用一个小桶装水，如果想装更多的水，就得换大水桶。</p>
-<ul>
-<li>默认当Entry数量达到桶数量的75%时，哈希冲突已比较严重，就会成倍扩容桶数组，并重新分配所有原来的Entry。</li>
-<li>hashmap在扩容时候的步骤之一</li>
-<li>衡量HashMap是否进行Resize的条件如下：</li>
-<li>HashMap.Size   &gt;=  Capacity * LoadFactor</li>
-<li>具体两个步骤<ul>
-<li>1.扩容:创建一个新的Entry空数组，长度是原数组的2倍。</li>
-<li>2.ReHash:遍历原Entry数组，把所有的Entry重新Hash到新数组</li>
-</ul>
-</li>
-</ul>
-<h3 id="1-7源码"><a href="#1-7源码" class="headerlink" title="1.7源码"></a>1.7源码</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"> void resize(int newCapacity) &#123;</span><br><span class="line">     Entry[] oldTable = table;</span><br><span class="line">     int oldCapacity = oldTable.length;</span><br><span class="line">     if (oldCapacity == MAXIMUM_CAPACITY) &#123;</span><br><span class="line">         threshold = Integer.MAX_VALUE;</span><br><span class="line">         return;</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">     Entry[] newTable = new Entry[newCapacity];</span><br><span class="line">     transfer(newTable, initHashSeedAsNeeded(newCapacity));</span><br><span class="line">     table = newTable;</span><br><span class="line">     threshold = (int)Math.min(newCapacity * loadFactor, MAXIMUM_CAPACITY + 1);</span><br><span class="line"> &#125;</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">void transfer(Entry[] newTable, boolean rehash) &#123;</span><br><span class="line">     int newCapacity = newTable.length;</span><br><span class="line">     for (Entry&lt;K,V&gt; e : table) &#123;</span><br><span class="line">         while(null != e) &#123;</span><br><span class="line">             Entry&lt;K,V&gt; next = e.next;</span><br><span class="line">             if (rehash) &#123;</span><br><span class="line">                 e.hash = null == e.key ? 0 : hash(e.key);</span><br><span class="line">             &#125;</span><br><span class="line">             int i = indexFor(e.hash, newCapacity);</span><br><span class="line">             e.next = newTable[i];</span><br><span class="line">             newTable[i] = e;</span><br><span class="line">             e = next;</span><br><span class="line">         &#125;</span><br><span class="line">     &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
-<p>newTable[i]的引用赋给了e.next，也就是使用了单链表的头插入方式，同一位置上新元素总会被放在链表的头部位置</p>
-<p><img src="/images/pasted-37.png" alt="upload successful"></p>
-<p>在扩充HashMap的时候，不需要像JDK1.7的实现那样重新计算hash，只需要看看原来的hash值新增的那个bit是1还是0就好了，是0的话索引没变，是1的话索引变成“原索引+oldCap”，可以看看下图为16扩充为32的resize示意图：<br><img src="/images/pasted-38.png" alt="upload successful"></p>
-<h3 id="其他博客中resize的错误表述"><a href="#其他博客中resize的错误表述" class="headerlink" title="其他博客中resize的错误表述:"></a>其他博客中resize的错误表述:</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">对于原bullet中的链表中的数据在扩容之后肯定还在一个链表中，因为hash值是一样的</span><br></pre></td></tr></table></figure>
-<p>此描述是错误的,在一个链表中,不一定代表hash是一样的,只是代表hash&amp;(length-1)计算后的结果是一样的</p>
-<h2 id="并发问题"><a href="#并发问题" class="headerlink" title="并发问题"></a>并发问题</h2><ul>
-<li>ReHash在并发的情况下可能会形成链表环。</li>
-<li>让下一次循环出现死循环</li>
-</ul>
-<h1 id="ConcurrentHashMap"><a href="#ConcurrentHashMap" class="headerlink" title="ConcurrentHashMap"></a>ConcurrentHashMap</h1><ul>
-<li>避免hashmap的方法有:hashtable,Collections.sysnchronizedMap</li>
-<li>但是上面的都有性能问题,导致阻塞</li>
-<li>Sement</li>
-<li><img src="http://pic.victor123.cn/18-1-4/28447320.jpg"></li>
-<li>可以说，ConcurrentHashMap是一个二级哈希表。在一个总的哈希表下面，有若干个子哈希表。这样的二级结构，和数据库的水平拆分有些相似。</li>
-<li>不同Segment的写入是可以并发执行的。</li>
-<li>同一Segment的一写一读</li>
-<li><p>同一Segment的并发写入</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">Get方法：</span><br><span class="line"></span><br><span class="line">1.为输入的Key做Hash运算，得到hash值。</span><br><span class="line"></span><br><span class="line">2.通过hash值，定位到对应的Segment对象</span><br><span class="line"></span><br><span class="line">3.再次通过hash值，定位到Segment当中数组的具体位置。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Put方法：</span><br><span class="line"></span><br><span class="line">1.为输入的Key做Hash运算，得到hash值。</span><br><span class="line"></span><br><span class="line">2.通过hash值，定位到对应的Segment对象</span><br><span class="line"></span><br><span class="line">3.获取可重入锁</span><br><span class="line"></span><br><span class="line">4.再次通过hash值，定位到Segment当中数组的具体位置。</span><br><span class="line"></span><br><span class="line">5.插入或覆盖HashEntry对象。</span><br><span class="line"></span><br><span class="line">6.释放锁。</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>如果在统计Segment元素数量的过程中，已统计过的Segment瞬间插入新的元素，这时候该怎么办呢？</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">ConcurrentHashMap的Size方法是一个嵌套循环，大体逻辑如下：</span><br><span class="line"></span><br><span class="line">1.遍历所有的Segment。</span><br><span class="line"></span><br><span class="line">2.把Segment的元素数量累加起来。</span><br><span class="line"></span><br><span class="line">3.把Segment的修改次数累加起来。</span><br><span class="line"></span><br><span class="line">4.判断所有Segment的总修改次数是否大于上一次的总修改次数。如果大于，说明统计过程中有修改，重新统计，尝试次数+1；如果不是。说明没有修改，统计结束。</span><br><span class="line"></span><br><span class="line">5.如果尝试次数超过阈值，则对每一个Segment加锁，再重新统计。</span><br><span class="line"></span><br><span class="line">6.再次判断所有Segment的总修改次数是否大于上一次的总修改次数。由于已经加锁，次数一定和上次相等。</span><br><span class="line"></span><br><span class="line">7.释放锁，统计结束。</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>为了尽量不锁住所有Segment，首先乐观地假设Size过程中不会有修改。当尝试一定次数，才无奈转为悲观锁，锁住所有Segment保证强一致性。</p>
-<h1 id="jdk-1-8hashmap"><a href="#jdk-1-8hashmap" class="headerlink" title="jdk 1.8hashmap"></a>jdk 1.8hashmap</h1><ul>
-<li>HashMap采用的是数组+链表+红黑树的形式。</li>
-<li>什么时候链表转化为红黑树？当数组大小已经超过64并且链表中的元素个数超过默认设定（8个）时，将链表转化为红黑树</li>
-</ul>
-<h1 id="jdk-1-8ConcurrentHashMap"><a href="#jdk-1-8ConcurrentHashMap" class="headerlink" title="jdk 1.8ConcurrentHashMap"></a>jdk 1.8ConcurrentHashMap</h1><h1 id="与hashTable的区别"><a href="#与hashTable的区别" class="headerlink" title="与hashTable的区别"></a>与hashTable的区别</h1><ul>
-<li>继承的父类不同:Hashtable继承自Dictionary类，而HashMap继承自AbstractMap类，</li>
-<li>线程安全性不同:Hashtable 中的方法是Synchronize的</li>
-<li>是否提供contains方法:HashMap把Hashtable的contains方法去掉了</li>
-<li>key和value是否允许null值:Hashtable中，key和value都不允许出现null值。HashMap中没有该键，也可能使该键所对应的值为null。因此，在HashMap中不能由get()方法来判断HashMap中是否存在某个键， 而应该用containsKey()方法来判断。</li>
-<li>两个遍历方式的内部实现上不同:Hashtable还使用了Enumeration的方式 。</li>
-<li>hash值不同:哈希值的使用不同，HashTable直接使用对象的hashCode。而HashMap重新计算hash值。</li>
-<li>内部实现使用的数组初始化和扩容方式不同:Hashtable和HashMap它们两个内部实现方式的数组的初始大小和扩容的方式。HashTable中hash数组默认大小是11，增加的方式是 old*2+1。HashMap中hash数组的默认大小是16，而且一定是2的指数。</li>
-</ul>
-<h1 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h1><p>要知道hashmap是什么，首先要搞清楚它的数据结构，在java编程语言中，最基本的结构就是两种，一个是数组，另外一个是模拟指针（引用），所有的数据结构都可以用这两个基本结构来构造的，hashmap也不例外。Hashmap实际上是一个数组和链表的结合体（在数据结构中，一般称之为“链表散列“）</p>
-<h1 id="哈希冲突"><a href="#哈希冲突" class="headerlink" title="哈希冲突"></a>哈希冲突</h1><h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><ul>
-<li>hashcode通过hash算法得到有限的地址区间</li>
-<li>哈希冲突：由于哈希算法被计算的数据是无限的，而计算后的结果范围有限，因此总会存在不同的数据经过计算后得到的值相同，这就是哈希冲突。</li>
-</ul>
-<h2 id="解决哈希冲突的方法"><a href="#解决哈希冲突的方法" class="headerlink" title="解决哈希冲突的方法"></a>解决哈希冲突的方法</h2><ul>
-<li>1.开放定址法<ul>
-<li>开放定址法需要的表长度要大于等于所需要存放的元素。</li>
-</ul>
-</li>
-<li>2.线行探查法<ul>
-<li>它从发生冲突的单元起，依次判断下一个单元是否为空，当达到最后一个单元时，再从表首依次判断。直到碰到空闲的单元或者探查完全部单元为止。</li>
-</ul>
-</li>
-<li>3.平方探查法</li>
-<li>4.双散列函数探查法</li>
-<li>5.链地址法（拉链法）<ul>
-<li>注：在java中，链接地址法也是HashMap解决哈希冲突的方法之一，jdk1.7完全采用单链表来存储同义词，jdk1.8则采用了一种混合模式，对于链表长度大于8的，会转换为红黑树存储。</li>
-</ul>
-</li>
-<li>6.再哈希法<ul>
-<li>就是同时构造多个不同的哈希函数,发生冲突时，再用H2 = RH2(key) 进行计算，直到冲突不再产生，这种方法不易产生聚集，但是增加了计算时间。</li>
-</ul>
-</li>
-<li>7.建立公共溢出区<ul>
-<li>将哈希表分为公共表和溢出表，当溢出发生时，将所有溢出数据统一放到溢出区。</li>
-</ul>
-</li>
-</ul>
-<h1 id="1-8源码"><a href="#1-8源码" class="headerlink" title="1.8源码"></a>1.8源码</h1><p>hash算法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">static final int hash(Object key) &#123;</span><br><span class="line">    int h;</span><br><span class="line">    return (key == null) ? 0 : (h = key.hashCode()) ^ (h &gt;&gt;&gt; 16);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p><img src="/images/pasted-35.png" alt="upload successful"><br>混合高位和地位,以此来加大地位的随机性</p>
-<ul>
-<li>数组的位置:    (n - 1) &amp; hash</li>
-<li><p>确定数组后,链表中确定相同的方法: </p>
-<ul>
-<li>e.hash == hash &amp;&amp; ((k = e.key) == key || (key != null &amp;&amp; key.equals(k)))</li>
-<li>always check first node</li>
-<li>在一个数组中,不代表hash是一样的,so必须判断</li>
-</ul>
-</li>
-<li><p>数组的长度:因为16是2的整数次幂的原因,n-1 二进制中都是x个1,这样,更能减少key之间的碰撞</p>
-</li>
-</ul>
-<h1 id="位运算符-知识补充"><a href="#位运算符-知识补充" class="headerlink" title="位运算符(知识补充)"></a>位运算符(知识补充)</h1><p>左移( &lt;&lt; )、右移( &gt;&gt; ) 、无符号右移( &gt;&gt;&gt; )<br>位与、位或、位异或、位非</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">5&lt;&lt;2</span><br><span class="line">0000 0000 0000 0000 0000 0000 0000 0101           然后左移2位后，低位补0：</span><br><span class="line">0000 0000 0000 0000 0000 0000 0001 0100           换算成10进制为20</span><br><span class="line"></span><br><span class="line">5&gt;&gt;2</span><br><span class="line">还是先将5转为2进制表示形式：</span><br><span class="line">0000 0000 0000 0000 0000 0000 0000 0101 然后右移2位，高位补0：</span><br><span class="line">0000 0000 0000 0000 0000 0000 0000 0001</span><br><span class="line"></span><br><span class="line">-5&gt;&gt;&gt;3</span><br><span class="line">-5换算成二进制： 1111 1111 1111 1111 1111 1111 1111 1011</span><br><span class="line">-5无符号右移3位后的结果 536870911 换算成二进制： </span><br><span class="line">0001 1111 1111 1111 1111 1111 1111 1111   // (用0进行补位)</span><br><span class="line">------------</span><br><span class="line">位与：第一个操作数的的第n位于第二个操作数的第n位如果都是1，那么结果的第n为也为1，否则为0</span><br><span class="line">5 &amp; 3</span><br><span class="line">5转换为二进制 ：0000 0000 0000 0000 0000 0000 0000 0101</span><br><span class="line">3转换为二进制 ：0000 0000 0000 0000 0000 0000 0000 0011</span><br><span class="line">1转换为二进制	：0000 0000 0000 0000 0000 0000 0000 0001</span><br><span class="line"></span><br><span class="line">位异或：第一个操作数的的第n位于第二个操作数的第n位 相反，那么结果的第n为也为1，否则为0</span><br><span class="line">5 ^ 3</span><br><span class="line">5转换为二进制：0000 0000 0000 0000 0000 0000 0000 0101</span><br><span class="line">3转换为二进制：0000 0000 0000 0000 0000 0000 0000 0011</span><br><span class="line">6转换为二进制：0000 0000 0000 0000 0000 0000 0000 0110</span><br></pre></td></tr></table></figure>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://blog.csdn.net/u013256816/article/details/50912762" target="_blank" rel="noopener">http://blog.csdn.net/u013256816/article/details/50912762</a><br><a href="https://tech.meituan.com/java-hashmap.html" target="_blank" rel="noopener">https://tech.meituan.com/java-hashmap.html</a><br><a href="https://bestswifter.com/hashtable/" target="_blank" rel="noopener">https://bestswifter.com/hashtable/</a></p>
-<h1 id="更新日志"><a href="#更新日志" class="headerlink" title="更新日志"></a>更新日志</h1><ul>
-<li>2018.01.22:终于理解这段的代码:e.hash == hash &amp;&amp; ((k = e.key) == key || (key != null &amp;&amp; key.equals(k)))</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/03/机器学习/jikeshijian-ai-base-study-linear-regression/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/03/机器学习/jikeshijian-ai-base-study-linear-regression/" itemprop="url">极客时间-学习笔记-人工智能基础课-线性回归</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-03T07:13:39+08:00">
-                2018-01-03
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/人工智能/" itemprop="url" rel="index">
-                    <span itemprop="name">人工智能</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/01/03/机器学习/jikeshijian-ai-base-study-linear-regression/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/01/03/机器学习/jikeshijian-ai-base-study-linear-regression/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/01/03/机器学习/jikeshijian-ai-base-study-linear-regression/" class="leancloud_visitors" data-flag-title="极客时间-学习笔记-人工智能基础课-线性回归">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><ul>
-<li>线性回归假设输出变量是若干输入变量的线性组合,并根据这一关系求解线性组合中的最优系数.</li>
-</ul>
-<h1 id="误差"><a href="#误差" class="headerlink" title="误差"></a>误差</h1><ul>
-<li>在线性回归中,误差误差是以军方误差来定义的</li>
-</ul>
-<h1 id="求解"><a href="#求解" class="headerlink" title="求解"></a>求解</h1><ul>
-<li>当线性回归的模型为二维平面上的直线时,军方误差就是预测输出和真实输出之间的欧几里得距离</li>
-<li>求解方法是:最小二乘法</li>
-</ul>
-<h1 id="防止过拟合"><a href="#防止过拟合" class="headerlink" title="防止过拟合"></a>防止过拟合</h1><ul>
-<li>存在多个最优解,意味着存在拟合,要解决过拟合问题,常见的做法是正则化,即添加额外的惩罚项,可分为两种:灵回过和LASSO回归</li>
-<li>岭回归又被称作”参数衰减”</li>
-<li>LASSO回归,全程是”最小绝对缩减和选择算子”</li>
-<li>与岭回归相比,LASSO回归的特点在于稀疏性的引入,时间花复杂问题的常用方法,在数据压缩,信号处理等其他领域中已有广泛的应用</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/02/机器学习/jikeshijian-ai-base-study-outline/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/02/机器学习/jikeshijian-ai-base-study-outline/" itemprop="url">极客时间-学习笔记-人工智能基础课-机器学习概率</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-02T07:25:00+08:00">
-                2018-01-02
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/人工智能/" itemprop="url" rel="index">
-                    <span itemprop="name">人工智能</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/01/02/机器学习/jikeshijian-ai-base-study-outline/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/01/02/机器学习/jikeshijian-ai-base-study-outline/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/01/02/机器学习/jikeshijian-ai-base-study-outline/" class="leancloud_visitors" data-flag-title="极客时间-学习笔记-人工智能基础课-机器学习概率">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><ul>
-<li>经验学习:从大量现象中提取反复出现的规律和模式</li>
-<li>计算机给予数据构建概率统计模型并与应用模型对数据进行预测与分析的学科</li>
-</ul>
-<h1 id="根据输入输出类型的不行-预测问题分为三类"><a href="#根据输入输出类型的不行-预测问题分为三类" class="headerlink" title="根据输入输出类型的不行,预测问题分为三类"></a>根据输入输出类型的不行,预测问题分为三类</h1><ul>
-<li>分类问题:输出离散变量</li>
-<li>回归问题:连续变量</li>
-<li>标注问题:序列</li>
-</ul>
-<h1 id="实际中就会存在误差-机器学习也是一样-误差性能"><a href="#实际中就会存在误差-机器学习也是一样-误差性能" class="headerlink" title="实际中就会存在误差,机器学习也是一样(误差性能)"></a>实际中就会存在误差,机器学习也是一样(误差性能)</h1><ul>
-<li>误差并定义为学习器的实际预测与样本真实输出之间的差异</li>
-<li>误差分为训练误差和测试误差</li>
-<li>典型的过拟合现象:训练误差较低,但是训练误差较低</li>
-<li>欠拟合:学习能力太弱</li>
-<li>整体来看,测试误差与模型复杂度之间呈现得是抛物线的关系</li>
-<li>交叉验证法,重复利用有限的样本,不同模型中平均测试误差最小的模型就是最有模型</li>
-<li>调参:性能和效率之间的这种</li>
-</ul>
-<h1 id="根据训练数据是否有标签信息-可以将机器学习的任务分为三类"><a href="#根据训练数据是否有标签信息-可以将机器学习的任务分为三类" class="headerlink" title="根据训练数据是否有标签信息,可以将机器学习的任务分为三类"></a>根据训练数据是否有标签信息,可以将机器学习的任务分为三类</h1><ul>
-<li>监督学习</li>
-<li>无监督学习</li>
-<li>半监督学习</li>
-<li>监督学习分为:<ul>
-<li>生成方法:更快的收敛速度和更广的应用范围</li>
-<li>判别方法:更高的准确性和更简单的使用方式</li>
-</ul>
-</li>
+<p>继承了Proxy类，实现了代理的接口，由于java不能多继承，这里已经继承了Proxy类了，不能再继承其他的类，所以JDK的动态代理不支持对实现类的代理，只支持接口的代理</p>
+<h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br></pre></td><td class="code"><pre><span class="line">private static final class ProxyClassFactory</span><br><span class="line">        implements BiFunction&lt;ClassLoader, Class&lt;?&gt;[], Class&lt;?&gt;&gt;</span><br><span class="line">    &#123;</span><br><span class="line">        // prefix for all proxy class names</span><br><span class="line">        private static final String proxyClassNamePrefix = &quot;$Proxy&quot;;</span><br><span class="line"></span><br><span class="line">        // next number to use for generation of unique proxy class names</span><br><span class="line">        private static final AtomicLong nextUniqueNumber = new AtomicLong();</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        public Class&lt;?&gt; apply(ClassLoader loader, Class&lt;?&gt;[] interfaces) &#123;</span><br><span class="line"></span><br><span class="line">            Map&lt;Class&lt;?&gt;, Boolean&gt; interfaceSet = new IdentityHashMap&lt;&gt;(interfaces.length);</span><br><span class="line">            for (Class&lt;?&gt; intf : interfaces) &#123;</span><br><span class="line">                /*</span><br><span class="line">                 * Verify that the class loader resolves the name of this</span><br><span class="line">                 * interface to the same Class object.</span><br><span class="line">                 */</span><br><span class="line">                Class&lt;?&gt; interfaceClass = null;</span><br><span class="line">                try &#123;</span><br><span class="line">                    interfaceClass = Class.forName(intf.getName(), false, loader);</span><br><span class="line">                &#125; catch (ClassNotFoundException e) &#123;</span><br><span class="line">                &#125;</span><br><span class="line">                if (interfaceClass != intf) &#123;</span><br><span class="line">                    throw new IllegalArgumentException(</span><br><span class="line">                        intf + &quot; is not visible from class loader&quot;);</span><br><span class="line">                &#125;</span><br><span class="line">                /*</span><br><span class="line">                 * Verify that the Class object actually represents an</span><br><span class="line">                 * interface.</span><br><span class="line">                 */</span><br><span class="line">                if (!interfaceClass.isInterface()) &#123;</span><br><span class="line">                    throw new IllegalArgumentException(</span><br><span class="line">                        interfaceClass.getName() + &quot; is not an interface&quot;);</span><br><span class="line">                &#125;</span><br><span class="line">                /*</span><br><span class="line">                 * Verify that this interface is not a duplicate.</span><br><span class="line">                 */</span><br><span class="line">                if (interfaceSet.put(interfaceClass, Boolean.TRUE) != null) &#123;</span><br><span class="line">                    throw new IllegalArgumentException(</span><br><span class="line">                        &quot;repeated interface: &quot; + interfaceClass.getName());</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            String proxyPkg = null;     // package to define proxy class in</span><br><span class="line">            int accessFlags = Modifier.PUBLIC | Modifier.FINAL;</span><br><span class="line"></span><br><span class="line">            /*</span><br><span class="line">             * Record the package of a non-public proxy interface so that the</span><br><span class="line">             * proxy class will be defined in the same package.  Verify that</span><br><span class="line">             * all non-public proxy interfaces are in the same package.</span><br><span class="line">             */</span><br><span class="line">            for (Class&lt;?&gt; intf : interfaces) &#123;</span><br><span class="line">                int flags = intf.getModifiers();</span><br><span class="line">                if (!Modifier.isPublic(flags)) &#123;</span><br><span class="line">                    accessFlags = Modifier.FINAL;</span><br><span class="line">                    String name = intf.getName();</span><br><span class="line">                    int n = name.lastIndexOf(&apos;.&apos;);</span><br><span class="line">                    String pkg = ((n == -1) ? &quot;&quot; : name.substring(0, n + 1));</span><br><span class="line">                    if (proxyPkg == null) &#123;</span><br><span class="line">                        proxyPkg = pkg;</span><br><span class="line">                    &#125; else if (!pkg.equals(proxyPkg)) &#123;</span><br><span class="line">                        throw new IllegalArgumentException(</span><br><span class="line">                            &quot;non-public interfaces from different packages&quot;);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            if (proxyPkg == null) &#123;</span><br><span class="line">                // if no non-public proxy interfaces, use com.sun.proxy package</span><br><span class="line">                proxyPkg = ReflectUtil.PROXY_PACKAGE + &quot;.&quot;;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            /*</span><br><span class="line">             * Choose a name for the proxy class to generate.</span><br><span class="line">             */</span><br><span class="line">            long num = nextUniqueNumber.getAndIncrement();</span><br><span class="line">            String proxyName = proxyPkg + proxyClassNamePrefix + num;</span><br><span class="line"></span><br><span class="line">            /*</span><br><span class="line">             * Generate the specified proxy class.</span><br><span class="line">             */</span><br><span class="line">            byte[] proxyClassFile = ProxyGenerator.generateProxyClass(</span><br><span class="line">                proxyName, interfaces, accessFlags);</span><br><span class="line">            try &#123;</span><br><span class="line">                return defineClass0(loader, proxyName,</span><br><span class="line">                                    proxyClassFile, 0, proxyClassFile.length);</span><br><span class="line">            &#125; catch (ClassFormatError e) &#123;</span><br><span class="line">                /*</span><br><span class="line">                 * A ClassFormatError here means that (barring bugs in the</span><br><span class="line">                 * proxy class generation code) there was some other</span><br><span class="line">                 * invalid aspect of the arguments supplied to the proxy</span><br><span class="line">                 * class creation (such as virtual machine limitations</span><br><span class="line">                 * exceeded).</span><br><span class="line">                 */</span><br><span class="line">                throw new IllegalArgumentException(e.toString());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">apply:639, Proxy$ProxyClassFactory &#123;java.lang.reflect&#125;</span><br><span class="line">apply:557, Proxy$ProxyClassFactory &#123;java.lang.reflect&#125;</span><br><span class="line">get:230, WeakCache$Factory &#123;java.lang.reflect&#125;</span><br><span class="line">get:127, WeakCache &#123;java.lang.reflect&#125;</span><br><span class="line">getProxyClass0:419, Proxy &#123;java.lang.reflect&#125;</span><br><span class="line">newProxyInstance:719, Proxy &#123;java.lang.reflect&#125;</span><br><span class="line">main:11, ProxyTest &#123;com.example.demo.proxy.jdk&#125;</span><br></pre></td></tr></table></figure>
+<p>获取的对象是$Proxy对象,里面持有了真正的原始对象</p>
+<h2 id="cglib"><a href="#cglib" class="headerlink" title="cglib"></a>cglib</h2><p>核心是MethodInterceptor接口和Enhancer类<br>对于final方法，无法进行代理(不报错,正常执行原方法)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">public class CglibProxy implements MethodInterceptor &#123;</span><br><span class="line">    private Enhancer enhancer = new Enhancer();</span><br><span class="line">    public Object getProxy(Class clazz)&#123;</span><br><span class="line">        //设置需要创建子类的类</span><br><span class="line">        enhancer.setSuperclass(clazz);</span><br><span class="line">        enhancer.setCallback(this);</span><br><span class="line">        //通过字节码技术动态创建子类实例</span><br><span class="line">        return enhancer.create();</span><br><span class="line">    &#125;</span><br><span class="line">    //实现MethodInterceptor接口方法</span><br><span class="line">    public Object intercept(Object obj, Method method, Object[] args,</span><br><span class="line">                            MethodProxy proxy) throws Throwable &#123;</span><br><span class="line">        System.out.println(&quot;前置代理&quot;);</span><br><span class="line">        //通过代理类调用父类中的方法</span><br><span class="line">        Object result = proxy.invokeSuper(obj, args);</span><br><span class="line">        System.out.println(&quot;后置代理&quot;);</span><br><span class="line">        return result;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public class DoCGLib &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">    CglibProxy proxy = new CglibProxy();</span><br><span class="line">    //通过生成子类的方式创建代理类</span><br><span class="line">    HelloWorldImpl proxyImp = (HelloWorldImpl)proxy.getProxy(HelloWorldImpl.class);</span><br><span class="line">    proxyImp.sayHello(&quot;wing&quot;);</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="spring生命周期"><a href="#spring生命周期" class="headerlink" title="spring生命周期"></a>spring生命周期</h1><ul>
+<li>1.Spring对Bean进行实例化（相当于程序中的new Xx()）</li>
+<li>2.Spring将值和Bean的引用注入进Bean对应的属性中</li>
+<li>3.如果Bean实现了BeanNameAware接口，Spring将Bean的ID传递给setBeanName()方法（实现BeanNameAware清主要是为了通过Bean的引用来获得Bean的ID，一般业务中是很少有用到Bean的ID的）</li>
+<li>4.如果Bean实现了BeanFactoryAware接口，Spring将调用setBeanDactory(BeanFactory bf)方法并把BeanFactory容器实例作为参数传入。（实现BeanFactoryAware 主要目的是为了获取Spring容器，如Bean通过Spring容器发布事件等）</li>
+<li>5.如果Bean实现了ApplicationContextAwaer接口，Spring容器将调用setApplicationContext(ApplicationContext ctx)方法，把y应用上下文作为参数传入.(作用与BeanFactory类似都是为了获取Spring容器，不同的是Spring容器在调用setApplicationContext方法时会把它自己作为setApplicationContext 的参数传入，而Spring容器在调用setBeanDactory前需要程序员自己指定（注入）setBeanDactory里的参数BeanFactory )</li>
+<li>6.如果Bean实现了BeanPostProcess接口，Spring将调用它们的postProcessBeforeInitialization（预初始化）方法（作用是在Bean实例创建成功后对进行增强处理，如对Bean进行修改，增加某个功能）</li>
+<li>7.如果Bean实现了InitializingBean接口，Spring将调用它们的afterPropertiesSet方法，作用与在配置文件中对Bean使用init-method声明初始化的作用一样，都是在Bean的全部属性设置成功后执行的初始化方法。</li>
+<li>8.如果Bean实现了BeanPostProcess接口，Spring将调用它们的postProcessAfterInitialization（后初始化）方法（作用与6的一样，只不过6是在Bean初始化前执行的，而这个是在Bean初始化后执行的，时机不同 )</li>
+<li>9.经过以上的工作后，Bean将一直驻留在应用上下文中给应用使用，直到应用上下文被销毁</li>
+<li>10.如果Bean实现了DispostbleBean接口，Spring将调用它的destory方法，作用与在配置文件中对Bean使用destory-method属性的作用一样，都是在Bean实例销毁前执行的方法。</li>
 </ul>
 <hr>
-<h1 id="生成-判别方法"><a href="#生成-判别方法" class="headerlink" title="生成/判别方法"></a>生成/判别方法</h1><ul>
-<li><a href="https://www.zhihu.com/question/20446337" target="_blank" rel="noopener">https://www.zhihu.com/question/20446337</a></li>
-<li>有监督机器学习方法可以分为生成方法和判别方法<ul>
-<li>常见的生成方法有混合高斯模型、朴素贝叶斯法和隐形马尔科夫模型等</li>
-<li>常见的判别方法有SVM、LR等</li>
-<li>生成模型的求解思路是：联合分布——-&gt;求解类别先验概率和类别条件概率</li>
-<li>判别模型求解的思路是：条件分布——&gt;模型参数后验概率最大——-&gt;（似然函数\cdot 参数先验）最大——-&gt;最大似然</li>
-<li>生成模型:要知道原始数据的概率密度（或者估计参数得到），然后习惯用bayes理论去做预测</li>
-<li>判别模型是不需要知道原始数据概率密度，比较粗线条</li>
+<p>Bean的完整生命周期经历了各种方法调用，这些方法可以划分为以下几类：</p>
+<p>1、Bean自身的方法　　：　　这个包括了Bean本身调用的方法和通过配置文件中<bean>的init-method和destroy-method指定的方法</bean></p>
+<p>2、Bean级生命周期接口方法　　：　　这个包括了BeanNameAware、BeanFactoryAware、InitializingBean和DiposableBean这些接口的方法</p>
+<p>3、容器级生命周期接口方法　　：　　这个包括了InstantiationAwareBeanPostProcessor 和 BeanPostProcessor 这两个接口实现，一般称它们的实现类为“后处理器”。</p>
+<p>4、工厂后处理器接口方法　　：　　这个包括了AspectJWeavingEnabler, ConfigurationClassPostProcessor, CustomAutowireConfigurer等等非常有用的工厂后处理器　　接口的方法。工厂后处理器也是容器级的。在应用上下文装配配置文件之后立即调用。</p>
+<h2 id="1-类级别生命周期回调"><a href="#1-类级别生命周期回调" class="headerlink" title="1.类级别生命周期回调"></a>1.类级别生命周期回调</h2><ul>
+<li>1.1 init-method xml配置</li>
+<li>1.2 InitializingBean接口</li>
+<li>1.3 PostConstruct注解<h2 id="2-容器级别扩展"><a href="#2-容器级别扩展" class="headerlink" title="2.容器级别扩展"></a>2.容器级别扩展</h2></li>
+<li>2.1BeanPostProcessor接口<br>bean实例初始化后处理器及后处理器链<br>实例初始化后处理器多用于对实例的一些代理操作。Spring中一些使用到AOP的特性也是通过后处理器的方式实现的。<br>实例初始化后处理器链 是多个后处理器，就会有执行顺序的问题，可以通过实现Ordered接口，指定后处理的执行顺序，Ordered接口声明了getOrder方法，方法返回值越小，后处理的优先级越高，越早执行。<br>在通过实现BeanPostProcessor接口自定义实例初始化后处理器的时候，建议也实现Ordered接口，指定优先级。</li>
+<li>2.2 BeanFactoryPostProcessor接口<br>2.2.1 bean factory后处理器<br>BeanFactoryPostProcessors接口在bean实例化前处理bean的配置元数据，BeanPostProcessor接口在bean实例化后处理bean的实例</li>
 </ul>
-</li>
-</ul>
-<p><img src="/images/pasted-2.png" alt="upload successful"></p>
-<p><img src="/images/pasted-6.png" alt="upload successful"></p>
-<ul>
-<li>wiki例子<ul>
-<li>假设有四个samples：<br><img src="/images/pasted-3.png" alt="upload successful"></li>
-<li>生成式模型的世界是这个样子：<br><img src="/images/pasted-4.png" alt="upload successful"></li>
-<li>而判定式模型的世界是这个样子：<br><img src="/images/pasted-5.png" alt="upload successful"></li>
-</ul>
-</li>
-</ul>
+<p><img src="/images/pasted-45.png" alt="upload successful"></p>
+<p><img src="/images/pasted-46.png" alt="upload successful"></p>
+<p><a href="https://www.cnblogs.com/zrtqsk/p/3735273.html" target="_blank" rel="noopener">https://www.cnblogs.com/zrtqsk/p/3735273.html</a></p>
+<hr>
+<h1 id="springbean是否线程安全"><a href="#springbean是否线程安全" class="headerlink" title="springbean是否线程安全"></a>springbean是否线程安全</h1><p>我们交由Spring管理的大多数对象其实都是一些无状态的对象，这种不会因为多线程而导致状态被破坏的对象很适合Spring的默认scope，每个单例的无状态对象都是线程安全的（也可以说只要是无状态的对象，不管单例多例都是线程安全的，不过单例毕竟节省了不断创建对象与GC的开销）。</p>
+<p>无状态的对象即是自身没有状态的对象，自然也就不会因为多个线程的交替调度而破坏自身状态导致线程安全问题。无状态对象包括我们经常使用的DO、DTO、VO这些只作为数据的实体模型的贫血对象，还有Service、DAO和Controller，这些对象并没有自己的状态，它们只是用来执行某些操作的。例如，每个DAO提供的函数都只是对数据库的CRUD，而且每个数据库Connection都作为函数的局部变量（局部变量是在用户栈中的，而且用户栈本身就是线程私有的内存区域，所以不存在线程安全问题），用完即关（或交还给连接池）。</p>
+<p><img src="/images/pasted-36.png" alt="upload successful"></p>
+<h1 id="spring-的优点？"><a href="#spring-的优点？" class="headerlink" title="spring 的优点？"></a>spring 的优点？</h1><p>1.降低了组件之间的耦合性 ，实现了软件各层之间的解耦 </p>
+<p>2.可以使用容易提供的众多服务，如事务管理，消息服务等 </p>
+<p>3.容器提供单例模式支持 </p>
+<p>4.容器提供了AOP技术，利用它很容易实现如权限拦截，运行期监控等功能 </p>
+<p>5.容器提供了众多的辅助类，能加快应用的开发 </p>
+<p>6.spring对于主流的应用框架提供了集成支持，如hibernate，JPA，Struts等 </p>
+<p>7.spring属于低侵入式设计，代码的污染极低 </p>
+<p>8.独立于各种应用服务器 </p>
+<p>9.spring的DI机制降低了业务对象替换的复杂性 </p>
+<p>10.Spring的高度开放性，并不强制应用完全依赖于Spring，开发者可以自由选择spring的部分或全部</p>
 
           
         
@@ -2186,7 +982,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/12/28/egenie_bugfix/error-saleorder/">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/19/design_pattern/desin-pattern/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
@@ -2205,7 +1001,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/12/28/egenie_bugfix/error-saleorder/" itemprop="url">error-saleorder</a></h1>
+                <a class="post-title-link" href="/2018/01/19/design_pattern/desin-pattern/" itemprop="url">desin_pattern</a></h1>
         
 
         <div class="post-meta">
@@ -2217,8 +1013,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-28T15:17:58+08:00">
-                2017-12-28
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-19T23:04:56+08:00">
+                2018-01-19
               </time>
             
 
@@ -2240,8 +1036,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/异常/" itemprop="url" rel="index">
-                    <span itemprop="name">异常</span>
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
                   </a>
                 </span>
 
@@ -2258,9 +1054,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2017/12/28/egenie_bugfix/error-saleorder/#comments" itemprop="discussionUrl">
+                <a href="/2018/01/19/design_pattern/desin-pattern/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/12/28/egenie_bugfix/error-saleorder/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/01/19/design_pattern/desin-pattern/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -2268,7 +1064,7 @@
 
           
           
-             <span id="/2017/12/28/egenie_bugfix/error-saleorder/" class="leancloud_visitors" data-flag-title="error-saleorder">
+             <span id="/2018/01/19/design_pattern/desin-pattern/" class="leancloud_visitors" data-flag-title="desin_pattern">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -2300,14 +1096,1163 @@
 
       
         
-          <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">#</span><br><span class="line"># A fatal error has been detected by the Java Runtime Environment:</span><br><span class="line">#</span><br><span class="line">#  SIGSEGV (0xb) at pc=0x000000010146e882, pid=65032, tid=0x0000000000005303</span><br><span class="line">#</span><br><span class="line"># JRE version: Java(TM) SE Runtime Environment (8.0_151-b12) (build 1.8.0_151-b12)</span><br><span class="line"># Java VM: Java HotSpot(TM) 64-Bit Server VM (25.151-b12 mixed mode bsd-amd64 compressed oops)</span><br><span class="line"># Problematic frame:</span><br><span class="line"># V  [libjvm.dylib+0x534882]  Symbol::decrement_refcount()+0x4</span><br><span class="line">#</span><br><span class="line"># Failed to write core dump. Core dumps have been disabled. To enable core dumping, try &quot;ulimit -c unlimited&quot; before starting Java again</span><br><span class="line">#</span><br><span class="line"># An error report file with more information is saved as:</span><br><span class="line"># /Users/victor/code/egenieProjects/ejlerp-saleorder/hs_err_pid65032.log</span><br><span class="line">#</span><br><span class="line"># If you would like to submit a bug report, please visit:</span><br><span class="line">#   http://bugreport.java.com/bugreport/crash.jsp</span><br><span class="line">#</span><br><span class="line"></span><br><span class="line">Process finished with exit code 134 (interrupted by signal 6: SIGABRT)</span><br></pre></td></tr></table></figure>
+          
+            <h1 id="模板方法（Template-Method-）"><a href="#模板方法（Template-Method-）" class="headerlink" title="模板方法（Template Method ）"></a>模板方法（Template Method ）</h1><p>定义一个操作中的算法的骨架，而将一些步骤延迟到子类中。Template Method使得子类可以不改变一个算法的结构即可重定义该算法的某些特定步骤。<br>Template Method模式一般是需要继承的。这里想要探讨另一种对Template Method的理解。spring中的JdbcTemplate，在用这个类时并不想去继承这个类，因为这个类的方法太多，但是我们还是想用到JdbcTemplate已有的稳定的、公用的数据库连接，那么我们怎么办呢？我们可以把变化的东西抽出来作为一个参数传入JdbcTemplate的方法中。但是变化的东西是一段代码，而且这段代码会用到JdbcTemplate中的变量。怎么办？那我们就用回调对象吧。在这个回调对象中定义一个操纵JdbcTemplate中变量的方法，我们去实现这个方法，就把变化的东西集中到这里了。然后我们再传入这个回调对象到JdbcTemplate，从而完成了调用。这可能是Template Method不需要继承的另一种实现方式吧。</p>
+<h1 id="策略（Strategy-）"><a href="#策略（Strategy-）" class="headerlink" title="策略（Strategy ）"></a>策略（Strategy ）</h1><h1 id="观察者（Observer-）"><a href="#观察者（Observer-）" class="headerlink" title="观察者（Observer ）"></a>观察者（Observer ）</h1><p>定义对象间的一种一对多的依赖关系，当一个对象的状态发生改变时，所有依赖于它的对象都得到通知并被自动更新。<br>spring中Observer模式常用的地方是listener的实现。如ApplicationListener。</p>
+<h1 id="包装器（Decorator-）"><a href="#包装器（Decorator-）" class="headerlink" title="包装器（Decorator ）"></a>包装器（Decorator ）</h1><p>在我们的项目中遇到这样一个问题：我们的项目需要连接多个数据库，而且不同的客户在每次访问中根据需要会去访问不同的数据库。我们以往在spring和hibernate框架中总是配置一个数据源，因而sessionFactory的dataSource属性总是指向这个数据源并且恒定不变，所有DAO在使用sessionFactory的时候都是通过这个数据源访问数据库。但是现在，由于项目的需要，我们的DAO在访问sessionFactory的时候都不得不在多个数据源中不断切换，问题就出现了：如何让sessionFactory在执行数据持久化的时候，根据客户的需求能够动态切换不同的数据源？我们能不能在spring的框架下通过少量修改得到解决？是否有什么设计模式可以利用呢？<br>首先想到在spring的applicationContext中配置所有的dataSource。这些dataSource可能是各种不同类型的，比如不同的数据库：Oracle、SQL Server、MySQL等，也可能是不同的数据源：比如apache 提供的org.apache.commons.dbcp.BasicDataSource、spring提供的org.springframework.jndi.JndiObjectFactoryBean等。然后sessionFactory根据客户的每次请求，将dataSource属性设置成不同的数据源，以到达切换数据源的目的。<br>spring中用到的包装器模式在类名上有两种表现：一种是类名中含有Wrapper，另一种是类名中含有Decorator。基本上都是动态地给一个对象添加一些额外的职责。</p>
+<h1 id="代理（Proxy-）"><a href="#代理（Proxy-）" class="headerlink" title="代理（Proxy ）"></a>代理（Proxy ）</h1><p>为其他对象提供一种代理以控制对这个对象的访问。  从结构上来看和Decorator模式类似，但Proxy是控制，更像是一种对功能的限制，而Decorator是增加职责。<br>spring的Proxy模式在aop中有体现，比如JdkDynamicAopProxy和Cglib2AopProxy。</p>
+<h1 id="单例模式（Singleton-）"><a href="#单例模式（Singleton-）" class="headerlink" title="单例模式（Singleton ）"></a>单例模式（Singleton ）</h1><p>保证一个类仅有一个实例，并提供一个访问它的全局访问点。<br>spring中的单例模式完成了后半句话，即提供了全局的访问点BeanFactory。但没有从构造器级别去控制单例，这是因为spring管理的是是任意的java对象。<br>核心提示点：Spring下默认的bean均为singleton，可以通过singleton=“true|false” 或者 scope=“？”来指定</p>
+<h1 id="适配器（Adapter-）"><a href="#适配器（Adapter-）" class="headerlink" title="适配器（Adapter ）"></a>适配器（Adapter ）</h1><p>在Spring的Aop中，使用的Advice（通知）来增强被代理类的功能。Spring实现这一AOP功能的原理就使用代理模式（1、JDK动态代理。2、CGLib字节码生成技术代理。）对类进行方法级别的切面增强，即，生成被代理类的代理类， 并在代理类的方法前，设置拦截器，通过执行拦截器重的内容增强了代理方法的功能，实现的面向切面编程。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/18/java_spring/reivew-spring-mvc/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/18/java_spring/reivew-spring-mvc/" itemprop="url">reivew_spring_mvc</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-18T21:19:00+08:00">
+                2018-01-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/springmvc/" itemprop="url" rel="index">
+                    <span itemprop="name">springmvc</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/18/java_spring/reivew-spring-mvc/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/18/java_spring/reivew-spring-mvc/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/18/java_spring/reivew-spring-mvc/" class="leancloud_visitors" data-flag-title="reivew_spring_mvc">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="springmvc是什么"><a href="#springmvc是什么" class="headerlink" title="springmvc是什么"></a>springmvc是什么</h1><ul>
+<li>Spring Web MVC是一种基于Java的实现了Web MVC设计模式的请求驱动类型的轻量级Web框架</li>
+<li>将web层进行职责解耦</li>
+<li>工作者模式的实现???<h1 id="帮我们做什么"><a href="#帮我们做什么" class="headerlink" title="帮我们做什么"></a>帮我们做什么</h1></li>
+<li>让我们能非常简单的设计出干净的Web层和薄薄的Web层；</li>
+<li>进行更简洁的Web层的开发；</li>
+<li>天生与Spring框架集成（如IoC容器、AOP等）；</li>
+<li>提供强大的约定大于配置的契约式编程支持；</li>
+<li>能简单的进行Web层的单元测试；</li>
+<li>支持灵活的URL到页面控制器的映射；</li>
+<li>非常容易与其他视图技术集成，如Velocity、FreeMarker等等，因为模型数据不放在特定的API里，而是放在一个Model里（Map数据结构实现，因此很容易被其他框架使用）；</li>
+<li>非常灵活的数据验证、格式化和数据绑定机制，能使用任何对象进行数据绑定，不必实现特定框架的API；</li>
+<li>提供一套强大的JSP标签库，简化JSP开发；</li>
+<li>支持灵活的本地化、主题等解析；</li>
+<li>更加简单的异常处理；</li>
+<li>对静态资源的支持；</li>
+<li>支持Restful风格。</li>
+</ul>
+<h1 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h1><p><img src="/images/pasted-28.png" alt="upload successful"></p>
+<p><img src="/images/pasted-29.png" alt="upload successful"></p>
+<p><img src="/images/pasted-85.png" alt="upload successful"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line">//前端控制器分派方法  </span><br><span class="line">protected void doDispatch(HttpServletRequest request, HttpServletResponse response) throws Exception &#123;  </span><br><span class="line">        HttpServletRequest processedRequest = request;  </span><br><span class="line">        HandlerExecutionChain mappedHandler = null;  </span><br><span class="line">        int interceptorIndex = -1;  </span><br><span class="line">  </span><br><span class="line">        try &#123;  </span><br><span class="line">            ModelAndView mv;  </span><br><span class="line">            boolean errorView = false;  </span><br><span class="line">  </span><br><span class="line">            try &#123;  </span><br><span class="line">                   //检查是否是请求是否是multipart（如文件上传），如果是将通过MultipartResolver解析  </span><br><span class="line">                processedRequest = checkMultipart(request);  </span><br><span class="line">                   //步骤2、请求到处理器（页面控制器）的映射，通过HandlerMapping进行映射  </span><br><span class="line">                mappedHandler = getHandler(processedRequest, false);  </span><br><span class="line">                if (mappedHandler == null || mappedHandler.getHandler() == null) &#123;  </span><br><span class="line">                    noHandlerFound(processedRequest, response);  </span><br><span class="line">                    return;  </span><br><span class="line">                &#125;  </span><br><span class="line">                   //步骤3、处理器适配，即将我们的处理器包装成相应的适配器（从而支持多种类型的处理器）  </span><br><span class="line">                HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());  </span><br><span class="line">  </span><br><span class="line">                  // 304 Not Modified缓存支持  </span><br><span class="line">                //此处省略具体代码  </span><br><span class="line">  </span><br><span class="line">                // 执行处理器相关的拦截器的预处理（HandlerInterceptor.preHandle）  </span><br><span class="line">                //此处省略具体代码  </span><br><span class="line">  </span><br><span class="line">                // 步骤4、由适配器执行处理器（调用处理器相应功能处理方法）  </span><br><span class="line">                mv = ha.handle(processedRequest, response, mappedHandler.getHandler());  </span><br><span class="line">  </span><br><span class="line">                // Do we need view name translation?  </span><br><span class="line">                if (mv != null &amp;&amp; !mv.hasView()) &#123;  </span><br><span class="line">                    mv.setViewName(getDefaultViewName(request));  </span><br><span class="line">                &#125;  </span><br><span class="line">  </span><br><span class="line">                // 执行处理器相关的拦截器的后处理（HandlerInterceptor.postHandle）  </span><br><span class="line">                //此处省略具体代码  </span><br><span class="line">            &#125;  </span><br><span class="line">            catch (ModelAndViewDefiningException ex) &#123;  </span><br><span class="line">                logger.debug(&quot;ModelAndViewDefiningException encountered&quot;, ex);  </span><br><span class="line">                mv = ex.getModelAndView();  </span><br><span class="line">            &#125;  </span><br><span class="line">            catch (Exception ex) &#123;  </span><br><span class="line">                Object handler = (mappedHandler != null ? mappedHandler.getHandler() : null);  </span><br><span class="line">                mv = processHandlerException(processedRequest, response, handler, ex);  </span><br><span class="line">                errorView = (mv != null);  </span><br><span class="line">            &#125;  </span><br><span class="line">  </span><br><span class="line">            //步骤5 步骤6、解析视图并进行视图的渲染  </span><br><span class="line">//步骤5 由ViewResolver解析View（viewResolver.resolveViewName(viewName, locale)）  </span><br><span class="line">//步骤6 视图在渲染时会把Model传入（view.render(mv.getModelInternal(), request, response);）  </span><br><span class="line">            if (mv != null &amp;&amp; !mv.wasCleared()) &#123;  </span><br><span class="line">                render(mv, processedRequest, response);  </span><br><span class="line">                if (errorView) &#123;  </span><br><span class="line">                    WebUtils.clearErrorRequestAttributes(request);  </span><br><span class="line">                &#125;  </span><br><span class="line">            &#125;  </span><br><span class="line">            else &#123;  </span><br><span class="line">                if (logger.isDebugEnabled()) &#123;  </span><br><span class="line">                    logger.debug(&quot;Null ModelAndView returned to DispatcherServlet with name &apos;&quot; + getServletName() +  </span><br><span class="line">                            &quot;&apos;: assuming HandlerAdapter completed request handling&quot;);  </span><br><span class="line">                &#125;  </span><br><span class="line">            &#125;  </span><br><span class="line">  </span><br><span class="line">            // 执行处理器相关的拦截器的完成后处理（HandlerInterceptor.afterCompletion）  </span><br><span class="line">            //此处省略具体代码  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">        catch (Exception ex) &#123;  </span><br><span class="line">            // Trigger after-completion for thrown exception.  </span><br><span class="line">            triggerAfterCompletion(mappedHandler, interceptorIndex, processedRequest, response, ex);  </span><br><span class="line">            throw ex;  </span><br><span class="line">        &#125;  </span><br><span class="line">        catch (Error err) &#123;  </span><br><span class="line">            ServletException ex = new NestedServletException(&quot;Handler processing failed&quot;, err);  </span><br><span class="line">            // Trigger after-completion for thrown exception.  </span><br><span class="line">            triggerAfterCompletion(mappedHandler, interceptorIndex, processedRequest, response, ex);  </span><br><span class="line">            throw ex;  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">        finally &#123;  </span><br><span class="line">            // Clean up any resources used by a multipart request.  </span><br><span class="line">            if (processedRequest != request) &#123;  </span><br><span class="line">                cleanupMultipart(processedRequest);  </span><br><span class="line">            &#125;  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>核心架构的具体流程步骤如下：</p>
+<p>1、  首先用户发送请求——&gt;DispatcherServlet，前端控制器收到请求后自己不进行处理，而是委托给其他的解析器进行处理，作为统一访问点，进行全局的流程控制；</p>
+<p>2、  DispatcherServlet——&gt;<b>HandlerMapping</b>， HandlerMapping将会把请求映射为HandlerExecutionChain对象（包含一个Handler处理器（页面控制器）对象、多个HandlerInterceptor拦截器）对象，通过这种策略模式，很容易添加新的映射策略；</p>
+<p>3、  DispatcherServlet——&gt;HandlerAdapter，HandlerAdapter将会把处理器包装为适配器，从而支持多种类型的处理器，即适配器设计模式的应用，从而很容易支持很多类型的处理器；</p>
+<p>4、  HandlerAdapter——&gt;处理器功能处理方法的调用，HandlerAdapter将会根据适配的结果调用真正的处理器的功能处理方法，完成功能处理；并返回一个ModelAndView对象（包含模型数据、逻辑视图名）；</p>
+<p>5、  ModelAndView的逻辑视图名——&gt; ViewResolver， ViewResolver将把逻辑视图名解析为具体的View，通过这种策略模式，很容易更换其他视图技术；</p>
+<p>6、  View——&gt;渲染，View会根据传进来的Model模型数据进行渲染，此处的Model实际是一个Map数据结构，因此很容易支持其他视图技术；</p>
+<p>7、返回控制权给DispatcherServlet，由DispatcherServlet返回响应给用户，到此一个流程结束。</p>
+<p>此处我们只是讲了核心流程，没有考虑拦截器、本地解析、文件上传解析等，后边再细述。</p>
+<h1 id="hello-world"><a href="#hello-world" class="headerlink" title="hello world"></a>hello world</h1><p><img src="/images/pasted-30.png" alt="upload successful"></p>
+<p><img src="/images/pasted-60.png" alt="upload successful"></p>
+<ul>
+<li>DispatcherServlet：Spring提供的前端控制器，所有的请求都有经过它来统一分发。在DispatcherServlet将请求分发给Spring Controller之前，需要借助于Spring提供的HandlerMapping定位到具体的Controller。</li>
+<li>HandlerMapping：能够完成客户请求到Controller映射。</li>
+<li>Controller：需要为并发用户处理上述请求，因此实现Controller接口时，必须保证线程安全并且可重用。Controller将处理用户请求，这和Struts Action扮演的角色是一致的。一旦Controller处理完用户请求，则返回ModelAndView对象给DispatcherServlet前端控制器，ModelAndView中包含了模型（Model）和视图（View）。从宏观角度考虑，DispatcherServlet是整个Web应用的控制器；从微观考虑，Controller是单个Http请求处理过程中的控制器，而ModelAndView是Http请求过程中返回的模型（Model）和视图（View）。</li>
+<li>ViewResolver：Spring提供的视图解析器（ViewResolver）在Web应用中查找View对象，从而将相应结果渲染给客户。</li>
+</ul>
+<h1 id="DispatcherServlet与HttpMessageConverter的关系"><a href="#DispatcherServlet与HttpMessageConverter的关系" class="headerlink" title="DispatcherServlet与HttpMessageConverter的关系"></a>DispatcherServlet与HttpMessageConverter的关系</h1><p>//TODO</p>
+<p><a href="http://sishuok.com/forum/blogPost/list/5160.html" target="_blank" rel="noopener">http://sishuok.com/forum/blogPost/list/5160.html</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/18/java_tools/btrace-study/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/18/java_tools/btrace-study/" itemprop="url">btrace-study</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-18T07:21:23+08:00">
+                2018-01-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/18/java_tools/btrace-study/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/18/java_tools/btrace-study/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/18/java_tools/btrace-study/" class="leancloud_visitors" data-flag-title="btrace-study">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h1 id="btrace概念"><a href="#btrace概念" class="headerlink" title="btrace概念:"></a>btrace概念:</h1><ul>
+<li><p>Probe Point: </p>
+<ul>
+<li>“location” or “event” at which a set of tracing statements are executed. Probe point is “place” or “event” of interest where we want to execute some tracing statements.（探测点，就是我们想要执行一些追踪语句的地方或事件）</li>
+</ul>
+</li>
+<li><p>Trace Actions or Actions: </p>
+<ul>
+<li>Trace statements that are executed whenever a probe “fires”.（当探测触发时执行追踪语句）</li>
+</ul>
+</li>
+<li><p>Action Methods: </p>
+<ul>
+<li>BTrace trace statements that are executed when a probe fires are defined inside a static method a class. Such methods are called “action” methods.（当在类的静态方法中定义了探测触发时执行的BTrace跟踪语句。这种方法被称为“操作”方法。）</li>
+</ul>
+</li>
+</ul>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/12/28/egenie_bugfix/error-saleorder/#more" rel="contents">
+            <a class="btn" href="/2018/01/18/java_tools/btrace-study/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
           <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/17/java_dubbo/study-dubbo/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/17/java_dubbo/study-dubbo/" itemprop="url">dubbo需求</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-17T07:43:00+08:00">
+                2018-01-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/dubbo/" itemprop="url" rel="index">
+                    <span itemprop="name">dubbo</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/17/java_dubbo/study-dubbo/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/17/java_dubbo/study-dubbo/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/17/java_dubbo/study-dubbo/" class="leancloud_visitors" data-flag-title="dubbo需求">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h1><h3 id="流程图"><a href="#流程图" class="headerlink" title="流程图"></a>流程图</h3><p><img src="/images/pasted-25.png" alt="upload successful"><br>服务授权<br>服务降级<br>软负载均衡<br>服务路由<br>服务编排<br>服务质量协定<br>服务容量<br>服务注册与发现<br>服务质量协定</p>
+<h3 id="其他需求"><a href="#其他需求" class="headerlink" title="其他需求"></a>其他需求</h3><ul>
+<li>服务注册中心 替代 f5负载均衡服务器(内部使用)<ul>
+<li>当服务越来越多时，服务 URL 配置管理变得非常困难，F5 硬件负载均衡器的单点压力也越来越大。 此时需要一个服务注册中心，动态的注册和发现服务，使服务的位置透明。并通过在消费方获取服务提供方地址列表，实现软负载均衡和 Failover，降低对 F5 硬件负载均衡器的依赖，也能减少部分成本。</li>
+</ul>
+</li>
+<li>应用依赖<ul>
+<li>当进一步发展，服务间依赖关系变得错踪复杂，甚至分不清哪个应用要在哪个应用之前启动，架构师都不能完整的描述应用的架构关系。 这时，需要自动画出应用间的依赖关系图，以帮助架构师理清理关系。</li>
+</ul>
+</li>
+<li>调用(调用量,响应时间)监控<ul>
+<li>接着，服务的调用量越来越大，服务的容量问题就暴露出来，这个服务需要多少机器支撑？什么时候该加机器？ 为了解决这些问题，第一步，要将服务现在每天的调用量，响应时间，都统计出来，作为容量规划的参考指标。其次，要可以动态调整权重，在线上，将某台机器的权重一直加大，并在加大的过程中记录响应时间的变化，直到响应时间到达阀值，记录此时的访问量，再以此访问量乘以机器数反推总容量。</li>
+</ul>
+</li>
+</ul>
+<h1 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h1><p><img src="/images/pasted-26.png" alt="upload successful"></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/15/http/advantage-api/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/15/http/advantage-api/" itemprop="url">RESTful-API概念学习</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-15T20:13:15+08:00">
+                2018-01-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HTTP协议/" itemprop="url" rel="index">
+                    <span itemprop="name">HTTP协议</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/15/http/advantage-api/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/15/http/advantage-api/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/15/http/advantage-api/" class="leancloud_visitors" data-flag-title="RESTful-API概念学习">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="RESTful-API"><a href="#RESTful-API" class="headerlink" title="RESTful API"></a>RESTful API</h1><ul>
+<li>透明性，暴露资源存在。</li>
+<li>充分利用 HTTP 协议本身语义。</li>
+<li>无状态，这点非常重要。在调用一个接口（访问、操作资源）的时候，可以不用考虑上下文，不用考虑当前状态，极大的降低了复杂度</li>
+<li>HTTP 本身提供了丰富的内容协商手段，无论是缓存，还是资源修改的乐观并发控制，都可以以业务无关的中间件来实现</li>
+</ul>
+<h1 id="理解RESTful架构"><a href="#理解RESTful架构" class="headerlink" title="理解RESTful架构"></a>理解RESTful架构</h1><ul>
+<li>Representational State Transfer</li>
+<li>REST的名称”表现层状态转化”中，省略了主语。”表现层”其实指的是”资源”（Resources）的”表现层”。<br>所谓”资源”，就是网络上的一个实体，或者说是网络上的一个具体信息。它可以是一段文本、一张图片、一首歌曲、一种服务，总之就是一个具体的实在。你可以用一个URI（统一资源定位符）指向它，每种资源对应一个特定的URI。要获取这个资源，访问它的URI就可以，因此URI就成了每一个资源的地址或独一无二的识别符。</li>
+</ul>
+<p>所谓”上网”，就是与互联网上一系列的”资源”互动，调用它的URI。</p>
+<p>互联网通信协议HTTP协议，是一个无状态协议。这意味着，所有的状态都保存在服务器端。因此，如果客户端想要操作服务器，必须通过某种手段，让服务器端发生”状态转化”（State Transfer）。而这种转化是建立在表现层之上的，所以就是”表现层状态转化”。</p>
+<p>最常见的一种设计错误，就是URI包含动词。因为”资源”表示一种实体，所以应该是名词，URI不应该有动词，动词应该放在HTTP协议中。</p>
+<p>因为不同的版本，可以理解成同一种资源的不同表现形式，所以应该采用同一个URI。版本号可以在HTTP请求头信息的Accept字段中进行区分<br><a href="http://www.ruanyifeng.com/blog/2011/09/restful.html" target="_blank" rel="noopener">http://www.ruanyifeng.com/blog/2011/09/restful.html</a></p>
+<h1 id="RESTful-API-设计指南"><a href="#RESTful-API-设计指南" class="headerlink" title="RESTful API 设计指南"></a>RESTful API 设计指南</h1><ul>
+<li>协议</li>
+<li>域名</li>
+<li>版本（Versioning）</li>
+<li>路径（Endpoint）<br>在RESTful架构中，每个网址代表一种资源（resource），所以网址中不能有动词，只能有名词，而且所用的名词往往与数据库的表格名对应。一般来说，数据库中的表都是同种记录的”集合”（collection），所以API中的名词也应该使用复数。</li>
+<li>HTTP动词</li>
+<li>过滤信息（Filtering）</li>
+<li>状态码（Status Codes）</li>
+<li>错误处理</li>
+<li>返回结果</li>
+<li>Hypermedia API<br>RESTful API最好做到Hypermedia，即返回结果中提供链接，连向其他API方法，使得用户不查文档，也知道下一步应该做什么。</li>
+<li>其他<ul>
+<li>（1）API的身份认证应该使用OAuth 2.0框架。</li>
+<li>（2）服务器返回的数据格式，应该尽量使用JSON，避免使用XML。</li>
+</ul>
+</li>
+</ul>
+<p><a href="http://www.ruanyifeng.com/blog/2014/05/restful_api.html" target="_blank" rel="noopener">http://www.ruanyifeng.com/blog/2014/05/restful_api.html</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/13/java_thread/review-java-thread/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/13/java_thread/review-java-thread/" itemprop="url">java-线程复习</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-13T10:13:27+08:00">
+                2018-01-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/13/java_thread/review-java-thread/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/13/java_thread/review-java-thread/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/13/java_thread/review-java-thread/" class="leancloud_visitors" data-flag-title="java-线程复习">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h1><p>创建线程有两种方式：<br>一、继承 Thread 类，扩展线程。<br>二、实现 Runnable 接口。</p>
+<p>Callable接口<br>Future接口<br>FutureTask实现了 Future 接口<br>FutureTask 的好处是 FutureTask 是为了弥补 Thread 的不足而设计的，它可以让程序员准确地知道线程什么时候执行完成并获得到线程执行完成后返回的结果。FutureTask 是一种可以取消的异步的计算任务，它的计算是通过 Callable 实现的，它等价于可以携带结果的 Runnable，并且有三个状态：等待、运行和完成。完成包括所有计算以任意的方式结束，包括正常结束、取消和异常。</p>
+<h1 id="多线程"><a href="#多线程" class="headerlink" title="多线程"></a>多线程</h1><p>多线程的概念很好理解就是多条线程同时存在，但要用好多线程确不容易，涉及到多线程间通信，多线程共用一个资源等诸多问题。</p>
+<h2 id="synchronized"><a href="#synchronized" class="headerlink" title="synchronized"></a>synchronized</h2><p>解决多个线程之间访问资源的同步性</p>
+<ul>
+<li>对于同步方法，锁是当前实例对象。</li>
+<li>对于静态同步方法，锁是当前对象的Class对象。</li>
+<li>对于同步方法块，锁是Synchonized括号里配置的对象。</li>
+</ul>
+<p>锁提供了两种主要特性：互斥（mutual exclusion） 和可见性（visibility）。互斥即一次只允许一个线程持有某个特定的锁，因此可使用该特性实现对共享数据的协调访问协议，这样，一次就只有一个线程能够使用该共享数据。可见性要更加复杂一些，它必须确保释放锁之前对共享数据做出的更改对于随后获得该锁的另一个线程是可见的 —— 如果没有同步机制提供的这种可见性保证，线程看到的共享变量可能是修改前的值或不一致的值，这将引发许多严重问题。</p>
+<h2 id="volatile"><a href="#volatile" class="headerlink" title="volatile"></a>volatile</h2><p>解决变量在多个线程之间的可见性</p>
+<p>出于简易性或可伸缩性的考虑，您可能倾向于使用 volatile 变量而不是锁。当使用 volatile 变量而非锁时，某些习惯用法（idiom）更加易于编码和阅读。此外，volatile 变量不会像锁那样造成线程阻塞，因此也很少造成可伸缩性问题。在某些情况下，如果读操作远远大于写操作，volatile 变量还可以提供优于锁的性能优势。</p>
+<h3 id="正确使用-volatile-变量的条件"><a href="#正确使用-volatile-变量的条件" class="headerlink" title="正确使用 volatile 变量的条件"></a>正确使用 volatile 变量的条件</h3><p>您只能在有限的一些情形下使用 volatile 变量替代锁。要使 volatile 变量提供理想的线程安全，必须同时满足下面两个条件：</p>
+<p>对变量的写操作不依赖于当前值。<br>该变量没有包含在具有其他变量的不变式中。<br>实际上，这些条件表明，可以被写入 volatile 变量的这些有效值独立于任何程序的状态，包括变量的当前状态。</p>
+<p>第一个条件的限制使 volatile 变量不能用作线程安全计数器。虽然增量操作（x++）看上去类似一个单独操作，实际上它是一个由读取－修改－写入操作序列组成的组合操作，必须以原子方式执行，而 volatile 不能提供必须的原子特性。实现正确的操作需要使 x 的值在操作期间保持不变，而 volatile 变量无法实现这点。（然而，如果将值调整为只从单个线程写入，那么可以忽略第一个条件。）</p>
+<p>大多数编程情形都会与这两个条件的其中之一冲突，使得 volatile 变量不能像 synchronized 那样普遍适用于实现线程安全。清单 1 显示了一个非线程安全的数值范围类。它包含了一个不变式 —— 下界总是小于或等于上界。</p>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>与锁相比，Volatile 变量是一种非常简单但同时又非常脆弱的同步机制，它在某些情况下将提供优于锁的性能和伸缩性。如果严格遵循 volatile 的使用条件 —— 即变量真正独立于其他变量和自己以前的值 —— 在某些情况下可以使用 volatile 代替 synchronized 来简化代码。然而，使用 volatile 的代码往往比使用锁的代码更加容易出错。本文介绍的模式涵盖了可以使用 volatile 代替 synchronized 的最常见的一些用例。遵循这些模式（注意使用时不要超过各自的限制）可以帮助您安全地实现大多数用例，使用 volatile 变量获得更佳性能。</p>
+<h2 id="wait-、notify-、notifyAll"><a href="#wait-、notify-、notifyAll" class="headerlink" title="wait()、notify()、notifyAll()"></a>wait()、notify()、notifyAll()</h2><p>wait():我的部分已经做完了,等别人让我做的时候再做,释放锁<br>notify():等我做完了,释放锁后,让其他一个人做<br>wait() 与 Thread.sleep(long time) 的区别:sleep傻等,sleep不释放锁</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">作者：孙立伟</span><br><span class="line">链接：https://www.zhihu.com/question/23328075/answer/24228413</span><br><span class="line">来源：知乎</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br><span class="line"></span><br><span class="line">首先，要记住这个差别，“sleep是Thread类的方法,wait是Object类中定义的方法”。尽管这两个方法都会影响线程的执行行为，但是本质上是有区别的。</span><br><span class="line"></span><br><span class="line">Thread.sleep不会导致锁行为的改变，如果当前线程是拥有锁的，那么Thread.sleep不会让线程释放锁。如果能够帮助你记忆的话，可以简单认为和锁相关的方法都定义在Object类中，因此调用Thread.sleep是不会影响锁的相关行为。</span><br><span class="line"></span><br><span class="line">Thread.sleep和Object.wait都会暂停当前的线程，对于CPU资源来说，不管是哪种方式暂停的线程，都表示它暂时不再需要CPU的执行时间。OS会将执行时间分配给其它线程。区别是，调用wait后，需要别的线程执行notify/notifyAll才能够重新获得CPU执行时间。</span><br><span class="line"></span><br><span class="line">线程的状态参考 Thread.State的定义。新创建的但是没有执行（还没有调用start())的线程处于“就绪”，或者说Thread.State.NEW状态。</span><br><span class="line"></span><br><span class="line">Thread.State.BLOCKED（阻塞）表示线程正在获取锁时，因为锁不能获取到而被迫暂停执行下面的指令，一直等到这个锁被别的线程释放。BLOCKED状态下线程，OS调度机制需要决定下一个能够获取锁的线程是哪个，这种情况下，就是产生锁的争用，无论如何这都是很耗时的操作。</span><br></pre></td></tr></table></figure>
+<h2 id="ThreadLocal-变量"><a href="#ThreadLocal-变量" class="headerlink" title="ThreadLocal 变量"></a>ThreadLocal 变量</h2><p>线程隔离<br>InheritableTreadLocal让子线程获取父线程中取得值</p>
+<h2 id="join-方法"><a href="#join-方法" class="headerlink" title="join() 方法"></a>join() 方法</h2><p>等待线程对象销毁<br>等待子进程执行完,我再执行<br>Thread.yield() 方法</p>
+<h1 id="ReentrantLock"><a href="#ReentrantLock" class="headerlink" title="ReentrantLock"></a>ReentrantLock</h1><h2 id="lock"><a href="#lock" class="headerlink" title="lock()"></a>lock()</h2><h2 id="unlock"><a href="#unlock" class="headerlink" title="unlock()"></a>unlock()</h2><h2 id="condition"><a href="#condition" class="headerlink" title="condition"></a>condition</h2><h3 id="等待-通知"><a href="#等待-通知" class="headerlink" title="等待/通知"></a>等待/通知</h3><ul>
+<li>awiate() 相当于Object类中的wait()方法</li>
+<li>await(long time,TImeUnit unit) 相当于Object类中的wait()方法</li>
+<li>signal() 相当于Object类中的notify()方法</li>
+<li>sigalAll() 相当于Object类中的notifyAll()方法</li>
+</ul>
+<h3 id="通知部分线程"><a href="#通知部分线程" class="headerlink" title="通知部分线程"></a>通知部分线程</h3><p>Lock lock=new Reentrantock();<br>Condition conditionA=lock.newCondition();<br>Condition conditionB=lock.newCondition();</p>
+<h3 id="公平锁-非公平锁"><a href="#公平锁-非公平锁" class="headerlink" title="公平锁,非公平锁"></a>公平锁,非公平锁</h3><ul>
+<li>获取锁的顺序是按照线程加锁的顺序来分配的,及先来先得的FIFO先进先出顺序</li>
+</ul>
+<h3 id="getHoldCount-getQueueLength-getWaiteQueueLength"><a href="#getHoldCount-getQueueLength-getWaiteQueueLength" class="headerlink" title="getHoldCount(),getQueueLength(),getWaiteQueueLength()"></a>getHoldCount(),getQueueLength(),getWaiteQueueLength()</h3><ul>
+<li>getHoldCount()查询当前线程保持此锁定的个数,调用lock()方法的次数</li>
+<li>getQueueLength()返回正在等待次锁定的线程估计数</li>
+<li>getWaiteQueueLength(Condition condition)返回等待与此锁定翔安的给定条件Condition的线程估计数</li>
+</ul>
+<h1 id="线程状态切换"><a href="#线程状态切换" class="headerlink" title="线程状态切换"></a>线程状态切换</h1><p><img src="/images/pasted-42.png" alt="upload successful"></p>
+<ul>
+<li>监视器代表synchronized</li>
+<li>lock代表锁</li>
+</ul>
+<h1 id="AtomicInteger类"><a href="#AtomicInteger类" class="headerlink" title="AtomicInteger类"></a>AtomicInteger类</h1><h1 id="ReentrantReadWriteLock"><a href="#ReentrantReadWriteLock" class="headerlink" title="ReentrantReadWriteLock"></a>ReentrantReadWriteLock</h1><h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://www.ibm.com/developerworks/cn/java/j-jtp06197.html" target="_blank" rel="noopener">https://www.ibm.com/developerworks/cn/java/j-jtp06197.html</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/08/java_tools/jdk1-9-maven-fix/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/08/java_tools/jdk1-9-maven-fix/" itemprop="url">jdk1.9-maven-fix</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-08T13:59:00+08:00">
+                2018-01-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/08/java_tools/jdk1-9-maven-fix/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/08/java_tools/jdk1-9-maven-fix/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/08/java_tools/jdk1-9-maven-fix/" class="leancloud_visitors" data-flag-title="jdk1.9-maven-fix">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>在安装了多个jdk版本后,发现maven命令不好使了</p>
+<h1 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h1><ul>
+<li>maven-compiler-plugin:3.1:compile (default-compile) @ report 出现异常<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ report ---</span><br><span class="line">[INFO] Changes detected - recompiling the module!</span><br><span class="line">[INFO] Compiling 60 source files to /Users/victor/code/egenieProjects/report/target/classes</span><br><span class="line">WARNING: An illegal reflective access operation has occurred</span><br><span class="line">WARNING: Illegal reflective access by lombok.javac.apt.Processor to field com.sun.tools.javac.processing.JavacProcessingEnvironment.processorClassLoader</span><br><span class="line">WARNING: Please consider reporting this to the maintainers of lombok.javac.apt.Processor</span><br><span class="line">WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations</span><br><span class="line">WARNING: All illegal access operations will be denied in a future release</span><br><span class="line">[INFO] ------------------------------------------------------------------------</span><br><span class="line">[INFO] BUILD FAILURE</span><br><span class="line">[INFO] ------------------------------------------------------------------------</span><br><span class="line">[INFO] Total time: 5.198 s</span><br><span class="line">[INFO] Finished at: 2018-01-08T14:04:55+08:00</span><br><span class="line">[INFO] Final Memory: 35M/115M</span><br><span class="line">[INFO] ------------------------------------------------------------------------</span><br><span class="line">[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.1:compile (default-compile) on project report: Fatal error compiling: java.lang.NoSuchFieldError: pid -&gt; [Help 1]</span><br><span class="line">[ERROR]</span><br><span class="line">[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.</span><br><span class="line">[ERROR] Re-run Maven using the -X switch to enable full debug logging.</span><br><span class="line">[ERROR]</span><br><span class="line">[ERROR] For more information about the errors and possible solutions, please read the following articles:</span><br><span class="line">[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h1 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h1><ul>
+<li><p>1.9</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">victordeMacBook-Pro:report victor$ mvn -v</span><br><span class="line">Apache Maven 3.5.2 (138edd61fd100ec658bfa2d307c43b76940a5d7d; 2017-10-18T15:58:13+08:00)</span><br><span class="line">Maven home: /usr/local/Cellar/maven/3.5.2/libexec</span><br><span class="line">Java version: 9.0.1, vendor: Oracle Corporation</span><br><span class="line">Java home: /Library/Java/JavaVirtualMachines/jdk-9.0.1.jdk/Contents/Home</span><br><span class="line">Default locale: zh_CN, platform encoding: UTF-8</span><br><span class="line">OS name: &quot;mac os x&quot;, version: &quot;10.13.2&quot;, arch: &quot;x86_64&quot;, family: &quot;mac&quot;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>执行命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo -n &quot;JAVA_HOME=`/usr/libexec/java_home -v 1.8`&quot; &gt; ~/.mavenrc</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>1.8</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">victordeMacBook-Pro:report victor$ mvn -v</span><br><span class="line">Apache Maven 3.5.2 (138edd61fd100ec658bfa2d307c43b76940a5d7d; 2017-10-18T15:58:13+08:00)</span><br><span class="line">Maven home: /usr/local/Cellar/maven/3.5.2/libexec</span><br><span class="line">Java version: 1.8.0_151, vendor: Oracle Corporation</span><br><span class="line">Java home: /Library/Java/JavaVirtualMachines/jdk1.8.0_151.jdk/Contents/Home/jre</span><br><span class="line">Default locale: zh_CN, platform encoding: UTF-8</span><br><span class="line">OS name: &quot;mac os x&quot;, version: &quot;10.13.2&quot;, arch: &quot;x86_64&quot;, family: &quot;mac&quot;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h1 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h1><p>虽然此种方法解决了这个问题,但具体是什么原因导致的此问题,还需进一步研究</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://geeekr.com/fix-maven-java-version-mac-osx/" target="_blank" rel="noopener">http://geeekr.com/fix-maven-java-version-mac-osx/</a></p>
+
+          
         
       
     </div>
@@ -2345,7 +2290,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/7/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/page/9/">9</a><span class="space">&hellip;</span><a class="page-number" href="/page/11/">11</a><a class="extend next" rel="next" href="/page/9/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/7/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/page/9/">9</a><span class="space">&hellip;</span><a class="page-number" href="/page/13/">13</a><a class="extend next" rel="next" href="/page/9/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2391,7 +2336,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">110</span>
+                  <span class="site-state-item-count">121</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="多线程," />
 
 
 
@@ -79,17 +79,18 @@
 
 
 
-<meta name="description" content="题目给你n个赛车，让他们都在起跑线上就绪后，同时出发，让你用Java多线程的技术把这种情况写出来。 答案1234567891011121314151617181920212223242526272829303132333435public class Car implements Runnable &amp;#123;">
+<meta name="description" content="题目给你n个赛车，让他们都在起跑线上就绪后，同时出发，让你用Java多线程的技术把这种情况写出来。 答案12345678910111213141516171819202122232425262728293031323334353637383940414243public class CountDownTest &amp">
+<meta name="keywords" content="多线程">
 <meta property="og:type" content="article">
-<meta property="og:title" content="多个线程如何同时启动">
+<meta property="og:title" content="赛跑比赛实现">
 <meta property="og:url" content="http://www.victor123.cn/2018/03/27/java_thread/interview-car-competition/index.html">
 <meta property="og:site_name" content="Victor的博客">
-<meta property="og:description" content="题目给你n个赛车，让他们都在起跑线上就绪后，同时出发，让你用Java多线程的技术把这种情况写出来。 答案1234567891011121314151617181920212223242526272829303132333435public class Car implements Runnable &amp;#123;    private int carNum;    private Competion">
+<meta property="og:description" content="题目给你n个赛车，让他们都在起跑线上就绪后，同时出发，让你用Java多线程的技术把这种情况写出来。 答案12345678910111213141516171819202122232425262728293031323334353637383940414243public class CountDownTest &amp;#123;    private static class ProcessJob im">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-03-27T14:06:50.266Z">
+<meta property="og:updated_time" content="2018-04-02T14:46:10.456Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="多个线程如何同时启动">
-<meta name="twitter:description" content="题目给你n个赛车，让他们都在起跑线上就绪后，同时出发，让你用Java多线程的技术把这种情况写出来。 答案1234567891011121314151617181920212223242526272829303132333435public class Car implements Runnable &amp;#123;    private int carNum;    private Competion">
+<meta name="twitter:title" content="赛跑比赛实现">
+<meta name="twitter:description" content="题目给你n个赛车，让他们都在起跑线上就绪后，同时出发，让你用Java多线程的技术把这种情况写出来。 答案12345678910111213141516171819202122232425262728293031323334353637383940414243public class CountDownTest &amp;#123;    private static class ProcessJob im">
 
 
 
@@ -125,7 +126,7 @@
 
 
 
-  <title>多个线程如何同时启动 | Victor的博客</title>
+  <title>赛跑比赛实现 | Victor的博客</title>
   
 
 
@@ -343,7 +344,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">多个线程如何同时启动</h1>
+          <h1 class="post-title" itemprop="name headline">赛跑比赛实现</h1>
         
 
         <div class="post-meta">
@@ -384,7 +385,7 @@
 
           
           
-             <span id="/2018/03/27/java_thread/interview-car-competition/" class="leancloud_visitors" data-flag-title="多个线程如何同时启动">
+             <span id="/2018/03/27/java_thread/interview-car-competition/" class="leancloud_visitors" data-flag-title="赛跑比赛实现">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -416,7 +417,8 @@
 
       
         <h1 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h1><p>给你n个赛车，让他们都在起跑线上就绪后，同时出发，让你用Java多线程的技术把这种情况写出来。</p>
-<h1 id="答案"><a href="#答案" class="headerlink" title="答案"></a>答案</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">public class Car implements Runnable &#123;</span><br><span class="line">    private int carNum;</span><br><span class="line">    private CompetionLatch latch = null;</span><br><span class="line">    public Car(int carNum, CompetionLatch latch) &#123;</span><br><span class="line">        this.carNum = carNum;</span><br><span class="line">        this.latch = latch;</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        this.latch.countDown();</span><br><span class="line">        this.latch.await();</span><br><span class="line">        startCar();</span><br><span class="line">    &#125;</span><br><span class="line">    private void startCar() &#123;</span><br><span class="line">        System.out.println(&quot;Car num &quot; + this.carNum + &quot; start to run.&quot;);</span><br><span class="line">        try &#123;</span><br><span class="line">            Thread.sleep(3000);</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(&quot;Car num &quot; + this.carNum + &quot; get to the finish line.&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public class CarCompetion &#123;</span><br><span class="line">    </span><br><span class="line">    public static final int CAR_NUM = 10;</span><br><span class="line">    </span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">	CountDownLatch competion = new CountDownLatch(10);</span><br><span class="line">	for (int i = 0; i &lt; CarCompetion.CAR_NUM; i++) &#123;</span><br><span class="line">	competion.countDown();</span><br><span class="line">	competion.await();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="答案"><a href="#答案" class="headerlink" title="答案"></a>答案</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">public class CountDownTest &#123;</span><br><span class="line">    private static class ProcessJob implements Runnable &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        private CountDownLatch startLatch;</span><br><span class="line">        private CountDownLatch stopLatch;</span><br><span class="line"></span><br><span class="line">        public ProcessJob(CountDownLatch startLatch, CountDownLatch stopLatch) &#123;</span><br><span class="line">            this.startLatch = startLatch;</span><br><span class="line">            this.stopLatch = stopLatch;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        public void run() &#123;</span><br><span class="line">            try &#123;</span><br><span class="line">                startLatch.await();</span><br><span class="line">                TimeUnit.SECONDS.sleep(2);</span><br><span class="line">            &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">            System.out.println(&quot;Some Job&quot;);</span><br><span class="line">            stopLatch.countDown();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) throws InterruptedException &#123;</span><br><span class="line">        ExecutorService executorService = Executors.newCachedThreadPool();</span><br><span class="line">        int jobSize = 20;</span><br><span class="line">        CountDownLatch startLatch = new CountDownLatch(1);</span><br><span class="line">        CountDownLatch stopLatch = new CountDownLatch(jobSize);</span><br><span class="line">        for (int i = 0; i &lt; jobSize; i++) &#123;</span><br><span class="line">            executorService.submit(new ProcessJob(startLatch, stopLatch));</span><br><span class="line">        &#125;</span><br><span class="line">        long start = System.currentTimeMillis();</span><br><span class="line">        startLatch.countDown();</span><br><span class="line">        // 等待所有线程执行完任务</span><br><span class="line">        stopLatch.await();</span><br><span class="line">        long end = System.currentTimeMillis();</span><br><span class="line">        System.out.println(&quot;Total cost time: &quot; + (end - start));</span><br><span class="line">        executorService.shutdown();</span><br><span class="line">        executorService.awaitTermination(1, TimeUnit.MINUTES);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
       
     </div>
     
@@ -436,7 +438,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="http://www.victor123.cn/2018/03/27/java_thread/interview-car-competition/" title="多个线程如何同时启动">http://www.victor123.cn/2018/03/27/java_thread/interview-car-competition/</a>
+    <a href="http://www.victor123.cn/2018/03/27/java_thread/interview-car-competition/" title="赛跑比赛实现">http://www.victor123.cn/2018/03/27/java_thread/interview-car-competition/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>
@@ -448,6 +450,12 @@
     
 
     <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/多线程/" rel="tag"># 多线程</a>
+          
+        </div>
       
 
       
@@ -557,7 +565,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">110</span>
+                  <span class="site-state-item-count">121</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -784,7 +792,7 @@
         var disqus_config = function () {
           this.page.url = 'http://www.victor123.cn/2018/03/27/java_thread/interview-car-competition/';
           this.page.identifier = '2018/03/27/java_thread/interview-car-competition/';
-          this.page.title = '多个线程如何同时启动';
+          this.page.title = '赛跑比赛实现';
         };
         var d = document, s = d.createElement('script');
         s.src = 'https://victor123-cn.disqus.com/embed.js';
