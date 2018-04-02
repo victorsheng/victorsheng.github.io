@@ -1,6 +1,7 @@
 title: juc-overview
 date: 2018-03-30 10:14:33
 tags:
+	- 多线程
 categories:
 ---
 # 参考
@@ -29,8 +30,12 @@ JSR，全称 Java Specification Requests， 即Java规范提案， 主要是用�
 	+ 栅栏 CyclicBarrier
 	+ 信号量 Semaphore
 	+ 交换器 Exchanger
-   	+ Phaser
+  + Phaser
 - 显示锁
+	+ ReentrantLock
+	+ ReentrantReadWriteLock
+	+ StampedLock
+	+
 - 原子变量类(Atomic Variables)
 - 并发集合(Concurrent Collections)
 - Executor框架（线程池、 Callable 、Future）

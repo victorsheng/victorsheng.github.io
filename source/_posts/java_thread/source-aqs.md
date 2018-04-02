@@ -2,6 +2,7 @@
 title: source-aqs
 date: 2018-04-02 12:38:41
 tags:
+	- 多线程
 categories:
 ---
 # 背景和简介
@@ -72,25 +73,25 @@ AQS还提供了一个ConditionObject类来表示监视器风格的等待通知�
 static final class Node {
 
 	// 省略部分代码...
-		
+
 	volatile Node prev; // 前节点
-	
+
 	volatile Node next; // 后节点
 
 	volatile int waitStatus;// 等待状态
-	
+
 	volatile Thread thread; // 节点线程
-	
+
 	Node nextWaiter; // 节点模式
 
 	Node() { }
-	
-	Node(Thread thread, Node mode) { 
+
+	Node(Thread thread, Node mode) {
 		this.nextWaiter = mode;
 		this.thread = thread;
 	}
-	
-	Node(Thread thread, int waitStatus) { 
+
+	Node(Thread thread, int waitStatus) {
 		this.waitStatus = waitStatus;
 		this.thread = thread;
 	}
@@ -131,7 +132,7 @@ private transient volatile Node tail;
 private Node addWaiter(Node mode) {
 
 	Node node = new Node(Thread.currentThread(), mode);
-	
+
 	Node pred = tail;
 
 	// 为空表示等待队列为空
@@ -144,10 +145,10 @@ private Node addWaiter(Node mode) {
 			return node;
 		}
 	}
-	
+
 	// 关键 -> 当[等待队列]为空，或者新节点入队失败时（说明存在并发），代码才会执行到这
 	enq(node);
-	
+
 	return node;
 }
 
@@ -187,9 +188,9 @@ private Node enq(final Node node) {
 if (p == head && tryAcquire(arg)) {
 	// 设置新的头节点
     setHead(node);
-	
+
 	// 将旧头节点后指针置空，表示从等待队列移除
-    p.next = null; 
+    p.next = null;
     failed = false;
     return interrupted;
 }

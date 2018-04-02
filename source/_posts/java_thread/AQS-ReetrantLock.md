@@ -1,6 +1,7 @@
-title: study-java-ReetrantLock
+title: ReetrantLock源码
 date: 2018-02-28 19:12:09
 tags:
+  - 多线程
 categories:
 ---
 # Lock接口
@@ -84,37 +85,37 @@ public class ReenterLock implements Runnable{
 
 ```
 //查询当前线程保持此锁的次数。
-int getHoldCount() 
+int getHoldCount()
 
 //返回目前拥有此锁的线程，如果此锁不被任何线程拥有，则返回 null。      
-protected  Thread   getOwner(); 
+protected  Thread   getOwner();
 
 //返回一个 collection，它包含可能正等待获取此锁的线程，其内部维持一个队列，这点稍后会分析。      
-protected  Collection<Thread>   getQueuedThreads(); 
+protected  Collection<Thread>   getQueuedThreads();
 
 //返回正等待获取此锁的线程估计数。   
 int getQueueLength();
 
 // 返回一个 collection，它包含可能正在等待与此锁相关给定条件的那些线程。
-protected  Collection<Thread>   getWaitingThreads(Condition condition); 
+protected  Collection<Thread>   getWaitingThreads(Condition condition);
 
 //返回等待与此锁相关的给定条件的线程估计数。       
 int getWaitQueueLength(Condition condition);
 
 // 查询给定线程是否正在等待获取此锁。     
-boolean hasQueuedThread(Thread thread); 
+boolean hasQueuedThread(Thread thread);
 
 //查询是否有些线程正在等待获取此锁。     
 boolean hasQueuedThreads();
 
 //查询是否有些线程正在等待与此锁有关的给定条件。     
-boolean hasWaiters(Condition condition); 
+boolean hasWaiters(Condition condition);
 
 //如果此锁的公平设置为 true，则返回 true。     
-boolean isFair() 
+boolean isFair()
 
 //查询当前线程是否保持此锁。      
-boolean isHeldByCurrentThread() 
+boolean isHeldByCurrentThread()
 
 //查询此锁是否由任意线程保持。        
 boolean isLocked()    
@@ -311,6 +312,18 @@ static final class NonfairSync extends Sync {
             acquire(1);
     }
 }
+
+/**
+ * 公平锁实现
+ */
+static final class FairSync extends Sync {
+      private static final long serialVersionUID = -3000897897090466540L;
+
+      final void lock() {
+          acquire(1);
+      }
+
+  }
 ```
 
 这里获取锁时，首先对同步状态执行CAS操作，尝试把state的状态从0设置为1，如果返回true则代表获取同步状态成功，也就是当前线程获取锁成，可操作临界资源，如果返回false，则表示已有线程持有该同步状态(其值为1)，获取锁失败，注意这里存在并发的情景，也就是可能同时存在多个线程设置state变量，因此是CAS操作保证了state变量操作的原子性。返回false后，执行 acquire(1)方法，该方法是AQS中的方法，它对中断不敏感，即使线程获取同步状态失败，进入同步队列，后续对该线程执行中断操作也不会从同步队列中移出，方法如下
@@ -378,7 +391,7 @@ public final void acquire(int arg) {
 }
 ```
 
-如果tryAcquire(arg)返回true，acquireQueued自然不会执行，这是最理想的，因为毕竟当前线程已获取到锁，如果tryAcquire(arg)返回false，则会执行addWaiter(Node.EXCLUSIVE)进行入队操作,由于ReentrantLock属于独占锁，因此结点类型为Node.EXCLUSIVE，下面看看addWaiter方法具体实现
+如果tryAcquire(arg)返回true，acquireQueued自然不会执行，这是最理想的，因为毕竟当前线程已获取到锁，如果tryAcquire(arg)返回false，则会执行addWaiter(Node.EXCLUSIVE)进行入队操作,由于ReentrantLock属于独占锁，因此结点类型为Node.EXCLUSIVE，下面看看addWaiter方法具体实现（先执行里面的方法）
 
 
 ```
@@ -520,7 +533,7 @@ private final boolean parkAndCheckInterrupt() {
 }
 ```
 
-shouldParkAfterFailedAcquire()方法的作用是判断当前结点的前驱结点是否为SIGNAL状态(即等待唤醒状态)，如果是则返回true。如果结点的ws为CANCELLED状态(值为1>0),即结束状态，则说明该前驱结点已没有用应该从同步队列移除，执行while循环，直到寻找到非CANCELLED状态的结点。倘若前驱结点的ws值不为CANCELLED，也不为SIGNAL(当从Condition的条件等待队列转移到同步队列时，结点状态为CONDITION因此需要转换为SIGNAL)，那么将其转换为SIGNAL状态，等待被唤醒。 
+shouldParkAfterFailedAcquire()方法的作用是判断当前结点的前驱结点是否为SIGNAL状态(即等待唤醒状态)，如果是则返回true。如果结点的ws为CANCELLED状态(值为1>0),即结束状态，则说明该前驱结点已没有用应该从同步队列移除，执行while循环，直到寻找到非CANCELLED状态的结点。倘若前驱结点的ws值不为CANCELLED，也不为SIGNAL(当从Condition的条件等待队列转移到同步队列时，结点状态为CONDITION因此需要转换为SIGNAL)，那么将其转换为SIGNAL状态，等待被唤醒。
 若shouldParkAfterFailedAcquire()方法返回true，即前驱结点为SIGNAL状态同时又不是head结点，那么使用parkAndCheckInterrupt()方法挂起当前线程，称为WAITING状态，需要等待一个unpark()操作来唤醒它，到此ReetrantLock内部间接通过AQS的FIFO的同步队列就完成了lock()操作，这里我们总结成逻辑流程图
 
 
@@ -583,7 +596,7 @@ public final boolean release(int arg) {
     return false;
 }
 
-//ReentrantLock类中的内部类Sync实现的tryRelease(int releases) 
+//ReentrantLock类中的内部类Sync实现的tryRelease(int releases)
 protected final boolean tryRelease(int releases) {
 
       int c = getState() - releases;
@@ -623,7 +636,7 @@ private void unparkSuccessor(Node node) {
 }
 ```
 
-从代码执行操作来看，这里主要作用是用unpark()唤醒同步队列中最前边未放弃线程(也就是状态为CANCELLED的线程结点s)。此时，回忆前面分析进入自旋的函数acquireQueued()，s结点的线程被唤醒后，会进入acquireQueued()函数的if (p == head && tryAcquire(arg))的判断，如果p!=head也不会有影响，因为它会执行shouldParkAfterFailedAcquire()，由于s通过unparkSuccessor()操作后已是同步队列中最前边未放弃的线程结点，那么通过shouldParkAfterFailedAcquire()内部对结点状态的调整，s也必然会成为head的next结点，因此再次自旋时p==head就成立了，然后s把自己设置成head结点，表示自己已经获取到资源了，最终acquire()也返回了，这就是独占锁释放的过程。 
+从代码执行操作来看，这里主要作用是用unpark()唤醒同步队列中最前边未放弃线程(也就是状态为CANCELLED的线程结点s)。此时，回忆前面分析进入自旋的函数acquireQueued()，s结点的线程被唤醒后，会进入acquireQueued()函数的if (p == head && tryAcquire(arg))的判断，如果p!=head也不会有影响，因为它会执行shouldParkAfterFailedAcquire()，由于s通过unparkSuccessor()操作后已是同步队列中最前边未放弃的线程结点，那么通过shouldParkAfterFailedAcquire()内部对结点状态的调整，s也必然会成为head的next结点，因此再次自旋时p==head就成立了，然后s把自己设置成head结点，表示自己已经获取到资源了，最终acquire()也返回了，这就是独占锁释放的过程。
 ok~，关于独占模式的加锁和释放锁的过程到这就分析完，总之呢，在AQS同步器中维护着一个同步队列，当线程获取同步状态失败后，将会被封装成Node结点，加入到同步队列中并进行自旋操作，当当前线程结点的前驱结点为head时，将尝试获取同步状态，获取成功将自己设置为head结点。在释放同步状态时，则通过调用子类(ReetrantLock中的Sync内部类)的tryRelease(int releases)方法释放同步状态，释放成功则唤醒后继结点的线程。
 
 ## ReetrantLock中公平锁
@@ -654,15 +667,20 @@ protected final boolean tryAcquire(int acquires) {
         }
 ```
 
-该方法与nonfairTryAcquire(int acquires)方法唯一的不同是在使用CAS设置尝试设置state值前，调用了hasQueuedPredecessors()判断同步队列是否存在结点，如果存在必须先执行完同步队列中结点的线程，当前线程进入等待状态。这就是非公平锁与公平锁最大的区别，即公平锁在线程请求到来时先会判断同步队列是否存在结点，如果存在先执行同步队列中的结点线程，当前线程将封装成node加入同步队列等待。而非公平锁呢，当线程请求到来时，不管同步队列是否存在线程结点，直接尝试获取同步状态，获取成功直接访问共享资源，但请注意在绝大多数情况下，非公平锁才是我们理想的选择，毕竟从效率上来说非公平锁总是胜于公平锁。 
-    以上便是ReentrantLock的内部实现原理，这里我们简单进行小结，重入锁ReentrantLock，是一个基于AQS并发框架的并发控制类，其内部实现了3个类，分别是Sync、NoFairSync以及FairSync类，其中Sync继承自AQS，实现了释放锁的模板方法tryRelease(int)，而NoFairSync和FairSync都继承自Sync，实现各种获取锁的方法tryAcquire(int)。ReentrantLock的所有方法实现几乎都间接调用了这3个类，因此当我们在使用ReentrantLock时，大部分使用都是在间接调用AQS同步器中的方法，这就是ReentrantLock的内部实现原理,最后给出张类图结构 
-    
-    
+该方法与nonfairTryAcquire(int acquires)方法唯一的不同是在使用CAS设置尝试设置state值前，调用了hasQueuedPredecessors()判断同步队列是否存在结点，如果存在必须先执行完同步队列中结点的线程，当前线程进入等待状态。这就是非公平锁与公平锁最大的区别，即公平锁在线程请求到来时先会判断同步队列是否存在结点，如果存在先执行同步队列中的结点线程，当前线程将封装成node加入同步队列等待。而非公平锁呢，当线程请求到来时，不管同步队列是否存在线程结点，直接尝试获取同步状态，获取成功直接访问共享资源，但请注意在绝大多数情况下，非公平锁才是我们理想的选择，毕竟从效率上来说非公平锁总是胜于公平锁。
+    以上便是ReentrantLock的内部实现原理，这里我们简单进行小结，重入锁ReentrantLock，是一个基于AQS并发框架的并发控制类，其内部实现了3个类，分别是Sync、NoFairSync以及FairSync类，其中Sync继承自AQS，实现了释放锁的模板方法tryRelease(int)，而NoFairSync和FairSync都继承自Sync，实现各种获取锁的方法tryAcquire(int)。ReentrantLock的所有方法实现几乎都间接调用了这3个类，因此当我们在使用ReentrantLock时，大部分使用都是在间接调用AQS同步器中的方法，这就是ReentrantLock的内部实现原理,最后给出张类图结构
+
+
 ![upload successful](/images/pasted-72.png)
 
 ## 关于synchronized 与ReentrantLock
 
 在JDK 1.6之后，虚拟机对于synchronized关键字进行整体优化后，在性能上synchronized与ReentrantLock已没有明显差距，因此在使用选择上，需要根据场景而定，大部分情况下我们依然建议是synchronized关键字，原因之一是使用方便语义清晰，二是性能上虚拟机已为我们自动优化。而ReentrantLock提供了多样化的同步特性，如超时获取锁、可以被中断获取锁（synchronized的同步是不能中断的）、等待唤醒机制的多个条件变量(Condition)等，因此当我们确实需要使用到这些功能是，可以选择ReentrantLock
+
+ReentrantLock:
+- 超时获取锁
+- 可以被中断获取锁（synchronized的同步是不能中断的）
+- 等待唤醒机制的多条件变量
 
 # 神奇的Condition
 
@@ -938,7 +956,7 @@ public final void await() throws InterruptedException {
       if (acquireQueued(node, savedState) && interruptMode != THROW_IE)
           interruptMode = REINTERRUPT;
        // clean up if cancelled
-      if (node.nextWaiter != null) 
+      if (node.nextWaiter != null)
           //清理等待队列中不为CONDITION状态的结点
           unlinkCancelledWaiters();
       if (interruptMode != 0)

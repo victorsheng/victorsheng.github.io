@@ -1,6 +1,7 @@
 title: 赛跑比赛实现
 date: 2018-03-27 22:02:00
 tags:
+  - 多线程
 categories:
 ---
 # 题目

@@ -1,6 +1,7 @@
-title: study-java-unsafe
+title: CAS和Unsafe
 date: 2018-02-28 09:03:00
 tags:
+  - 多线程
 categories:
 ---
 # 无锁的概念
@@ -201,7 +202,7 @@ public native int arrayBaseOffset(Class arrayClass);
 public native int arrayIndexScale(Class arrayClass);
 ```
 
-## CAS 操作相关 
+## CAS 操作相关
 CAS是一些CPU直接支持的指令，也就是我们前面分析的无锁操作，在Java中无锁操作CAS基于以下3个方法实现，在稍后讲解Atomic系列内部方法是基于下述方法的实现的。
 ```
 //第一个参数o为给定对象，offset为对象内存的偏移量，通过这个偏移量迅速定位字段并设置或获取该字段的值，
@@ -267,7 +268,7 @@ public final native boolean compareAndSwapLong(Object o, long offset,long expect
 ```
 
 
-## 挂起与恢复 
+## 挂起与恢复
 
 将一个线程进行挂起是通过park方法实现的，调用 park后，线程将一直阻塞直到超时或者中断等条件出现。unpark可以终止一个挂起的线程，使其恢复正常。Java对线程的挂起操作被封装在 LockSupport类中，LockSupport类中有各种版本pack方法，其底层实现最终还是使用Unsafe.park()方法和Unsafe.unpark()方法
 
@@ -276,7 +277,7 @@ public final native boolean compareAndSwapLong(Object o, long offset,long expect
 public native void park(boolean isAbsolute, long time);  
 
 //终止挂起的线程，恢复正常.java.util.concurrent包中挂起操作都是在LockSupport类实现的，其底层正是使用这两个方法，  
-public native void unpark(Object thread); 
+public native void unpark(Object thread);
 ```
 
 ## 内存屏障
@@ -315,7 +316,7 @@ public native Class defineClass(String name, byte[] b, int off, int len, ClassLo
 public native Class defineAnonymousClass(Class hostClass, byte[] data, Object[] cpPatches);
 //判断是否需要加载一个类
 public native boolean shouldBeInitialized(Class<?> c);
-//确保类一定被加载 
+//确保类一定被加载
 public native  void ensureClassInitialized(Class<?> c)
 ```
 

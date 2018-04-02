@@ -2,6 +2,7 @@
 title: study-locksupport
 date: 2018-04-02 18:39:55
 tags:
+  - 多线程
 categories:
 ---
 # 介绍
@@ -61,9 +62,9 @@ park函数是将当前调用Thread阻塞，而unpark函数则是将指定线程T
 # 测试
 ```
 public static void main(String[] args) {
-        
+
         final Thread mainThread = Thread.currentThread();
-        
+
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -78,7 +79,7 @@ public static void main(String[] args) {
         });
         thread.start();
         LockSupport.park();
-        
+
         System.out.println("Demo.main()");
     }
 ```

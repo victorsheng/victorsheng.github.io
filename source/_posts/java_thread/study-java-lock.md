@@ -1,6 +1,7 @@
 title: study-java-lock
 date: 2018-02-01 22:49:51
 tags:
+  - 多线程
 categories:
 ---
 ```
@@ -58,4 +59,3 @@ ACC_SYNCHRONIZED
   <td>类型指针指向对象的类元数据，JVM通过这个指针确定该对象是哪个类的实例。</td>
 </tr>
 </tbody></table>
-

@@ -1,7 +1,8 @@
 ---
-title: java-deprecated-thread-stop
+title: 为什么废弃thread类的stop方法
 date: 2018-03-28 14:27:14
 tags:
+  - 多线程
 categories:
 ---
 
@@ -44,18 +45,18 @@ class MyThread extends Thread {
 
 ```
 
-console输出的结果是： 
-try 
+console输出的结果是：
+try
 run
-finally 
+finally
 
 可以看到，stop终结一个线程，并且释放监控线程的所有资源。对于主线程来说，并不能再跟踪线程的运行状况，当线程出现异常也不能被捕获。而其他线程并不知道被stop的线程出现了异常。这样导致状态不一致的情况产生。
 
-注释掉stop 一行，换用interrupt,进行测试。输出结果是： 
-try 
-finally 
-run 
-exception 
+注释掉stop 一行，换用interrupt,进行测试。输出结果是：
+try
+finally
+run
+exception
 
 catch部分无法处理ThreadDeath异常
 
@@ -71,10 +72,10 @@ public class ThreadDeath extends Error {
 ```
  ThreadDeath 悄无声息的杀死及其他线程。因此，用户得不到程序可能会崩溃的警告。崩溃会在真正破坏发生后的任意时刻显现，甚至在数小时或数天之后。
 
- 
+
 ## 为何不正确
-首先应该明确一点：一个线程不应该由其他线程来强制中断或停止，而是应该由线程自己自行停止。所以Thread.stop(),（同样的原因还有Thread.suspend(), Thread.resume()）都已经被废弃了。 
- 
+首先应该明确一点：一个线程不应该由其他线程来强制中断或停止，而是应该由线程自己自行停止。所以Thread.stop(),（同样的原因还有Thread.suspend(), Thread.resume()）都已经被废弃了。
+
 ### 一、资源回收问题
 线程A调用线程B的stop方法去停止线程B，调用这个方法的时候线程A其实并不知道线程B执行的具体情况，这种突然地停止会导致线程B的一些清理工作无法完成。
 
