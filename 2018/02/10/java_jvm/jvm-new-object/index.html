@@ -79,7 +79,7 @@
 
 
 
-<meta name="description" content="类的初始化类加载机制概述我们知道，一个.java文件在编译后会形成相应的一个或多个Class文件（若一个类中含有内部类，则编译后会产生多个Class文件），但这些Class文件中描述的各种信息，最终都需要加载到虚拟机中之后才能被运行和使用。事实上，虚拟机把描述类的数据从Class文件加载到内存，并对数据进行校验，转换解">
+<meta name="description" content="类的初始化类加载机制概述我们知道，一个.java文件在编译后会形成相应的一个或多个Class文件（若一个类中含有内部类，则编译后会产生多个Class文件），但这些Class文件中描述的各种信息，最终都需要加载到虚拟机中之后才能被运行和使用。事实上，虚拟机把描述类的数据从Class文件加载到内存，并对数据进行校验，转换解析和初始化，最终形成可以被虚拟机直接使用的Java类型的过程就是虚拟机的 类加">
 <meta property="og:type" content="article">
 <meta property="og:title" content="jvm-new-object">
 <meta property="og:url" content="http://www.victor123.cn/2018/02/10/java_jvm/jvm-new-object/index.html">
@@ -89,7 +89,7 @@
 <meta property="og:image" content="http://pic.victor123.cn/18-2-11/44324841.jpg">
 <meta property="og:image" content="http://pic.victor123.cn/18-2-10/76019613.jpg">
 <meta property="og:image" content="http://pic.victor123.cn/18-2-10/68053536.jpg">
-<meta property="og:updated_time" content="2018-02-17T15:53:42.000Z">
+<meta property="og:updated_time" content="2018-04-03T01:23:38.155Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="jvm-new-object">
 <meta name="twitter:description" content="类的初始化类加载机制概述我们知道，一个.java文件在编译后会形成相应的一个或多个Class文件（若一个类中含有内部类，则编译后会产生多个Class文件），但这些Class文件中描述的各种信息，最终都需要加载到虚拟机中之后才能被运行和使用。事实上，虚拟机把描述类的数据从Class文件加载到内存，并对数据进行校验，转换解析和初始化，最终形成可以被虚拟机直接使用的Java类型的过程就是虚拟机的 类加">
@@ -494,8 +494,8 @@
 <p>这几种类加载器的层次关系如下图所示：</p>
 <p><img src="http://pic.victor123.cn/18-2-10/68053536.jpg" alt=""></p>
 <p>站在Java虚拟机的角度来讲，只存在两种不同的类加载器：启动类加载器：它使用C++实现（这里仅限于Hotspot，也就是JDK1.5之后默认的虚拟机，有很多其他的虚拟机是用Java语言实现的），是虚拟机自身的一部分；所有其它的类加载器：这些类加载器都由Java语言实现，独立于虚拟机之外，并且全部继承自抽象类java.lang.ClassLoader，这些类加载器需要由启动类加载器加载到内存中之后才能去加载其他的类。</p>
-<h3 id="JVM三种预定义类型类加载器"><a href="#JVM三种预定义类型类加载器" class="headerlink" title="JVM三种预定义类型类加载器"></a>JVM三种预定义类型类加载器</h3><h4 id="启动（Bootstrap）类加载器："><a href="#启动（Bootstrap）类加载器：" class="headerlink" title="启动（Bootstrap）类加载器："></a>启动（Bootstrap）类加载器：</h4><p>引导类加载器是用 本地代码实现的类加载器，它负责将 <java_home>/lib下面的核心类库 或 -Xbootclasspath选项指定的jar包等 虚拟机识别的类库 加载到内存中。由于引导类加载器涉及到虚拟机本地实现细节，开发者无法直接获取到启动类加载器的引用，所以 不允许直接通过引用进行操作。</java_home></p>
-<h4 id="扩展（Extension）类加载器："><a href="#扩展（Extension）类加载器：" class="headerlink" title="扩展（Extension）类加载器："></a>扩展（Extension）类加载器：</h4><p>扩展类加载器是由Sun的ExtClassLoader（sun.misc.Launcher$ExtClassLoader）实现的，它负责将 <java_home>/lib/ext或者由系统变量-Djava.ext.dir指定位置中的类库 加载到内存中。开发者可以直接使用标准扩展类加载器。</java_home></p>
+<h3 id="JVM三种预定义类型类加载器"><a href="#JVM三种预定义类型类加载器" class="headerlink" title="JVM三种预定义类型类加载器"></a>JVM三种预定义类型类加载器</h3><h4 id="启动（Bootstrap）类加载器："><a href="#启动（Bootstrap）类加载器：" class="headerlink" title="启动（Bootstrap）类加载器："></a>启动（Bootstrap）类加载器：</h4><p>引导类加载器是用 本地代码实现的类加载器，它负责将 &lt;JAVA_HOME&gt;/lib下面的核心类库 或 -Xbootclasspath选项指定的jar包等 虚拟机识别的类库 加载到内存中。由于引导类加载器涉及到虚拟机本地实现细节，开发者无法直接获取到启动类加载器的引用，所以 不允许直接通过引用进行操作。</p>
+<h4 id="扩展（Extension）类加载器："><a href="#扩展（Extension）类加载器：" class="headerlink" title="扩展（Extension）类加载器："></a>扩展（Extension）类加载器：</h4><p>扩展类加载器是由Sun的ExtClassLoader（sun.misc.Launcher$ExtClassLoader）实现的，它负责将 &lt;JAVA_HOME &gt;/lib/ext或者由系统变量-Djava.ext.dir指定位置中的类库 加载到内存中。开发者可以直接使用标准扩展类加载器。</p>
 <h4 id="系统（System）类加载器："><a href="#系统（System）类加载器：" class="headerlink" title="系统（System）类加载器："></a>系统（System）类加载器：</h4><p>系统类加载器是由 Sun 的 AppClassLoader（sun.misc.Launcher$AppClassLoader）实现的，它负责将 用户类路径(java -classpath或-Djava.class.path变量所指的目录，即当前类所在路径及其引用的第三方类库的路径，如第四节中的问题6所述)下的类库 加载到内存中。开发者可以直接使用系统类加载器。</p>
 <p>应用程序都是由这三种类加载器互相配合进行加载的，如果有必要，我们还可以加入自定义的类加载器。因为JVM自带的ClassLoader只是懂得从本地文件系统加载标准的java class文件，因此如果编写了自己的ClassLoader，便可以做到如下几点：</p>
 <p>1、在执行非置信代码之前，自动验证数字签名。<br>2、动态地创建符合用户特定需要的定制化构建类。<br>3、从特定的场所取得java class，例如数据库中和网络中。</p>

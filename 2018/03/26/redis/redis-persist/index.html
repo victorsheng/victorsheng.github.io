@@ -79,7 +79,7 @@
 
 
 
-<meta name="description" content="为防止数据丢失，需要将 Redis 中的数据从内存中 dump 到磁盘，这就是持久化。Redis 提供两种持久化方式：RDB 和 AOF。Redis 允许两者结合，也允许两者同时关闭。 RDB 可以定时备份内存中的数据集。服务器启动的时候，可以从 RDB 文件中恢复数据集。 AOF(append only file) ">
+<meta name="description" content="为防止数据丢失，需要将 Redis 中的数据从内存中 dump 到磁盘，这就是持久化。Redis 提供两种持久化方式：RDB 和 AOF。Redis 允许两者结合，也允许两者同时关闭。 RDB 可以定时备份内存中的数据集。服务器启动的时候，可以从 RDB 文件中恢复数据集。 AOF(append only file) 可以记录服务器的所有写操作。在服务器重新启动的时候，会把所有的写操作重新执行一遍">
 <meta name="keywords" content="redis">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Redis持久化方式">
@@ -89,7 +89,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://wiki.jikexueyuan.com/project/redis/images/redis16.png">
 <meta property="og:image" content="http://wiki.jikexueyuan.com/project/redis/images/redis18.png">
-<meta property="og:updated_time" content="2018-03-28T15:47:12.102Z">
+<meta property="og:updated_time" content="2018-04-03T01:23:38.178Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Redis持久化方式">
 <meta name="twitter:description" content="为防止数据丢失，需要将 Redis 中的数据从内存中 dump 到磁盘，这就是持久化。Redis 提供两种持久化方式：RDB 和 AOF。Redis 允许两者结合，也允许两者同时关闭。 RDB 可以定时备份内存中的数据集。服务器启动的时候，可以从 RDB 文件中恢复数据集。 AOF(append only file) 可以记录服务器的所有写操作。在服务器重新启动的时候，会把所有的写操作重新执行一遍">
@@ -471,7 +471,7 @@
 <p><img src="http://wiki.jikexueyuan.com/project/redis/images/redis18.png" alt="image.png"></p>
 <p>1）AOF 后台执行的方式和 RDB 有类似的地方，fork 一个子进程，主进程仍进行服务，子进程执行AOF 持久化，数据被dump 到磁盘上。与 RDB 不同的是，后台子进程持久化过程中，主进程会记录期间的所有数据变更（主进程还在服务），并存储在 server.aof_rewrite_buf_blocks 中；后台子进程结束后，Redis 更新缓存追加到 AOF 文件中，是 RDB 持久化所不具备的。</p>
 <p>来说说更新缓存这个东西。Redis 服务器产生数据变更的时候，譬如 set name Jhon，不仅仅会修改内存数据集，也会记录此更新（修改）操作，记录的方式就是上面所说的数据组织方式。</p>
-<p>更新缓存可以存储在 server.aof<em>buf 中，你可以把它理解为一个小型临时中转站，所有累积的更新缓存都会先放入这里，它会在特定时机写入文件或者插入到server.aof</em>-rewrite_buf_blocks 下链表（下面会详述）；server.aof<em>buf 中的数据在 propagrate() 添加，在涉及数据更新的地方都会调用propagrate() 以累积变更。更新缓存也可以存储在 server.aof</em>-rewrite_buf_blocks，这是一个元素类型为 struct aofrwblock 的链表，你可以把它理解为一个仓库，当后台有AOF 子进程的时候，会将累积的更新缓存（在 server.aof_buf 中）插入到链表中，而当 AOF 子进程结束，它会被整个写入到文件。两者是有关联的。</p>
+<p>更新缓存可以存储在 server.aof_buf 中，你可以把它理解为一个小型临时中转站，所有累积的更新缓存都会先放入这里，它会在特定时机写入文件或者插入到server.aof_-rewrite_buf_blocks 下链表（下面会详述）；server.aof_buf 中的数据在 propagrate() 添加，在涉及数据更新的地方都会调用propagrate() 以累积变更。更新缓存也可以存储在 server.aof_-rewrite_buf_blocks，这是一个元素类型为 struct aofrwblock 的链表，你可以把它理解为一个仓库，当后台有AOF 子进程的时候，会将累积的更新缓存（在 server.aof_buf 中）插入到链表中，而当 AOF 子进程结束，它会被整个写入到文件。两者是有关联的。</p>
 <p>这里的意图即是不用每次出现数据变更的时候都触发一个写操作，可以将写操作先缓存到内存中，待到合适的时机写入到磁盘，如此避免频繁的写操作。当然，完全可以实现让数据变更及时更新到磁盘中。两种做法的好坏就是一种博弈了。</p>
 <p>Redis允许同时开启AOF和RDB，既保证了数据安全又使得进行备份等操作十分容易。此时重新启动Redis后Redis会使用AOF文件来恢复数据，因为AOF方式的持久化可能丢失的数据更少。</p>
 <h2 id="AOF-的优点"><a href="#AOF-的优点" class="headerlink" title="AOF 的优点"></a>AOF 的优点</h2><ul>
@@ -531,8 +531,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/03/26/redis/redis-fast/" rel="next" title="Redis 快的原因">
-                <i class="fa fa-chevron-left"></i> Redis 快的原因
+              <a href="/2018/03/26/redis/redis-data-type/" rel="next" title="redis数据类型">
+                <i class="fa fa-chevron-left"></i> redis数据类型
               </a>
             
           </div>
@@ -541,8 +541,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/03/26/redis/redis-key-timeout/" rel="prev" title="Redis过期淘汰机制">
-                Redis过期淘汰机制 <i class="fa fa-chevron-right"></i>
+              <a href="/2018/03/27/design/study-idempotence/" rel="prev" title="常见用来保证幂等的手段">
+                常见用来保证幂等的手段 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>

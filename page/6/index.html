@@ -1543,6 +1543,151 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/02/01/java_thread/study-java-lock/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/02/01/java_thread/study-java-lock/" itemprop="url">study-java-lock</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-01T22:49:51+08:00">
+                2018-02-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/02/01/java_thread/study-java-lock/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/02/01/java_thread/study-java-lock/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/02/01/java_thread/study-java-lock/" class="leancloud_visitors" data-flag-title="study-java-lock">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">锁的实现</span><br><span class="line"></span><br><span class="line">在关于锁的面试过程中，一般主要问Synchronized和ReentrantLock的实现原理，更有甚者会问一些读写锁。</span><br><span class="line">场景对话：</span><br><span class="line"></span><br><span class="line">面试官：都了解Java中的什么锁？</span><br><span class="line">我：比如Synchronized和ReentrantLock...读写锁用的不多，就没研究了</span><br><span class="line">面试官：那好，你先说说Synchronized的实现原理吧</span><br><span class="line">我：嗯，Synchronized是JVM实现的一种锁，其中锁的获取和释放分别是monitorenter和monitorexit指令，该锁在实现上分为了偏向锁、轻量级锁和重量级锁，其中偏向锁在1.6是默认开启的，轻量级锁在多线程竞争的情况下会膨胀成重量级锁，有关锁的数据都保存在对象头中...&amp;&amp;@@#，（嗯，说了一大堆，面试官也没打断我）</span><br><span class="line">面试官：哦，嗯，理解的还挺透彻，那你说说ReentrantLock的实现吧...</span><br><span class="line">我：ReentrantLock是基于AQS实现的</span><br><span class="line">面试官：什么是AQS？</span><br><span class="line">我：在AQS内部会保存一个状态变量state，通过CAS修改该变量的值，修改成功的线程表示获取到该锁，没有修改成功，或者发现状态state已经是加锁状态，则通过一个Waiter对象封装线程，添加到等待队列中，并挂起等待被唤醒&amp;&amp;&amp;$$（又说了一堆）</span><br><span class="line">面试官：能说说CAS的实现原理么？</span><br><span class="line">我：CAS是通过unsafe类的compareAndSwap方法实现的（心里得意的一笑）</span><br><span class="line">面试官：哦，好的，那你知道这个方法的参数的含义的么？</span><br><span class="line">我：（这是在逼我啊...努力的回想，因为我真的看过啊）我想想啊，这个方法看的时间有点久远了，第一个参数是要修改的对象，第二个参数是对象中要修改变量的偏移量，第三个参数是修改之前的值，第四个参数是预想修改后的值....（说出来之后都有点佩服自己，这个都记得，不过面试官好像还是不肯放过我...）</span><br><span class="line">面试官：嗯，对的，那你知道操作系统级别是如何实现的么？</span><br><span class="line">我：（我去你大爷...）我只记得X86中有一个cmp开头的指令，具体的我忘记了...</span><br><span class="line">面试官：嗯，好，你知道CAS指令有什么缺点么</span><br><span class="line">我：哦，CAS的缺点是存在ABA问题</span><br><span class="line">面试官：怎么讲？</span><br><span class="line">我：就是一个变量V，如果变量V初次读取的时候是A，并且在准备赋值的时候检查到它仍然是A，那能说明它的值没有被其他线程修改过了吗？如果在这段期间它的值曾经被改成了B，然后又改回A，那CAS操作就会误认为它从来没有被修改过。</span><br><span class="line">面试官：那怎么解决？</span><br><span class="line">我：（有完没完了啊...我的心里是崩溃的）针对这种情况，java并发包中提供了一个带有标记的原子引用类&quot;AtomicStampedReference&quot;，它可以通过控制变量值的版本来保证CAS的正确性。</span><br><span class="line"></span><br><span class="line">本来转载自公众号  占小狼的博客</span><br><span class="line">作者占小狼   来自 美团点评 基础架构组</span><br></pre></td></tr></table></figure>
+<p>Java 虚拟机中的同步(Synchronization)基于进入和退出管程(Monitor)对象实现</p>
+<p>ACC_SYNCHRONIZED</p>
+<table><br><thead><br><tr><br>  <th align="center">虚拟机位数</th><br>  <th align="center">头对象结构</th><br>  <th>说明</th><br></tr><br></thead><br><tbody><tr><br>  <td align="center">32/64bit</td><br>  <td align="center">Mark Word</td><br>  <td>存储对象的hashCode、锁信息或分代年龄或GC标志等信息</td><br></tr><br><tr><br>  <td align="center">32/64bit</td><br>  <td align="center">Class Metadata Address</td><br>  <td>类型指针指向对象的类元数据，JVM通过这个指针确定该对象是哪个类的实例。</td><br></tr><br></tbody></table>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/02/01/java_jvm/study-Synchronized-lock/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1673,151 +1818,6 @@
 <h2 id="等待唤醒机制与synchronized"><a href="#等待唤醒机制与synchronized" class="headerlink" title="等待唤醒机制与synchronized"></a>等待唤醒机制与synchronized</h2><p>所谓等待唤醒机制本篇主要指的是notify/notifyAll和wait方法，在使用这3个方法时，必须处于synchronized代码块或者synchronized方法中，否则就会抛出IllegalMonitorStateException异常，这是因为调用这几个方法前必须拿到当前对象的监视器monitor对象，也就是说notify/notifyAll和wait方法依赖于monitor对象，在前面的分析中，我们知道monitor 存在于对象头的Mark Word 中(存储monitor引用指针)，而synchronized关键字可以获取 monitor ，这也就是为什么notify/notifyAll和wait方法必须在synchronized代码块或者synchronized方法调用的原因。</p>
 <p>需要特别理解的一点是，与sleep方法不同的是wait方法调用完成后，线程将被暂停，但wait方法将会释放当前持有的监视器锁(monitor)，直到有线程调用notify/notifyAll方法后方能继续执行，而sleep方法只让线程休眠并不释放锁。同时notify/notifyAll方法调用后，并不会马上释放监视器锁，而是在相应的synchronized(){}/synchronized方法执行结束后才自动释放锁。</p>
 <h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://blog.csdn.net/javazejian/article/details/72828483" target="_blank" rel="noopener">http://blog.csdn.net/javazejian/article/details/72828483</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/02/01/java_thread/study-java-lock/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/02/01/java_thread/study-java-lock/" itemprop="url">study-java-lock</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-01T22:49:51+08:00">
-                2018-02-01
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/02/01/java_thread/study-java-lock/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/02/01/java_thread/study-java-lock/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/02/01/java_thread/study-java-lock/" class="leancloud_visitors" data-flag-title="study-java-lock">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">锁的实现</span><br><span class="line"></span><br><span class="line">在关于锁的面试过程中，一般主要问Synchronized和ReentrantLock的实现原理，更有甚者会问一些读写锁。</span><br><span class="line">场景对话：</span><br><span class="line"></span><br><span class="line">面试官：都了解Java中的什么锁？</span><br><span class="line">我：比如Synchronized和ReentrantLock...读写锁用的不多，就没研究了</span><br><span class="line">面试官：那好，你先说说Synchronized的实现原理吧</span><br><span class="line">我：嗯，Synchronized是JVM实现的一种锁，其中锁的获取和释放分别是monitorenter和monitorexit指令，该锁在实现上分为了偏向锁、轻量级锁和重量级锁，其中偏向锁在1.6是默认开启的，轻量级锁在多线程竞争的情况下会膨胀成重量级锁，有关锁的数据都保存在对象头中...&amp;&amp;@@#，（嗯，说了一大堆，面试官也没打断我）</span><br><span class="line">面试官：哦，嗯，理解的还挺透彻，那你说说ReentrantLock的实现吧...</span><br><span class="line">我：ReentrantLock是基于AQS实现的</span><br><span class="line">面试官：什么是AQS？</span><br><span class="line">我：在AQS内部会保存一个状态变量state，通过CAS修改该变量的值，修改成功的线程表示获取到该锁，没有修改成功，或者发现状态state已经是加锁状态，则通过一个Waiter对象封装线程，添加到等待队列中，并挂起等待被唤醒&amp;&amp;&amp;$$（又说了一堆）</span><br><span class="line">面试官：能说说CAS的实现原理么？</span><br><span class="line">我：CAS是通过unsafe类的compareAndSwap方法实现的（心里得意的一笑）</span><br><span class="line">面试官：哦，好的，那你知道这个方法的参数的含义的么？</span><br><span class="line">我：（这是在逼我啊...努力的回想，因为我真的看过啊）我想想啊，这个方法看的时间有点久远了，第一个参数是要修改的对象，第二个参数是对象中要修改变量的偏移量，第三个参数是修改之前的值，第四个参数是预想修改后的值....（说出来之后都有点佩服自己，这个都记得，不过面试官好像还是不肯放过我...）</span><br><span class="line">面试官：嗯，对的，那你知道操作系统级别是如何实现的么？</span><br><span class="line">我：（我去你大爷...）我只记得X86中有一个cmp开头的指令，具体的我忘记了...</span><br><span class="line">面试官：嗯，好，你知道CAS指令有什么缺点么</span><br><span class="line">我：哦，CAS的缺点是存在ABA问题</span><br><span class="line">面试官：怎么讲？</span><br><span class="line">我：就是一个变量V，如果变量V初次读取的时候是A，并且在准备赋值的时候检查到它仍然是A，那能说明它的值没有被其他线程修改过了吗？如果在这段期间它的值曾经被改成了B，然后又改回A，那CAS操作就会误认为它从来没有被修改过。</span><br><span class="line">面试官：那怎么解决？</span><br><span class="line">我：（有完没完了啊...我的心里是崩溃的）针对这种情况，java并发包中提供了一个带有标记的原子引用类&quot;AtomicStampedReference&quot;，它可以通过控制变量值的版本来保证CAS的正确性。</span><br><span class="line"></span><br><span class="line">本来转载自公众号  占小狼的博客</span><br><span class="line">作者占小狼   来自 美团点评 基础架构组</span><br></pre></td></tr></table></figure>
-<p>Java 虚拟机中的同步(Synchronization)基于进入和退出管程(Monitor)对象实现</p>
-<p>ACC_SYNCHRONIZED</p>
-<table><br><thead><br><tr><br>  <th align="center">虚拟机位数</th><br>  <th align="center">头对象结构</th><br>  <th>说明</th><br></tr><br></thead><br><tbody><tr><br>  <td align="center">32/64bit</td><br>  <td align="center">Mark Word</td><br>  <td>存储对象的hashCode、锁信息或分代年龄或GC标志等信息</td><br></tr><br><tr><br>  <td align="center">32/64bit</td><br>  <td align="center">Class Metadata Address</td><br>  <td>类型指针指向对象的类元数据，JVM通过这个指针确定该对象是哪个类的实例。</td><br></tr><br></tbody></table>
 
           
         
