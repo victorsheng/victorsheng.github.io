@@ -1,5 +1,5 @@
 ---
-title: 为什么废弃thread类的stop方法
+title: 为什么废弃thread类的stop方法及java中的中断概念
 date: 2018-03-28 14:27:14
 tags:
   - 多线程
@@ -159,7 +159,18 @@ java.lang.ThreadDeath
 ```
 可以看到thread1抛出了java.lang.ThreadDeath错误。同时thread的lock被破坏掉了，只有thread2获得了lock。因为锁被破坏，所以当前线程可能不安全。
 
+# 线程中断
+在Java中没有办法立即停止一条线程，然而停止线程却显得尤为重要，如取消一个耗时操作。因此，Java提供了一种用于停止线程的机制——中断。
+- 中断只是一种协作机制，Java没有给中断增加任何语法，中断的过程完全需要程序员自己实现。若要中断一个线程，你需要手动调用该线程的interrupted方法，该方法也仅仅是将线程对象的中断标识设成true；接着你需要自己写代码不断地检测当前线程的标识位；如果为true，表示别的线程要求这条线程中断，此时究竟该做什么需要你自己写代码实现。
+- 每个线程对象中都有一个标识，用于表示线程是否被中断；该标识位为true表示中断，为false表示未中断；
+- 通过调用线程对象的interrupt方法将该线程的标识位设为true；可以在别的线程中调用，也可以在自己的线程中调用。
 
+## 相关方法
+中断的相关方法public void interrupt() 将调用者线程的中断状态设为true。public boolean isInterrupted() 判断调用者线程的中断状态。public static boolean interrupted 只能通过Thread.interrupted()调用。 它会做两步操作：返回当前线程的中断状态；将当前线程的中断状态设为false；
+
+## 正确用法
+1.设置中断监听
+2.触发中断
 
 # 参考
  http://ibruce.info/2013/12/19/how-to-stop-a-java-thread/

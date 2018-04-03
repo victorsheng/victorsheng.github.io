@@ -60,6 +60,13 @@ public interface Lock {
 平性也如此。如果希望遵守此锁的公平设置，则使用 tryLock(0, TimeUnit.SECONDS)
 ```
 
+## 总结
+lock ： 在锁上等待，直到获取锁；
+
+tryLock：立即返回，获得锁返回true,没获得锁返回false；
+
+tryInterruptibly：在锁上等待，直到获取锁，但是会响应中断，这个方法优先考虑响应中断，而不是响应锁的普通获取或重入获取。 
+
 # Lock接口的实现
 
 Lock接口主要的实现是
