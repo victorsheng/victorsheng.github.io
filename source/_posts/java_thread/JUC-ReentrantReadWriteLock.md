@@ -2,7 +2,7 @@
 title: AQS-ReentrantReadWriteLock
 date: 2018-04-02 23:02:00
 tags:
-	- 多线程
+   - 多线程
 categories:
 ---
 
@@ -26,4 +26,3 @@ ReentrantReadWriteLock允许读线程和写线程重复获取读锁或写锁。�
 
 4. Condition支持：
 Condition只有在写锁中用到，读锁是不支持Condition的。
-

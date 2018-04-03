@@ -35,7 +35,6 @@ JSR，全称 Java Specification Requests， 即Java规范提案， 主要是用�
 	+ ReentrantLock
 	+ ReentrantReadWriteLock
 	+ StampedLock
-	+
 - 原子变量类(Atomic Variables)
 - 并发集合(Concurrent Collections)
 - Executor框架（线程池、 Callable 、Future）
