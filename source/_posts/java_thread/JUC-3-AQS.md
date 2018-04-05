@@ -1,8 +1,7 @@
----
 title: AbstractQueuedSynchronizer学习
-date: 2018-04-02 12:38:41
 tags:
-	- 多线程
+  - 多线程
+date: 2018-04-02 12:38:41
 categories:
 ---
 # 背景和简介
@@ -31,12 +30,13 @@ AQS内部通过一个int类型的state字段表示同步状态，状态的具体
 - FutureTask.get(1.5以后不再使用AQS)
 
 
-等。
+
 另外AQS还提供其他功能，如非阻塞的获取tryAcquire, 带有超时时间的获取，可以中断的获取等。
 AQS可以根据具体的场景提供exclusive模式和shared模式，在exclusive模式下，同一时刻最多只能有一个线程能够处于成功获取的状态，排他锁是一个exclusive模式的例子，shared模式则可以多个线程一起获取成功，如多个许可的Semaphore。
 另外在java.util.concurrent包中还定义了Condition接口，用来提供监视器风格的等待通知操作，可以替换Object中基于synchronized、监视器锁的wait和notify机制。
 
 实现具体的同步器时，需要将实现类作为具体同步器的内部类，然后调用实现类的acquire、acquireShared、release等方法。
+
 
 ## 更具体的设计
 
@@ -68,7 +68,7 @@ AQS还提供了一个ConditionObject类来表示监视器风格的等待通知�
 
 # 代码实现
 
-## 节点(5个字段)
+## 节点
 ```
 static final class Node {
 
@@ -204,3 +204,193 @@ private void setHead(Node node) {
 
 ## 共享模式
 共享式的操作与独占式的主要区别在于，每次acquire竞争失败后，独占式将立即阻塞当前线程，而共享式需要在多次acquire失败后才会阻塞当前线程。简单来说，共享式是有一定限额的独占式。限额的满足方式，根据不同的子类不同的实现方式。
+
+
+
+# 总结
+## AbstractQueuedSynchronizer方法概述
+Lock的接口方法是针对用户的使用而定义的，我们在实现Lock的时候，就需要做如下事情，重点关注下这些事情的共性和异性
+
+- 指明什么情况下才叫获取到锁：如独占锁，一旦有人占据了，就不能获取到锁。如共享锁，有人占据，但是没超过限制也能获取锁。这一部分应该是锁的实现的业务代码，每种锁都有自己的业务逻辑。这一部分其实就是AbstractQueuedSynchronizer对子类留出的tryAcquire方法
+
+- 获取不到锁的时候该如何处理呢：我们当然希望它们能够继续等待，有一个队列就最好不过了，一旦获取锁失败就加入到等待队列中排队，队列中的等待者依次再去竞争获取锁。这一部分代码其实就和哪种锁没太大关系了，所以应该是锁的共性部分，这一部分其实就是AbstractQueuedSynchronizer实现的共性部分acquireQueued
+
+```
+if (!tryAcquire(arg) &&
+        acquireQueued(addWaiter(Node.EXCLUSIVE), arg))
+
+```
+
+代表着先试着获取一下锁，如果获取不成功，就把之后的处理逻辑交给AbstractQueuedSynchronizer来处理。反正你只管告诉AbstractQueuedSynchronizer它怎样才叫获取到锁，其他的等待处理逻辑你就可以不用再关心了。
+
+
+以上也仅仅是部分内容，下面来全面看下AbstractQueuedSynchronizer对外留出的接口和已实现的共性部分
+
+### 对外留出的接口：
+
+tryAcquire：该方法向AQS解释了怎么才叫获取一把独占锁
+
+tryRelease：该方法向AQS解释了怎么才叫释放一把独占锁
+
+tryAcquireShared：该方法向AQS解释了怎么才叫获取一把共享锁
+
+tryReleaseShared：该方法向AQS解释了怎么才叫释放一把共享锁
+
+这些内容就是各种锁本身的业务逻辑，属于异性部分。
+```
+public class AbstractQueuedSynchronizerChild  extends AbstractQueuedSynchronizer {
+
+    @Override
+    protected boolean tryAcquire(int arg) {
+        return super.tryAcquire(arg);
+    }
+
+    @Override
+    protected boolean tryRelease(int arg) {
+        return super.tryRelease(arg);
+    }
+
+    @Override
+    protected int tryAcquireShared(int arg) {
+        return super.tryAcquireShared(arg);
+    }
+
+    @Override
+    protected boolean tryReleaseShared(int arg) {
+        return super.tryReleaseShared(arg);
+    }
+
+
+}
+
+```
+
+### 来看看锁的共性部分相关方法：
+
+
+来看看锁的共性部分相关方法：
+
+- acquire：获取一把独占锁的过程
+```
+public final void acquire(int arg) {
+    if (!tryAcquire(arg) &&
+        acquireQueued(addWaiter(Node.EXCLUSIVE), arg))
+        selfInterrupt();
+}
+就是先拿锁实现的tryAcquire方法去尝试获取独占锁，一旦获取锁失败就进入队列，交给AQS来处理，一旦成功就表示获取到了一把锁。
+```
+- release：释放一把独占锁的过程
+```
+public final boolean release(int arg) {
+    if (tryRelease(arg)) {
+        Node h = head;
+        if (h != null && h.waitStatus != 0)
+            unparkSuccessor(h);
+        return true;
+    }
+    return false;
+}
+```
+就是先拿锁实现的tryRelease方法尝试释放独占锁，一旦释放成功，就通知队列，有人释放锁了，队列前面的可以再次去竞争锁了（这一部分下面详细说明）
+
+- acquireShared：获取一把共享锁的过程
+```
+public final void acquireShared(int arg) {
+    if (tryAcquireShared(arg) < 0)
+        doAcquireShared(arg);
+}
+```
+就是先拿锁实现的tryAcquireShared方法尝试获取共享锁，一旦获取失败，就进入队列，交给AQS来处理
+
+- releaseShared：释放一把共享锁的过程
+```
+public final boolean releaseShared(int arg) {
+    if (tryReleaseShared(arg)) {
+        doReleaseShared();
+        return true;
+    }
+    return false;
+}
+```
+就是先拿锁实现的tryReleaseShared方法尝试释放共享锁，一旦释放成功，就通知队列，有人释放锁了
+
+## AbstractQueuedSynchronizer的状态属性state
+从上面我们就看到老是方法中会有各种的int参数，其实这是AbstractQueuedSynchronizer将获取锁的过程量化对数字的操作，而state变量就是用于记录当前数字值的。以独占锁为例:
+
+- state=0 表示该锁未被其他线程获取
+
+- 一旦有线程想获取锁，就可以对state进行CAS增量操作，这个增量可以是任意值，不过大多数都默认取1。也就是说一旦一个线程对state CAS操作成功就代表该线程获取到了锁，则state就变成1了。其他操作对state CAS操作失败的就代表没获取到锁，就自动进入AQS管理流程
+
+- 其他线程发现当前state值不等于0表示锁已被其他线程获取，就自动进入AQS管理流程
+
+- 一旦获取锁的线程想释放锁，就可以对state进行自减，即减到0，其他线程又可以去获取锁了
+
+从上面的例子中可以看到对state的几种线程安全和非安全操作：
+
+- compareAndSetState(int expect, int update)：线程安全的设置状态，因为可能多个线程并发调用该方法，所以需要CAS来保证线程安全
+
+- setState(int newState)：非线程安全的设置状态，这种一般是针对只有一个线程获取锁的时候来释放锁，此时没有并发的可能性，所以就不需要上述的compareAndSetState操作
+
+- getState()：获取状态值
+
+AQS提供了上述线程安全和非安全的设置状态state的方法，供我们在实现锁的tryAcquire、tryRelease等方法的时候合理的时候它们。
+
+## AbstractQueuedSynchronizer的FIFO队列
+前面简单提到了，就是先拿锁实现的tryAcquire方法去尝试获取独占锁，一旦获取锁失败就进入队列，交给AQS来处理。AQS的处理简单描述下就是将当前线程包装成Node节点然后放到队列中进程排队，等待前面的Node节点都出队了，被唤醒轮到自己再次去竞争锁。
+
+我们先来认识下Node节点,大致如下结构：
+```
+static final class Node {
+
+    volatile Node prev;
+    volatile Node next;
+
+    volatile Thread thread;
+
+    Node nextWaiter;
+
+	volatile int waitStatus;
+}
+
+private transient volatile Node head;
+
+private transient volatile Node tail;
+```
+
+首先就是prev、next节点可以构成一个双向队列。AQS中含有上述的head和tail两个属性一起来构成FIFO队列。
+
+Thread thread则代表的是构成此节点的线程。
+
+Node nextWaiter：是用于condition queue，用于构成一个单向的FIFO队列，详见下面。
+
+volatile int waitStatus：则表示该节点当前的状态，目前有如下状态：
+```
+/** waitStatus value to indicate thread has cancelled */
+static final int CANCELLED =  1;
+/** waitStatus value to indicate successor's thread needs unparking */
+static final int SIGNAL    = -1;
+/** waitStatus value to indicate thread is waiting on condition */
+static final int CONDITION = -2;
+/**
+ * waitStatus value to indicate the next acquireShared should
+ * unconditionally propagate
+ */
+static final int PROPAGATE = -3;
+```
+CANCELLED：表示该节点所对应的线程因为获取锁的过程中超时或者被中断而被设置成此状态
+
+SIGNAL：表示该节点所对应的线程被阻塞，不再被调度执行，需要等待其他线程释放锁之后来唤醒它，才能再次加入锁的竞争
+
+CONDITION：表示该节点所对应的线程被阻塞，不再被调度执行，在等待某一个condition的signal、signalAll方法的唤醒
+
+PROPAGATE：只用于共享状态的HEAD节点，目前还没弄清楚，欢迎一起来探讨
+
+节点创建后默认状态值是0。
+
+
+## AbstractQueuedSynchronizer的condition queue
+
+
+
+# 参考
+https://my.oschina.net/pingpangkuangmo/blog/679636

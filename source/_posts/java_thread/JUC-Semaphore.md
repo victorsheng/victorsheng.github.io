@@ -50,3 +50,7 @@ public class SemaphoreTest {
     }
 }
 ```
+
+# 源码解析
+
+Semaphore 通过 AQS中的 state 来进行控制 permit 的获取控制, 其实它就是一个限制数量的 ReadLock
