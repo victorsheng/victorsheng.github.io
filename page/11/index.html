@@ -326,6 +326,450 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/12/18/机器学习/jikeshijian-ai-study1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/18/机器学习/jikeshijian-ai-study1/" itemprop="url">极客时间-学习笔记-AI技术内参1-经典搜索核心算法</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-18T21:43:00+08:00">
+                2017-12-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/人工智能/" itemprop="url" rel="index">
+                    <span itemprop="name">人工智能</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/12/18/机器学习/jikeshijian-ai-study1/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/12/18/机器学习/jikeshijian-ai-study1/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/12/18/机器学习/jikeshijian-ai-study1/" class="leancloud_visitors" data-flag-title="极客时间-学习笔记-AI技术内参1-经典搜索核心算法">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="TF-IDF及其变种"><a href="#TF-IDF及其变种" class="headerlink" title="TF-IDF及其变种"></a>TF-IDF及其变种</h1><ul>
+<li>信息检索,文本挖掘,自然语言处理领域</li>
+<li>把查询关键字(Query)和文档(Document)都转为向量</li>
+<li>‘向量空间模型’Vector Spcece Model就是希望吧查询关键字和文档都表达成变量,然后利用向量之间的运算来进行进一步表达向量之间的关系</li>
+<li>相似性:余弦相似性,或者是点积</li>
+<li>V个词汇,V维度,查询关键字和每个文档的向量都有V个维度</li>
+<li>TF和IDF的乘机</li>
+<li>TF单词频率Term Frequency,计算一个查询关键字中某一个单子在目标文档中出现的次数<ul>
+<li>如查询’car insurance’,那么计算car出现了多少次,insurance出现了多少次</li>
+<li>表示相关度</li>
+</ul>
+</li>
+<li>IDF,逆文档频率Inerse Document Frequency,需要去惩罚哪些出现在太多文档中的单词<ul>
+<li>多少文档包含了这个单词,越大越不重要</li>
+</ul>
+</li>
+<li>其他学习资料<br><a href="http://www.ruanyifeng.com/blog/2013/03/tf-idf.html" target="_blank" rel="noopener">http://www.ruanyifeng.com/blog/2013/03/tf-idf.html</a><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">让我们从一个实例开始讲起。假定现在有一篇长文《中国的蜜蜂养殖》，我们准备用计算机提取它的关键词。所以，排在最前面的几个词，就是这篇文章的关键词。</span><br><span class="line">除了自动提取关键词，TF-IDF算法还可以用于许多别的地方。比如，信息检索时，对于每个文档，都可以分别计算一组搜索词（&quot;中国&quot;、&quot;蜜蜂&quot;、&quot;养殖&quot;）的TF-IDF，将它们相加，就可以得到整个文档的TF-IDF。这个值最高的文档就是与搜索词最相关的文档。</span><br><span class="line">TF-IDF算法的优点是简单快速，结果比较符合实际情况。缺点是，单纯以&quot;词频&quot;衡量一个词的重要性，不够全面，有时重要的词可能出现次数并不多。而且，这种算法无法体现词的位置信息，出现位置靠前的词与出现位置靠后的词，都被视为重要性相同，这是不正确的。（一种解决方法是，对全文的第一段和每一段的第一句话，给予较大的权重。）</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h1 id="BM25及其变种"><a href="#BM25及其变种" class="headerlink" title="BM25及其变种"></a>BM25及其变种</h1><ul>
+<li>BM是’最佳匹配’Best Match的简称</li>
+<li>用来计算某一目标文档(Document)相对于一个查询关键字(Query)的”相关性”(Relevance)的流程, 非监督学习排序算法中的一个典型代表</li>
+<li>定义:<ul>
+<li>单词和目标文档的相关性<ul>
+<li>词频 TF-IDF里面的TF部分,but词频需要”标准化”,某一个单词对最后的分数的贡献不会随着词频的增加而无限增加</li>
+<li>两个超参数:当前文档的长度,整个数据集所有文档的平均长度</li>
+</ul>
+</li>
+<li>单词和查询关键词的相关性<ul>
+<li>同样需要标准化过程</li>
+</ul>
+</li>
+<li>单词的权重部分<ul>
+<li>某种变形的来对单词加权,例如某种变形的IDF来对单词甲醛</li>
+<li>罗伯逊-斯巴克-琼斯权重,需要一个监督信息</li>
+<li>在很多情况下,利用IDF来直接对单词权重的版本更加普遍,如果再有监督信息的情况下,RSJ值也不失为一个很好的选择</li>
+</ul>
+</li>
+<li>这个三个部分的乘积组成某一个单词的分数,然后,整个文档相对于某个查询关键字的分数,就是所有查询关键字里所有单词分数的总和 </li>
+</ul>
+</li>
+<li>bm25是对某一概率相关模型的逼近</li>
+<li>bm25算法变种:bm25f,<ul>
+<li>域的概念(文档包括标题,摘要和正文)</li>
+<li>把BM25和其他文档信息(非文字)结合起来</li>
+<li>BM25和PageRank的线性结果来确定网页的相关性</li>
+</ul>
+</li>
+</ul>
+<h1 id="语言模型及其变种"><a href="#语言模型及其变种" class="headerlink" title="语言模型及其变种"></a>语言模型及其变种</h1><ul>
+<li>详解:用概率模型(Probabilistic Model)来描述查询关键字和目标文档之间的关系</li>
+<li>最简单的:查询关键字似然检索模型<ul>
+<li>一个语言模型就是一个针对词汇表的概率分布</li>
+<li>词汇表1w个单词,1w个单词上的离散概率分布</li>
+<li>查询关键字是从一个语言模型中”抽样”得到一个样本</li>
+<li>对一个查询关键字打分=这组词出现的联合概率,因为联合概率可能会很小,因此很多时候都通过一个对数变化,来把概率的乘积变成概率对数加和</li>
+<li>语言模型的参数:”类别分布”(Categorical Distiribution),也就是多项式分布,去除排列组合信息</li>
+<li>参数股计算法:最大似然估计</li>
+<li>每个单词出现的可能性,正好等于这个单词在目标文档中出现的次数,除以所有单词在文档中出现的次数.</li>
+<li>每个文档都对应一个类别分布,有多少文档,就有多少个类别分布</li>
+<li>如果没有在训练数据中出现过,最优解就是0</li>
+<li>平滑(Smoohting)<br><a href="http://52opencourse.com/111/%E6%96%AF%E5%9D%A6%E7%A6%8F%E5%A4%A7%E5%AD%A6%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E7%AC%AC%E5%9B%9B%E8%AF%BE-%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%EF%BC%88language-modeling%EF%BC%89" target="_blank" rel="noopener">http://52opencourse.com/111/%E6%96%AF%E5%9D%A6%E7%A6%8F%E5%A4%A7%E5%AD%A6%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E7%AC%AC%E5%9B%9B%E8%AF%BE-%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%EF%BC%88language-modeling%EF%BC%89</a></li>
+</ul>
+</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/12/18/微服务/study-api-gateway/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/12/18/微服务/study-api-gateway/" itemprop="url">api网关学习</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-18T19:42:00+08:00">
+                2017-12-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/微服务/" itemprop="url" rel="index">
+                    <span itemprop="name">微服务</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/12/18/微服务/study-api-gateway/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/12/18/微服务/study-api-gateway/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/12/18/微服务/study-api-gateway/" class="leancloud_visitors" data-flag-title="api网关学习">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="什么是api网关"><a href="#什么是api网关" class="headerlink" title="什么是api网关"></a>什么是api网关</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">王延炯：API Gateway（API GW / API 网关），顾名思义，是出现在系统边界上的一个面向API的、串行集中式的强管控服务，这里的边界是企业IT系统的边界。</span><br><span class="line"></span><br><span class="line">在微服务概念的流行之前，API GW的实体就已经诞生了，这时的主要应用场景是OpenAPI，也就是开放平台，面向的是企业外部合作伙伴，对于这个应用场景，相信接触的人会比较多。当在微服务概念流行起来之后，API网关似乎成了在上层应用层集成的标配组件。</span><br></pre></td></tr></table></figure>
+<h1 id="为什么需要api网关"><a href="#为什么需要api网关" class="headerlink" title="为什么需要api网关"></a>为什么需要api网关</h1><ul>
+<li>负载均衡</li>
+<li>减少客户端与服务端的直接调用</li>
+<li>容错</li>
+<li>服务发现与注册</li>
+<li>统一认证</li>
+</ul>
+<h1 id="选型"><a href="#选型" class="headerlink" title="选型"></a>选型</h1><h2 id="spring-cloud-zuul"><a href="#spring-cloud-zuul" class="headerlink" title="spring cloud zuul"></a>spring cloud zuul</h2><p><a href="https://github.com/Netflix/zuul" target="_blank" rel="noopener">https://github.com/Netflix/zuul</a></p>
+<h2 id="nginx-kong"><a href="#nginx-kong" class="headerlink" title="nginx kong"></a>nginx kong</h2><p><a href="https://github.com/Kong/kong" target="_blank" rel="noopener">https://github.com/Kong/kong</a></p>
+<h2 id="阿里云apigateway"><a href="#阿里云apigateway" class="headerlink" title="阿里云apigateway"></a>阿里云apigateway</h2><p><a href="https://www.aliyun.com/product/apigateway" target="_blank" rel="noopener">https://www.aliyun.com/product/apigateway</a></p>
+<p><img src="/images/pasted-20.png" alt="upload successful"></p>
+<h4 id="API-生命周期管理"><a href="#API-生命周期管理" class="headerlink" title="API 生命周期管理"></a>API 生命周期管理</h4><ul>
+<li>支持包括 API 发布、API 测试、API 下线等生命周期管理功能。</li>
+<li><p>支持 API 日常管理、API 版本管理、API 快速回滚等维护功能。</p>
+<h4 id="全面的安全防护"><a href="#全面的安全防护" class="headerlink" title="全面的安全防护"></a>全面的安全防护</h4></li>
+<li><p>支持多种认证方式，支持 HMAC (SHA-1，SHA-256) 算法签名。</p>
+</li>
+<li>支持 HTTPS 协议，支持 SSL 加密。</li>
+<li><p>防攻击、防注入、请求防重放、请求防篡改。</p>
+<h4 id="灵活的权限控制"><a href="#灵活的权限控制" class="headerlink" title="灵活的权限控制"></a>灵活的权限控制</h4></li>
+<li><p>用户以 APP 作为请求 API 的身份，网关支持针对 APP 的权限控制。</p>
+</li>
+<li>只有已经获得授权的 APP 才能请求相应的 API。</li>
+<li>API 提供者可以主动授权某个 APP 调用某个 API 的权限。</li>
+<li><p>API 若上架到 API 市场，则购买者可以将已购买的 API 授权给自己的 APP。</p>
+<h4 id="精准的流量控制"><a href="#精准的流量控制" class="headerlink" title="精准的流量控制"></a>精准的流量控制</h4></li>
+<li><p>流量控制可以用于管控 API的被访问频率、APP的请求频率、用户的请求频率。</p>
+</li>
+<li>流量控制的时间单位可以是分钟、小时、天。</li>
+<li><p>同时支持流控例外，允许设置特殊的 APP 或者用户。</p>
+<h4 id="请求校验"><a href="#请求校验" class="headerlink" title="请求校验"></a>请求校验</h4></li>
+<li><p>支持参数类型、参数值（范围、枚举、正则、Json Schema）校验，无效校验直接会被 API 网关拒绝，减少无效请求对后端造成的资源浪费，大大降低后端服务的处理成本。</p>
+<h4 id="数据转换"><a href="#数据转换" class="headerlink" title="数据转换"></a>数据转换</h4></li>
+<li><p>通过配置映射规则，实现前、后端数据翻译。</p>
+</li>
+<li>支持前端请求的数据转换。</li>
+<li><p>支持返回结果的数据转换。</p>
+<h4 id="监控报警"><a href="#监控报警" class="headerlink" title="监控报警"></a>监控报警</h4></li>
+<li><p>提供可视化的API实时监控，包括：调用量、流量大小、响应时间、错误率，在陆续增加维度。</p>
+</li>
+<li>支持历史情况查询，以便统筹分析。</li>
+<li><p>可配置预警方式（短信、Email），订阅预警信息，以便实时掌握API运行情况。</p>
+<h4 id="自动工具"><a href="#自动工具" class="headerlink" title="自动工具"></a>自动工具</h4></li>
+<li><p>自动生成 API 文档，可供在线查看。</p>
+</li>
+<li>API 网关提供多种语言 SDK 的示例。降低 API 的运维成本。</li>
+<li><p>提供可视化的界面调试工具，快速测试，快速上线。</p>
+<h4 id="API-市场"><a href="#API-市场" class="headerlink" title="API 市场"></a>API 市场</h4></li>
+<li><p>可将 API 上架到 API 市场，供更多开发者采购和使用。</p>
+</li>
+</ul>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p><a href="http://www.infoq.com/cn/news/2016/07/API-background-architecture-floo" target="_blank" rel="noopener">http://www.infoq.com/cn/news/2016/07/API-background-architecture-floo</a><br><a href="http://www.infoq.com/cn/articles/construct-micro-service-using-api-gateway" target="_blank" rel="noopener">http://www.infoq.com/cn/articles/construct-micro-service-using-api-gateway</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/12/14/egenie_bugfix/optimize-dubbuo-reference/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1799,344 +2243,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/12/05/机器学习/python-pandas-read-csv/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/05/机器学习/python-pandas-read-csv/" itemprop="url">pandas中read_csv方法的学习</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-05T23:24:55+08:00">
-                2017-12-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/机器学习/" itemprop="url" rel="index">
-                    <span itemprop="name">机器学习</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/12/05/机器学习/python-pandas-read-csv/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/12/05/机器学习/python-pandas-read-csv/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2017/12/05/机器学习/python-pandas-read-csv/" class="leancloud_visitors" data-flag-title="pandas中read_csv方法的学习">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>#read_csv内容过大的处理方式:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1.</span><br><span class="line">train = pd.read_csv(&quot;/Users/victor/code/kaggle/Expedia/input/train.csv&quot;,nrows=3000)</span><br><span class="line"></span><br><span class="line">2.</span><br><span class="line">chunksize=100</span><br></pre></td></tr></table></figure></p>
-<h1 id="总api"><a href="#总api" class="headerlink" title="总api"></a>总api</h1><p><a href="http://pandas.pydata.org/pandas-docs/version/0.15" target="_blank" rel="noopener">http://pandas.pydata.org/pandas-docs/version/0.15</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/12/05/机器学习/kaggle/kaggle-expedia-hotel-recommendations/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/05/机器学习/kaggle/kaggle-expedia-hotel-recommendations/" itemprop="url">kaggle-expedia-hotel-recommendations学习笔记</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-05T16:31:00+08:00">
-                2017-12-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/kaggle/" itemprop="url" rel="index">
-                    <span itemprop="name">kaggle</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/12/05/机器学习/kaggle/kaggle-expedia-hotel-recommendations/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/12/05/机器学习/kaggle/kaggle-expedia-hotel-recommendations/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2017/12/05/机器学习/kaggle/kaggle-expedia-hotel-recommendations/" class="leancloud_visitors" data-flag-title="kaggle-expedia-hotel-recommendations学习笔记">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h1 id="题目地址"><a href="#题目地址" class="headerlink" title="题目地址"></a>题目地址</h1><p><a href="https://www.kaggle.com/c/expedia-hotel-recommendations#description" target="_blank" rel="noopener">https://www.kaggle.com/c/expedia-hotel-recommendations#description</a></p>
-<h1 id="学习地址"><a href="#学习地址" class="headerlink" title="学习地址"></a>学习地址</h1><p><a href="https://www.dataquest.io/blog/kaggle-tutorial/" target="_blank" rel="noopener">https://www.dataquest.io/blog/kaggle-tutorial/</a></p>
-<h1 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h1><ul>
-<li>初步了解机器学习流程</li>
-<li>通过实际代码,了解python代码的语法</li>
-</ul>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/12/05/机器学习/kaggle/kaggle-expedia-hotel-recommendations/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2187,7 +2293,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">121</span>
+                  <span class="site-state-item-count">123</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

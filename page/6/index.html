@@ -326,6 +326,339 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/02/07/java_jvm/jvm-memory-model/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/02/07/java_jvm/jvm-memory-model/" itemprop="url">jvm-memory-model</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-07T21:10:26+08:00">
+                2018-02-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/02/07/java_jvm/jvm-memory-model/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/02/07/java_jvm/jvm-memory-model/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/02/07/java_jvm/jvm-memory-model/" class="leancloud_visitors" data-flag-title="jvm-memory-model">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><img src="http://pic.victor123.cn/18-2-7/17364258.jpg"></p>
+<p><img src="http://pic.victor123.cn/18-2-7/21259009.jpg"></p>
+<p><img src="http://pic.victor123.cn/18-2-10/10387821.jpg"></p>
+<h1 id="程序计数器"><a href="#程序计数器" class="headerlink" title="程序计数器"></a>程序计数器</h1><p>程序计数器是一块较小的内存空间，可以看作是当前线程所执行的字节码的行号指示器。分支、循环、跳转、异常处理、线程恢复等基础功能都需要依赖这个计数器来完成。</p>
+<h1 id="虚拟机栈"><a href="#虚拟机栈" class="headerlink" title="虚拟机栈"></a>虚拟机栈</h1><p>线程私有，它的生命周期与线程相同。虚拟机栈描述的是Java 方法执行的内存模型：每个方法被执行的时候都会同时创建一个栈帧（Stack Frame）用于存储局部变量表、操作栈、动态链接、方法出口等信息。</p>
+<p>动画是由一帧一帧图片连续切换结果的结果而产生的，其实虚拟机的运行和动画也类似，每个在虚拟机中运行的程序也是由许多的帧的切换产生的结果，只是这些帧里面存放的是方法的局部变量，操作数栈，动态链接，方法返回地址和一些额外的附加信息组成。每一个方法被调用直至执行完成的过程，就对应着一个栈帧在虚拟机栈中从入栈到出栈的过程。</p>
+<p>对于执行引擎来说，活动线程中，只有栈顶的栈帧是有效的，称为当前栈帧，这个栈帧所关联的方法称为当前方法。执行引擎所运行的所有字节码指令都只针对当前栈帧进行操作。</p>
+<h2 id="局部变量表"><a href="#局部变量表" class="headerlink" title="局部变量表"></a>局部变量表</h2><p>用于存放方法参数和方法内部定义的局部变量</p>
+<ul>
+<li>虚拟机是使用局部变量表完成参数值到参数变量列表的传递过程的，如果是实例方法（非static），那么局部变量表的第0位索引的Slot默认是用于传递方法所属对象实例的引用，在方法中通过this访问。</li>
+<li>系统不会为局部变量赋予初始值（实例变量和类变量都会被赋予初始值）。也就是说不存在类变量那样的准备阶段。</li>
+</ul>
+<h2 id="操作栈"><a href="#操作栈" class="headerlink" title="操作栈"></a>操作栈</h2><h2 id="动态链接"><a href="#动态链接" class="headerlink" title="动态链接"></a>动态链接</h2><h2 id="返回地址"><a href="#返回地址" class="headerlink" title="返回地址"></a>返回地址</h2><h2 id="异常"><a href="#异常" class="headerlink" title="异常"></a>异常</h2><h1 id="本地方法栈"><a href="#本地方法栈" class="headerlink" title="本地方法栈"></a>本地方法栈</h1><h1 id="堆"><a href="#堆" class="headerlink" title="堆"></a>堆</h1><p><img src="http://pic.victor123.cn/18-2-7/51814309.jpg"></p>
+<p><img src="http://pic.victor123.cn/18-2-10/93364899.jpg"></p>
+<p>是Java 虚拟机所管理的内存中最大的一块。Java 堆是被所有线程共享的一块内存区域，在虚拟机启动时创建。此内存区域的唯一目的就是存放对象实例，几乎所有的对象实例都在这里分配内存。</p>
+<p>但是随着JIT 编译器的发展与逃逸分析技术的逐渐成熟，栈上分配、标量替换优化技术将会导致一些微妙的变化发生，所有的对象都分配在堆上也渐渐变得不是那么“绝对”了。</p>
+<p>堆是垃圾收集器管理的主要区域，因此很多时候也被称做“GC 堆”</p>
+<p>如果从内存回收的角度看，由于现在收集器基本都是采用的分代收集算法，所以Java 堆中还可以细分为：新生代和老年代；</p>
+<ul>
+<li><p>新生代：程序新创建的对象都是从新生代分配内存，新生代由Eden Space和两块相同大小的Survivor Space(通常又称S0和S1或From和To)构成，可通过-Xmn参数来指定新生代的大小，也可以通过-XX:SurvivorRation来调整Eden Space及SurvivorSpace的大小。</p>
+</li>
+<li><p>老年代：用于存放经过多次新生代GC仍然存活的对象，例如缓存对象，新建的对象也有可能直接进入老年代，主要有两种情况：1、大对象，可通过启动参数设置-XX:PretenureSizeThreshold=1024(单位为字节，默认为0)来代表超过多大时就不在新生代分配，而是直接在老年代分配。2、大的数组对象，且数组中无引用外部对象。</p>
+</li>
+</ul>
+<h1 id="方法区"><a href="#方法区" class="headerlink" title="方法区"></a>方法区</h1><p>也称”永久代” 、“非堆”， 它用于存储虚拟机加载的类信息、常量、静态变量、是各个线程共享的内存区域。</p>
+<h2 id="类信息"><a href="#类信息" class="headerlink" title="类信息"></a>类信息</h2><h2 id="常量"><a href="#常量" class="headerlink" title="常量"></a>常量</h2><h2 id="静态变量"><a href="#静态变量" class="headerlink" title="静态变量"></a>静态变量</h2><h2 id="即时编译后的代码"><a href="#即时编译后的代码" class="headerlink" title="即时编译后的代码"></a>即时编译后的代码</h2><h2 id="class文件常量池"><a href="#class文件常量池" class="headerlink" title="class文件常量池"></a>class文件常量池</h2><h2 id="运行时常量池"><a href="#运行时常量池" class="headerlink" title="运行时常量池"></a>运行时常量池</h2><p>之所以说运行时常量池关键，是因为它相对于Class文件常量池的另外一个重要特性是具备动态性，java语言并不要求常量一定只有编译器才能产生，也就是并非预置入Class文件中常量池的内容才能进入方法区运行时常量池，运行期间也可能将新的常量放入池中，比如String类的intern方法就为此类操作。运行时常量池为我们提供了一种能够在运行时动态操作常量池的方法。</p>
+<h2 id="方法区主要有以下几个特点："><a href="#方法区主要有以下几个特点：" class="headerlink" title="方法区主要有以下几个特点："></a>方法区主要有以下几个特点：</h2><p>1、方法区是线程安全的。由于所有的线程都共享方法区，所以，方法区里的数据访问必须被设计成线程安全的。例如，假如同时有两个线程都企图访问方法区中的同一个类，而这个类还没有被装入JVM，那么只允许一个线程去装载它，而其它线程必须等待</p>
+<p>2、方法区的大小不必是固定的，JVM可根据应用需要动态调整。同时，方法区也不一定是连续的，方法区可以在一个堆(甚至是JVM自己的堆)中自由分配。</p>
+<p>3、方法区也可被垃圾收集，当某个类不在被使用(不可触及)时，JVM将卸载这个类，进行垃圾收集</p>
+<h1 id="直接内存"><a href="#直接内存" class="headerlink" title="直接内存"></a>直接内存</h1><p>直接内存（Direct Memory）并不是虚拟机运行时数据区的一部分，也不是java虚拟机规范中定义的的一部分。但这部分内存在项目中也会被频繁的使用，而且也可能导致OOM异常，所以我们一起进行归类。</p>
+<p>在JDK1.4中新加入了NIO类，引入了一种基于通道与缓冲区的I/O方法，它可以使用Native函数库直接分配堆外内存，然后通过一个存储在Java堆中的对象堆这块内存进行操作。</p>
+<h1 id="各区域参数设置"><a href="#各区域参数设置" class="headerlink" title="各区域参数设置"></a>各区域参数设置</h1><p><img src="http://pic.victor123.cn/18-2-10/69248166.jpg"></p>
+<p>控制参数:</p>
+<ul>
+<li>-Xms设置堆的最小空间大小。</li>
+<li>-Xmx设置堆的最大空间大小。</li>
+<li>-XX:NewSize设置新生代最小空间大小。</li>
+<li>-XX:MaxNewSize设置新生代最大空间大小。</li>
+<li>-XX:PermSize设置永久代最小空间大小。</li>
+<li>-XX:MaxPermSize设置永久代最大空间大小。</li>
+<li>-Xss设置每个线程的堆栈大小。</li>
+</ul>
+<p>没有直接设置老年代的参数，但是可以设置堆空间大小和新生代空间大小两个参数来间接控制。<br>老年代空间大小=堆空间大小-年轻代大空间大小</p>
+<h1 id="资料"><a href="#资料" class="headerlink" title="资料"></a>资料</h1><p><a href="http://www.ityouknow.com/jvm.html" target="_blank" rel="noopener">http://www.ityouknow.com/jvm.html</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/02/06/egenie_bugfix/bugfix-dubbo-channel-close/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/02/06/egenie_bugfix/bugfix-dubbo-channel-close/" itemprop="url">bugfix-dubbo-channel-close</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-06T10:09:16+08:00">
+                2018-02-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/02/06/egenie_bugfix/bugfix-dubbo-channel-close/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/02/06/egenie_bugfix/bugfix-dubbo-channel-close/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/02/06/egenie_bugfix/bugfix-dubbo-channel-close/" class="leancloud_visitors" data-flag-title="bugfix-dubbo-channel-close">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">com.alibaba.dubbo.rpc.RpcException: Failed to invoke the method findByIds in the service com.ejlerp.baseinfo.api.SkuService. Tried 3 times of the providers [10.27.215.53:20880, 10.26.109.140:20881] (2/3) from the registry 10.25.242.182:2181 on the consumer 118.178.19.115 using the dubbo version 2.8.4. Last error is: Failed to invoke remote method: findByIds, provider: dubbo://10.27.215.53:20880/com.ejlerp.baseinfo.api.SkuService?application=ejlerp-pms-provider&amp;check=false&amp;dubbo=2.8.4&amp;generic=false&amp;interface=com.ejlerp.baseinfo.api.SkuService&amp;methods=generateSkuNo,findSimpleSkuLikeSkuNo,batchFindByBarcode,findAll,saveAvoidDuplicate,translateSku,calculateWeight,queryAndTranslateSku,findByBarcode,updateColumn,queryByNo,findSimpleSkuLikeSellerOuterNoIsEnabled,getSkuSpec,findSkuLikeProductNo,updateNotEmptyById,findSimpleSkuLikeProductName,findSkuLikeProductName,isCombinedSku,findSimpleSkuByCategoryNo,findSimpleSKUBySKUNo,findSimpleSKULikeShortCutKey,findAllSimpleSku,findAllSimpleSkuIsEnabled,batchUpdateNotEmptyById,findSimpleSkuLikeSizeType,updateSku,batchInsert,save,findAllSkus,batchReplace,findSimpleSkuLikeSellerOuterNo,batchDelete,findSkubyColorType,findById,findCombinedSku,findPage,findSkuIdByCondition,deleteSkus,findSimpleSkuLikeProductNoIsEnabled,findSimpleSkuByProductIdAndColor,batchInsertAvoidDuplicate,getSkuInfoByCondition,updateOneColumnById,replace,addSku,findPageV2,findSkubySizeType,findSimpleSkuByIds,findSkuInfoForMatch,isHugeSku,findByProductIds,findSimpleSkuLikeProductShortcutKeyIsEnabled,queryByBarcode,findSimpleSkuLikeSpec,batchGenerateSkus,findSimpleSkuByProductIds,findByIds,findSkuLikeProductShortcutKey,findLikeSkuNo,findSimpleSkuLikeProductNameIsEnabled,findBySellerOuterNo,setCombinedSku,checkUniqueColumn,findByNo,hardDelete,findSimpleSkuLikeNoOrBarcode,getAllProduct,findSkuIdsByProductIds,batchUpdate,findOne,findByNos,findSimpleSkuLikeProductShortcutKey,findSkuNotInIds,update,batchHardDelete,delete,findByCondition,findDetailsBySkuId,findSkuByNoOrBarCode,findSimpleSkuByProductIdAndSize,setNeedSpec,findByProductId,findTranslateByIds,findSimpleSkuLikeSkuNoIsEnabled,findSimpleSKUByBarCode,updateSKUsCostPrice,queryLikeNo,deleteSku,findSimpleSkuLikeColorType,findSimpleSkuLikeProductNo,queryById&amp;organization=ejlerp&amp;owner=victor&amp;pid=3801&amp;revision=0.1&amp;side=consumer&amp;timeout=60000&amp;timestamp=1517844500677&amp;version=0.1, cause: message can not send, because channel is closed . url:dubbo://10.27.215.53:20880/com.ejlerp.baseinfo.api.DictService?application=ejlerp-pms-provider&amp;check=false&amp;codec=dubbo&amp;dubbo=2.8.4&amp;generic=false&amp;heartbeat=60000&amp;interface=com.ejlerp.baseinfo.api.DictService&amp;methods=findCustomerDicts,findDictsByType,findCustomerDictsByType,deleteCustomerDict,updateDict,findCustomerDict,findCustomerDictByKey,findAllDicts,findMaxCodeByCustomerType,addCustomerDict,findCustomerDictMapByTypes,findDictByKey,findCustomerDictsMapByType,findDicts,deleteDict,updateCustomerDict,findDictsByTypes,findCustomerDictsByTypeAndKeys,findMaxCodeByType,findCustomerDictByType,findCustomerDictByKeys,findDict,findDictsMapByType,addDict,findDictMapByTypes,findCustomerDictByValue,findDictByValue,findCustomerDictLikeValue&amp;organization=ejlerp&amp;owner=victor&amp;pid=3801&amp;revision=0.1&amp;side=consumer&amp;timeout=8000&amp;timestamp=1517844501227&amp;version=0.1</span><br><span class="line">	at com.alibaba.dubbo.rpc.cluster.support.FailoverClusterInvoker.doInvoke(FailoverClusterInvoker.java:108)</span><br><span class="line">	at com.alibaba.dubbo.rpc.cluster.support.AbstractClusterInvoker.invoke(AbstractClusterInvoker.java:227)</span><br><span class="line">	at com.alibaba.dubbo.rpc.cluster.support.wrapper.MockClusterInvoker.invoke(MockClusterInvoker.java:72)</span><br><span class="line">	at com.alibaba.dubbo.rpc.proxy.InvokerInvocationHandler.invoke(InvokerInvocationHandler.java:52)</span><br><span class="line">	at com.alibaba.dubbo.common.bytecode.proxy6.findByIds(proxy6.java)</span><br><span class="line">	at com.ejlerp.pms.provider.service.agent.baseinfo.BaseInfoAgentService.findSkuByIds(BaseInfoAgentService.java:92)</span><br><span class="line">	at com.ejlerp.pms.provider.service.StockOutReportServiceImpl.pageExecute(StockOutReportServiceImpl.java:114)</span><br><span class="line">	at com.ejlerp.pms.provider.service.StockOutReportServiceImpl.refreshAction(StockOutReportServiceImpl.java:99)</span><br><span class="line">	at com.alibaba.dubbo.common.bytecode.Wrapper51.invokeMethod(Wrapper51.java)</span><br><span class="line">	at com.alibaba.dubbo.rpc.proxy.javassist.JavassistProxyFactory$1.doInvoke(JavassistProxyFactory.java:46)</span><br><span class="line">	at com.alibaba.dubbo.rpc.proxy.AbstractProxyInvoker.invoke(AbstractProxyInvoker.java:72)</span><br><span class="line">	at com.alibaba.dubbo.rpc.protocol.InvokerWrapper.invoke(InvokerWrapper.java:53)</span><br><span class="line">	at com.alibaba.dubbo.rpc.filter.ExceptionFilter.invoke(ExceptionFilter.java:64)</span><br><span class="line">	at com.alibaba.dubbo.rpc.protocol.ProtocolFilterWrapper$1.invoke(ProtocolFilterWrapper.java:91)</span><br><span class="line">	at com.alibaba.dubbo.monitor.support.MonitorFilter.invoke(MonitorFilter.java:75)</span><br><span class="line">	at com.alibaba.dubbo.rpc.protocol.ProtocolFilterWrapper$1.invoke(ProtocolFilterWrapper.java:91)</span><br><span class="line">	at com.alibaba.dubbo.rpc.filter.TimeoutFilter.invoke(TimeoutFilter.java:42)</span><br><span class="line">	at com.alibaba.dubbo.rpc.protocol.ProtocolFilterWrapper$1.invoke(ProtocolFilterWrapper.java:91)</span><br><span class="line">	at com.alibaba.dubbo.rpc.protocol.dubbo.filter.TraceFilter.invoke(TraceFilter.java:78)</span><br><span class="line">	at com.alibaba.dubbo.rpc.protocol.ProtocolFilterWrapper$1.invoke(ProtocolFilterWrapper.java:91)</span><br><span class="line">	at com.alibaba.dubbo.rpc.filter.ContextFilter.invoke(ContextFilter.java:70)</span><br><span class="line">	at com.alibaba.dubbo.rpc.protocol.ProtocolFilterWrapper$1.invoke(ProtocolFilterWrapper.java:91)</span><br><span class="line">	at com.alibaba.dubbo.rpc.filter.GenericFilter.invoke(GenericFilter.java:132)</span><br><span class="line">	at com.alibaba.dubbo.rpc.protocol.ProtocolFilterWrapper$1.invoke(ProtocolFilterWrapper.java:91)</span><br><span class="line">	at com.alibaba.dubbo.rpc.filter.ClassLoaderFilter.invoke(ClassLoaderFilter.java:38)</span><br><span class="line">	at com.alibaba.dubbo.rpc.protocol.ProtocolFilterWrapper$1.invoke(ProtocolFilterWrapper.java:91)</span><br><span class="line">	at com.alibaba.dubbo.rpc.filter.EchoFilter.invoke(EchoFilter.java:38)</span><br><span class="line">	at com.alibaba.dubbo.rpc.protocol.ProtocolFilterWrapper$1.invoke(ProtocolFilterWrapper.java:91)</span><br><span class="line">	at com.alibaba.dubbo.rpc.protocol.dubbo.DubboProtocol$1.reply(DubboProtocol.java:113)</span><br><span class="line">	at com.alibaba.dubbo.remoting.exchange.support.header.HeaderExchangeHandler.handleRequest(HeaderExchangeHandler.java:84)</span><br><span class="line">	at com.alibaba.dubbo.remoting.exchange.support.header.HeaderExchangeHandler.received(HeaderExchangeHandler.java:170)</span><br><span class="line">	at com.alibaba.dubbo.remoting.transport.DecodeHandler.received(DecodeHandler.java:52)</span><br><span class="line">	at com.alibaba.dubbo.remoting.transport.dispatcher.ChannelEventRunnable.run(ChannelEventRunnable.java:82)</span><br><span class="line">	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)</span><br><span class="line">	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)</span><br><span class="line">	at java.lang.Thread.run(Thread.java:745)</span><br><span class="line">Caused by: com.alibaba.dubbo.remoting.RemotingException: message can not send, because channel is closed . url:dubbo://10.27.215.53:20880/com.ejlerp.baseinfo.api.DictService?application=ejlerp-pms-provider&amp;check=false&amp;codec=dubbo&amp;dubbo=2.8.4&amp;generic=false&amp;heartbeat=60000&amp;interface=com.ejlerp.baseinfo.api.DictService&amp;methods=findCustomerDicts,findDictsByType,findCustomerDictsByType,deleteCustomerDict,updateDict,findCustomerDict,findCustomerDictByKey,findAllDicts,findMaxCodeByCustomerType,addCustomerDict,findCustomerDictMapByTypes,findDictByKey,findCustomerDictsMapByType,findDicts,deleteDict,updateCustomerDict,findDictsByTypes,findCustomerDictsByTypeAndKeys,findMaxCodeByType,findCustomerDictByType,findCustomerDictByKeys,findDict,findDictsMapByType,addDict,findDictMapByTypes,findCustomerDictByValue,findDictByValue,findCustomerDictLikeValue&amp;organization=ejlerp&amp;owner=victor&amp;pid=3801&amp;revision=0.1&amp;side=consumer&amp;timeout=8000&amp;timestamp=1517844501227&amp;version=0.1</span><br><span class="line">	at com.alibaba.dubbo.remoting.transport.AbstractClient.send(AbstractClient.java:268)</span><br><span class="line">	at com.alibaba.dubbo.remoting.transport.AbstractPeer.send(AbstractPeer.java:51)</span><br><span class="line">	at com.alibaba.dubbo.remoting.exchange.support.header.HeaderExchangeChannel.request(HeaderExchangeChannel.java:112)</span><br><span class="line">	at com.alibaba.dubbo.remoting.exchange.support.header.HeaderExchangeClient.request(HeaderExchangeClient.java:91)</span><br><span class="line">	at com.alibaba.dubbo.rpc.protocol.dubbo.ReferenceCountExchangeClient.request(ReferenceCountExchangeClient.java:81)</span><br><span class="line">	at com.alibaba.dubbo.rpc.protocol.dubbo.DubboInvoker.doInvoke(DubboInvoker.java:96)</span><br><span class="line">	at com.alibaba.dubbo.rpc.protocol.AbstractInvoker.invoke(AbstractInvoker.java:144)</span><br><span class="line">	at com.alibaba.dubbo.monitor.support.MonitorFilter.invoke(MonitorFilter.java:75)</span><br><span class="line">	at com.alibaba.dubbo.rpc.protocol.ProtocolFilterWrapper$1.invoke(ProtocolFilterWrapper.java:91)</span><br><span class="line">	at com.alibaba.dubbo.rpc.protocol.dubbo.filter.FutureFilter.invoke(FutureFilter.java:53)</span><br><span class="line">	at com.alibaba.dubbo.rpc.protocol.ProtocolFilterWrapper$1.invoke(ProtocolFilterWrapper.java:91)</span><br><span class="line">	at com.alibaba.dubbo.rpc.filter.ConsumerContextFilter.invoke(ConsumerContextFilter.java:48)</span><br><span class="line">	at com.alibaba.dubbo.rpc.protocol.ProtocolFilterWrapper$1.invoke(ProtocolFilterWrapper.java:91)</span><br><span class="line">	at com.alibaba.dubbo.rpc.listener.ListenerInvokerWrapper.invoke(ListenerInvokerWrapper.java:74)</span><br><span class="line">	at com.alibaba.dubbo.rpc.protocol.InvokerWrapper.invoke(InvokerWrapper.java:53)</span><br><span class="line">	at com.alibaba.dubbo.rpc.cluster.support.FailoverClusterInvoker.doInvoke(FailoverClusterInvoker.java:77)</span><br><span class="line">	... 35 common frames omitted</span><br></pre></td></tr></table></figure>
+<p>dubbo提供了自动重连的机制</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line">    * init reconnect thread</span><br><span class="line">    */</span><br><span class="line">   private synchronized void initConnectStatusCheckCommand() &#123;</span><br><span class="line">       //reconnect=false to close reconnect</span><br><span class="line">       int reconnect = getReconnectParam(getUrl());</span><br><span class="line">       if (reconnect &gt; 0 &amp;&amp; (reconnectExecutorFuture == null || reconnectExecutorFuture.isCancelled())) &#123;</span><br><span class="line">           Runnable connectStatusCheckCommand = new Runnable() &#123;</span><br><span class="line">               public void run() &#123;</span><br><span class="line">                   try &#123;</span><br><span class="line">                       if (!isConnected()) &#123;</span><br><span class="line">                           connect();</span><br><span class="line">                       &#125; else &#123;</span><br><span class="line">                           lastConnectedTime = System.currentTimeMillis();</span><br><span class="line">                       &#125;</span><br><span class="line">                   &#125; catch (Throwable t) &#123;</span><br><span class="line">                       String errorMsg = &quot;client reconnect to &quot; + getUrl().getAddress() + &quot; find error . url: &quot; + getUrl();</span><br><span class="line">                       // wait registry sync provider list</span><br><span class="line">                       if (System.currentTimeMillis() - lastConnectedTime &gt; shutdown_timeout) &#123;</span><br><span class="line">                           if (!reconnect_error_log_flag.get()) &#123;</span><br><span class="line">                               reconnect_error_log_flag.set(true);</span><br><span class="line">                               logger.error(errorMsg, t);</span><br><span class="line">                               return;</span><br><span class="line">                           &#125;</span><br><span class="line">                       &#125;</span><br><span class="line">                       if (reconnect_count.getAndIncrement() % reconnect_warning_period == 0) &#123;</span><br><span class="line">                           logger.warn(errorMsg, t);</span><br><span class="line">                       &#125;</span><br><span class="line">                   &#125;</span><br><span class="line">               &#125;</span><br><span class="line">           &#125;;</span><br><span class="line">           reconnectExecutorFuture = reconnectExecutorService.scheduleWithFixedDelay(connectStatusCheckCommand, reconnect, reconnect, TimeUnit.MILLISECONDS);</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>日志</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">2018-02-06 08:10:57.798 [DubboClientReconnectTimer-thread-1] ERROR com.alibaba.dubbo.remoting.transport.AbstractClient.error -  [DUBBO] client reconnect to 10.27.215.53:20880 find e</span><br><span class="line">rror . url: dubbo://10.27.215.53:20880/com.ejlerp.baseinfo.api.DictService?application=ejlerp-pms-provider&amp;check=false&amp;codec=dubbo&amp;dubbo=2.8.4&amp;generic=false&amp;heartbeat=60000&amp;interfac</span><br><span class="line">e=com.ejlerp.baseinfo.api.DictService&amp;methods=findCustomerDicts,findDictsByType,findCustomerDictsByType,deleteCustomerDict,updateDict,findCustomerDict,findCustomerDictByKey,findAllD</span><br><span class="line">icts,findMaxCodeByCustomerType,addCustomerDict,findCustomerDictMapByTypes,findDictByKey,findCustomerDictsMapByType,findDicts,deleteDict,updateCustomerDict,findDictsByTypes,findCusto</span><br><span class="line">merDictsByTypeAndKeys,findMaxCodeByType,findCustomerDictByType,findCustomerDictByKeys,findDict,findDictsMapByType,addDict,findDictMapByTypes,findCustomerDictByValue,findDictByValue,</span><br><span class="line">findCustomerDictLikeValue&amp;organization=ejlerp&amp;owner=victor&amp;pid=3801&amp;revision=0.1&amp;side=consumer&amp;timeout=8000&amp;timestamp=1517844501227&amp;version=0.1, dubbo version: 2.8.4, current host:</span><br><span class="line">118.178.19.115</span><br><span class="line">com.alibaba.dubbo.remoting.RemotingException: client(url: dubbo://10.27.215.53:20880/com.ejlerp.baseinfo.api.DictService?application=ejlerp-pms-provider&amp;check=false&amp;codec=dubbo&amp;dubb</span><br><span class="line">o=2.8.4&amp;generic=false&amp;heartbeat=60000&amp;interface=com.ejlerp.baseinfo.api.DictService&amp;methods=findCustomerDicts,findDictsByType,findCustomerDictsByType,deleteCustomerDict,updateDict,f</span><br><span class="line">indCustomerDict,findCustomerDictByKey,findAllDicts,findMaxCodeByCustomerType,addCustomerDict,findCustomerDictMapByTypes,findDictByKey,findCustomerDictsMapByType,findDicts,deleteDict</span><br><span class="line">,updateCustomerDict,findDictsByTypes,findCustomerDictsByTypeAndKeys,findMaxCodeByType,findCustomerDictByType,findCustomerDictByKeys,findDict,findDictsMapByType,addDict,findDictMapBy</span><br><span class="line">Types,findCustomerDictByValue,findDictByValue,findCustomerDictLikeValue&amp;organization=ejlerp&amp;owner=victor&amp;pid=3801&amp;revision=0.1&amp;side=consumer&amp;timeout=8000&amp;timestamp=1517844501227&amp;ver</span><br><span class="line">sion=0.1) failed to connect to server /10.27.215.53:20880 client-side timeout 3000ms (elapsed: 3001ms) from netty client 118.178.19.115 using dubbo version 2.8.4</span><br><span class="line">        at com.alibaba.dubbo.remoting.transport.netty.NettyClient.doConnect(NettyClient.java:147)</span><br><span class="line">        at com.alibaba.dubbo.remoting.transport.AbstractClient.connect(AbstractClient.java:280)</span><br><span class="line">        at com.alibaba.dubbo.remoting.transport.AbstractClient$1.run(AbstractClient.java:145)</span><br><span class="line">        at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)</span><br><span class="line">        at java.util.concurrent.FutureTask.runAndReset(FutureTask.java:308)</span><br><span class="line">        at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$301(ScheduledThreadPoolExecutor.java:180)</span><br><span class="line">        at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:294)</span><br><span class="line">        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)</span><br><span class="line">        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)</span><br><span class="line">        at java.lang.Thread.run(Thread.java:745)</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">2018-02-06 02:34:26.962 [DubboClientReconnectTimer-thread-1] WARN  com.alibaba.dubbo.remoting.transport.AbstractClient.warn -  [DUBBO] client reconnect to 10.25.242.182:20885 find e</span><br><span class="line">rror . url: dubbo://10.25.242.182:20885/com.ejlerp.baseinfo.api.VendorService?application=ejlerp-pms-provider&amp;check=false&amp;codec=dubbo&amp;dubbo=2.8.4&amp;generic=false&amp;heartbeat=60000&amp;inter</span><br><span class="line">face=com.ejlerp.baseinfo.api.VendorService&amp;methods=findLikeVendorNo,findByVendorTenantId,updateOneColumnById,replace,findLikeVendorShortcutKey,findPageV2,findAll,saveAvoidDuplicate,</span><br><span class="line">findAndSaveByVendorName,findVendorIdAndNameMap,findMyVendorOL,enableVendor,findVendorNoAndIdMap,addVendor,updateColumn,findByIds,relateVendorOL,deleteVendor,checkUniqueColumn,findBy</span><br><span class="line">No,findByVendorName,updateNotEmptyById,hardDelete,batchUpdateNotEmptyById,batchUpdate,batchInsert,findOne,save,batchHardDelete,update,findByPuchaserId,batchReplace,delete,updateVend</span><br><span class="line">or,batchDelete,vendorOLSync,findById,findTmpByVendorTenantIds,findByMobile,findPage,findLikeVendorName,disableVendor,batchInsertAvoidDuplicate,findByCategoryNo,findByVendorNames&amp;org</span><br><span class="line">anization=ejlerp&amp;owner=victor&amp;pid=3801&amp;revision=0.1&amp;side=consumer&amp;timeout=8000&amp;timestamp=1517844500217&amp;version=0.1, dubbo version: 2.8.4, current host: 118.178.19.115</span><br><span class="line">com.alibaba.dubbo.remoting.RemotingException: client(url: dubbo://10.25.242.182:20885/com.ejlerp.baseinfo.api.VendorService?application=ejlerp-pms-provider&amp;check=false&amp;codec=dubbo&amp;d</span><br><span class="line">ubbo=2.8.4&amp;generic=false&amp;heartbeat=60000&amp;interface=com.ejlerp.baseinfo.api.VendorService&amp;methods=findLikeVendorNo,findByVendorTenantId,updateOneColumnById,replace,findLikeVendorShor</span><br><span class="line">tcutKey,findPageV2,findAll,saveAvoidDuplicate,findAndSaveByVendorName,findVendorIdAndNameMap,findMyVendorOL,enableVendor,findVendorNoAndIdMap,addVendor,updateColumn,findByIds,relate</span><br><span class="line">VendorOL,deleteVendor,checkUniqueColumn,findByNo,findByVendorName,updateNotEmptyById,hardDelete,batchUpdateNotEmptyById,batchUpdate,batchInsert,findOne,save,batchHardDelete,update,f</span><br><span class="line">indByPuchaserId,batchReplace,delete,updateVendor,batchDelete,vendorOLSync,findById,findTmpByVendorTenantIds,findByMobile,findPage,findLikeVendorName,disableVendor,batchInsertAvoidDu</span><br><span class="line">plicate,findByCategoryNo,findByVendorNames&amp;organization=ejlerp&amp;owner=victor&amp;pid=3801&amp;revision=0.1&amp;side=consumer&amp;timeout=8000&amp;timestamp=1517844500217&amp;version=0.1) failed to connect t</span><br><span class="line">o server /10.25.242.182:20885 client-side timeout 3000ms (elapsed: 3000ms) from netty client 118.178.19.115 using dubbo version 2.8.4</span><br><span class="line">        at com.alibaba.dubbo.remoting.transport.netty.NettyClient.doConnect(NettyClient.java:147)</span><br><span class="line">        at com.alibaba.dubbo.remoting.transport.AbstractClient.connect(AbstractClient.java:280)</span><br><span class="line">        at com.alibaba.dubbo.remoting.transport.AbstractClient$1.run(AbstractClient.java:145)</span><br><span class="line">        at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)</span><br><span class="line">        at java.util.concurrent.FutureTask.runAndReset(FutureTask.java:308)</span><br><span class="line">        at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$301(ScheduledThreadPoolExecutor.java:180)</span><br><span class="line">        at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:294)</span><br><span class="line">        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)</span><br><span class="line">        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)</span><br><span class="line">        at java.lang.Thread.run(Thread.java:745)</span><br></pre></td></tr></table></figure>
+<p><img src="http://pic.victor123.cn/18-2-6/69248542.jpg"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -Xmx150M -XX:+PrintGC -XX:+PrintGCDateStamps -XX:+PrintGCDetails -XX:+PrintHeapAtGC -Xloggc:./pms-gc.log -jar ejlerp-pms-provider-0.2-SNAPSHOT.jar --spring.profiles.active=prod --regCenter.serverList=10.25.242.182:2181 --server.port=9087 --druid.url=jdbc:mysql://rm-bp1ov5155kw37fa31i.mysql.rds.aliyuncs.com:3306/egenie_kn --druid.username=egeniekn --druid.password=ejl@2302 --spring.datasource.url=jdbc:mysql://rm-bp1ov5155kw37fa31i.mysql.rds.aliyuncs.com:3306/job_hz1 --dubbo.registry.address=zookeeper://10.25.242.182:2181 --dubbo.protocol.host=10.25.242.182 --dubbo.monitor=false --provider.appKey=pmsP-hz1-s1 --goods.rest.host=http://www.runscm.com --pmsTradeIsOpen=0 &gt; /dev/null 2&gt;&amp;1 &amp;</span><br></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/02/06/design/study-id-generater/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1675,364 +2008,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/02/01/java_jvm/study-Synchronized-lock/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/02/01/java_jvm/study-Synchronized-lock/" itemprop="url">study-Synchronized-lock</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-01T22:49:51+08:00">
-                2018-02-01
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/02/01/java_jvm/study-Synchronized-lock/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/02/01/java_jvm/study-Synchronized-lock/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/02/01/java_jvm/study-Synchronized-lock/" class="leancloud_visitors" data-flag-title="study-Synchronized-lock">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">锁的实现</span><br><span class="line"></span><br><span class="line">在关于锁的面试过程中，一般主要问Synchronized和ReentrantLock的实现原理，更有甚者会问一些读写锁。</span><br><span class="line">场景对话：</span><br><span class="line"></span><br><span class="line">面试官：都了解Java中的什么锁？</span><br><span class="line">我：比如Synchronized和ReentrantLock...读写锁用的不多，就没研究了</span><br><span class="line">面试官：那好，你先说说Synchronized的实现原理吧</span><br><span class="line">我：嗯，Synchronized是JVM实现的一种锁，其中锁的获取和释放分别是monitorenter和monitorexit指令，该锁在实现上分为了偏向锁、轻量级锁和重量级锁，其中偏向锁在1.6是默认开启的，轻量级锁在多线程竞争的情况下会膨胀成重量级锁，有关锁的数据都保存在对象头中...&amp;&amp;@@#，（嗯，说了一大堆，面试官也没打断我）</span><br><span class="line">面试官：哦，嗯，理解的还挺透彻，那你说说ReentrantLock的实现吧...</span><br><span class="line">我：ReentrantLock是基于AQS实现的</span><br><span class="line">面试官：什么是AQS？</span><br><span class="line">我：在AQS内部会保存一个状态变量state，通过CAS修改该变量的值，修改成功的线程表示获取到该锁，没有修改成功，或者发现状态state已经是加锁状态，则通过一个Waiter对象封装线程，添加到等待队列中，并挂起等待被唤醒&amp;&amp;&amp;$$（又说了一堆）</span><br><span class="line">面试官：能说说CAS的实现原理么？</span><br><span class="line">我：CAS是通过unsafe类的compareAndSwap方法实现的（心里得意的一笑）</span><br><span class="line">面试官：哦，好的，那你知道这个方法的参数的含义的么？</span><br><span class="line">我：（这是在逼我啊...努力的回想，因为我真的看过啊）我想想啊，这个方法看的时间有点久远了，第一个参数是要修改的对象，第二个参数是对象中要修改变量的偏移量，第三个参数是修改之前的值，第四个参数是预想修改后的值....（说出来之后都有点佩服自己，这个都记得，不过面试官好像还是不肯放过我...）</span><br><span class="line">面试官：嗯，对的，那你知道操作系统级别是如何实现的么？</span><br><span class="line">我：（我去你大爷...）我只记得X86中有一个cmp开头的指令，具体的我忘记了...</span><br><span class="line">面试官：嗯，好，你知道CAS指令有什么缺点么</span><br><span class="line">我：哦，CAS的缺点是存在ABA问题</span><br><span class="line">面试官：怎么讲？</span><br><span class="line">我：就是一个变量V，如果变量V初次读取的时候是A，并且在准备赋值的时候检查到它仍然是A，那能说明它的值没有被其他线程修改过了吗？如果在这段期间它的值曾经被改成了B，然后又改回A，那CAS操作就会误认为它从来没有被修改过。</span><br><span class="line">面试官：那怎么解决？</span><br><span class="line">我：（有完没完了啊...我的心里是崩溃的）针对这种情况，java并发包中提供了一个带有标记的原子引用类&quot;AtomicStampedReference&quot;，它可以通过控制变量值的版本来保证CAS的正确性。</span><br><span class="line"></span><br><span class="line">本来转载自公众号  占小狼的博客</span><br><span class="line">作者占小狼   来自 美团点评 基础架构组</span><br></pre></td></tr></table></figure>
-<h1 id="理解Java对象头与Monitor"><a href="#理解Java对象头与Monitor" class="headerlink" title="理解Java对象头与Monitor"></a>理解Java对象头与Monitor</h1><p>Java 虚拟机中的同步(Synchronization)基于进入和退出管程(Monitor)对象实现</p>
-<p>ACC_SYNCHRONIZED</p>
-<hr>
-<p>synchronized使用的锁对象是存储在Java对象头里的，jvm中采用2个字来存储对象头(如果对象是数组则会分配3个字，多出来的1个字记录的是数组长度)，其主要结构是由Mark Word 和 Class Metadata Address 组成，其结构说明如下表：</p>
-<p><img src="/images/pasted-62.png" alt="upload successful"></p>
-<p>其中Mark Word在默认情况下存储着对象的HashCode、分代年龄、锁标记位等以下是32位JVM的Mark Word默认存储结构</p>
-<p><img src="/images/pasted-63.png" alt="upload successful"></p>
-<p>由于对象头的信息是与对象自身定义的数据没有关系的额外存储成本，因此考虑到JVM的空间效率，Mark Word 被设计成为一个非固定的数据结构，以便存储更多有效的数据，它会根据对象本身的状态复用自己的存储空间，如32位JVM下，除了上述列出的Mark Word默认存储结构外，还有如下可能变化的结构：</p>
-<p><img src="/images/pasted-61.png" alt="upload successful"></p>
-<p>其中轻量级锁和偏向锁是Java 6 对 synchronized 锁进行优化后新增加的，稍后我们会简要分析。这里我们主要分析一下重量级锁也就是通常说synchronized的对象锁，锁标识位为10，其中指针指向的是monitor对象（也称为管程或监视器锁）的起始地址。每个对象都存在着一个 monitor 与之关联，对象与其 monitor 之间的关系有存在多种实现方式，如monitor可以与对象一起创建销毁或当线程试图获取对象锁时自动生成，但当一个 monitor 被某个线程持有后，它便处于锁定状态。在Java虚拟机(HotSpot)中，monitor是由ObjectMonitor实现的，其主要数据结构如下（位于HotSpot虚拟机源码ObjectMonitor.hpp文件，C++实现的）</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">ObjectMonitor() &#123;</span><br><span class="line">    _header       = NULL;</span><br><span class="line">    _count        = 0; //记录个数</span><br><span class="line">    _waiters      = 0,</span><br><span class="line">    _recursions   = 0;</span><br><span class="line">    _object       = NULL;</span><br><span class="line">    _owner        = NULL;</span><br><span class="line">    _WaitSet      = NULL; //处于wait状态的线程，会被加入到_WaitSet</span><br><span class="line">    _WaitSetLock  = 0 ;</span><br><span class="line">    _Responsible  = NULL ;</span><br><span class="line">    _succ         = NULL ;</span><br><span class="line">    _cxq          = NULL ;</span><br><span class="line">    FreeNext      = NULL ;</span><br><span class="line">    _EntryList    = NULL ; //处于等待锁block状态的线程，会被加入到该列表</span><br><span class="line">    _SpinFreq     = 0 ;</span><br><span class="line">    _SpinClock    = 0 ;</span><br><span class="line">    OwnerIsThread = 0 ;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>_WaitSet</li>
-<li>_EntryList</li>
-</ul>
-<p><img src="/images/pasted-105.png" alt="upload successful"><br>ObjectMonitor中有两个队列，_WaitSet 和 _EntryList，用来保存ObjectWaiter对象列表( 每个等待锁的线程都会被封装成ObjectWaiter对象)，_owner指向持有ObjectMonitor对象的线程，当多个线程同时访问一段同步代码时，首先会进入 _EntryList 集合，当线程获取到对象的monitor 后进入 _Owner 区域并把monitor中的owner变量设置为当前线程同时monitor中的计数器count加1，若线程调用 wait() 方法，将释放当前持有的monitor，owner变量恢复为null，count自减1，同时该线程进入 WaitSet集合中等待被唤醒。若当前线程执行完毕也将释放monitor(锁)并复位变量的值，以便其他线程进入获取monitor(锁)。如下图所示</p>
-<p><img src="/images/pasted-64.png" alt="upload successful"></p>
-<p>由此看来，monitor对象存在于每个Java对象的对象头中(存储的指针的指向)，synchronized锁便是通过这种方式获取锁的，也是为什么Java中任意对象可以作为锁的原因，同时也是notify/notifyAll/wait等方法存在于顶级对象Object中的原因(关于这点稍后还会进行分析)，ok~，有了上述知识基础后，下面我们将进一步分析synchronized在字节码层面的具体语义实现。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">3: monitorenter  //进入同步方法</span><br><span class="line">//..........省略其他  </span><br><span class="line">15: monitorexit   //退出同步方法</span><br><span class="line">16: goto          24</span><br><span class="line">//省略其他.......</span><br><span class="line">21: monitorexit //退出同步方法 --抛异常时退出同步方法</span><br></pre></td></tr></table></figure>
-<p>从字节码中可知同步语句块的实现使用的是monitorenter 和 monitorexit 指令，其中monitorenter指令指向同步代码块的开始位置，monitorexit指令则指明同步代码块的结束位置，当执行monitorenter指令时，当前线程将试图获取 objectref(即对象锁) 所对应的 monitor 的持有权，当 objectref 的 monitor 的进入计数器为 0，那线程可以成功取得 monitor，并将计数器值设置为 1，取锁成功。如果当前线程已经拥有 objectref 的 monitor 的持有权，那它可以重入这个 monitor (关于重入性稍后会分析)，重入时计数器的值也会加 1。倘若其他线程已经拥有 objectref 的 monitor 的所有权，那当前线程将被阻塞，直到正在执行线程执行完毕，即monitorexit指令被执行，执行线程将释放 monitor(锁)并设置计数器值为0 ，其他线程将有机会持有 monitor 。值得注意的是编译器将会确保无论方法通过何种方式完成，方法中调用过的每条 monitorenter 指令都有执行其对应 monitorexit 指令，而无论这个方法是正常结束还是异常结束。为了保证在方法异常完成时 monitorenter 和 monitorexit 指令依然可以正确配对执行，编译器会自动产生一个异常处理器，这个异常处理器声明可处理所有的异常，它的目的就是用来执行 monitorexit 指令。从字节码中也可以看出多了一个monitorexit指令，它就是异常结束时被执行的释放monitor 的指令。</p>
-<h1 id="synchronized代码块底层原理"><a href="#synchronized代码块底层原理" class="headerlink" title="synchronized代码块底层原理"></a>synchronized代码块底层原理</h1><p>方法级的同步是隐式，即无需通过字节码指令来控制的，它实现在方法调用和返回操作之中。JVM可以从方法常量池中的方法表结构(method_info Structure) 中的 ACC_SYNCHRONIZED 访问标志区分一个方法是否同步方法。当方法调用时，调用指令将会 检查方法的 ACC_SYNCHRONIZED 访问标志是否被设置，如果设置了，执行线程将先持有monitor（虚拟机规范中用的是管程一词）， 然后再执行方法，最后再方法完成(无论是正常完成还是非正常完成)时释放monitor。在方法执行期间，执行线程持有了monitor，其他任何线程都无法再获得同一个monitor。如果一个同步方法执行期间抛 出了异常，并且在方法内部无法处理此异常，那这个同步方法所持有的monitor将在异常抛到同步方法之外时自动释放。下面我们看看字节码层面如何实现：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"> Last modified 2017-6-2; size 308 bytes</span><br><span class="line">  MD5 checksum f34075a8c059ea65e4cc2fa610e0cd94</span><br><span class="line">  Compiled from &quot;SyncMethod.java&quot;</span><br><span class="line">public class com.zejian.concurrencys.SyncMethod</span><br><span class="line">  minor version: 0</span><br><span class="line">  major version: 52</span><br><span class="line">  flags: ACC_PUBLIC, ACC_SUPER</span><br><span class="line">Constant pool;</span><br><span class="line"></span><br><span class="line">   //省略没必要的字节码</span><br><span class="line">  //==================syncTask方法======================</span><br><span class="line">  public synchronized void syncTask();</span><br><span class="line">    descriptor: ()V</span><br><span class="line">    //方法标识ACC_PUBLIC代表public修饰，ACC_SYNCHRONIZED指明该方法为同步方法</span><br><span class="line">    flags: ACC_PUBLIC, ACC_SYNCHRONIZED</span><br><span class="line">    Code:</span><br><span class="line">      stack=3, locals=1, args_size=1</span><br><span class="line">         0: aload_0</span><br><span class="line">         1: dup</span><br><span class="line">         2: getfield      #2                  // Field i:I</span><br><span class="line">         5: iconst_1</span><br><span class="line">         6: iadd</span><br><span class="line">         7: putfield      #2                  // Field i:I</span><br><span class="line">        10: return</span><br><span class="line">      LineNumberTable:</span><br><span class="line">        line 12: 0</span><br><span class="line">        line 13: 10</span><br><span class="line">&#125;</span><br><span class="line">SourceFile: &quot;SyncMethod.java&quot;</span><br></pre></td></tr></table></figure>
-<p>从字节码中可以看出，synchronized修饰的方法并没有monitorenter指令和monitorexit指令，取得代之的确实是ACC_SYNCHRONIZED标识，该标识指明了该方法是一个同步方法，JVM通过该ACC_SYNCHRONIZED访问标志来辨别一个方法是否声明为同步方法，从而执行相应的同步调用。这便是synchronized锁在同步代码块和同步方法上实现的基本原理。同时我们还必须注意到的是在Java早期版本中，synchronized属于重量级锁，效率低下，因为监视器锁（monitor）是依赖于底层的操作系统的Mutex Lock来实现的，而操作系统实现线程之间的切换时需要从用户态转换到核心态，这个状态之间的转换需要相对比较长的时间，时间成本相对较高，这也是为什么早期的synchronized效率低的原因。庆幸的是在Java 6之后Java官方对从JVM层面对synchronized较大优化，所以现在的synchronized锁效率也优化得很不错了，Java 6之后，为了减少获得锁和释放锁所带来的性能消耗，引入了轻量级锁和偏向锁，接下来我们将简单了解一下Java官方在JVM层面对synchronized锁的优化。</p>
-<h1 id="Java虚拟机对synchronized的优化"><a href="#Java虚拟机对synchronized的优化" class="headerlink" title="Java虚拟机对synchronized的优化"></a>Java虚拟机对synchronized的优化</h1><p>锁的状态总共有四种，无锁状态、偏向锁、轻量级锁和重量级锁。随着锁的竞争，锁可以从偏向锁升级到轻量级锁，再升级的重量级锁，但是锁的升级是单向的，也就是说只能从低到高升级，不会出现锁的降级，关于重量级锁，前面我们已详细分析过，下面我们将介绍偏向锁和轻量级锁以及JVM的其他优化手段，这里并不打算深入到每个锁的实现和转换过程更多地是阐述Java虚拟机所提供的每个锁的核心优化思想，毕竟涉及到具体过程比较繁琐，如需了解详细过程可以查阅《深入理解Java虚拟机原理》。</p>
-<h2 id="偏向锁-单线程"><a href="#偏向锁-单线程" class="headerlink" title="偏向锁(单线程)"></a>偏向锁(单线程)</h2><p>偏向锁是Java 6之后加入的新锁，它是一种针对加锁操作的优化手段，经过研究发现，在大多数情况下，锁不仅不存在多线程竞争，而且总是由同一线程多次获得，因此为了减少同一线程获取锁(会涉及到一些CAS操作,耗时)的代价而引入偏向锁。偏向锁的核心思想是，如果一个线程获得了锁，那么锁就进入偏向模式，此时Mark Word 的结构也变为偏向锁结构，当这个线程再次请求锁时，无需再做任何同步操作，即获取锁的过程，这样就省去了大量有关锁申请的操作，从而也就提供程序的性能。所以，对于没有锁竞争的场合，偏向锁有很好的优化效果，毕竟极有可能连续多次是同一个线程申请相同的锁。但是对于锁竞争比较激烈的场合，偏向锁就失效了，因为这样场合极有可能每次申请锁的线程都是不相同的，因此这种场合下不应该使用偏向锁，否则会得不偿失，需要注意的是，偏向锁失败后，并不会立即膨胀为重量级锁，而是先升级为轻量级锁。下面我们接着了解轻量级锁。</p>
-<h2 id="轻量级锁-线程交替执行同步块的场合"><a href="#轻量级锁-线程交替执行同步块的场合" class="headerlink" title="轻量级锁(线程交替执行同步块的场合)"></a>轻量级锁(线程交替执行同步块的场合)</h2><p>倘若偏向锁失败，虚拟机并不会立即升级为重量级锁，它还会尝试使用一种称为轻量级锁的优化手段(1.6之后加入的)，此时Mark Word 的结构也变为轻量级锁的结构。轻量级锁能够提升程序性能的依据是“对绝大部分的锁，在整个同步周期内都不存在竞争”，注意这是经验数据。需要了解的是，轻量级锁所适应的场景是线程交替执行同步块的场合，如果存在同一时间访问同一锁的场合，就会导致轻量级锁膨胀为重量级锁。</p>
-<h2 id="自旋锁-针对线程持有锁的时间都不会太长"><a href="#自旋锁-针对线程持有锁的时间都不会太长" class="headerlink" title="自旋锁(针对线程持有锁的时间都不会太长)"></a>自旋锁(针对线程持有锁的时间都不会太长)</h2><p>轻量级锁失败后，虚拟机为了避免线程真实地在操作系统层面挂起，还会进行一项称为自旋锁的优化手段。这是基于在大多数情况下，线程持有锁的时间都不会太长，如果直接挂起操作系统层面的线程可能会得不偿失，毕竟操作系统实现线程之间的切换时需要从用户态转换到核心态，这个状态之间的转换需要相对比较长的时间，时间成本相对较高，因此自旋锁会假设在不久将来，当前的线程可以获得锁，因此虚拟机会让当前想要获取锁的线程做几个空循环(这也是称为自旋的原因)，一般不会太久，可能是50个循环或100循环，在经过若干次循环后，如果得到锁，就顺利进入临界区。如果还不能获得锁，那就会将线程在操作系统层面挂起，这就是自旋锁的优化方式，这种方式确实也是可以提升效率的。最后没办法也就只能升级为重量级锁了。</p>
-<h2 id="锁消除-针对局部变量"><a href="#锁消除-针对局部变量" class="headerlink" title="锁消除(针对局部变量)"></a>锁消除(针对局部变量)</h2><p>消除锁是虚拟机另外一种锁的优化，这种优化更彻底，Java虚拟机在JIT编译时(可以简单理解为当某段代码即将第一次被执行时进行编译，又称即时编译)，通过对运行上下文的扫描，去除不可能存在共享资源竞争的锁，通过这种方式消除没有必要的锁，可以节省毫无意义的请求锁时间，如下StringBuffer的append是一个同步方法，但是在add方法中的StringBuffer属于一个局部变量，并且不会被其他线程所使用，因此StringBuffer不可能存在共享资源竞争的情景，JVM会自动将其锁消除。</p>
-<h1 id="关于synchronized-可能需要了解的关键点"><a href="#关于synchronized-可能需要了解的关键点" class="headerlink" title="关于synchronized 可能需要了解的关键点"></a>关于synchronized 可能需要了解的关键点</h1><h2 id="synchronized的可重入性"><a href="#synchronized的可重入性" class="headerlink" title="synchronized的可重入性"></a>synchronized的可重入性</h2><p>从互斥锁的设计上来说，当一个线程试图操作一个由其他线程持有的对象锁的临界资源时，将会处于阻塞状态，但当一个线程再次请求自己持有对象锁的临界资源时，这种情况属于重入锁，请求将会成功，在java中synchronized是基于原子性的内部锁机制，是可重入的，因此在一个线程调用synchronized方法的同时在其方法体内部调用该对象另一个synchronized方法，也就是说一个线程得到一个对象锁后再次请求该对象锁，是允许的，这就是synchronized的可重入性。<br>每次重入，monitor中的计数器仍会加1。</p>
-<h1 id="线程中断与synchronized"><a href="#线程中断与synchronized" class="headerlink" title="线程中断与synchronized"></a>线程中断与synchronized</h1><h2 id="线程中断"><a href="#线程中断" class="headerlink" title="线程中断"></a>线程中断</h2><p>当一个线程处于被阻塞状态或者试图执行一个阻塞操作时，使用Thread.interrupt()方式中断该线程，注意此时将会抛出一个InterruptedException的异常，同时中断状态将会被复位(由中断状态改为非中断状态)</p>
-<p>除了阻塞中断的情景，我们还可能会遇到处于运行期且非阻塞的状态的线程，这种情况下，直接调用Thread.interrupt()中断线程是不会得到任响应的.应该使用了实例方法isInterrupted判断线程是否已被中断，如果被中断将跳出循环以此结束线程,注意非阻塞状态调用interrupt()并不会导致中断状态重置。<br>综合所述，可以简单总结一下中断两种情况，一种是当线程处于阻塞状态或者试图执行一个阻塞操作时，我们可以使用实例方法interrupt()进行线程中断，执行中断操作后将会抛出interruptException异常(该异常必须捕捉无法向外抛出)并将中断状态复位，另外一种是当线程处于运行状态时，我们也可调用实例方法interrupt()进行线程中断，但同时必须手动判断中断状态，并编写中断线程的代码(其实就是结束run方法体的代码)。有时我们在编码时可能需要兼顾以上两种情况，那么就可以如下编写：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">public void run()&#123;</span><br><span class="line">    try &#123;</span><br><span class="line">    //判断当前线程是否已中断,注意interrupted方法是静态的,执行后会对中断状态进行复位</span><br><span class="line">    while (!Thread.interrupted()) &#123;</span><br><span class="line">        TimeUnit.SECONDS.sleep(2);</span><br><span class="line">    &#125;</span><br><span class="line">    &#125; catch (InterruptedException e) &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="中断与synchronized"><a href="#中断与synchronized" class="headerlink" title="中断与synchronized"></a>中断与synchronized</h2><p>事实上线程的中断操作对于正在等待获取的锁对象的synchronized方法或者代码块并不起作用，也就是对于synchronized来说，如果一个线程在等待锁，那么结果只有两种，要么它获得这把锁继续执行，要么它就保存等待，即使调用中断线程的方法，也不会生效。</p>
-<h2 id="等待唤醒机制与synchronized"><a href="#等待唤醒机制与synchronized" class="headerlink" title="等待唤醒机制与synchronized"></a>等待唤醒机制与synchronized</h2><p>所谓等待唤醒机制本篇主要指的是notify/notifyAll和wait方法，在使用这3个方法时，必须处于synchronized代码块或者synchronized方法中，否则就会抛出IllegalMonitorStateException异常，这是因为调用这几个方法前必须拿到当前对象的监视器monitor对象，也就是说notify/notifyAll和wait方法依赖于monitor对象，在前面的分析中，我们知道monitor 存在于对象头的Mark Word 中(存储monitor引用指针)，而synchronized关键字可以获取 monitor ，这也就是为什么notify/notifyAll和wait方法必须在synchronized代码块或者synchronized方法调用的原因。</p>
-<p>需要特别理解的一点是，与sleep方法不同的是wait方法调用完成后，线程将被暂停，但wait方法将会释放当前持有的监视器锁(monitor)，直到有线程调用notify/notifyAll方法后方能继续执行，而sleep方法只让线程休眠并不释放锁。同时notify/notifyAll方法调用后，并不会马上释放监视器锁，而是在相应的synchronized(){}/synchronized方法执行结束后才自动释放锁。</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://blog.csdn.net/javazejian/article/details/72828483" target="_blank" rel="noopener">http://blog.csdn.net/javazejian/article/details/72828483</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/02/01/java_dubbo/source-dubbo-total/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/02/01/java_dubbo/source-dubbo-total/" itemprop="url">dubbo-概述</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-01T21:53:00+08:00">
-                2018-02-01
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/dubbo/" itemprop="url" rel="index">
-                    <span itemprop="name">dubbo</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/02/01/java_dubbo/source-dubbo-total/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/02/01/java_dubbo/source-dubbo-total/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/02/01/java_dubbo/source-dubbo-total/" class="leancloud_visitors" data-flag-title="dubbo-概述">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="各层说明"><a href="#各层说明" class="headerlink" title="各层说明"></a>各层说明</h1><p><img src="http://dubbo.io/books/dubbo-dev-book/sources/images/dubbo-framework.jpg"></p>
-<ul>
-<li>config 配置层：对外配置接口，以 ServiceConfig, ReferenceConfig 为中心，可以直接初始化配置类，也可以通过 spring 解析配置生成配置类</li>
-<li>proxy 服务代理层：服务接口透明代理，生成服务的客户端 Stub 和服务器端 Skeleton, 以 ServiceProxy 为中心，扩展接口为 ProxyFactory</li>
-<li>registry 注册中心层：封装服务地址的注册与发现，以服务 URL 为中心，扩展接口为 RegistryFactory, Registry, RegistryService</li>
-<li>cluster 路由层：封装多个提供者的路由及负载均衡，并桥接注册中心，以 Invoker 为中心，扩展接口为 Cluster, Directory, Router, LoadBalance</li>
-<li>monitor 监控层：RPC 调用次数和调用时间监控，以 Statistics 为中心，扩展接口为 MonitorFactory, Monitor, MonitorService</li>
-<li>protocol 远程调用层：封将 RPC 调用，以 Invocation, Result 为中心，扩展接口为 Protocol, Invoker, Exporter</li>
-<li>exchange 信息交换层：封装请求响应模式，同步转异步，以 Request, Response 为中心，扩展接口为 Exchanger, ExchangeChannel, ExchangeClient, ExchangeServer</li>
-<li>transport 网络传输层：抽象 mina 和 netty 为统一接口，以 Message 为中心，扩展接口为 Channel, Transporter, Client, Server, Codec</li>
-<li>serialize 数据序列化层：可复用的一些工具，扩展接口为 Serialization, ObjectInput, ObjectOutput, ThreadPool</li>
-</ul>
-<p>接口verion1<br><img src="/images/pasted-50.png" alt="upload successful"></p>
-<p>接口verion2<br><img src="/images/pasted-51.png" alt="upload successful"></p>
-<h1 id="基类模板方法–-gt-链式过滤器"><a href="#基类模板方法–-gt-链式过滤器" class="headerlink" title="基类模板方法–&gt;链式过滤器"></a>基类模板方法–&gt;链式过滤器</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">public abstract AbstractInvoker implements Invoker &#123;  </span><br><span class="line"></span><br><span class="line">    public Result invoke(Invocation inv) throws RpcException &#123;  </span><br><span class="line">        // 伪代码  </span><br><span class="line">        active ++;  </span><br><span class="line">        if (active &gt; max)  </span><br><span class="line">            wait();  </span><br><span class="line"></span><br><span class="line">        doInvoke(inv);  </span><br><span class="line"></span><br><span class="line">        active --;  </span><br><span class="line">        notify();  </span><br><span class="line">    &#125;  </span><br><span class="line"></span><br><span class="line">    protected abstract Result doInvoke(Invocation inv) throws RpcException  </span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">public abstract LimitFilter implements Filter &#123;  </span><br><span class="line"></span><br><span class="line">    public Result invoke(Invoker chain, Invocation inv) throws RpcException &#123;  </span><br><span class="line">         // 伪代码  </span><br><span class="line">        active ++;  </span><br><span class="line">        if (active &gt; max)  </span><br><span class="line">            wait();  </span><br><span class="line"></span><br><span class="line">        chain.invoke(inv);  </span><br><span class="line"></span><br><span class="line">        active --;  </span><br><span class="line">        notify();  </span><br><span class="line">    &#125;  </span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>Invoker, Exporter, InvocationHandler, FilterChain 其实都是 invoke 行为的不同阶段，完全可以抽象掉，统一为 Invoker，减少概念。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2083,7 +2058,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">121</span>
+                  <span class="site-state-item-count">123</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

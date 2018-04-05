@@ -326,6 +326,328 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/04/04/future-task/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/04/future-task/" itemprop="url">future-task</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-04T08:53:18+08:00">
+                2018-04-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/04/future-task/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/04/04/future-task/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/04/04/future-task/" class="leancloud_visitors" data-flag-title="future-task">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public &lt;T&gt; Future&lt;T&gt; submit(Callable&lt;T&gt; task) &#123;</span><br><span class="line">    if (task == null) throw new NullPointerException();</span><br><span class="line">    RunnableFuture&lt;T&gt; ftask = newTaskFor(task);</span><br><span class="line">    execute(ftask);</span><br><span class="line">    return ftask;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>从上面看到就是对Callable封装成一个新的任务，即FutureTask，调用Executor的原始接口execute方法来执行FutureTask，并且返回给用户FutureTask对象，用于追踪任务的状态和数据，下面就需要我们来详细看看FutureTask如何对任务进行封装的</p>
+<h1 id="FutureTask"><a href="#FutureTask" class="headerlink" title="FutureTask"></a>FutureTask</h1><h2 id="FutureTask的属性和构造函数"><a href="#FutureTask的属性和构造函数" class="headerlink" title="FutureTask的属性和构造函数"></a>FutureTask的属性和构造函数</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">private volatile int state;</span><br><span class="line">private static final int NEW          = 0;</span><br><span class="line">private static final int COMPLETING   = 1;</span><br><span class="line">private static final int NORMAL       = 2;</span><br><span class="line">private static final int EXCEPTIONAL  = 3;</span><br><span class="line">private static final int CANCELLED    = 4;</span><br><span class="line">private static final int INTERRUPTING = 5;</span><br><span class="line">private static final int INTERRUPTED  = 6;</span><br><span class="line"></span><br><span class="line">/** The underlying callable; nulled out after running */</span><br><span class="line">private Callable&lt;V&gt; callable;</span><br><span class="line">/** The result to return or exception to throw from get() */</span><br><span class="line">private Object outcome; // non-volatile, protected by state reads/writes</span><br><span class="line">/** The thread running the callable; CASed during run() */</span><br><span class="line">private volatile Thread runner;</span><br><span class="line">/** Treiber stack of waiting threads */</span><br><span class="line">private volatile WaitNode waiters;</span><br><span class="line"></span><br><span class="line">public FutureTask(Callable&lt;V&gt; callable) &#123;</span><br><span class="line">    if (callable == null)</span><br><span class="line">        throw new NullPointerException();</span><br><span class="line">    this.callable = callable;</span><br><span class="line">    this.state = NEW;       // ensure visibility of callable</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>有一个状态变量state,</li>
+<li>一个Callable callable即原始任务，</li>
+<li>Object outcome存放原始任务的输出结果或者异常，</li>
+<li>Thread runner运行该任务的线程，</li>
+<li>WaitNode waiters等待获取任务结果的等待者</li>
+</ul>
+<h2 id="3-2-FutureTask的get方法实现"><a href="#3-2-FutureTask的get方法实现" class="headerlink" title="3.2 FutureTask的get方法实现"></a>3.2 FutureTask的get方法实现</h2><p>使用FutureTask阻塞式等待任务执行结果，一种是永远阻塞另一种就是阻塞一定时间否则报超时异常，如下2个方法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">public V get() throws InterruptedException, ExecutionException &#123;</span><br><span class="line">    int s = state;</span><br><span class="line">    if (s &lt;= COMPLETING)</span><br><span class="line">        s = awaitDone(false, 0L);</span><br><span class="line">    return report(s);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public V get(long timeout, TimeUnit unit)</span><br><span class="line">    throws InterruptedException, ExecutionException, TimeoutException &#123;</span><br><span class="line">    if (unit == null)</span><br><span class="line">        throw new NullPointerException();</span><br><span class="line">    int s = state;</span><br><span class="line">    if (s &lt;= COMPLETING &amp;&amp;</span><br><span class="line">        (s = awaitDone(true, unit.toNanos(timeout))) &lt;= COMPLETING)</span><br><span class="line">        throw new TimeoutException();</span><br><span class="line">    return report(s);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>阻塞式等待的核心逻辑就在上述awaitDone方法中，来详细看看<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">private int awaitDone(boolean timed, long nanos)</span><br><span class="line">    throws InterruptedException &#123;</span><br><span class="line">    final long deadline = timed ? System.nanoTime() + nanos : 0L;</span><br><span class="line">    WaitNode q = null;</span><br><span class="line">    boolean queued = false;</span><br><span class="line">    for (;;) &#123;</span><br><span class="line">        if (Thread.interrupted()) &#123;</span><br><span class="line">            removeWaiter(q);</span><br><span class="line">            throw new InterruptedException();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        int s = state;</span><br><span class="line">        if (s &gt; COMPLETING) &#123;</span><br><span class="line">            if (q != null)</span><br><span class="line">                q.thread = null;</span><br><span class="line">            return s;</span><br><span class="line">        &#125;</span><br><span class="line">        else if (s == COMPLETING) // cannot time out yet</span><br><span class="line">            Thread.yield();</span><br><span class="line">        else if (q == null)</span><br><span class="line">            q = new WaitNode();</span><br><span class="line">        else if (!queued)</span><br><span class="line">            queued = UNSAFE.compareAndSwapObject(this, waitersOffset,</span><br><span class="line">                                                 q.next = waiters, q);</span><br><span class="line">        else if (timed) &#123;</span><br><span class="line">            nanos = deadline - System.nanoTime();</span><br><span class="line">            if (nanos &lt;= 0L) &#123;</span><br><span class="line">                removeWaiter(q);</span><br><span class="line">                return state;</span><br><span class="line">            &#125;</span><br><span class="line">            LockSupport.parkNanos(this, nanos);</span><br><span class="line">        &#125;</span><br><span class="line">        else</span><br><span class="line">            LockSupport.park(this);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>可以看到有一个for循环不断处理着各种情况：</p>
+<ul>
+<li>1 从最开始的WaitNode q = null，构建了一个WaitNode，即代表着当前线程作为一个等待者，WaitNode就是一个简单的链表，如下</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">static final class WaitNode &#123;</span><br><span class="line">    volatile Thread thread;</span><br><span class="line">    volatile WaitNode next;</span><br><span class="line">    WaitNode() &#123; thread = Thread.currentThread(); &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>2 构建好WaitNode之后就要将该WaitNode放入链表中，这时候就会涉及多线程问题，使用UNSAFE的CAS来解决，这种方式也是AtomicLong等众多原子类的底层实现方式</p>
+</li>
+<li><p>3 成功放入WaitNode链表之后，采用LockSupport的park阻塞当前线程，要么只阻塞一定时间要么一直阻塞，直到被LockSupport的unpark唤醒。LockSupport在锁的底层实现AQS中也非常常见，使用了LockSupport就可以不用在for循环里不断判断当前任务状态而浪费CPU，只需要当前任务完成之后，使用LockSupport对等待线程进行unpark，就可以使等待的线程退出等待继续往下执行</p>
+</li>
+<li><p>4 如果LockSupport阻塞时间到了，还未收到unpark，则需要从等待者链表中删除当前线程代表的等待者</p>
+</li>
+</ul>
+<h2 id="FutureTask的任务执行过程"><a href="#FutureTask的任务执行过程" class="headerlink" title="FutureTask的任务执行过程"></a>FutureTask的任务执行过程</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">public void run() &#123;</span><br><span class="line">    if (state != NEW ||</span><br><span class="line">        !UNSAFE.compareAndSwapObject(this, runnerOffset,</span><br><span class="line">                                     null, Thread.currentThread()))</span><br><span class="line">        return;</span><br><span class="line">    try &#123;</span><br><span class="line">        Callable&lt;V&gt; c = callable;</span><br><span class="line">        if (c != null &amp;&amp; state == NEW) &#123;</span><br><span class="line">            V result;</span><br><span class="line">            boolean ran;</span><br><span class="line">            try &#123;</span><br><span class="line">                result = c.call();</span><br><span class="line">                ran = true;</span><br><span class="line">            &#125; catch (Throwable ex) &#123;</span><br><span class="line">                result = null;</span><br><span class="line">                ran = false;</span><br><span class="line">                setException(ex);</span><br><span class="line">            &#125;</span><br><span class="line">            if (ran)</span><br><span class="line">                set(result);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; finally &#123;</span><br><span class="line">        // runner must be non-null until state is settled to</span><br><span class="line">        // prevent concurrent calls to run()</span><br><span class="line">        runner = null;</span><br><span class="line">        // state must be re-read after nulling runner to prevent</span><br><span class="line">        // leaked interrupts</span><br><span class="line">        int s = state;</span><br><span class="line">        if (s &gt;= INTERRUPTING)</span><br><span class="line">            handlePossibleCancellationInterrupt(s);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>1 一旦FutureTask任务开始执行了，就需要将当前执行线程设置到FutureTask的volatile Thread runner属性中</p>
+<p>2 执行原始任务Callable的call方法，可能成功也可能失败也可能被中断被取消</p>
+<p>文档中有如下状态的迁移过程：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Possible state transitions:</span><br><span class="line"> * NEW -&gt; COMPLETING -&gt; NORMAL</span><br><span class="line"> * NEW -&gt; COMPLETING -&gt; EXCEPTIONAL</span><br><span class="line"> * NEW -&gt; CANCELLED</span><br><span class="line"> * NEW -&gt; INTERRUPTING -&gt; INTERRUPTED</span><br></pre></td></tr></table></figure>
+<p>成功和失败方法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">protected void set(V v) &#123;</span><br><span class="line">    if (UNSAFE.compareAndSwapInt(this, stateOffset, NEW, COMPLETING)) &#123;</span><br><span class="line">        outcome = v;</span><br><span class="line">        UNSAFE.putOrderedInt(this, stateOffset, NORMAL); // final state</span><br><span class="line">        finishCompletion();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">protected void setException(Throwable t) &#123;</span><br><span class="line">    if (UNSAFE.compareAndSwapInt(this, stateOffset, NEW, COMPLETING)) &#123;</span><br><span class="line">        outcome = t;</span><br><span class="line">        UNSAFE.putOrderedInt(this, stateOffset, EXCEPTIONAL); // final state</span><br><span class="line">        finishCompletion();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>都是首先将状态变成COMPLETING正在结束中，然后设置outcome，成功则设置正常的返回值，失败则设置成异常，然后根据划定最终的状态结果，成功就是NORMAL，失败就是EXCEPTIONAL，最后呢调用finishCompletion，去unpark之前说的WaitNode中对应的线程们</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">private void finishCompletion() &#123;</span><br><span class="line">    // assert state &gt; COMPLETING;</span><br><span class="line">    for (WaitNode q; (q = waiters) != null;) &#123;</span><br><span class="line">        if (UNSAFE.compareAndSwapObject(this, waitersOffset, q, null)) &#123;</span><br><span class="line">            for (;;) &#123;</span><br><span class="line">                Thread t = q.thread;</span><br><span class="line">                if (t != null) &#123;</span><br><span class="line">                    q.thread = null;</span><br><span class="line">                    LockSupport.unpark(t);</span><br><span class="line">                &#125;</span><br><span class="line">                WaitNode next = q.next;</span><br><span class="line">                if (next == null)</span><br><span class="line">                    break;</span><br><span class="line">                q.next = null; // unlink to help gc</span><br><span class="line">                q = next;</span><br><span class="line">            &#125;</span><br><span class="line">            break;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    done();</span><br><span class="line"></span><br><span class="line">    callable = null;        // to reduce footprint</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里就是遍历WaitNode链表，对每一个WaitNode对应的线程依次进行LockSupport.unpark(t)，使其结束阻塞。WaitNode通知完毕后，调用一个done方法，目前该方法是空的实现，所以你如果想在任务完成后执行一些动作的时候就可以重写该方法</p>
+<h2 id="FutureTask任务的取消"><a href="#FutureTask任务的取消" class="headerlink" title="FutureTask任务的取消"></a>FutureTask任务的取消</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">public boolean cancel(boolean mayInterruptIfRunning) &#123;</span><br><span class="line">    if (state != NEW)</span><br><span class="line">        return false;</span><br><span class="line">    if (mayInterruptIfRunning) &#123;</span><br><span class="line">        if (!UNSAFE.compareAndSwapInt(this, stateOffset, NEW, INTERRUPTING))</span><br><span class="line">            return false;</span><br><span class="line">        Thread t = runner;</span><br><span class="line">        if (t != null)</span><br><span class="line">            t.interrupt();</span><br><span class="line">        UNSAFE.putOrderedInt(this, stateOffset, INTERRUPTED); // final state</span><br><span class="line">    &#125;</span><br><span class="line">    else if (!UNSAFE.compareAndSwapInt(this, stateOffset, NEW, CANCELLED))</span><br><span class="line">        return false;</span><br><span class="line">    finishCompletion();</span><br><span class="line">    return true;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>取消任务，有2种情况，一种该任务正在运行，一种就是非运行状态，所以需要用户给出明示是否中断正在运行的任务，即需要一个参数mayInterruptIfRunning</p>
+<p>中断任务就是通过中断运行该任务的线程，即直接调用该线程的interrupt()方法</p>
+<h1 id="结束语"><a href="#结束语" class="headerlink" title="结束语"></a>结束语</h1><p>FutureTask大部分就简单分析完了，其他的自己去看下就行了。至此我们了解了一个任务被提交经过了封装，变成了一个新的任务FutureTask,同时FutureTask也明确了该任务的整个执行过程，只留出核心execute(futureTask)方法需要被子类来实现</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://my.oschina.net/pingpangkuangmo/blog/666762" target="_blank" rel="noopener">https://my.oschina.net/pingpangkuangmo/blog/666762</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/04/03/idea-keymap/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/03/idea-keymap/" itemprop="url">idea-keymap</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-03T21:55:52+08:00">
+                2018-04-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/03/idea-keymap/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/04/03/idea-keymap/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/04/03/idea-keymap/" class="leancloud_visitors" data-flag-title="idea-keymap">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>查看继承关系:Ctrl + T</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/04/03/java_thread/JUC-CyclicBarrier/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1598,334 +1920,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/03/29/redis/study-gossip/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/29/redis/study-gossip/" itemprop="url">study-gossip</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-29T09:40:49+08:00">
-                2018-03-29
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/03/29/redis/study-gossip/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/29/redis/study-gossip/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/03/29/redis/study-gossip/" class="leancloud_visitors" data-flag-title="study-gossip">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p><a href="https://github.com/aCoder2013/blog/issues/2" target="_blank" rel="noopener">https://github.com/aCoder2013/blog/issues/2</a></p>
-<p>Cassandra<br>redis</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/03/29/mysql/mysql-master-slave/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/29/mysql/mysql-master-slave/" itemprop="url">mysql-master-slave</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-29T07:37:34+08:00">
-                2018-03-29
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/03/29/mysql/mysql-master-slave/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/29/mysql/mysql-master-slave/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/03/29/mysql/mysql-master-slave/" class="leancloud_visitors" data-flag-title="mysql-master-slave">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="什么是Mysql主从复制"><a href="#什么是Mysql主从复制" class="headerlink" title="什么是Mysql主从复制"></a>什么是Mysql主从复制</h1><p>MySQL主从复制是其最重要的功能之一。主从复制是指一台服务器充当主数据库服务器，另一台或多台服务器充当从数据库服务器，主服务器中的数据自动复制到从服务器之中。对于多级复制，数据库服务器即可充当主机，也可充当从机。MySQL主从复制的基础是主服务器对数据库修改记录二进制日志，从服务器通过主服务器的二进制日志自动执行更新。</p>
-<h1 id="Mysq主从复制的类型"><a href="#Mysq主从复制的类型" class="headerlink" title="Mysq主从复制的类型"></a>Mysq主从复制的类型</h1><h2 id="基于语句的复制-Statement-："><a href="#基于语句的复制-Statement-：" class="headerlink" title="基于语句的复制(Statement)："></a>基于语句的复制(Statement)：</h2><p>主服务器上面执行的语句在从服务器上面再执行一遍，在MySQL-3.23版本以后支持。</p>
-<p>存在的问题：时间上可能不完全同步造成偏差，执行语句的用户也可能是不同一个用户。</p>
-<p>优点：不需要记录每一行的变化，减少了binlog日志量，节约了IO，提高性能。(相比row能节约多少性能与日志量，这个取决于应用的SQL情况，正常同一条记录修改或者插入row格式所产生的日志量还小于Statement产生的日志量，但是考虑到如果带条件的update操作，以及整表删除，alter表等操作，ROW格式会产生大量日志，因此在考虑是否使用ROW格式日志时应该跟据应用的实际情况，其所产生的日志量会增加多少，以及带来的IO性能问题。)</p>
-<p>缺点：由于记录的只是执行语句，为了这些语句能在slave上正确运行，因此还必须记录每条语句在执行的时候的一些相关信息，以保证所有语句能在slave得到和在master端执行时候相同 的结果。另外mysql 的复制,像一些特定函数功能，slave可与master上要保持一致会有很多相关问题(如sleep()函数， last_insert_id()，以及user-defined functions(udf)会出现问题).</p>
-<p>使用以下函数的语句也无法被复制：</p>
-<ul>
-<li><p>LOAD_FILE()</p>
-</li>
-<li><p>UUID()</p>
-</li>
-<li><p>USER()</p>
-</li>
-<li><p>FOUND_ROWS()</p>
-</li>
-<li><p>SYSDATE() (除非启动时启用了 –sysdate-is-now 选项)</p>
-</li>
-</ul>
-<p>同时在INSERT …SELECT 会产生比 RBR 更多的行级锁</p>
-<h2 id="基于行的复制-Row-："><a href="#基于行的复制-Row-：" class="headerlink" title="基于行的复制(Row)："></a>基于行的复制(Row)：</h2><p>把主服务器上面改编后的内容直接复制过去，而不关心到底改变该内容是由哪条语句引发的，在MySQL-5.0版本以后引入。</p>
-<p>存在的问题：比如一个工资表中有一万个用户，我们把每个用户的工资+1000，那么基于行的复制则要复制一万行的内容，由此造成的开销比较大，而基于语句的复制仅仅一条语句就可以了。</p>
-<p>优点： binlog中可以不记录执行的sql语句的上下文相关的信息，仅需要记录那一条记录被修改成什么了。所以rowlevel的日志内容会非常清楚的记录下每一行数据修改的细节。而且不会出现某些特定情况下的存储过程，或function，以及trigger的调用和触发无法被正确复制的问题</p>
-<p>缺点:所有的执行的语句当记录到日志中的时候，都将以每行记录的修改来记录，这样可能会产生大量的日志内容,比如一条update语句，修改多条记录，则binlog中每一条修改都会有记录，这样造成binlog日志量会很大，特别是当执行alter table之类的语句的时候，由于表结构修改，每条记录都发生改变，那么该表每一条记录都会记录到日志中。</p>
-<h2 id="混合类型的复制："><a href="#混合类型的复制：" class="headerlink" title="混合类型的复制："></a>混合类型的复制：</h2><p>是以上两种level的混合使用，一般的语句修改使用statment格式保存binlog，如一些函数，statement无法完成主从复制的操作，则采用row格式保存binlog,MySQL会根据执行的每一条具体的sql语句来区分对待记录的日志形式，也就是在Statement和Row之间选择一种.新版本的MySQL中队row level模式也被做了优化，并不是所有的修改都会以row level来记录，像遇到表结构变更的时候就会以statement模式来记录。至于update或者delete等修改数据的语句，还是会记录所有行的变更。</p>
-<h1 id="Binlog基本配制与格式设定"><a href="#Binlog基本配制与格式设定" class="headerlink" title="Binlog基本配制与格式设定"></a>Binlog基本配制与格式设定</h1><h2 id="1-基本配制"><a href="#1-基本配制" class="headerlink" title="1.基本配制"></a>1.基本配制</h2><p>Mysql BInlog日志格式可以通过mysql的my.cnf文件的属性binlog_format指定。如以下：</p>
-<p>binlog_format = MIXED //binlog日志格式</p>
-<p>log_bin =目录/mysql-bin.log //binlog日志名</p>
-<p>expire_logs_days = 7 //binlog过期清理时间</p>
-<p>max_binlog_size 100m //binlog每个日志文件大小</p>
-<h2 id="2-Binlog日志格式选择"><a href="#2-Binlog日志格式选择" class="headerlink" title="2.Binlog日志格式选择"></a>2.Binlog日志格式选择</h2><p>Mysql默认是使用Statement日志格式，推荐使用MIXED.</p>
-<p>由于一些特殊使用，可以考虑使用ROWED，如自己通过binlog日志来同步数据的修改，这样会节省很多相关操作。对于binlog数据处理会变得非常轻松,相对mixed，解析也会很轻松(当然前提是增加的日志量所带来的IO开销在容忍的范围内即可)。</p>
-<h2 id="3-mysqlbinlog格式选择"><a href="#3-mysqlbinlog格式选择" class="headerlink" title="3.mysqlbinlog格式选择"></a>3.mysqlbinlog格式选择</h2><p>mysql对于日志格式的选定原则:如果是采用 INSERT，UPDATE，DELETE 等直接操作表的情况，则日志格式根据 binlog_format 的设定而记录,如果是采用 GRANT，REVOKE，SET PASSWORD 等管理语句来做的话，那么无论如何 都采用 SBR 模式记录。</p>
-<h1 id="Mysql主从复制的过程"><a href="#Mysql主从复制的过程" class="headerlink" title="Mysql主从复制的过程"></a>Mysql主从复制的过程</h1><p>MySQL主从复制的两种情况：同步复制和异步复制，实际复制架构中大部分为异步复制。</p>
-<p>复制的基本过程如下：</p>
-<ul>
-<li><p>Slave上面的IO进程连接上Master，并请求从指定日志文件的指定位置（或者从最开始的日志）之后的日志内容。</p>
-</li>
-<li><p>Master接收到来自Slave的IO进程的请求后，负责复制的IO进程会根据请求信息读取日志指定位置之后的日志信息，返回给Slave的IO进程。返回信息中除了日志所包含的信息之外，还包括本次返回的信息已经到Master端的bin-log文件的名称以及bin-log的位置。</p>
-</li>
-<li><p>Slave的IO进程接收到信息后，将接收到的日志内容依次添加到Slave端的relay-log文件的最末端，并将读取到的Master端的 bin-log的文件名和位置记录到master-info文件中，以便在下一次读取的时候能够清楚的告诉Master“我需要从某个bin-log的哪个位置开始往后的日志内容，请发给我”。</p>
-</li>
-<li><p>Slave的Sql进程检测到relay-log中新增加了内容后，会马上解析relay-log的内容成为在Master端真实执行时候的那些可执行的内容，并在自身执行。</p>
-</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1976,7 +1970,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">121</span>
+                  <span class="site-state-item-count">123</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
