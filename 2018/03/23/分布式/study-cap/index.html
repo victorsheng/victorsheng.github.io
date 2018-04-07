@@ -86,7 +86,7 @@
 <meta property="og:site_name" content="Victor的博客">
 <meta property="og:description" content="CAP（Consistency一致性、Availability可用性、Partition-tolerance分区可容忍性）理论普遍被看成是大数据技术的理论基础。同时，凭据该理论，业界有一种极度流行、极度“专业”的认识，那就是：关系型数据库设计选择了C（一致性）与A（可用性），NoSQL数据库设计则差别。其中，HBase选择了C（一致性）与P（分区可容忍性），Cassandra选择了A（可用性）与P">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-04-03T01:23:38.181Z">
+<meta property="og:updated_time" content="2018-04-05T12:25:54.018Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="study-cap">
 <meta name="twitter:description" content="CAP（Consistency一致性、Availability可用性、Partition-tolerance分区可容忍性）理论普遍被看成是大数据技术的理论基础。同时，凭据该理论，业界有一种极度流行、极度“专业”的认识，那就是：关系型数据库设计选择了C（一致性）与A（可用性），NoSQL数据库设计则差别。其中，HBase选择了C（一致性）与P（分区可容忍性），Cassandra选择了A（可用性）与P">
@@ -421,7 +421,17 @@
 <li>Availability可用性：不论你和你妻子谁来工作，记忆公司总能接听来电，处理客户请求</li>
 <li>Partition-tolerance分区可容忍性：即便你和你妻子失联，记忆公司依然能正常运转</li>
 </ul>
-<table>
+<p>● 一致性(C): 在分布式系统中的所有数据备份，在同一时刻是否同样的值。(等同于所有节点访问同一份最新的数据副本)</p>
+<p>● 可用性(A): 在集群中一部分节点故障后，集群整体是否还能响应客户端 的读写请求。(对数据更新具备高可用性)</p>
+<p>● 分区容忍性(P): 以实际效果而言，分区相当于对通信的时限要求。系统如果不能在时限内达成数据一致性，就意味着发生了分区的情况，必须就当前 操作在 C 和 A 之间做出选择。(分区状态可以理解为部分机器不连通了，比如机器挂了，繁忙失去响应，单机房故障等)</p>
+<p>Partition 字面意思是网络分区，即因网络因素将系统分隔为多个单独的部 分，有人可能会说，网络分区的情况发生概率非常小啊，是不是不用考虑 P， 保证 CA 就好。要理解 P，我们看回 CAP 证明中 P 的定义:</p>
+<p>In order to model partition tolerance, the network will be allowed to lose arbitrarily many messages sent from one node to another。</p>
+<p>网络分区的情况符合该定义，网络丢包的情况也符合以上定义，另外节点宕 机，其他节点发往宕机节点的包也将丢失，这种情况同样符合定义。现实情况 下我们面对的是一个不可靠的网络、有一定概率宕机的设备，这两个因素都会 导致 Partition，因而分布式系统实现中 P 是一个必须项，而不是可选项。</p>
+<h2 id="解读"><a href="#解读" class="headerlink" title="解读"></a>解读</h2><p>CP without A:如果不要求 A(可用)，相当于每个请求都需要在 Server 之间 强一致，而 P(分区)会导致同步时间无限延长，如此 CP 也是可以保证的。很 多传统的数据库分布式事务都属于这种模式。</p>
+<p>AP wihtout C:要高可用并允许分区，则需放弃一致性。一旦分区发生，节点 之间可能会失去联系，为了高可用，每个节点只能用本地数据提供服务，而这样会导致全局数据的不一致性。现在众多的 NoSQL 都属于此类。</p>
+<h2 id="伪命题"><a href="#伪命题" class="headerlink" title="伪命题"></a>伪命题</h2><p>“三选二”是一个伪命题</p>
+<p>不是为了 P(分区容忍性)，要在 A 和 C 之间选择一个。分区很少出现，CAP 在大多数时候允许完美的 C 和 A。但当分区存在或可感知其影响的情况下，就要预备一种策略去探知分区并显式处理其影响。</p>
+<h1 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h1><table>
 <thead>
 <tr>
 <th style="text-align:left">Feature</th>
@@ -606,7 +616,7 @@
 <p>分布式系统分区容忍肯定是要保证的，因为总会有网络延迟，网络波动导致每个节点互相有短暂或长时间的通讯不通。所以我们在这个基础上，如果我们解决了一致性问题，也就是我们在网络波动和延迟的时候也让每个节点的数据是一样的，保证同时从任意节点取到的数据是一样的。</p>
 <p>那么我们就得舍弃可用性，也就是说我们在网络波动或者延迟的时候让整个分布式系统不可用，等到数据都同步完了，每个节点的数据都一样了，这时候我们在让分布式系统可用。这就是舍弃了可用性。</p>
 <p>那什么是舍弃一致性呢？就是在有网络延迟的时候，我整个的分布式系统还对外提供服务，这时就有可能短暂的出现获取的数据不是一致的。这就是舍弃了一致性。所以一般来说我们都是保证可用性，虽然有短暂的数据不一致，但我们只要最终保证了一致性在有些时候也是可以满足需要的。</p>
-<h1 id="解读"><a href="#解读" class="headerlink" title="解读"></a>解读</h1><p><a href="http://kongchen.github.io/how-cap-defines-avaiability/" target="_blank" rel="noopener">http://kongchen.github.io/how-cap-defines-avaiability/</a><br>C容易理解，所有节点上的数据都一样。<br>P是说一旦集群因为内部通信故障发生分裂，集群还能正常运转。</p>
+<h1 id="解读-1"><a href="#解读-1" class="headerlink" title="解读"></a>解读</h1><p><a href="http://kongchen.github.io/how-cap-defines-avaiability/" target="_blank" rel="noopener">http://kongchen.github.io/how-cap-defines-avaiability/</a><br>C容易理解，所有节点上的数据都一样。<br>P是说一旦集群因为内部通信故障发生分裂，集群还能正常运转。</p>
 <p>关键是这个A。</p>
 <p>说白了就是，CAP里的A指的是，只要是活着的节点能返回响应，那么就认为它是availability的。</p>
 <p>用汽车来做个比喻：<br>汽车一切良好，故障灯一个都不亮，能开能刹，这是我们理解的传统的Available。只要是出了任何问题，例如车胎爆了，发动机坏了，或者是没油开不动了，这都已经是不可用了。</p>
@@ -615,6 +625,8 @@
 <h2 id="只满足CA的系统"><a href="#只满足CA的系统" class="headerlink" title="只满足CA的系统"></a>只满足CA的系统</h2><p>根据P的定义： 一旦集群因为内部通信故障发生分裂，集群还能正常运转。 舍弃P意味着一旦集群发生分裂，整个集群都将无法运转。这是符合A的，因为这是的节点是fail的，不需要给任何响应。<br>单机服务器显然是CA的，只要结点活着，那自然是C+A。而结点一旦挂了，整个集群也就没了，符合舍弃P的选择。</p>
 <h2 id="只满足CP的系统"><a href="#只满足CP的系统" class="headerlink" title="只满足CP的系统"></a>只满足CP的系统</h2><p>一旦集群内部因为内部通信故障发生分裂（假设分裂成两部分），为了满足P，集群需要提供服务。而为了满足C，只能保留其中一部分提供服务，让另一部分整体退役。</p>
 <h2 id="只满足AP的系统"><a href="#只满足AP的系统" class="headerlink" title="只满足AP的系统"></a>只满足AP的系统</h2><p>整个最容易理解，一旦集群内部因为内部通信故障发生分裂（假设分裂成两部分），为了满足P，而又不需要满足C，那么可以让分裂出来的两部分都提供服务，因为暂时数据不一致没关系。</p>
+<h1 id="CAP-的意义"><a href="#CAP-的意义" class="headerlink" title="CAP 的意义"></a>CAP 的意义</h1><p>在系统架构时，应该根据具体的业务场景，来权衡 CAP。比如，对于大多数互联网应用来说（如门户网站），因为机器数量庞大，部署节点分散，网络故障是常态，可用性是必须需要保证的，所以只有舍弃一致性来保证服务的 AP。而对于银行等，需要确保一致性的场景，通常会权衡 CA 和 CP 模型，CA 模型网络故障时完全不可用，CP 模型具备部分可用性。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://yq.aliyun.com/articles/552548?spm=a2c4e.11153959.teamhomeleft.38.63cb356fpQ5C54" target="_blank" rel="noopener">https://yq.aliyun.com/articles/552548?spm=a2c4e.11153959.teamhomeleft.38.63cb356fpQ5C54</a></p>
 
       
     </div>
@@ -756,7 +768,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">123</span>
+                  <span class="site-state-item-count">130</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -813,7 +825,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#解读"><span class="nav-number">1.</span> <span class="nav-text">解读</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#只满足CA的系统"><span class="nav-number">1.1.</span> <span class="nav-text">只满足CA的系统</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#只满足CP的系统"><span class="nav-number">1.2.</span> <span class="nav-text">只满足CP的系统</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#只满足AP的系统"><span class="nav-number">1.3.</span> <span class="nav-text">只满足AP的系统</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#解读"><span class="nav-number">1.</span> <span class="nav-text">解读</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#伪命题"><span class="nav-number">2.</span> <span class="nav-text">伪命题</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#应用"><span class="nav-number"></span> <span class="nav-text">应用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#解读-1"><span class="nav-number"></span> <span class="nav-text">解读</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#只满足CA的系统"><span class="nav-number">1.</span> <span class="nav-text">只满足CA的系统</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#只满足CP的系统"><span class="nav-number">2.</span> <span class="nav-text">只满足CP的系统</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#只满足AP的系统"><span class="nav-number">3.</span> <span class="nav-text">只满足AP的系统</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CAP-的意义"><span class="nav-number"></span> <span class="nav-text">CAP 的意义</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number"></span> <span class="nav-text">参考</span></a></div>
             
 
           </div>

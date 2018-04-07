@@ -326,6 +326,1408 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/31/data_warehouse/study-map-reduce/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/31/data_warehouse/study-map-reduce/" itemprop="url">study_map_reduce</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-31T15:16:00+08:00">
+                2018-01-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/BI/" itemprop="url" rel="index">
+                    <span itemprop="name">BI</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/31/data_warehouse/study-map-reduce/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/31/data_warehouse/study-map-reduce/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/31/data_warehouse/study-map-reduce/" class="leancloud_visitors" data-flag-title="study_map_reduce">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="处理流程"><a href="#处理流程" class="headerlink" title="处理流程"></a>处理流程</h1><ul>
+<li><p>在正式执行 Map 前，需要将输入数据进行 分片。所谓分片，就是将输入数据切分为大小相等的数据块，每一块作为单个 Map Worker 的输入被处理，以便于多个 Map Worker 同时工作。<br>&lt; !– more –&gt;</p>
+</li>
+<li><p>分片完毕后，多个 Map Worker 便可同时工作。每个 Map Worker 在读入各自的数据后，进行计算处理，最终输出给 Reduce。Map Worker 在输出数据时，需要为每一条输出数据指定一个 Key，这个 Key 值决定了这条数据将会被发送给哪一个 Reduce Worker。Key 值和 Reduce Worker 是多对一的关系，具有相同 Key 的数据会被发送给同一个 Reduce Worker，单个 Reduce Worker 有可能会接收到多个 Key 值的数据。</p>
+</li>
+<li><p>在进入 Reduce 阶段之前，MapReduce 框架会对数据按照 Key 值排序，使得具有相同 Key 的数据彼此相邻。如果您指定了 合并操作（Combiner），框架会调用 Combiner，将具有相同 Key 的数据进行聚合。Combiner 的逻辑可以由您自定义实现。与经典的 MapReduce 框架协议不同，在 MaxCompute 中，Combiner 的输入、输出的参数必须与 Reduce 保持一致，这部分的处理通常也叫做 <b>洗牌（Shuffle）</b>。</p>
+</li>
+<li><p>接下来进入 Reduce 阶段。相同 Key 的数据会到达同一个 Reduce Worker。同一个 Reduce Worker 会接收来自多个 Map Worker 的数据。每个 Reduce Worker 会对 Key 相同的多个数据进行 Reduce 操作。最后，一个 Key 的多条数据经过 Reduce 的作用后，将变成一个值。</p>
+</li>
+</ul>
+<h1 id="WordCount"><a href="#WordCount" class="headerlink" title="WordCount"></a>WordCount</h1><p><img src="/images/pasted-49.png" alt="upload successful"></p>
+<p>操作步骤：</p>
+<ul>
+<li><p>输入数据：对文本进行分片，将每片内的数据作为单个 Map Worker 的输入。</p>
+</li>
+<li><p>Map 阶段：Map 处理输入，每获取一个数字，将数字的 Count 设置为 1，并将此&lt;Word, Count&gt;对输出，此时以 Word 作为输出数据的 Key。</p>
+</li>
+<li><p>Shuffle &gt; 合并排序：在 Shuffle 阶段前期，首先对每个 Map Worker 的输出，按照 Key 值（即 Word 值）进行排序。排序后进行 Combiner 操作，即将 Key 值（Word 值）相同的 Count 累加，构成一个新的&lt;Word, Count&gt;对。此过程被称为合并排序。</p>
+</li>
+<li><p>Shuffle &gt; 分配 Reduce：在 Shuffle 阶段后期，数据被发送到 Reduce 端。Reduce Worker 收到数据后依赖 Key 值再次对数据排序。</p>
+</li>
+<li><p>Reduce 阶段：每个 Reduce Worker 对数据进行处理时，采用与 Combiner 相同的逻辑，将 Key 值（Word 值）相同的 Count 累加，得到输出结果。</p>
+</li>
+<li><p>输出结果数据。</p>
+</li>
+</ul>
+<h1 id="学习资料"><a href="#学习资料" class="headerlink" title="学习资料"></a>学习资料</h1><p><a href="https://help.aliyun.com/document_detail/27875.html" target="_blank" rel="noopener">https://help.aliyun.com/document_detail/27875.html</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/31/java_dubbo/source-dubbo-cluster/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/31/java_dubbo/source-dubbo-cluster/" itemprop="url">source_dubbo_cluster</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-31T12:33:00+08:00">
+                2018-01-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/dubbo/" itemprop="url" rel="index">
+                    <span itemprop="name">dubbo</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/31/java_dubbo/source-dubbo-cluster/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/31/java_dubbo/source-dubbo-cluster/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/31/java_dubbo/source-dubbo-cluster/" class="leancloud_visitors" data-flag-title="source_dubbo_cluster">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="cluster层"><a href="#cluster层" class="headerlink" title="cluster层"></a>cluster层</h1><p>在集群调用失败时，Dubbo 提供了多种容错方案，缺省为 failover 重试。<br>cluster 路由层：封装多个提供者的路由及负载均衡，并桥接注册中心，以 Invoker 为中心，扩展接口为 Cluster, Directory, Router, LoadBalance</p>
+<p><img src="/images/pasted-48.png" alt="upload successful"><br>各节点关系：</p>
+<ul>
+<li>这里的 <code>Invoker</code> 是 <code>Provider</code> 的一个可调用 <code>Service</code> 的抽象，<code>Invoker</code> 封装了 <code>Provider</code> 地址及 <code>Service</code> 接口信息</li>
+<li><code>Directory</code> 代表多个 <code>Invoker</code>，可以把它看成 <code>List&lt;Invoker&gt;</code> ，但与 <code>List</code> 不同的是，它的值可能是动态变化的，比如注册中心推送变更</li>
+<li><code>Cluster</code> 将 <code>Directory</code> 中的多个 <code>Invoker</code> 伪装成一个 <code>Invoker</code>，对上层透明，伪装过程包含了容错逻辑，调用失败后，重试另一个</li>
+<li><code>Router</code> 负责从多个 <code>Invoker</code> 中按路由规则选出子集，比如读写分离，应用隔离等</li>
+<li><code>LoadBalance</code> 负责从多个 <code>Invoker</code> 中选出具体的一个用于本次调用，选的过程包含了负载均衡算法，调用失败后，需要重选</li>
+</ul>
+<h2 id="dubbo提供的实现"><a href="#dubbo提供的实现" class="headerlink" title="dubbo提供的实现"></a>dubbo提供的实现</h2><h3 id="Failover-Cluster"><a href="#Failover-Cluster" class="headerlink" title="Failover Cluster"></a>Failover Cluster</h3><p>失败自动切换，当出现失败，重试其它服务器 [^1]。通常用于读操作，但重试会带来更长延迟。可通过 <code>retries=&quot;2&quot;</code> 来设置重试次数(不含第一次)。</p>
+<p>重试次数配置如下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dubbo:service</span> <span class="attr">retries</span>=<span class="string">"2"</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+<p>或</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dubbo:reference</span> <span class="attr">retries</span>=<span class="string">"2"</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+<p>或</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dubbo:reference</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dubbo:method</span> <span class="attr">name</span>=<span class="string">"findFoo"</span> <span class="attr">retries</span>=<span class="string">"2"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dubbo:reference</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="Failfast-Cluster"><a href="#Failfast-Cluster" class="headerlink" title="Failfast Cluster"></a>Failfast Cluster</h3><p>快速失败，只发起一次调用，失败立即报错。通常用于非幂等性的写操作，比如新增记录。</p>
+<h3 id="Failsafe-Cluster"><a href="#Failsafe-Cluster" class="headerlink" title="Failsafe Cluster"></a>Failsafe Cluster</h3><p>失败安全，出现异常时，直接忽略。通常用于写入审计日志等操作。</p>
+<h3 id="Failback-Cluster"><a href="#Failback-Cluster" class="headerlink" title="Failback Cluster"></a>Failback Cluster</h3><p>失败自动恢复，后台记录失败请求，定时重发。通常用于消息通知操作。</p>
+<h3 id="Forking-Cluster"><a href="#Forking-Cluster" class="headerlink" title="Forking Cluster"></a>Forking Cluster</h3><p>并行调用多个服务器，只要一个成功即返回。通常用于实时性要求较高的读操作，但需要浪费更多服务资源。可通过 <code>forks=&quot;2&quot;</code> 来设置最大并行数。</p>
+<h3 id="Broadcast-Cluster"><a href="#Broadcast-Cluster" class="headerlink" title="Broadcast Cluster"></a>Broadcast Cluster</h3><p>广播调用所有提供者，逐个调用，任意一台报错则报错 [^2]。通常用于通知所有提供者更新缓存或日志等本地资源信息。</p>
+<h1 id="源码解析"><a href="#源码解析" class="headerlink" title="源码解析"></a>源码解析</h1><h2 id="AbstractClusterInvoker的invoke方法"><a href="#AbstractClusterInvoker的invoke方法" class="headerlink" title="AbstractClusterInvoker的invoke方法"></a>AbstractClusterInvoker的invoke方法</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Result <span class="title">invoke</span><span class="params">(<span class="keyword">final</span> Invocation invocation)</span> <span class="keyword">throws</span> RpcException </span>&#123;</span><br><span class="line"></span><br><span class="line">    checkWheatherDestoried();</span><br><span class="line"></span><br><span class="line">    LoadBalance loadbalance;</span><br><span class="line">    </span><br><span class="line">    List&lt;Invoker&lt;T&gt;&gt; invokers = list(invocation);</span><br><span class="line">    <span class="keyword">if</span> (invokers != <span class="keyword">null</span> &amp;&amp; invokers.size() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        loadbalance = ExtensionLoader.getExtensionLoader(LoadBalance.class).getExtension(invokers.get(<span class="number">0</span>).getUrl()</span><br><span class="line">                .getMethodParameter(invocation.getMethodName(),Constants.LOADBALANCE_KEY, Constants.DEFAULT_LOADBALANCE));</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        loadbalance = ExtensionLoader.getExtensionLoader(LoadBalance.class).getExtension(Constants.DEFAULT_LOADBALANCE);</span><br><span class="line">    &#125;</span><br><span class="line">    RpcUtils.attachInvocationIdIfAsync(getUrl(), invocation);</span><br><span class="line">    <span class="keyword">return</span> doInvoke(invocation, invokers, loadbalance);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="FailoverClusterInvoker"><a href="#FailoverClusterInvoker" class="headerlink" title="FailoverClusterInvoker"></a>FailoverClusterInvoker</h2><p>失败自动切换，当出现失败，重试其它服务器 ^1。通常用于读操作，但重试会带来更长延迟。可通过 retries=”2” 来设置重试次数(不含第一次)。</p>
+<p>失败转移，当出现失败，重试其它服务器，通常用于读操作，但重试会带来更长延迟。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line">public Result doInvoke(Invocation invocation, final List&lt;Invoker&lt;T&gt;&gt; invokers, LoadBalance loadbalance) throws RpcException &#123;</span><br><span class="line">    	List&lt;Invoker&lt;T&gt;&gt; copyinvokers = invokers;</span><br><span class="line">    	checkInvokers(copyinvokers, invocation);</span><br><span class="line">        int len = getUrl().getMethodParameter(invocation.getMethodName(), Constants.RETRIES_KEY, Constants.DEFAULT_RETRIES) + 1;</span><br><span class="line">        if (len &lt;= 0) &#123;</span><br><span class="line">            len = 1;</span><br><span class="line">        &#125;</span><br><span class="line">        // retry loop.</span><br><span class="line">        RpcException le = null; // last exception.</span><br><span class="line">        List&lt;Invoker&lt;T&gt;&gt; invoked = new ArrayList&lt;Invoker&lt;T&gt;&gt;(copyinvokers.size()); // invoked invokers.</span><br><span class="line">        Set&lt;String&gt; providers = new HashSet&lt;String&gt;(len);</span><br><span class="line">        for (int i = 0; i &lt; len; i++) &#123;</span><br><span class="line">        	//重试时，进行重新选择，避免重试时invoker列表已发生变化.</span><br><span class="line">        	//注意：如果列表发生了变化，那么invoked判断会失效，因为invoker示例已经改变</span><br><span class="line">        	if (i &gt; 0) &#123;</span><br><span class="line">        		checkWheatherDestoried();</span><br><span class="line">        		copyinvokers = list(invocation);</span><br><span class="line">        		//重新检查一下</span><br><span class="line">        		checkInvokers(copyinvokers, invocation);</span><br><span class="line">        	&#125;</span><br><span class="line">            Invoker&lt;T&gt; invoker = select(loadbalance, invocation, copyinvokers, invoked);</span><br><span class="line">            invoked.add(invoker);</span><br><span class="line">            RpcContext.getContext().setInvokers((List)invoked);</span><br><span class="line">            try &#123;</span><br><span class="line">                Result result = invoker.invoke(invocation);</span><br><span class="line">                if (le != null &amp;&amp; logger.isWarnEnabled()) &#123;</span><br><span class="line">                    logger.warn(&quot;Although retry the method &quot; + invocation.getMethodName()</span><br><span class="line">                            + &quot; in the service &quot; + getInterface().getName()</span><br><span class="line">                            + &quot; was successful by the provider &quot; + invoker.getUrl().getAddress()</span><br><span class="line">                            + &quot;, but there have been failed providers &quot; + providers </span><br><span class="line">                            + &quot; (&quot; + providers.size() + &quot;/&quot; + copyinvokers.size()</span><br><span class="line">                            + &quot;) from the registry &quot; + directory.getUrl().getAddress()</span><br><span class="line">                            + &quot; on the consumer &quot; + NetUtils.getLocalHost()</span><br><span class="line">                            + &quot; using the dubbo version &quot; + Version.getVersion() + &quot;. Last error is: &quot;</span><br><span class="line">                            + le.getMessage(), le);</span><br><span class="line">                &#125;</span><br><span class="line">                return result;</span><br><span class="line">            &#125; catch (RpcException e) &#123;</span><br><span class="line">                if (e.isBiz()) &#123; // biz exception.</span><br><span class="line">                    throw e;</span><br><span class="line">                &#125;</span><br><span class="line">                le = e;</span><br><span class="line">            &#125; catch (Throwable e) &#123;</span><br><span class="line">                le = new RpcException(e.getMessage(), e);</span><br><span class="line">            &#125; finally &#123;</span><br><span class="line">                providers.add(invoker.getUrl().getAddress());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        throw new RpcException(le != null ? le.getCode() : 0, &quot;Failed to invoke the method &quot;</span><br><span class="line">                + invocation.getMethodName() + &quot; in the service &quot; + getInterface().getName() </span><br><span class="line">                + &quot;. Tried &quot; + len + &quot; times of the providers &quot; + providers </span><br><span class="line">                + &quot; (&quot; + providers.size() + &quot;/&quot; + copyinvokers.size() </span><br><span class="line">                + &quot;) from the registry &quot; + directory.getUrl().getAddress()</span><br><span class="line">                + &quot; on the consumer &quot; + NetUtils.getLocalHost() + &quot; using the dubbo version &quot;</span><br><span class="line">                + Version.getVersion() + &quot;. Last error is: &quot;</span><br><span class="line">                + (le != null ? le.getMessage() : &quot;&quot;), le != null &amp;&amp; le.getCause() != null ? le.getCause() : le);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="FailbackClusterInvoker"><a href="#FailbackClusterInvoker" class="headerlink" title="FailbackClusterInvoker"></a>FailbackClusterInvoker</h2><p>失败自动恢复，后台记录失败请求，定时重发。通常用于消息通知操作。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line">protected Result doInvoke(Invocation invocation, List&lt;Invoker&lt;T&gt;&gt; invokers, LoadBalance loadbalance) throws RpcException &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        checkInvokers(invokers, invocation);</span><br><span class="line">        Invoker&lt;T&gt; invoker = select(loadbalance, invocation, invokers, null);</span><br><span class="line">        return invoker.invoke(invocation);</span><br><span class="line">    &#125; catch (Throwable e) &#123;</span><br><span class="line">        logger.error(&quot;Failback to invoke method &quot; + invocation.getMethodName() + &quot;, wait for retry in background. Ignored exception: &quot;</span><br><span class="line">                             + e.getMessage() + &quot;, &quot;, e);</span><br><span class="line">        addFailed(invocation, this);</span><br><span class="line">        return new RpcResult(); // ignore</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">	  //失败重试</span><br><span class="line">    private void addFailed(Invocation invocation, AbstractClusterInvoker&lt;?&gt; router) &#123;</span><br><span class="line">    //单例初始化一个定时任务</span><br><span class="line">    if (retryFuture == null) &#123;</span><br><span class="line">        synchronized (this) &#123;</span><br><span class="line">            if (retryFuture == null) &#123;</span><br><span class="line">                retryFuture = scheduledExecutorService.scheduleWithFixedDelay(new Runnable() &#123;</span><br><span class="line"></span><br><span class="line">                    public void run() &#123;</span><br><span class="line">                        // 收集统计信息</span><br><span class="line">                        try &#123;</span><br><span class="line">                            retryFailed();</span><br><span class="line">                        &#125; catch (Throwable t) &#123; // 防御性容错</span><br><span class="line">                            logger.error(&quot;Unexpected error occur at collect statistic&quot;, t);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;, RETRY_FAILED_PERIOD, RETRY_FAILED_PERIOD, TimeUnit.MILLISECONDS);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    //将失败的调用加入到Map中</span><br><span class="line">    failed.put(invocation, router);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//重试的Future</span><br><span class="line">private volatile ScheduledFuture&lt;?&gt; retryFuture;</span><br><span class="line"></span><br><span class="line">private final ConcurrentMap&lt;Invocation, AbstractClusterInvoker&lt;?&gt;&gt; failed = new ConcurrentHashMap&lt;Invocation, AbstractClusterInvoker&lt;?&gt;&gt;();</span><br><span class="line">	</span><br><span class="line">	//真实的进行重新调用</span><br><span class="line">    void retryFailed() &#123;</span><br><span class="line">    //说明没有失败任务</span><br><span class="line">    if (failed.size() == 0) &#123;</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line">    //遍历失败任务</span><br><span class="line">    for (Map.Entry&lt;Invocation, AbstractClusterInvoker&lt;?&gt;&gt; entry : new HashMap&lt;Invocation, AbstractClusterInvoker&lt;?&gt;&gt;(</span><br><span class="line">                                                                                                                     failed).entrySet()) &#123;</span><br><span class="line">        Invocation invocation = entry.getKey();</span><br><span class="line">        Invoker&lt;?&gt; invoker = entry.getValue();</span><br><span class="line">        try &#123;</span><br><span class="line">            invoker.invoke(invocation);</span><br><span class="line">            failed.remove(invocation);</span><br><span class="line">        &#125; catch (Throwable e) &#123;</span><br><span class="line">            logger.error(&quot;Failed retry to invoke method &quot; + invocation.getMethodName() + &quot;, waiting again.&quot;, e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="ScheduledExecutorService核心方法"><a href="#ScheduledExecutorService核心方法" class="headerlink" title="ScheduledExecutorService核心方法"></a>ScheduledExecutorService核心方法</h3><ul>
+<li>schedule<ul>
+<li>接收Runnable</li>
+<li>接收Callable<v></v></li>
+</ul>
+</li>
+<li>scheduleAtFixedRate<ul>
+<li>基于固定时间间隔进行任务调度</li>
+<li>固定的频率来执行某项计划，它不受计划执行时间的影响。到时间，它就执行。</li>
+<li>每次执行时间为 :initialDelay, initialDelay+period, initialDelay+2*period, …</li>
+</ul>
+</li>
+<li>ScheduleWithFixedDelay<ul>
+<li>基于不固定时间间隔进行任务调度</li>
+<li>是相对任务的。即无论某个任务执行多长时间，等执行完了，我再延迟指定的时间。也就是第二个方法，它受计划执行时间的影响。</li>
+<li>每次执行时间为上一次任务结束起向后推一个时间间隔，即每次执行时间为：initialDelay, initialDelay+executeTime+delay</li>
+</ul>
+</li>
+</ul>
+<h3 id="ScheduledExecutorService的构造方法"><a href="#ScheduledExecutorService的构造方法" class="headerlink" title="ScheduledExecutorService的构造方法"></a>ScheduledExecutorService的构造方法</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public ScheduledThreadPoolExecutor(int corePoolSize,</span><br><span class="line">                                   ThreadFactory threadFactory) &#123;</span><br><span class="line">    super(corePoolSize, Integer.MAX_VALUE, 0, NANOSECONDS,</span><br><span class="line">          new DelayedWorkQueue(), threadFactory);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="ForkingClusterInvoker"><a href="#ForkingClusterInvoker" class="headerlink" title="ForkingClusterInvoker"></a>ForkingClusterInvoker</h2><p>并行调用多个服务器，只要一个成功即返回。通常用于实时性要求较高的读操作，但需要浪费更多服务资源。可通过 forks=”2” 来设置最大并行数。<br>并行调用，只要一个成功即返回，通常用于实时性要求较高的操作，但需要浪费更多服务资源。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">private final ExecutorService executor = Executors.newCachedThreadPool(new NamedThreadFactory(&quot;forking-cluster-timer&quot;, true));</span><br><span class="line"></span><br><span class="line">public Result doInvoke(final Invocation invocation, List&lt;Invoker&lt;T&gt;&gt; invokers, LoadBalance loadbalance) throws RpcException &#123;</span><br><span class="line">        checkInvokers(invokers, invocation);</span><br><span class="line">        final List&lt;Invoker&lt;T&gt;&gt; selected;</span><br><span class="line">        final int forks = getUrl().getParameter(Constants.FORKS_KEY, Constants.DEFAULT_FORKS);</span><br><span class="line">        final int timeout = getUrl().getParameter(Constants.TIMEOUT_KEY, Constants.DEFAULT_TIMEOUT);</span><br><span class="line">        if (forks &lt;= 0 || forks &gt;= invokers.size()) &#123;</span><br><span class="line">            selected = invokers;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            selected = new ArrayList&lt;Invoker&lt;T&gt;&gt;();</span><br><span class="line">            for (int i = 0; i &lt; forks; i++) &#123;</span><br><span class="line">                //在invoker列表(排除selected)后,如果没有选够,则存在重复循环问题.见select实现.</span><br><span class="line">                Invoker&lt;T&gt; invoker = select(loadbalance, invocation, invokers, selected);</span><br><span class="line">                if(!selected.contains(invoker))&#123;//防止重复添加invoker</span><br><span class="line">                    selected.add(invoker);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        RpcContext.getContext().setInvokers((List)selected);</span><br><span class="line">        final AtomicInteger count = new AtomicInteger();</span><br><span class="line">        //核心代码:通过阻塞队列,来收集结果</span><br><span class="line">        final BlockingQueue&lt;Object&gt; ref = new LinkedBlockingQueue&lt;Object&gt;();</span><br><span class="line">        for (final Invoker&lt;T&gt; invoker : selected) &#123;</span><br><span class="line">            executor.execute(new Runnable() &#123;</span><br><span class="line">                public void run() &#123;</span><br><span class="line">                    try &#123;</span><br><span class="line">                        Result result = invoker.invoke(invocation);</span><br><span class="line">                        ref.offer(result);</span><br><span class="line">                    &#125; catch(Throwable e) &#123;</span><br><span class="line">                        int value = count.incrementAndGet();</span><br><span class="line">                        if (value &gt;= selected.size()) &#123;</span><br><span class="line">                            ref.offer(e);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">        try &#123;</span><br><span class="line">        		//只要得到一个结果,就返回</span><br><span class="line">            Object ret = ref.poll(timeout, TimeUnit.MILLISECONDS);</span><br><span class="line">            if (ret instanceof Throwable) &#123;</span><br><span class="line">                Throwable e = (Throwable) ret;</span><br><span class="line">                throw new RpcException(e instanceof RpcException ? ((RpcException)e).getCode() : 0, &quot;Failed to forking invoke provider &quot; + selected + &quot;, but no luck to perform the invocation. Last error is: &quot; + e.getMessage(), e.getCause() != null ? e.getCause() : e);</span><br><span class="line">            &#125;</span><br><span class="line">            return (Result) ret;</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            throw new RpcException(&quot;Failed to forking invoke provider &quot; + selected + &quot;, but no luck to perform the invocation. Last error is: &quot; + e.getMessage(), e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/31/java_thread/review-java-thread-pool/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/31/java_thread/review-java-thread-pool/" itemprop="url">review-java-thread-pool</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-31T11:14:41+08:00">
+                2018-01-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/31/java_thread/review-java-thread-pool/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/31/java_thread/review-java-thread-pool/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/31/java_thread/review-java-thread-pool/" class="leancloud_visitors" data-flag-title="review-java-thread-pool">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h1 id="线程池"><a href="#线程池" class="headerlink" title="线程池"></a>线程池</h1><h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><ul>
+<li>如果并发的线程数量很多，并且每个线程都是执行一个时间很短的任务就结束了，</li>
+<li>频繁创建线程就会大大降低系统的效率，因为频繁创建线程和销毁线程需要时间。</li>
+<li>请求频繁，但是连接上以后读/写很少量的数据就断开连接。考虑到服务的并发问题，如果每个请求来到以后服务都为它启动一个线程，那么这对服务的资源可能会造成很大的浪费。
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/01/31/java_thread/review-java-thread-pool/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/29/java_data_structure/study-java-queue/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/29/java_data_structure/study-java-queue/" itemprop="url">java-study-BlockingQueue</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-29T23:47:00+08:00">
+                2018-01-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/29/java_data_structure/study-java-queue/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/29/java_data_structure/study-java-queue/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/29/java_data_structure/study-java-queue/" class="leancloud_visitors" data-flag-title="java-study-BlockingQueue">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="BlockingQueue"><a href="#BlockingQueue" class="headerlink" title="BlockingQueue"></a>BlockingQueue</h1><ul>
+<li>阻塞队列</li>
+<li>先进先出</li>
+<li>有边界:当队列满时,插入的元素的线程会等待队列可有</li>
+<li>等待队列为非空</li>
+<li>生产者消费者<br>&lt; !– more –&gt;</li>
+</ul>
+<p>阻塞队列的主要功能并不是在于提升程序高并发时队列的性能，而是在于简化多线程间的数据共享（用于多线程间的数据传递）。</p>
+<h1 id="五种类"><a href="#五种类" class="headerlink" title="五种类"></a>五种类</h1><h2 id="ArrayBlockingQueue"><a href="#ArrayBlockingQueue" class="headerlink" title="ArrayBlockingQueue"></a>ArrayBlockingQueue</h2><ul>
+<li>有界。ArrayBlockingQueue是基于数组实现的有界阻塞队列；其能容纳的元素数量固定，一旦创建，就不能再增加其容量；</li>
+<li>FIFO。队列的获取操作作用于队列头部，添加操作作用于队列尾部，满足FIFO特性；</li>
+<li>自动阻塞唤醒。试图向已满队列放入元素将导致操作阻塞，试图从空队列中获取元素同样将导致操作阻塞等待。</li>
+</ul>
+<h2 id="LinkedBlockingQueue"><a href="#LinkedBlockingQueue" class="headerlink" title="LinkedBlockingQueue"></a>LinkedBlockingQueue</h2><ul>
+<li>有界，也可认为是无界。LinkedBlockingQueue是基于链表实现的阻塞队列；如果在构造函数不指定容量，则默认为一个类似无限大小的容量，大小为Integer.MAX_VALUE，在此种情况下，如果生产者速度远远大于消费者速度，由于容量很大，那么系统内存有可能会被消耗殆尽；如果在构造函数指定了容量大小，则队列容纳的元素数量固定。</li>
+<li>FIFO。队列的获取操作作用于队列头部，添加操作作用于队列尾部，满足FIFO特性</li>
+<li>自动阻塞唤醒。put操作试图向已满队列放入元素将导致操作阻塞，直到其他线程从队列中获取元素，队列出现空闲后再唤醒操作；take操作试图从空队列中获取元素同样将导致操作阻塞等待，直到其他线程从队列中添加元素，队列中存在元素后再唤醒操作。</li>
+<li>锁分离机制。对添加数据的操作与获取数据的操作分别采用了独立的、不同的锁来控制数据同步（ArrayBlockingQueue采用了同一把锁），即在高并发的情况下生产者和消费者可以并行的操作队列中的数据，进而提高整个队列的并发性能。</li>
+</ul>
+<h2 id="PriorityBlockingQueue"><a href="#PriorityBlockingQueue" class="headerlink" title="PriorityBlockingQueue"></a>PriorityBlockingQueue</h2><p>PriorityBlockingQueue又称为优先级阻塞队列。其特性如下：</p>
+<ul>
+<li>无界。由于容量不存在限制(最大为Integer.MAX_VALUE - 8，可基本认为是无限制)，队列就不会阻塞生产者，因为只要能生产数据，就可以把数据放入队列中；如果生产者速度远远大于消费者速度，由于容量无限，那么系统内存有可能会被消耗殆尽。</li>
+<li>元素必须实现Comparable接口。在实现的CompareTo方法中，如果返回值为负数，则表明当前对象this的优先级越高；返回值为正数，则表明当前对象this的优先级越低。</li>
+<li>实现了有序列表。优先级的判断通过构造函数传入的Compator对象实现队列元素的自定义排序；如果Compator为空，则按对象的比较方法进行排序。队列中元素的优先级依次降低，优先级最高的排在队首。默认情况下元素采取自然顺序排序，也可以通过比较器comparator来指定元素的排序规则。</li>
+<li>仅阻塞消费者。当队列中无数据时，会阻塞消费者。</li>
+</ul>
+<h2 id="DelayQueue"><a href="#DelayQueue" class="headerlink" title="DelayQueue"></a>DelayQueue</h2><p>DelayQueue又称为延时队列。一个使用优先级队列（PriorityQueue）实现的无界阻塞队列。其特性如下：</p>
+<ul>
+<li>队列容量无界；不能存放null元素。</li>
+<li>元素必须同时实现Delayed接口与Comparable接口。元素所属类中必须实现public int compareTo(To)和long getDelay(TimeUnit unit)方法。<br>其中，Delayed接口继承了Comparable接口，因此必须实现compareTo方法；在public int compareTo(To)方法中，如果当前对象的延迟值小于参数对象的值，将返回一个小于0的值；如果当前对象的延迟值大于参数对象的值，将返回一个大于0的值；如果两者的延迟值相等则返回0。该队列的头部是延迟期满后保存时间最长的 Delayed 元素（也就是保证先过期的元素排在头部）。如果延迟都还没有期满，则队列头部不会被返回，即队列的 poll 方法将返回null。</li>
+<li>long getDelay(TimeUnit unit)方法中，是返回到激活日期的剩余时间；当返回值为0或者负数时，表面该元素已经可以被获取了；单位由单位参数指定。TimeUnit类是一个由下列常量组成的枚举类型：DAYS、HOURS、MICROSECONDS、MILLISECONDS、MINUTES、NANOSECONDS和SECONDES。</li>
+<li>只有在延迟期满时才能从队列中提取元素；Delayed接口使得对象成为了延迟对象，它使得队列中的元素对象具有了延迟期。由于DelayQueue是一个没有大小限制的队列，因此往队列中插入数据的操作永远不会被阻塞，而只有获取数据的操作才会被阻塞。<br>适用场景：</li>
+<li>缓存系统的设计：可以用DelayQueue保存缓存元素的有效期，使用一个线程循环查询DelayQueue，一旦能从队列中获取元素时候，表示缓存有效期到了。</li>
+<li>定时任务调度：使用DelayQueue保存当天将会执行的任务和执行时间。一旦从队列中获取到任务就开始执行，比如TimerQueue就是用DelayQueue实现的。</li>
+</ul>
+<h2 id="SynchronousQueue"><a href="#SynchronousQueue" class="headerlink" title="SynchronousQueue"></a>SynchronousQueue</h2><p>SynchronousQueue又称为同步队列。一个不存储元素的阻塞队列。其特性如下：</p>
+<ul>
+<li>是一个无缓冲的等待队列。队列本身不存储任何元素，每一个put操作必须等待一个take操作，否则不能继续添加元素。</li>
+<li>支持公平与非公平两种操作模式。如果采用公平模式：SynchronousQueue会采用公平锁，并配合一个FIFO队列来阻塞多余的生产者和消费者，体现了“先来先服务，后来则排队”的公平策略；如果采用非公平模式（SynchronousQueue默认选项），则配合一个LIFO队列来管理多余的生产者和消费者，体现了“无视当前排队，即来即抢占服务”的不公平策略，但是，在该种模式下，如果生产者和消费者的处理速度有差距，可能有某些生产者或者消费者永远都得不到处理（因为一直被抢占，一直被欺负）。</li>
+<li>与其他阻塞队列不同，其他阻塞队列维护的是一组元素，SynchronousQueue则是维护了两组线程（一组生产者线程，一组消费者线程），实现两者之间的数据传递。举个列子，有A、B两位同事，A需要将一些资料交给B。如果是A把文件直接交到B手中，那么就是SynchronousQueue实现模式；如果A通过发邮件的形式把资料给B，那么就是其他阻塞队列的实现模式。</li>
+<li>SyncchronousQueue吞吐量高于LinkedBlockingQueue和ArrayBlockingQueue。</li>
+</ul>
+<p>适用场景：<br>创建线程池。</p>
+<h2 id="LinkedTransferQueue"><a href="#LinkedTransferQueue" class="headerlink" title="LinkedTransferQueue"></a>LinkedTransferQueue</h2><p>LinkedTransferQueue又称为链表传输队列。一个由链表结构组成的无界阻塞队列。其特性如下：</p>
+<ul>
+<li>一个无界队列。</li>
+<li>具备FIFO特性。</li>
+<li>特别的阻塞：LinkedTransferQueue实现了TransferQueue接口，TransferQueue又继承了BlockingQueue；这两个接口的区别在于：BlockingQueue：当生产者向满队列添加元素时则会被阻塞；当消费者从空队列中获取元素时则会被阻塞；TransferQueue：相比于BlockingQueue，生产者会一直阻塞直到所添加到队列的元素被某一个消费者所消费（不只是把元素添加到队列中），其接口中的transfer方法实现了该功能。顾名思义，就是发生在元素从一个线程transfer到另一个线程的过程中，它有效地实现了元素在线程之间的传递（以建立Java内存模型中的happens-before关系的方式）。</li>
+</ul>
+<p>适用场景：<br>生产者-消费者高并发的业务场景。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/25/egenie_business/data-archiving-research/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/25/egenie_business/data-archiving-research/" itemprop="url">data-Archiving-research</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-25T10:42:00+08:00">
+                2018-01-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/25/egenie_business/data-archiving-research/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/25/egenie_business/data-archiving-research/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/25/egenie_business/data-archiving-research/" class="leancloud_visitors" data-flag-title="data-Archiving-research">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="归档目的"><a href="#归档目的" class="headerlink" title="归档目的"></a>归档目的</h1><ul>
+<li>主要处于性能考虑,减少查找的范围</li>
+</ul>
+<h1 id="归档需求"><a href="#归档需求" class="headerlink" title="归档需求"></a>归档需求</h1><ul>
+<li>同时要求系统中可以查询到之前的数据,不能归档到非结构化系统中</li>
+<li>要求条件需要多表进行关联,并添加自定义条件,保证业务</li>
+<li>要求主子表归档具有一致性,主子表不能分离</li>
+<li>已经归档过一次</li>
+<li>稳定性</li>
+<li>可追溯</li>
+<li>数据一致性</li>
+<li>定时自动执行</li>
+<li>跨数据库,最好支持到不同的数据源</li>
+</ul>
+<p>&lt; !–more–&gt;</p>
+<h1 id="归档流程梳理"><a href="#归档流程梳理" class="headerlink" title="归档流程梳理"></a>归档流程梳理</h1><ul>
+<li>复制指定条件的旧数据</li>
+<li>删除旧数据(是否需要人工介入?)后续自动</li>
+<li>读取归档数据</li>
+</ul>
+<h1 id="归档方案思路"><a href="#归档方案思路" class="headerlink" title="归档方案思路:"></a>归档方案思路:</h1><h2 id="1-建立归档表-archive"><a href="#1-建立归档表-archive" class="headerlink" title="1.建立归档表_archive"></a>1.建立归档表_archive</h2><p>这种方式是通过建立一个以_archive结尾的归档表来实施的。如果使用这种方式，那么一般需要在业务层进行查询的分离改造，比如基于我们的特定归档规则 ，对业务端核心代码改造或者使用proxy方案等来决定是使用主表还是归档表。同时我们还需要一个数据归档过程，当数据过时或者变成冷数据时，将该数据从主表迁移到归档表中。</p>
+<p>在业务层查询时，我们可以通过时间字段来进行查询判断，例如将90天之前的数据在归档表中查询，否则就在主表查询。另一种方式可以通过增加status列去判断查询主表还是归档表，如果是inactive则查询归档表，否则就在主表查询。</p>
+<h2 id="mysql分区"><a href="#mysql分区" class="headerlink" title="mysql分区"></a>mysql分区</h2><p>为了让优化器能将查询发送到正确的分区键，在创建分区表的时候，我们需要将分区键添加到主键里，并且理想情况下，该分区键能被包含在所有select/update/delete等语句的where条件里面，否则的话，你的查询将会按照顺序查找表对应的每个分区，这种情况下查询性能就没有那么好了。</p>
+<h3 id="根据日期进行分区"><a href="#根据日期进行分区" class="headerlink" title="根据日期进行分区"></a>根据日期进行分区</h3><p>这种方式是通过对表进行分区来实现，虽然这是一种不同的物理数据模型，但是确实有助于将表的数据进行拆分到不同的物理磁盘，并且不需要代码的任何改造。作为DBA，一般对表进行分区是比较常用的方式，我们可以通过日期字段很容易确定哪些是冷数据，并根据日期将不同日期的时间分配到不同的分区中，在查询的时候，我们可以通过日期来从分区中快速定位到对应的数据，同时建立分区表也比较利于DBA对大表进行管理操作。</p>
+<p>我们根据数据行的创建时间，按年将数据放入到不同的分区，这里需要注意的是在2020年以后，我们还需要在表里添加新的年份，当然我们可以提前加更多的分区或者部署脚本来自动化创建新的分区。</p>
+<h3 id="通过状态进行分区"><a href="#通过状态进行分区" class="headerlink" title="通过状态进行分区"></a>通过状态进行分区</h3><p>我们也可以通过status状态列来进行分区，这种情况下，通常状态列会包含active/inactive两种状态，然后通过update进行状态列的更新（使用replace或者insert+delete也是可以的），将数据放入到正确的分区当中。请看下面的示例</p>
+<h2 id="通过ID进行分区"><a href="#通过ID进行分区" class="headerlink" title="通过ID进行分区"></a>通过ID进行分区</h2><h1 id="具体方案"><a href="#具体方案" class="headerlink" title="具体方案"></a>具体方案</h1><h2 id="复制表并且按照条件插入数据（此种方法除了主键索引不包括其他索引）–-gt-手动sql"><a href="#复制表并且按照条件插入数据（此种方法除了主键索引不包括其他索引）–-gt-手动sql" class="headerlink" title="复制表并且按照条件插入数据（此种方法除了主键索引不包括其他索引）–&gt;手动sql"></a>复制表并且按照条件插入数据（此种方法除了主键索引不包括其他索引）–&gt;手动sql</h2><p><a href="http://blog.csdn.net/bluestarf/article/details/49641047" target="_blank" rel="noopener">http://blog.csdn.net/bluestarf/article/details/49641047</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE lime_survey_549656_20151001 as select * from lime_survey_549656  where submitdate &lt; &quot;2015-10-01 00:00:00&quot;;  </span><br><span class="line">   </span><br><span class="line">ALTER TABLE lime_survey_549656_20151001 change id id int primary key auto_increment;</span><br></pre></td></tr></table></figure>
+<h2 id="创建一张空表，结构和索引和原表一样-–-gt-手动sql"><a href="#创建一张空表，结构和索引和原表一样-–-gt-手动sql" class="headerlink" title="创建一张空表，结构和索引和原表一样 –&gt;手动sql"></a>创建一张空表，结构和索引和原表一样 –&gt;手动sql</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">create table lime_survey_549656_20151001 like lime_survey_549656;   </span><br><span class="line">INSERT INTO lime_survey_549656_20151001 select * from lime_survey_549656  where submitdate &lt; &quot;2015-10-01 00:00:00&quot;;</span><br></pre></td></tr></table></figure>
+<h2 id="存储过程来归档"><a href="#存储过程来归档" class="headerlink" title="存储过程来归档"></a>存储过程来归档</h2><h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>无法跨数据库备份</p>
+<h2 id="分区实现"><a href="#分区实现" class="headerlink" title="分区实现"></a>分区实现</h2><h3 id="问题-1"><a href="#问题-1" class="headerlink" title="问题"></a>问题</h3><ul>
+<li>表中有全文索引,无法分区</li>
+<li>分区的话,需要修改业务sql,改动较大–&gt;待确定</li>
+</ul>
+<h2 id="pt-archvier-mysql-percona工具集"><a href="#pt-archvier-mysql-percona工具集" class="headerlink" title="pt-archvier(mysql percona工具集)"></a>pt-archvier(mysql percona工具集)</h2><ul>
+<li>基础教程</li>
+</ul>
+<p><a href="https://yq.aliyun.com/articles/277145" target="_blank" rel="noopener">https://yq.aliyun.com/articles/277145</a></p>
+<ul>
+<li>是否可归档多表</li>
+</ul>
+<p><a href="https://www.percona.com/forums/questions-discussions/percona-toolkit/32449-pt-archiver-multiple-dependent-tables" target="_blank" rel="noopener">https://www.percona.com/forums/questions-discussions/percona-toolkit/32449-pt-archiver-multiple-dependent-tables</a></p>
+<ul>
+<li>可以多表条件,但是无法如果中途失败,无法继续归档</li>
+</ul>
+<p><a href="https://stackoverflow.com/questions/47203831/turn-mysql-query-into-percona-pt-archiver-string" target="_blank" rel="noopener">https://stackoverflow.com/questions/47203831/turn-mysql-query-into-percona-pt-archiver-string</a></p>
+<h2 id="mysql-archiver-python实现-pt-archvier"><a href="#mysql-archiver-python实现-pt-archvier" class="headerlink" title="mysql_archiver (python实现+pt-archvier)"></a>mysql_archiver (python实现+pt-archvier)</h2><p><a href="https://github.com/dbarun/mysql_archiver" target="_blank" rel="noopener">https://github.com/dbarun/mysql_archiver</a></p>
+<ul>
+<li>MySQL_archiver基本上实现了数据归档的自动运转，统一的归档任务调度管理、自动监控和预警、自动生成报表。在一定程度上节约了生产力，提高了运维效率。</li>
+<li>要知道每个归档任务成功与否、跑了多长时间、归档了多少数据<h2 id="JavaDataArchiver-java实现"><a href="#JavaDataArchiver-java实现" class="headerlink" title="JavaDataArchiver (java实现)"></a>JavaDataArchiver (java实现)</h2><a href="https://github.com/Sunshow/JavaDataArchiver" target="_blank" rel="noopener">https://github.com/Sunshow/JavaDataArchiver</a></li>
+</ul>
+<h3 id="问题-2"><a href="#问题-2" class="headerlink" title="问题"></a>问题</h3><p>下载源码后,发现未实现</p>
+<h2 id="阿里云maxcompute"><a href="#阿里云maxcompute" class="headerlink" title="阿里云maxcompute"></a>阿里云maxcompute</h2><h3 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h3><p>相对稳定,成本低,多数据源,可视化直接操作,无需开发,只需要配置</p>
+<h3 id="问题-3"><a href="#问题-3" class="headerlink" title="问题"></a>问题</h3><ul>
+<li>多表之间的id无法直接传递,需要使用join 同时过滤主表和字表的条件,例如sale_order和sale_order_detail(严重) 0226</li>
+<li>delete的条件传递 in (ids)</li>
+<li><p>delete的效率问题(性能) 0226</p>
+</li>
+<li><p>是否需要跨数据库备份</p>
+</li>
+</ul>
+<h2 id="阿里云maxcompute-归档字段"><a href="#阿里云maxcompute-归档字段" class="headerlink" title="阿里云maxcompute+归档字段"></a>阿里云maxcompute+归档字段</h2><ul>
+<li>先多表关联,将要归档的记录设置上需归档的状态</li>
+<li>各表根据归档状态,单标归档</li>
+<li>删除原表</li>
+</ul>
+<h3 id="问题-4"><a href="#问题-4" class="headerlink" title="问题"></a>问题</h3><p>数据量太大,可能update会锁表</p>
+<h2 id="阿里云maxcompute-归档记录"><a href="#阿里云maxcompute-归档记录" class="headerlink" title="阿里云maxcompute+归档记录"></a>阿里云maxcompute+归档记录</h2><ul>
+<li>先多表关联,将要归档的记录设置上需归档的状态</li>
+<li>各表根据归档状态,单标归档</li>
+<li>删除原表</li>
+</ul>
+<h3 id="问题-5"><a href="#问题-5" class="headerlink" title="问题"></a>问题</h3><p>待试验</p>
+<h2 id="外部程序实现"><a href="#外部程序实现" class="headerlink" title="外部程序实现"></a>外部程序实现</h2><h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><ul>
+<li>使用: mysql_archiver</li>
+<li>!!!!!!后续开发读取归档数据,同时不能影响生产库的性能(最好先定下来,否则目标 会不是mysql)</li>
+<li>target 也需要分区</li>
+</ul>
+<h1 id="目标库选择"><a href="#目标库选择" class="headerlink" title="目标库选择"></a>目标库选择</h1><ul>
+<li>nogsql</li>
+<li>mysql my</li>
+<li>maxcompute</li>
+</ul>
+<h1 id="废弃分表策略-对于v-sale-order和v-sale-order-detail"><a href="#废弃分表策略-对于v-sale-order和v-sale-order-detail" class="headerlink" title="废弃分表策略,对于v_sale_order和v_sale_order_detail"></a>废弃分表策略,对于v_sale_order和v_sale_order_detail</h1><h1 id="结论-1"><a href="#结论-1" class="headerlink" title="结论"></a>结论</h1><ul>
+<li>采用阿里云数据集成,跑归档任务</li>
+<li>在数据集成任务结束后的回调函数,可以配置删除归档数据的任务</li>
+<li>暂时目标库,还是mysql,后续的查询采用ElasticSearch进行查询,(阿里云提供1个月的免费试用,待研究确认后执行)</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/24/java_thread/study-java-thread-local/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/24/java_thread/study-java-thread-local/" itemprop="url">study-java-thread-local</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T23:21:00+08:00">
+                2018-01-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/24/java_thread/study-java-thread-local/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/24/java_thread/study-java-thread-local/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/24/java_thread/study-java-thread-local/" class="leancloud_visitors" data-flag-title="study-java-thread-local">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Thread-Local的作用"><a href="#Thread-Local的作用" class="headerlink" title="Thread Local的作用"></a>Thread Local的作用</h1><p>提供了一种将实例绑定到当前线程的机制，类似于隔离的效果.</p>
+<h1 id="SoftReference、Weak-Reference和PhantomRefrence"><a href="#SoftReference、Weak-Reference和PhantomRefrence" class="headerlink" title="SoftReference、Weak Reference和PhantomRefrence"></a>SoftReference、Weak Reference和PhantomRefrence</h1><h2 id="强引用"><a href="#强引用" class="headerlink" title="强引用"></a>强引用</h2><p>默认<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Object o=new Object();   </span><br><span class="line">Object o1=o;</span><br><span class="line">o=null;</span><br><span class="line">o1=null;</span><br></pre></td></tr></table></figure></p>
+<p>如果显式地设置o和o1为null，或超出范围，则gc认为该对象不存在引用，这时就可以收集它了。可以收集并不等于就一会被收集，什么时候收集这要取决于gc的算法，这要就带来很多不确定性。</p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">String abc=new String(&quot;abc&quot;);  //1   </span><br><span class="line">SoftReference&lt;String&gt; abcSoftRef=new SoftReference&lt;String&gt;(abc);  //2   </span><br><span class="line">WeakReference&lt;String&gt; abcWeakRef = new WeakReference&lt;String&gt;(abc); //3   </span><br><span class="line">abc=null; //4   </span><br><span class="line">abcSoftRef.clear();//5</span><br></pre></td></tr></table></figure>
+<p>上面的代码中：<br>    第一行在heap对中创建内容为“abc”的对象，并建立abc到该对象的强引用,该对象是强可及的。<br>    第二行和第三行分别建立对heap中对象的软引用和弱引用，此时heap中的对象仍是强可及的。<br>    第四行之后heap中对象不再是强可及的，变成软可及的。同样第五行执行之后变成弱可及的。</p>
+<h2 id="软引用"><a href="#软引用" class="headerlink" title="软引用"></a>软引用</h2><p>被 Soft Reference 指到的对象，即使没有任何 Direct Reference，也不会被清除。一直要到 JVM 内存不足且 没有 Direct Reference 时才会清除</p>
+<p>SoftReference 是用来设计 object-cache 之用的。如此一来 SoftReference 不但可以把对象 cache 起来，也不会造成内存不足的错误 （OutOfMemoryError）。我觉得 Soft Reference 也适合拿来实作 pooling 的技巧。</p>
+<hr>
+<pre><code>如果一个对象只具有软引用，那就类似于可有可物的生活用品。如果内存空间足够，垃圾回收器就不会回收它，如果内存空间不足了，就会回收这些对象的内存。只要垃圾回收器没有回收它，该对象就可以被程序使用。软引用可用来实现内存敏感的高速缓存。
+</code></pre><p>   软引用可以和一个引用队列（ReferenceQueue）联合使用，如果软引用所引用的对象被垃圾回收，JAVA虚拟机就会把这个软引用加入到与之关联的引用队列中。</p>
+<p>软引用可以加速JVM对垃圾内存的回收速度 , 维护系统的运行安全 , 防止产生内存溢出的问题</p>
+<h2 id="弱引用"><a href="#弱引用" class="headerlink" title="弱引用"></a>弱引用</h2><p>可以用来观察是否被gc掉</p>
+<p>gc收集弱可及对象的执行过程和软可及一样，只是gc不会根据内存情况来决定是不是收集该对象。</p>
+<p>如果你希望能随时取得某对象的信息，但又不想影响此对象的垃圾收集，那么你应该用 Weak Reference 来记住此对象，而不是用一般的 reference。</p>
+<hr>
+<p>如果一个对象只具有弱引用，那就类似于可有可物的生活用品。弱引用与软引用的区别在于：只具有弱引用的对象拥有更短暂的生命周期。<b>在垃圾回收器线程扫描它 所管辖的内存区域的过程中，一旦发现了只具有弱引用的对象，不管当前内存空间足够与否，都会回收它的内存。</b>不过，由于垃圾回收器是一个优先级很低的线程， 因此不一定会很快发现那些只具有弱引用的对象。</p>
+<p>弱引用可以和一个引用队列（ReferenceQueue）联合使用，如果弱引用所引用的对象被垃圾回收，Java虚拟机就会把这个弱引用加入到与之关联的引用队列中。</p>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">C c = new C(b);</span><br><span class="line">b = null;</span><br></pre></td></tr></table></figure>
+<p>当 b 被设置成null时，那么是否意味这一段时间后GC工作可以回收 b 所分配的内存空间呢？答案是否定的，因为即使 b 被设置成null，但 c 仍然持有对 b 的引用，而且还是强引用，所以GC不会回收 b 原先所分配的空间，既不能回收，又不能使用，这就造成了 内存泄露。<br>可以通过c = null;，也可以使用弱引用WeakReference w = new WeakReference(b);。因为使用了弱引用WeakReference，GC是可以回收 b 原先所分配的空间的。<br>如果是强引用,且thread依旧存活, Thread Ref -&gt; Thread -&gt; ThreaLocalMap -&gt; Entry -&gt; value 永远无法回收，造成内存泄漏。<br>ThreadLocalMap的设计中已经考虑到这种情况，也加上了一些防护措施：在ThreadLocal的get(),set(),remove()的时候都会清除线程ThreadLocalMap里所有key为null的value。</p>
+<h2 id="虚引用"><a href="#虚引用" class="headerlink" title="虚引用"></a>虚引用</h2><p> “虚引用”顾名思义，就是形同虚设，与其他几种引用都不同，虚引用并不会决定对象的生命周期。如果一个对象仅持有虚引用，那么它就和没有任何引用一样，在任何时候都可能被垃圾回收。<br>    虚引用主要用来跟踪对象被垃圾回收的活动。虚引用与软引用和弱引用的一个区别在于：虚引用必须和引用队列（ReferenceQueue）联合使用。当垃 圾回收器准备回收一个对象时，如果发现它还有虚引用，就会在回收对象的内存之前，把这个虚引用加入到与之关联的引用队列中。程序可以通过判断引用队列中是 否已经加入了虚引用，来了解</p>
+<pre><code>被引用的对象是否将要被垃圾回收。程序如果发现某个虚引用已经被加入到引用队列，那么就可以在所引用的对象的内存被回收之前采取必要的行动。
+</code></pre><h1 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">public T get() &#123;</span><br><span class="line">    Thread t = Thread.currentThread();</span><br><span class="line">    ThreadLocalMap map = getMap(t);</span><br><span class="line">    if (map != null) &#123;</span><br><span class="line">        ThreadLocalMap.Entry e = map.getEntry(this);</span><br><span class="line">        if (e != null) &#123;</span><br><span class="line">            @SuppressWarnings(&quot;unchecked&quot;)</span><br><span class="line">            T result = (T)e.value;</span><br><span class="line">            return result;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return setInitialValue();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public void set(T value) &#123;</span><br><span class="line">    Thread t = Thread.currentThread();</span><br><span class="line">    ThreadLocalMap map = getMap(t);</span><br><span class="line">    if (map != null)</span><br><span class="line">        map.set(this, value);</span><br><span class="line">    else</span><br><span class="line">        createMap(t, value);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"> public void remove() &#123;</span><br><span class="line">     ThreadLocalMap m = getMap(Thread.currentThread());</span><br><span class="line">     if (m != null)</span><br><span class="line">         m.remove(this);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="内部结构"><a href="#内部结构" class="headerlink" title="内部结构"></a>内部结构</h1><p>存储在Thread中的 java.lang.ThreadLocal.ThreadLocalMap类型的内部成员变量<br>其中 的Entry是弱引用:</p>
+<p>static class Entry extends WeakReference&lt;ThreadLocal&lt;?&gt;&gt;</p>
+<h1 id="ThreadLocal为什么使用WeakReference"><a href="#ThreadLocal为什么使用WeakReference" class="headerlink" title="ThreadLocal为什么使用WeakReference"></a>ThreadLocal为什么使用WeakReference</h1><p><img src="/images/pasted-44.png" alt="upload successful"></p>
+<p>ThreadLocalMap使用ThreadLocal的弱引用作为key，如果一个ThreadLocal没有外部强引用来引用它，那么系统 GC 的时候，这个ThreadLocal势必会被回收，这样一来，ThreadLocalMap中就会出现key为null的Entry，就没有办法访问这些key为null的Entry的value，如果当前线程再迟迟不结束的话，这些key为null的Entry的value就会一直存在一条强引用链：Thread Ref -&gt; Thread -&gt; ThreaLocalMap -&gt; Entry -&gt; value永远无法回收，造成内存泄漏。</p>
+<p>其实，ThreadLocalMap的设计中已经考虑到这种情况，也加上了一些防护措施：在ThreadLocal的get(),set(),remove()的时候都会清除线程ThreadLocalMap里所有key为null的value。</p>
+<p>但是这些被动的预防措施并不能保证不会内存泄漏：</p>
+<ul>
+<li>使用static的ThreadLocal，延长了ThreadLocal的生命周期，可能导致的内存泄漏（参考ThreadLocal 内存泄露的实例分析）。</li>
+<li>分配使用了ThreadLocal又不再调用get(),set(),remove()方法，那么就会导致内存泄漏。</li>
+</ul>
+<hr>
+<ul>
+<li>如果使用强引用则会,不remove,一直引用着key无法回收掉</li>
+<li>第一步WeakReference弱引用,的使得ey可以被回收为null</li>
+<li>在ThreadLocal的get(),set(),remove()的时候都会清除线程ThreadLocalMap里所有key为null的value</li>
+<li>但是如果不get(),set(),remove()就会出问题</li>
+</ul>
+<p>so:</p>
+<ul>
+<li>弱引用,解决了无其他引用时,有get(),set(),remove()调用的问题</li>
+<li>每次使用完ThreadLocal，都调用它的remove()方法，清除数据。</li>
+</ul>
+<p>即使设计上最大程度上减少了内存泄漏发生的概率,但是仍然不能100%保证,还是得靠程序员来协调</p>
+<hr>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/24/mysql/mysql-debug/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/24/mysql/mysql-debug/" itemprop="url">mysql下划线关键字</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-24T15:42:00+08:00">
+                2018-01-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mysql/" itemprop="url" rel="index">
+                    <span itemprop="name">mysql</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/24/mysql/mysql-debug/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/24/mysql/mysql-debug/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/24/mysql/mysql-debug/" class="leancloud_visitors" data-flag-title="mysql下划线关键字">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="问题sql"><a href="#问题sql" class="headerlink" title="问题sql"></a>问题sql</h1><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">  <span class="keyword">SELECT</span></span><br><span class="line">  *</span><br><span class="line"><span class="keyword">FROM</span> v_sale_order</span><br><span class="line"><span class="keyword">WHERE</span> <span class="number">1</span> = <span class="number">1</span> <span class="keyword">AND</span> v_sale_order.is_usable = <span class="number">1</span> <span class="keyword">AND</span> v_sale_order.tenant_id = <span class="number">100046</span> <span class="keyword">AND</span> <span class="number">1</span> = <span class="number">1</span> <span class="keyword">AND</span> archive_state <span class="keyword">IN</span> (<span class="number">0</span>, <span class="number">1</span>) <span class="keyword">AND</span></span><br><span class="line">#       v_sale_order.buyer_nick <span class="keyword">LIKE</span> <span class="string">'肆无忌惮演江山%'</span></span><br><span class="line">     v_sale_order.buyer_nick <span class="keyword">LIKE</span> <span class="string">'t_150175568%'</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> v_sale_order.last_update_time <span class="keyword">DESC</span>;</span><br></pre></td></tr></table></figure>
+<h1 id="如果查询内容带下划线"><a href="#如果查询内容带下划线" class="headerlink" title="如果查询内容带下划线"></a>如果查询内容带下划线</h1><table border="1" style="border-collapse:collapse"><br><tr><th>id</th><th>select_type</th><th>table</th><th>type</th><th>possible_keys</th><th>key</th><th>key_len</th><th>ref</th><th>rows</th><th>Extra</th></tr><br><tr><td>1</td><td>SIMPLE</td><td>sos</td><td>ref</td><td>idx_sale_order_id,IDX_ARCHIVE_SPLIT,oms_normal,oms_check,oms_suspend,oms_normal_v2,oms_check_v2,oms_suspend_v2,IX_SaleOrderStatus_SyncPlaystate,idx_pay_time,IDX_original_order_id</td><td>IDX_original_order_id</td><td>6</td><td>const,const</td><td>837216</td><td>Using where; Using filesort</td></tr><br><tr><td>1</td><td>SIMPLE</td><td>soc</td><td>ref</td><td>idx_sale_order_id</td><td>idx_sale_order_id</td><td>9</td><td>egenie_kn.sos.sale_order_id</td><td>1</td><td>NULL</td></tr><br><tr><td>1</td><td>SIMPLE</td><td>sow</td><td>ref</td><td>idx_sale_order_id</td><td>idx_sale_order_id</td><td>9</td><td>egenie_kn.sos.sale_order_id</td><td>1</td><td>NULL</td></tr><br><tr><td>1</td><td>SIMPLE</td><td>so</td><td>eq_ref</td><td>PRIMARY</td><td>PRIMARY</td><td>8</td><td>egenie_kn.sos.sale_order_id</td><td>1</td><td>NULL</td></tr><br><tr><td>1</td><td>SIMPLE</td><td>sof</td><td>ref</td><td>idx_sale_order_id</td><td>idx_sale_order_id</td><td>9</td><td>egenie_kn.sos.sale_order_id</td><td>1</td><td>NULL</td></tr><br><tr><td>1</td><td>SIMPLE</td><td>sor</td><td>ref</td><td>idx_sale_order_id,idx_buyer_nick</td><td>idx_sale_order_id</td><td>9</td><td>egenie_kn.sos.sale_order_id</td><td>1</td><td>Using where</td></tr><br><tr><td>1</td><td>SIMPLE</td><td>soi</td><td>ref</td><td>idx_sale_order_id</td><td>idx_sale_order_id</td><td>9</td><td>egenie_kn.sos.sale_order_id</td><td>1</td><td>NULL</td></tr></table>
+
+
+
+
+<h1 id="如果查询内容不带下划线"><a href="#如果查询内容不带下划线" class="headerlink" title="如果查询内容不带下划线"></a>如果查询内容不带下划线</h1><table border="1" style="border-collapse:collapse"><br><tr><th>id</th><th>select_type</th><th>table</th><th>type</th><th>possible_keys</th><th>key</th><th>key_len</th><th>ref</th><th>rows</th><th>Extra</th></tr><br><tr><td>1</td><td>SIMPLE</td><td>sor</td><td>range</td><td>idx_sale_order_id,idx_buyer_nick</td><td>idx_buyer_nick</td><td>303</td><td>NULL</td><td>7</td><td>Using index condition; Using where; Using temporary; Using filesort</td></tr><br><tr><td>1</td><td>SIMPLE</td><td>sos</td><td>eq_ref</td><td>idx_sale_order_id,IDX_ARCHIVE_SPLIT,oms_normal,oms_check,oms_suspend,oms_normal_v2,oms_check_v2,oms_suspend_v2,IX_SaleOrderStatus_SyncPlaystate,idx_pay_time,IDX_original_order_id</td><td>idx_sale_order_id</td><td>8</td><td>egenie_kn.sor.sale_order_id</td><td>1</td><td>Using where</td></tr><br><tr><td>1</td><td>SIMPLE</td><td>soc</td><td>ref</td><td>idx_sale_order_id</td><td>idx_sale_order_id</td><td>9</td><td>egenie_kn.sor.sale_order_id</td><td>1</td><td>NULL</td></tr><br><tr><td>1</td><td>SIMPLE</td><td>sow</td><td>ref</td><td>idx_sale_order_id</td><td>idx_sale_order_id</td><td>9</td><td>egenie_kn.sor.sale_order_id</td><td>1</td><td>NULL</td></tr><br><tr><td>1</td><td>SIMPLE</td><td>so</td><td>eq_ref</td><td>PRIMARY</td><td>PRIMARY</td><td>8</td><td>egenie_kn.sor.sale_order_id</td><td>1</td><td>NULL</td></tr><br><tr><td>1</td><td>SIMPLE</td><td>sof</td><td>ref</td><td>idx_sale_order_id</td><td>idx_sale_order_id</td><td>9</td><td>egenie_kn.sor.sale_order_id</td><td>1</td><td>NULL</td></tr><br><tr><td>1</td><td>SIMPLE</td><td>soi</td><td>ref</td><td>idx_sale_order_id</td><td>idx_sale_order_id</td><td>9</td><td>egenie_kn.sor.sale_order_id</td><td>1</td><td>NULL</td></tr></table>
+
+
+
+<h1 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h1><ul>
+<li>%代表任意多个字符</li>
+<li>_代表一个字符</li>
+<li>如果想搜索  _  就要用到转义符 “\”</li>
+</ul>
+<h1 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">value = value.replaceAll(<span class="string">"\\_"</span>, <span class="string">"\\\\_"</span>);</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/22/java_sort/study-quick-sort/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -846,1414 +2248,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/22/java_common/study-equals-and-hashCode/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/22/java_common/study-equals-and-hashCode/" itemprop="url">study_equals_and_hashCode</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-22T12:36:24+08:00">
-                2018-01-22
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/01/22/java_common/study-equals-and-hashCode/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/01/22/java_common/study-equals-and-hashCode/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/01/22/java_common/study-equals-and-hashCode/" class="leancloud_visitors" data-flag-title="study_equals_and_hashCode">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p><a href="https://www.ibm.com/developerworks/cn/java/j-jtp05273/index.html" target="_blank" rel="noopener">https://www.ibm.com/developerworks/cn/java/j-jtp05273/index.html</a></p>
-<h1 id="为什么-Override-equals-和hashCode"><a href="#为什么-Override-equals-和hashCode" class="headerlink" title="为什么 Override equals()和hashCode()?"></a>为什么 Override equals()和hashCode()?</h1><ul>
-<li><p>如果 Integer 不 Override equals() 和 hashCode() 情况又将如何?如果我们从未在 HashMap 或其它基于散列的集合中使用 Integer 作为关键字的话，什么也不会发生。但是，如果我们在 HashMap中 使用这类 Integer 对象作为关键字，我们将不能够可靠地检索相关的值，除非我们在 get() 调用中使用与 put() 调用中极其类似的 Integer 实例。这要求确保在我们的整个程序中，只能使用对应于特定整数值的 Integer 对象的一个实例。不用说，这种方法极不方便而且错误频频。</p>
-</li>
-<li><p>Object 的interface contract要求如果根据 equals() 两个对象是相等的，那么它们必须有相同的 hashCode() 值。当其识别能力整个包含在 equals() 中时，为什么我们的根对象类需要 hashCode() ？ </p>
-</li>
-<li>如果重写了equals方法，则一定要重写hashCode方法。</li>
-<li>hashCode() 方法纯粹用于提高效率。Java平台设计人员预计到了典型Java应用程序中基于散列的集合类（Collection Class)的重要性–如 Hashtable 、 HashMap 和 HashSet ，并且使用 equals() 与许多对象进行比较在计算方面非常昂贵。使所有Java对象都能够支持 hashCode() 并结合使用基于散列的集合，可以实现有效的存储和检索。</li>
-</ul>
-<h1 id="hashCode方法"><a href="#hashCode方法" class="headerlink" title="hashCode方法"></a>hashCode方法</h1><ul>
-<li><p>如果重写了equals方法，则一定要重写hashCode方法。</p>
-</li>
-<li><p>重写hashCode方法的原则如下：</p>
-<ul>
-<li>在程序执行期间，只要equals方法的比较操作用到的信息没有被修改，那么对这同一个对象调用多次，hashCode方法必须始终如一地返回同一个整数</li>
-<li>如果两个对象通过equals方法比较得到的结果是相等的，那么对这两个对象进行hashCode得到的值应该相同</li>
-<li>两个不同的对象，hashCode的结果可能是相同的，这就是哈希表中的冲突。为了保证哈希表的效率，哈希算法应尽可能的避免冲突</li>
-</ul>
-</li>
-<li><p>关于相应的哈希算法，一个简单的算法如下:</p>
-<ul>
-<li>永远不要让哈希算法返回一个常值，这时哈希表将退化成链表，查找时间复杂度也从 O(1)O(1) 退化到 O(N)O(N)</li>
-<li>如果参数是boolean型，计算(f ? 1 : 0)</li>
-<li>如果参数是byte, char, short或者int型，计算(int) f</li>
-<li>如果参数是long型，计算(int) (f ^ (f &gt;&gt;&gt; 32))</li>
-<li>如果参数是float型，计算Float.floatToIntBits(f)</li>
-<li>如果参数是double型，计算Double.doubleToLongBits(f)得到long类型的值，再根据公式计算出相应的hash值</li>
-<li>如果参数是Object型，那么应计算其有用的成员变量的hash值，并按照下面的公式计算最终的hash值</li>
-<li>如果参数是个数组，那么把数组中的每个值都当做单独的值，分别按照上面的方法单独计算hash值，最后按照下面的公式计算最终的hash值</li>
-<li>组合公式：result = 31 * result + c</li>
-</ul>
-</li>
-</ul>
-<h2 id="String类的hashCode方法如下（JDK-1-8）："><a href="#String类的hashCode方法如下（JDK-1-8）：" class="headerlink" title="String类的hashCode方法如下（JDK 1.8）："></a>String类的hashCode方法如下（JDK 1.8）：</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">public int hashCode() &#123;</span><br><span class="line">        int h = hash;</span><br><span class="line">        if (h == 0 &amp;&amp; value.length &gt; 0) &#123;</span><br><span class="line">            char val[] = value;</span><br><span class="line">            for (int i = 0; i &lt; value.length; i++) &#123;</span><br><span class="line">                h = 31 * h + val[i];</span><br><span class="line">            &#125;</span><br><span class="line">            hash = h;</span><br><span class="line">        &#125;</span><br><span class="line">        return h;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<h2 id="举个自定义类的hashCode例子："><a href="#举个自定义类的hashCode例子：" class="headerlink" title="举个自定义类的hashCode例子："></a>举个自定义类的hashCode例子：</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">class Duck &#123;</span><br><span class="line">    private int id;</span><br><span class="line">    private String name;</span><br><span class="line">    private double weight;</span><br><span class="line">    private float height;</span><br><span class="line">    private String note;</span><br><span class="line">    @Override</span><br><span class="line">    public boolean equals(Object o) &#123;</span><br><span class="line">        if (this == o) return true;</span><br><span class="line">        if (o == null || getClass() != o.getClass()) return false;</span><br><span class="line">        Duck duck = (Duck) o;</span><br><span class="line">        if (id != duck.id) return false;</span><br><span class="line">        if (Double.compare(duck.weight, weight) != 0) return false;</span><br><span class="line">        if (Float.compare(duck.height, height) != 0) return false;</span><br><span class="line">        if (name != null ? !name.equals(duck.name) : duck.name != null) return false;</span><br><span class="line">        return !(note != null ? !note.equals(duck.note) : duck.note != null);</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public int hashCode() &#123;</span><br><span class="line">        int result;</span><br><span class="line">        long temp;</span><br><span class="line">        result = id;</span><br><span class="line">        result = 31 * result + (name != null ? name.hashCode() : 0);</span><br><span class="line">        temp = Double.doubleToLongBits(weight);</span><br><span class="line">        result = 31 * result + (int) (temp ^ (temp &gt;&gt;&gt; 32));</span><br><span class="line">        result = 31 * result + (height != +0.0f ? Float.floatToIntBits(height) : 0);</span><br><span class="line">        result = 31 * result + (note != null ? note.hashCode() : 0);</span><br><span class="line">        return result;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h1 id="BTW-回顾一下-hashmap内部的实现"><a href="#BTW-回顾一下-hashmap内部的实现" class="headerlink" title="BTW 回顾一下 hashmap内部的实现"></a>BTW 回顾一下 hashmap内部的实现</h1><p>e.hash == hash &amp;&amp; ((k = e.key) == key || (key != null &amp;&amp; key.equals(k)))</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/19/java_spring/review-spring/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/19/java_spring/review-spring/" itemprop="url">review_spring</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-19T23:20:53+08:00">
-                2018-01-19
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/spring/" itemprop="url" rel="index">
-                    <span itemprop="name">spring</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/01/19/java_spring/review-spring/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/01/19/java_spring/review-spring/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/01/19/java_spring/review-spring/" class="leancloud_visitors" data-flag-title="review_spring">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Spring的优点"><a href="#Spring的优点" class="headerlink" title="Spring的优点"></a>Spring的优点</h1><ul>
-<li>轻量级：相较于EJB容器，Spring采用的IoC容器非常的轻量级，基础版本的Spring框架大约只有2MB。Spring可以让开发者们仅仅使用POJO(Plain Old Java Object，相对于EJB)就能够开发出企业级的应用。这样做的好处是，你不需要使用臃肿庞大的 EJB容器(应用服务器)，你只需要轻量的servlet容器(如Tomcat)。尤其在一些开发当中，很稀缺内存和CPU资源时，采用Spring比EJB无论是开发还是部署应用都更节约资源。</li>
-<li>控制反转(IOC)：Spring使用控制反转技术实现了松耦合。依赖被注入到对象，而不是创建或寻找依赖对象。</li>
-<li>面向切面编程(AOP)： Spring支持面向切面编程，同时把应用的业务逻辑与系统的服务分离开来。</li>
-<li>MVC框架：Spring MVC是一个非常好的MVC框架，可以替换其他web框架诸如Struts。</li>
-<li>集成性：Spring非常容易和其他的流行框架一起集成开发，这些框架包括：ORM框架，logging框架，JEE, Quartz，以及Struts等表现层框架。</li>
-<li>事务管理：Spring强大的事务管理功能，能够处理本地事务(一个数据库)或是全局事务(多个数据，采用JTA)。</li>
-<li>模块分离：Spring框架是由模块构成的。虽然已经有太多的包和类了，但它们都按照模块分好类了，你只需要考虑你会用到的模块，而不用理其他的模块。</li>
-<li>异常处理：由于Java的JDBC，Hibernate等API中有很多方法抛出的是checked exception，而很多开发者并不能很好的处理异常。Spring提供了统一的API将这些checked exception的异常转换成Spring的unchecked exception。</li>
-<li>单元测试：Spring写出来的代码非常容易做单元测试，可以采用依赖注射(Dependency Injection)将测试的数据注射到程序中。</li>
-</ul>
-<p>IOC就是典型的工厂模式，通过sessionfactory去注入实例。</p>
-<p>AOP就是典型的代理模式的体现。</p>
-<h1 id="IOC概念"><a href="#IOC概念" class="headerlink" title="IOC概念"></a>IOC概念</h1><p><img src="/images/pasted-80.png" alt="upload successful"><br>IOC解耦<br><img src="/images/pasted-81.png" alt="upload successful"><br>引进了中间位置的“第三方”，也就是IOC容器，使得A、B、C、D这4个对象没有了耦合关系，齿轮之间的传动全部依靠“第三方”了</p>
-<p>通过引入IOC容器，利用依赖关系注入的方式，实现对象之间的解耦。</p>
-<p><img src="/images/pasted-82.png" alt="upload successful"></p>
-<h2 id="IOC为我们带来了什么好处"><a href="#IOC为我们带来了什么好处" class="headerlink" title="IOC为我们带来了什么好处"></a>IOC为我们带来了什么好处</h2><p>我们还是从USB的例子说起，使用USB外部设备比使用内置硬盘，到底带来什么好处？</p>
-<p>第一、USB设备作为电脑主机的外部设备，在插入主机之前，与电脑主机没有任何的关系，只有被我们连接在一起之后，两者才发生联系，具有相关性。所以，无论两者中的任何一方出现什么的问题，都不会影响另一方的运行。这种特性体现在软件工程中，就是可维护性比较好，非常便于进行单元测试，便于调试程序和诊断故障。代码中的每一个Class都可以单独测试，彼此之间互不影响，只要保证自身的功能无误即可，这就是组件之间低耦合或者无耦合带来的好处。</p>
-<p>第二、USB设备和电脑主机的之间无关性，还带来了另外一个好处，生产USB设备的厂商和生产电脑主机的厂商完全可以是互不相干的人，各干各事，他们之间唯一需要遵守的就是USB接口标准。这种特性体现在软件开发过程中，好处可是太大了。每个开发团队的成员都只需要关心实现自身的业务逻辑，完全不用去关心其它的人工作进展，因为你的任务跟别人没有任何关系，你的任务可以单独测试，你的任务也不用依赖于别人的组件，再也不用扯不清责任了。所以，在一个大中型项目中，团队成员分工明确、责任明晰，很容易将一个大的任务划分为细小的任务，开发效率和产品质量必将得到大幅度的提高。</p>
-<p>第三、同一个USB外部设备可以插接到任何支持USB的设备，可以插接到电脑主机，也可以插接到DV机，USB外部设备可以被反复利用。在软件工程中，这种特性就是可复用性好，我们可以把具有普遍性的常用组件独立出来，反复利用到项目中的其它部分，或者是其它项目，当然这也是面向对象的基本特征。显然，IOC不仅更好地贯彻了这个原则，提高了模块的可复用性。符合接口标准的实现，都可以插接到支持此标准的模块中。</p>
-<p>第四、同USB外部设备一样，模块具有热插拔特性。IOC生成对象的方式转为外置方式，也就是把对象生成放在配置文件里进行定义，这样，当我们更换一个实现子类将会变得很简单，只要修改配置文件就可以了，完全具有热插拨的特性。</p>
-<h2 id="IOC容器的一些产品"><a href="#IOC容器的一些产品" class="headerlink" title="IOC容器的一些产品"></a>IOC容器的一些产品</h2><p>spring EJB</p>
-<h1 id="Spring的IOC-将一个类实例化成对象的技术"><a href="#Spring的IOC-将一个类实例化成对象的技术" class="headerlink" title="Spring的IOC(将一个类实例化成对象的技术)"></a>Spring的IOC(将一个类实例化成对象的技术)</h1><p>IOC技术第一个解释叫做控制反转(IOC)，它还有个解释就是依赖注入(DI)，这两个名字很难从字面理解，但是当你理解它的原理后就会发现它们的描述是何等准确。IOC技术的本质就是构建对象的技术换句话说就是将一个类实例化成对象的技术。</p>
-<p>耦合具有两面性。一方面，紧密耦合的代码难以测试，难以复用，难以理解，并且表现出“打地鼠”式的bug特性（修复一个bug，导致出现一个新的或者甚至更多的bug）。另一方面，一定程度的耦合又是必须的，完全没有耦合的代码什么也做不了。为了完成有实际意义的工作，不同的类必须以适当的方式进行交互。总而言之，耦合是必须的，但应当小心谨慎的管理它。通过控制反转或者依赖注入，对象的依赖关系将由负责协调系统中各个对象的第三方组件在创建对象时设定。对象无需自行创建或管理它们的依赖关系，依赖关系将被自动注入到需要它们的对象中去。</p>
-<p>我们通过实际生活中的一个例子来解释一下IOC：</p>
-<p>例如我们有个roo对象作用是完成打猎的操作，那么打猎这个对象内部包含两个辅助对象：人和枪，只有人和枪赋予了打猎这个对象，那么打猎对象才能完成打猎的操作，但是构建一个人和枪的对象并不是看起来那么简单，这里以枪为例，要创造一把枪我们需要金属，需要机床，需要子弹，而机床和子弹又是两个新对象，这些对象一个个相互嵌套相互关联，大伙试想下如果我们在java代码里构建一个枪的对象那是何其的复杂，假如我们要构造的不是简单的枪对象而是更加复杂的航空母舰，那么构造这个对象的成本之高是让人难以想象的，怎么来消除这种对象相互嵌套相互依赖的关系了？</p>
-<p>Spring提供了一种方式，这种方式就是Spring提供一个容器，我们在xml文件里定义各个对象的依赖关系，由容器完成对象的构建，当我们Java代码里需要使用某个实例的时候就可以从容器里获取，那么对象的构建操作就被Spring容器接管，所以它被称为控制反转。</p>
-<p><font color="#0099ff" size="5" face="黑体">控制反转的意思就是本来属于java程序里构建对象的功能交由容器接管，依赖注入就是当程序要使用某个对象时候，容器会把它注入到程序里。</font>在Java开发里我们想使用某个类提供的功能，有两种方式：一种就是构造一个新的类，新的类继承该类，另一种方式则是将某个类定义在新类里，那么两个类之间就建立一种关联关系，Spring的IOC容器就是实现了这种关联关系。</p>
-<p>通过上面这段内容，相信大家应该会对IOC有个比较清晰的了解了。关于Spring中IOC部分是如何实现以及使用，就不进行讨论了，本文的目的也是能从整体上把握一下。但可以稍微提一点，<font color="#0099ff" size="5" face="黑体">Spring的IOC功能其实就是依赖于Java的反射机制</font>。直白点说，当你在xml文件中配置好了bean（bean需要提供全类名）之后，Spring通过自己的类对xml文件进行解析，然后利用反射机制将对象创建出来，然后放到自己的数据结构中，比如Map。然后键就是bean中的id属性的值，值就是创建的对象。</p>
-<h1 id="Spring的AOP"><a href="#Spring的AOP" class="headerlink" title="Spring的AOP"></a>Spring的AOP</h1><p>在设计模式里有一种代理模式，代理模式将继承模式和关联模式结合在一起使用，代理模式就是继承模式和关联模式的综合体，不过这个综合体的作用倒不是解决对象注入的问题，而是为具体操作对象找到一个保姆或者是秘书，这就和小说里的二号首长一样，这个二号首长对外代表了具体的实例对象，实例对象的入口和出口都是通过这个二号首长，具体的实例对象是一号首长，一号首长是要干大事的，所以一些事务性，重复性的工作例如泡茶，安排车子，这样的工作是不用劳烦一号首长的大驾，而是二号首长帮忙解决的，这就是AOP的思想。AOP解决程序开发里事务性，和核心业务无关的问题，但这些问题对于业务场景的实现是很有必要的，在实际开发里AOP也是节省代码的一种方式。</p>
-<p>AOP将应用系统分为两部分，核心业务逻辑（Core business concerns）及横向的通用逻辑，也就是所谓的方面Crosscutting enterprise concerns，例如，所有大中型应用都要涉及到的持久化管理（Persistent）、事务管理（Transaction Management）、安全管理（Security）、日志管理（Logging）和调试管理（Debugging）等。</p>
-<p>实现AOP的技术，主要分为两大类：一是采用动态代理技术，利用截取消息的方式，对该消息进行装饰，以取代原有对象行为的执行；二是采用静态织入的方式，引入特定的语法创建“方面”，从而使得编译器可以在编译期间织入有关“方面”的代码。</p>
-<h2 id="过程"><a href="#过程" class="headerlink" title="过程"></a>过程</h2><h3 id="1-初始化"><a href="#1-初始化" class="headerlink" title="1. 初始化"></a>1. 初始化</h3><p>大致单步跟了下Spring IOC的初始化过程，整个脉络很庞大，初始化的过程主要就是读取XML资源，并解析，最终注册到Bean Factory中：<br><img src="/images/pasted-83.png" alt="upload successful"></p>
-<h3 id="2-注入依赖"><a href="#2-注入依赖" class="headerlink" title="2. 注入依赖"></a>2. 注入依赖</h3><p>当完成初始化IOC容器后，如果bean没有设置lazy-init(延迟加载)属性，那么bean的实例就会在初始化IOC完成之后，及时地进行初始化。初始化时会先建立实例，然后根据配置利用反射对实例进行进一步操作，具体流程如下所示：</p>
-<p><img src="/images/pasted-84.png" alt="upload successful"></p>
-<ul>
-<li>创建bean的实例</li>
-<li>注入bean的属性</li>
-</ul>
-<h2 id="AOP术语"><a href="#AOP术语" class="headerlink" title="AOP术语"></a>AOP术语</h2><ul>
-<li><p>Join Point: Spring AOP中，join point就是一个方法。（通俗来讲就是起作用的那个方法）。</p>
-</li>
-<li><p>Pointcut: 用来指定join point（通俗来讲就是描述的一组符合某个条件的join point）。通常使用pointcut表达式来限定joint point，Spring默认使用AspectJ pointcut expression language。</p>
-</li>
-<li><p>Advice: 在join point上特定的时刻执行的操作，Advice有几种不同类型，下文将会讨论（通俗地来讲就是起作用的内容和时间点）。</p>
-</li>
-<li><p>Introduction：给对象增加方法或者属性。</p>
-</li>
-<li><p>Target object: Advice起作用的那个对象。</p>
-</li>
-<li><p>AOP proxy: 为实现AOP所生成的代理。在Spring中有两种方式生成代理:JDK代理和CGLIB代理。</p>
-</li>
-<li><p>Aspect: 组合了Pointcut与Advice，在Spring中有时候也称为Advisor。某些资料说Advisor是一种特殊的Aspect，其区别是Advisor只能包含一对pointcut和advice，但是aspect可以包含多对。AOP中的aspect可以类比于OOP中的class。</p>
-</li>
-<li><p>Weaving：将Advice织入join point的这个过程。</p>
-</li>
-</ul>
-<h2 id="静态代理"><a href="#静态代理" class="headerlink" title="静态代理"></a>静态代理</h2><p>静态代理是编译阶段生成AOP代理类，也就是说生成的字节码就织入了增强后的AOP对象；动态代理则不会修改字节码，而是在内存中临时生成一个AOP对象，这个AOP对象包含了目标对象的全部方法，并且在特定的切点做了增强处理，并回调原对象的方法。<br>实现静态代理常用的方法是通过AspectJ，AspectJ 是一个基于 Java 语言的 AOP 框架，提供了强大的 AOP 功能，主要包含两个部分，第一个部分定义了如何表达、定义 AOP 编程中的语法规范；另一个部分是工具部分，包括编译器、调试工具等。<br>Aspectj实现了独有的编译器，在编译时生成代理类文件</p>
-<h2 id="Spring的AOP代理对象的生成"><a href="#Spring的AOP代理对象的生成" class="headerlink" title="Spring的AOP代理对象的生成"></a>Spring的AOP代理对象的生成</h2><p>spring支持AspectJ风格的AOP还是动态的，标注中用到的JoinPoint等类都来自aspectj包</p>
-<p>Spring提供了两种方式来生成代理对象: JDKProxy和Cglib，具体使用哪种方式生成由AopProxyFactory根据AdvisedSupport对象的配置来决定。默认的策略是如果目标类是接口，则使用JDK动态代理技术，否则使用Cglib来生成代理。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">import org.aspectj.lang.JoinPoint;</span><br><span class="line">import org.aspectj.lang.ProceedingJoinPoint;</span><br><span class="line">import org.aspectj.lang.annotation.After;</span><br><span class="line">import org.aspectj.lang.annotation.AfterReturning;</span><br><span class="line">import org.aspectj.lang.annotation.AfterThrowing;</span><br><span class="line">import org.aspectj.lang.annotation.Around;</span><br><span class="line">import org.aspectj.lang.annotation.Aspect;</span><br><span class="line">import org.aspectj.lang.annotation.Before;</span><br><span class="line">import org.aspectj.lang.annotation.Pointcut;</span><br><span class="line">import org.springframework.stereotype.Component;</span><br><span class="line"></span><br><span class="line">@Component</span><br><span class="line">@Aspect</span><br><span class="line">public class SimpleAspect &#123;</span><br><span class="line">	@Pointcut(&quot;execution(* cn.outofmemory.spring_aop_aspect.*Service*.*(..))&quot;)</span><br><span class="line">	public void pointCut() &#123;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	@After(&quot;pointCut()&quot;)</span><br><span class="line">	public void after(JoinPoint joinPoint) &#123;</span><br><span class="line">		System.out.println(&quot;after aspect executed&quot;);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	@Before(&quot;pointCut()&quot;)</span><br><span class="line">	public void before(JoinPoint joinPoint) &#123;</span><br><span class="line">		//如果需要这里可以取出参数进行处理</span><br><span class="line">		//Object[] args = joinPoint.getArgs();</span><br><span class="line">		System.out.println(&quot;before aspect executing&quot;);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	@AfterReturning(pointcut = &quot;pointCut()&quot;, returning = &quot;returnVal&quot;)</span><br><span class="line">	public void afterReturning(JoinPoint joinPoint, Object returnVal) &#123;</span><br><span class="line">		System.out.println(&quot;afterReturning executed, return result is &quot;</span><br><span class="line">				+ returnVal);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	@Around(&quot;pointCut()&quot;)</span><br><span class="line">	public void around(ProceedingJoinPoint pjp) throws Throwable &#123;</span><br><span class="line">		System.out.println(&quot;around start..&quot;);</span><br><span class="line">		try &#123;</span><br><span class="line">			pjp.proceed();</span><br><span class="line">		&#125; catch (Throwable ex) &#123;</span><br><span class="line">			System.out.println(&quot;error in around&quot;);</span><br><span class="line">			throw ex;</span><br><span class="line">		&#125;</span><br><span class="line">		System.out.println(&quot;around end&quot;);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	@AfterThrowing(pointcut = &quot;pointCut()&quot;, throwing = &quot;error&quot;)</span><br><span class="line">	public void afterThrowing(JoinPoint jp, Throwable error) &#123;</span><br><span class="line">		System.out.println(&quot;error:&quot; + error);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="jdkProxy"><a href="#jdkProxy" class="headerlink" title="jdkProxy"></a>jdkProxy</h2><p>JDK动态代理通过反射来接收被代理的类，并且要求被代理的类必须实现一个接口。</p>
-<p>核心是InvocationHandler接口和Proxy类。</p>
-<ul>
-<li>java.lang.reflect.Proxy，这是Java动态代理机制生成的所有动态代理类的父类，它提供静态方法来为一组接口动态地生成代理类及其对象。</li>
-<li>java.lang.reflect.InvocationHandler，这是调用处理器接口，它自定义了一个invoke方法，用于实现代理逻辑、转发请求给对原始类对象。</li>
-</ul>
-<p>继承了Proxy类，实现了代理的接口，由于java不能多继承，这里已经继承了Proxy类了，不能再继承其他的类，所以JDK的动态代理不支持对实现类的代理，只支持接口的代理</p>
-<h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br></pre></td><td class="code"><pre><span class="line">private static final class ProxyClassFactory</span><br><span class="line">        implements BiFunction&lt;ClassLoader, Class&lt;?&gt;[], Class&lt;?&gt;&gt;</span><br><span class="line">    &#123;</span><br><span class="line">        // prefix for all proxy class names</span><br><span class="line">        private static final String proxyClassNamePrefix = &quot;$Proxy&quot;;</span><br><span class="line"></span><br><span class="line">        // next number to use for generation of unique proxy class names</span><br><span class="line">        private static final AtomicLong nextUniqueNumber = new AtomicLong();</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        public Class&lt;?&gt; apply(ClassLoader loader, Class&lt;?&gt;[] interfaces) &#123;</span><br><span class="line"></span><br><span class="line">            Map&lt;Class&lt;?&gt;, Boolean&gt; interfaceSet = new IdentityHashMap&lt;&gt;(interfaces.length);</span><br><span class="line">            for (Class&lt;?&gt; intf : interfaces) &#123;</span><br><span class="line">                /*</span><br><span class="line">                 * Verify that the class loader resolves the name of this</span><br><span class="line">                 * interface to the same Class object.</span><br><span class="line">                 */</span><br><span class="line">                Class&lt;?&gt; interfaceClass = null;</span><br><span class="line">                try &#123;</span><br><span class="line">                    interfaceClass = Class.forName(intf.getName(), false, loader);</span><br><span class="line">                &#125; catch (ClassNotFoundException e) &#123;</span><br><span class="line">                &#125;</span><br><span class="line">                if (interfaceClass != intf) &#123;</span><br><span class="line">                    throw new IllegalArgumentException(</span><br><span class="line">                        intf + &quot; is not visible from class loader&quot;);</span><br><span class="line">                &#125;</span><br><span class="line">                /*</span><br><span class="line">                 * Verify that the Class object actually represents an</span><br><span class="line">                 * interface.</span><br><span class="line">                 */</span><br><span class="line">                if (!interfaceClass.isInterface()) &#123;</span><br><span class="line">                    throw new IllegalArgumentException(</span><br><span class="line">                        interfaceClass.getName() + &quot; is not an interface&quot;);</span><br><span class="line">                &#125;</span><br><span class="line">                /*</span><br><span class="line">                 * Verify that this interface is not a duplicate.</span><br><span class="line">                 */</span><br><span class="line">                if (interfaceSet.put(interfaceClass, Boolean.TRUE) != null) &#123;</span><br><span class="line">                    throw new IllegalArgumentException(</span><br><span class="line">                        &quot;repeated interface: &quot; + interfaceClass.getName());</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            String proxyPkg = null;     // package to define proxy class in</span><br><span class="line">            int accessFlags = Modifier.PUBLIC | Modifier.FINAL;</span><br><span class="line"></span><br><span class="line">            /*</span><br><span class="line">             * Record the package of a non-public proxy interface so that the</span><br><span class="line">             * proxy class will be defined in the same package.  Verify that</span><br><span class="line">             * all non-public proxy interfaces are in the same package.</span><br><span class="line">             */</span><br><span class="line">            for (Class&lt;?&gt; intf : interfaces) &#123;</span><br><span class="line">                int flags = intf.getModifiers();</span><br><span class="line">                if (!Modifier.isPublic(flags)) &#123;</span><br><span class="line">                    accessFlags = Modifier.FINAL;</span><br><span class="line">                    String name = intf.getName();</span><br><span class="line">                    int n = name.lastIndexOf(&apos;.&apos;);</span><br><span class="line">                    String pkg = ((n == -1) ? &quot;&quot; : name.substring(0, n + 1));</span><br><span class="line">                    if (proxyPkg == null) &#123;</span><br><span class="line">                        proxyPkg = pkg;</span><br><span class="line">                    &#125; else if (!pkg.equals(proxyPkg)) &#123;</span><br><span class="line">                        throw new IllegalArgumentException(</span><br><span class="line">                            &quot;non-public interfaces from different packages&quot;);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            if (proxyPkg == null) &#123;</span><br><span class="line">                // if no non-public proxy interfaces, use com.sun.proxy package</span><br><span class="line">                proxyPkg = ReflectUtil.PROXY_PACKAGE + &quot;.&quot;;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            /*</span><br><span class="line">             * Choose a name for the proxy class to generate.</span><br><span class="line">             */</span><br><span class="line">            long num = nextUniqueNumber.getAndIncrement();</span><br><span class="line">            String proxyName = proxyPkg + proxyClassNamePrefix + num;</span><br><span class="line"></span><br><span class="line">            /*</span><br><span class="line">             * Generate the specified proxy class.</span><br><span class="line">             */</span><br><span class="line">            byte[] proxyClassFile = ProxyGenerator.generateProxyClass(</span><br><span class="line">                proxyName, interfaces, accessFlags);</span><br><span class="line">            try &#123;</span><br><span class="line">                return defineClass0(loader, proxyName,</span><br><span class="line">                                    proxyClassFile, 0, proxyClassFile.length);</span><br><span class="line">            &#125; catch (ClassFormatError e) &#123;</span><br><span class="line">                /*</span><br><span class="line">                 * A ClassFormatError here means that (barring bugs in the</span><br><span class="line">                 * proxy class generation code) there was some other</span><br><span class="line">                 * invalid aspect of the arguments supplied to the proxy</span><br><span class="line">                 * class creation (such as virtual machine limitations</span><br><span class="line">                 * exceeded).</span><br><span class="line">                 */</span><br><span class="line">                throw new IllegalArgumentException(e.toString());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">apply:639, Proxy$ProxyClassFactory &#123;java.lang.reflect&#125;</span><br><span class="line">apply:557, Proxy$ProxyClassFactory &#123;java.lang.reflect&#125;</span><br><span class="line">get:230, WeakCache$Factory &#123;java.lang.reflect&#125;</span><br><span class="line">get:127, WeakCache &#123;java.lang.reflect&#125;</span><br><span class="line">getProxyClass0:419, Proxy &#123;java.lang.reflect&#125;</span><br><span class="line">newProxyInstance:719, Proxy &#123;java.lang.reflect&#125;</span><br><span class="line">main:11, ProxyTest &#123;com.example.demo.proxy.jdk&#125;</span><br></pre></td></tr></table></figure>
-<p>获取的对象是$Proxy对象,里面持有了真正的原始对象</p>
-<h2 id="cglib"><a href="#cglib" class="headerlink" title="cglib"></a>cglib</h2><p>核心是MethodInterceptor接口和Enhancer类<br>对于final方法，无法进行代理(不报错,正常执行原方法)</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">public class CglibProxy implements MethodInterceptor &#123;</span><br><span class="line">    private Enhancer enhancer = new Enhancer();</span><br><span class="line">    public Object getProxy(Class clazz)&#123;</span><br><span class="line">        //设置需要创建子类的类</span><br><span class="line">        enhancer.setSuperclass(clazz);</span><br><span class="line">        enhancer.setCallback(this);</span><br><span class="line">        //通过字节码技术动态创建子类实例</span><br><span class="line">        return enhancer.create();</span><br><span class="line">    &#125;</span><br><span class="line">    //实现MethodInterceptor接口方法</span><br><span class="line">    public Object intercept(Object obj, Method method, Object[] args,</span><br><span class="line">                            MethodProxy proxy) throws Throwable &#123;</span><br><span class="line">        System.out.println(&quot;前置代理&quot;);</span><br><span class="line">        //通过代理类调用父类中的方法</span><br><span class="line">        Object result = proxy.invokeSuper(obj, args);</span><br><span class="line">        System.out.println(&quot;后置代理&quot;);</span><br><span class="line">        return result;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public class DoCGLib &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">    CglibProxy proxy = new CglibProxy();</span><br><span class="line">    //通过生成子类的方式创建代理类</span><br><span class="line">    HelloWorldImpl proxyImp = (HelloWorldImpl)proxy.getProxy(HelloWorldImpl.class);</span><br><span class="line">    proxyImp.sayHello(&quot;wing&quot;);</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h1 id="spring生命周期"><a href="#spring生命周期" class="headerlink" title="spring生命周期"></a>spring生命周期</h1><ul>
-<li>1.Spring对Bean进行实例化（相当于程序中的new Xx()）</li>
-<li>2.Spring将值和Bean的引用注入进Bean对应的属性中</li>
-<li>3.如果Bean实现了BeanNameAware接口，Spring将Bean的ID传递给setBeanName()方法（实现BeanNameAware清主要是为了通过Bean的引用来获得Bean的ID，一般业务中是很少有用到Bean的ID的）</li>
-<li>4.如果Bean实现了BeanFactoryAware接口，Spring将调用setBeanDactory(BeanFactory bf)方法并把BeanFactory容器实例作为参数传入。（实现BeanFactoryAware 主要目的是为了获取Spring容器，如Bean通过Spring容器发布事件等）</li>
-<li>5.如果Bean实现了ApplicationContextAwaer接口，Spring容器将调用setApplicationContext(ApplicationContext ctx)方法，把y应用上下文作为参数传入.(作用与BeanFactory类似都是为了获取Spring容器，不同的是Spring容器在调用setApplicationContext方法时会把它自己作为setApplicationContext 的参数传入，而Spring容器在调用setBeanDactory前需要程序员自己指定（注入）setBeanDactory里的参数BeanFactory )</li>
-<li>6.如果Bean实现了BeanPostProcess接口，Spring将调用它们的postProcessBeforeInitialization（预初始化）方法（作用是在Bean实例创建成功后对进行增强处理，如对Bean进行修改，增加某个功能）</li>
-<li>7.如果Bean实现了InitializingBean接口，Spring将调用它们的afterPropertiesSet方法，作用与在配置文件中对Bean使用init-method声明初始化的作用一样，都是在Bean的全部属性设置成功后执行的初始化方法。</li>
-<li>8.如果Bean实现了BeanPostProcess接口，Spring将调用它们的postProcessAfterInitialization（后初始化）方法（作用与6的一样，只不过6是在Bean初始化前执行的，而这个是在Bean初始化后执行的，时机不同 )</li>
-<li>9.经过以上的工作后，Bean将一直驻留在应用上下文中给应用使用，直到应用上下文被销毁</li>
-<li>10.如果Bean实现了DispostbleBean接口，Spring将调用它的destory方法，作用与在配置文件中对Bean使用destory-method属性的作用一样，都是在Bean实例销毁前执行的方法。</li>
-</ul>
-<hr>
-<p>Bean的完整生命周期经历了各种方法调用，这些方法可以划分为以下几类：</p>
-<p>1、Bean自身的方法　　：　　这个包括了Bean本身调用的方法和通过配置文件中<bean>的init-method和destroy-method指定的方法</bean></p>
-<p>2、Bean级生命周期接口方法　　：　　这个包括了BeanNameAware、BeanFactoryAware、InitializingBean和DiposableBean这些接口的方法</p>
-<p>3、容器级生命周期接口方法　　：　　这个包括了InstantiationAwareBeanPostProcessor 和 BeanPostProcessor 这两个接口实现，一般称它们的实现类为“后处理器”。</p>
-<p>4、工厂后处理器接口方法　　：　　这个包括了AspectJWeavingEnabler, ConfigurationClassPostProcessor, CustomAutowireConfigurer等等非常有用的工厂后处理器　　接口的方法。工厂后处理器也是容器级的。在应用上下文装配配置文件之后立即调用。</p>
-<h2 id="1-类级别生命周期回调"><a href="#1-类级别生命周期回调" class="headerlink" title="1.类级别生命周期回调"></a>1.类级别生命周期回调</h2><ul>
-<li>1.1 init-method xml配置</li>
-<li>1.2 InitializingBean接口</li>
-<li>1.3 PostConstruct注解<h2 id="2-容器级别扩展"><a href="#2-容器级别扩展" class="headerlink" title="2.容器级别扩展"></a>2.容器级别扩展</h2></li>
-<li>2.1BeanPostProcessor接口<br>bean实例初始化后处理器及后处理器链<br>实例初始化后处理器多用于对实例的一些代理操作。Spring中一些使用到AOP的特性也是通过后处理器的方式实现的。<br>实例初始化后处理器链 是多个后处理器，就会有执行顺序的问题，可以通过实现Ordered接口，指定后处理的执行顺序，Ordered接口声明了getOrder方法，方法返回值越小，后处理的优先级越高，越早执行。<br>在通过实现BeanPostProcessor接口自定义实例初始化后处理器的时候，建议也实现Ordered接口，指定优先级。</li>
-<li>2.2 BeanFactoryPostProcessor接口<br>2.2.1 bean factory后处理器<br>BeanFactoryPostProcessors接口在bean实例化前处理bean的配置元数据，BeanPostProcessor接口在bean实例化后处理bean的实例</li>
-</ul>
-<p><img src="/images/pasted-45.png" alt="upload successful"></p>
-<p><img src="/images/pasted-46.png" alt="upload successful"></p>
-<p><a href="https://www.cnblogs.com/zrtqsk/p/3735273.html" target="_blank" rel="noopener">https://www.cnblogs.com/zrtqsk/p/3735273.html</a></p>
-<hr>
-<h1 id="springbean是否线程安全"><a href="#springbean是否线程安全" class="headerlink" title="springbean是否线程安全"></a>springbean是否线程安全</h1><p>我们交由Spring管理的大多数对象其实都是一些无状态的对象，这种不会因为多线程而导致状态被破坏的对象很适合Spring的默认scope，每个单例的无状态对象都是线程安全的（也可以说只要是无状态的对象，不管单例多例都是线程安全的，不过单例毕竟节省了不断创建对象与GC的开销）。</p>
-<p>无状态的对象即是自身没有状态的对象，自然也就不会因为多个线程的交替调度而破坏自身状态导致线程安全问题。无状态对象包括我们经常使用的DO、DTO、VO这些只作为数据的实体模型的贫血对象，还有Service、DAO和Controller，这些对象并没有自己的状态，它们只是用来执行某些操作的。例如，每个DAO提供的函数都只是对数据库的CRUD，而且每个数据库Connection都作为函数的局部变量（局部变量是在用户栈中的，而且用户栈本身就是线程私有的内存区域，所以不存在线程安全问题），用完即关（或交还给连接池）。</p>
-<p><img src="/images/pasted-36.png" alt="upload successful"></p>
-<h1 id="spring-的优点？"><a href="#spring-的优点？" class="headerlink" title="spring 的优点？"></a>spring 的优点？</h1><p>1.降低了组件之间的耦合性 ，实现了软件各层之间的解耦 </p>
-<p>2.可以使用容易提供的众多服务，如事务管理，消息服务等 </p>
-<p>3.容器提供单例模式支持 </p>
-<p>4.容器提供了AOP技术，利用它很容易实现如权限拦截，运行期监控等功能 </p>
-<p>5.容器提供了众多的辅助类，能加快应用的开发 </p>
-<p>6.spring对于主流的应用框架提供了集成支持，如hibernate，JPA，Struts等 </p>
-<p>7.spring属于低侵入式设计，代码的污染极低 </p>
-<p>8.独立于各种应用服务器 </p>
-<p>9.spring的DI机制降低了业务对象替换的复杂性 </p>
-<p>10.Spring的高度开放性，并不强制应用完全依赖于Spring，开发者可以自由选择spring的部分或全部</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/19/design_pattern/desin-pattern/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/19/design_pattern/desin-pattern/" itemprop="url">desin_pattern</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-19T23:04:56+08:00">
-                2018-01-19
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/设计模式/" itemprop="url" rel="index">
-                    <span itemprop="name">设计模式</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/01/19/design_pattern/desin-pattern/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/01/19/design_pattern/desin-pattern/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/01/19/design_pattern/desin-pattern/" class="leancloud_visitors" data-flag-title="desin_pattern">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="模板方法（Template-Method-）"><a href="#模板方法（Template-Method-）" class="headerlink" title="模板方法（Template Method ）"></a>模板方法（Template Method ）</h1><p>定义一个操作中的算法的骨架，而将一些步骤延迟到子类中。Template Method使得子类可以不改变一个算法的结构即可重定义该算法的某些特定步骤。<br>Template Method模式一般是需要继承的。这里想要探讨另一种对Template Method的理解。spring中的JdbcTemplate，在用这个类时并不想去继承这个类，因为这个类的方法太多，但是我们还是想用到JdbcTemplate已有的稳定的、公用的数据库连接，那么我们怎么办呢？我们可以把变化的东西抽出来作为一个参数传入JdbcTemplate的方法中。但是变化的东西是一段代码，而且这段代码会用到JdbcTemplate中的变量。怎么办？那我们就用回调对象吧。在这个回调对象中定义一个操纵JdbcTemplate中变量的方法，我们去实现这个方法，就把变化的东西集中到这里了。然后我们再传入这个回调对象到JdbcTemplate，从而完成了调用。这可能是Template Method不需要继承的另一种实现方式吧。</p>
-<h1 id="策略（Strategy-）"><a href="#策略（Strategy-）" class="headerlink" title="策略（Strategy ）"></a>策略（Strategy ）</h1><h1 id="观察者（Observer-）"><a href="#观察者（Observer-）" class="headerlink" title="观察者（Observer ）"></a>观察者（Observer ）</h1><p>定义对象间的一种一对多的依赖关系，当一个对象的状态发生改变时，所有依赖于它的对象都得到通知并被自动更新。<br>spring中Observer模式常用的地方是listener的实现。如ApplicationListener。</p>
-<h1 id="包装器（Decorator-）"><a href="#包装器（Decorator-）" class="headerlink" title="包装器（Decorator ）"></a>包装器（Decorator ）</h1><p>在我们的项目中遇到这样一个问题：我们的项目需要连接多个数据库，而且不同的客户在每次访问中根据需要会去访问不同的数据库。我们以往在spring和hibernate框架中总是配置一个数据源，因而sessionFactory的dataSource属性总是指向这个数据源并且恒定不变，所有DAO在使用sessionFactory的时候都是通过这个数据源访问数据库。但是现在，由于项目的需要，我们的DAO在访问sessionFactory的时候都不得不在多个数据源中不断切换，问题就出现了：如何让sessionFactory在执行数据持久化的时候，根据客户的需求能够动态切换不同的数据源？我们能不能在spring的框架下通过少量修改得到解决？是否有什么设计模式可以利用呢？<br>首先想到在spring的applicationContext中配置所有的dataSource。这些dataSource可能是各种不同类型的，比如不同的数据库：Oracle、SQL Server、MySQL等，也可能是不同的数据源：比如apache 提供的org.apache.commons.dbcp.BasicDataSource、spring提供的org.springframework.jndi.JndiObjectFactoryBean等。然后sessionFactory根据客户的每次请求，将dataSource属性设置成不同的数据源，以到达切换数据源的目的。<br>spring中用到的包装器模式在类名上有两种表现：一种是类名中含有Wrapper，另一种是类名中含有Decorator。基本上都是动态地给一个对象添加一些额外的职责。</p>
-<h1 id="代理（Proxy-）"><a href="#代理（Proxy-）" class="headerlink" title="代理（Proxy ）"></a>代理（Proxy ）</h1><p>为其他对象提供一种代理以控制对这个对象的访问。  从结构上来看和Decorator模式类似，但Proxy是控制，更像是一种对功能的限制，而Decorator是增加职责。<br>spring的Proxy模式在aop中有体现，比如JdkDynamicAopProxy和Cglib2AopProxy。</p>
-<h1 id="单例模式（Singleton-）"><a href="#单例模式（Singleton-）" class="headerlink" title="单例模式（Singleton ）"></a>单例模式（Singleton ）</h1><p>保证一个类仅有一个实例，并提供一个访问它的全局访问点。<br>spring中的单例模式完成了后半句话，即提供了全局的访问点BeanFactory。但没有从构造器级别去控制单例，这是因为spring管理的是是任意的java对象。<br>核心提示点：Spring下默认的bean均为singleton，可以通过singleton=“true|false” 或者 scope=“？”来指定</p>
-<h1 id="适配器（Adapter-）"><a href="#适配器（Adapter-）" class="headerlink" title="适配器（Adapter ）"></a>适配器（Adapter ）</h1><p>在Spring的Aop中，使用的Advice（通知）来增强被代理类的功能。Spring实现这一AOP功能的原理就使用代理模式（1、JDK动态代理。2、CGLib字节码生成技术代理。）对类进行方法级别的切面增强，即，生成被代理类的代理类， 并在代理类的方法前，设置拦截器，通过执行拦截器重的内容增强了代理方法的功能，实现的面向切面编程。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/18/java_spring/reivew-spring-mvc/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/18/java_spring/reivew-spring-mvc/" itemprop="url">reivew_spring_mvc</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-18T21:19:00+08:00">
-                2018-01-18
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/springmvc/" itemprop="url" rel="index">
-                    <span itemprop="name">springmvc</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/01/18/java_spring/reivew-spring-mvc/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/01/18/java_spring/reivew-spring-mvc/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/01/18/java_spring/reivew-spring-mvc/" class="leancloud_visitors" data-flag-title="reivew_spring_mvc">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="springmvc是什么"><a href="#springmvc是什么" class="headerlink" title="springmvc是什么"></a>springmvc是什么</h1><ul>
-<li>Spring Web MVC是一种基于Java的实现了Web MVC设计模式的请求驱动类型的轻量级Web框架</li>
-<li>将web层进行职责解耦</li>
-<li>工作者模式的实现???<h1 id="帮我们做什么"><a href="#帮我们做什么" class="headerlink" title="帮我们做什么"></a>帮我们做什么</h1></li>
-<li>让我们能非常简单的设计出干净的Web层和薄薄的Web层；</li>
-<li>进行更简洁的Web层的开发；</li>
-<li>天生与Spring框架集成（如IoC容器、AOP等）；</li>
-<li>提供强大的约定大于配置的契约式编程支持；</li>
-<li>能简单的进行Web层的单元测试；</li>
-<li>支持灵活的URL到页面控制器的映射；</li>
-<li>非常容易与其他视图技术集成，如Velocity、FreeMarker等等，因为模型数据不放在特定的API里，而是放在一个Model里（Map数据结构实现，因此很容易被其他框架使用）；</li>
-<li>非常灵活的数据验证、格式化和数据绑定机制，能使用任何对象进行数据绑定，不必实现特定框架的API；</li>
-<li>提供一套强大的JSP标签库，简化JSP开发；</li>
-<li>支持灵活的本地化、主题等解析；</li>
-<li>更加简单的异常处理；</li>
-<li>对静态资源的支持；</li>
-<li>支持Restful风格。</li>
-</ul>
-<h1 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h1><p><img src="/images/pasted-28.png" alt="upload successful"></p>
-<p><img src="/images/pasted-29.png" alt="upload successful"></p>
-<p><img src="/images/pasted-85.png" alt="upload successful"></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line">//前端控制器分派方法  </span><br><span class="line">protected void doDispatch(HttpServletRequest request, HttpServletResponse response) throws Exception &#123;  </span><br><span class="line">        HttpServletRequest processedRequest = request;  </span><br><span class="line">        HandlerExecutionChain mappedHandler = null;  </span><br><span class="line">        int interceptorIndex = -1;  </span><br><span class="line">  </span><br><span class="line">        try &#123;  </span><br><span class="line">            ModelAndView mv;  </span><br><span class="line">            boolean errorView = false;  </span><br><span class="line">  </span><br><span class="line">            try &#123;  </span><br><span class="line">                   //检查是否是请求是否是multipart（如文件上传），如果是将通过MultipartResolver解析  </span><br><span class="line">                processedRequest = checkMultipart(request);  </span><br><span class="line">                   //步骤2、请求到处理器（页面控制器）的映射，通过HandlerMapping进行映射  </span><br><span class="line">                mappedHandler = getHandler(processedRequest, false);  </span><br><span class="line">                if (mappedHandler == null || mappedHandler.getHandler() == null) &#123;  </span><br><span class="line">                    noHandlerFound(processedRequest, response);  </span><br><span class="line">                    return;  </span><br><span class="line">                &#125;  </span><br><span class="line">                   //步骤3、处理器适配，即将我们的处理器包装成相应的适配器（从而支持多种类型的处理器）  </span><br><span class="line">                HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());  </span><br><span class="line">  </span><br><span class="line">                  // 304 Not Modified缓存支持  </span><br><span class="line">                //此处省略具体代码  </span><br><span class="line">  </span><br><span class="line">                // 执行处理器相关的拦截器的预处理（HandlerInterceptor.preHandle）  </span><br><span class="line">                //此处省略具体代码  </span><br><span class="line">  </span><br><span class="line">                // 步骤4、由适配器执行处理器（调用处理器相应功能处理方法）  </span><br><span class="line">                mv = ha.handle(processedRequest, response, mappedHandler.getHandler());  </span><br><span class="line">  </span><br><span class="line">                // Do we need view name translation?  </span><br><span class="line">                if (mv != null &amp;&amp; !mv.hasView()) &#123;  </span><br><span class="line">                    mv.setViewName(getDefaultViewName(request));  </span><br><span class="line">                &#125;  </span><br><span class="line">  </span><br><span class="line">                // 执行处理器相关的拦截器的后处理（HandlerInterceptor.postHandle）  </span><br><span class="line">                //此处省略具体代码  </span><br><span class="line">            &#125;  </span><br><span class="line">            catch (ModelAndViewDefiningException ex) &#123;  </span><br><span class="line">                logger.debug(&quot;ModelAndViewDefiningException encountered&quot;, ex);  </span><br><span class="line">                mv = ex.getModelAndView();  </span><br><span class="line">            &#125;  </span><br><span class="line">            catch (Exception ex) &#123;  </span><br><span class="line">                Object handler = (mappedHandler != null ? mappedHandler.getHandler() : null);  </span><br><span class="line">                mv = processHandlerException(processedRequest, response, handler, ex);  </span><br><span class="line">                errorView = (mv != null);  </span><br><span class="line">            &#125;  </span><br><span class="line">  </span><br><span class="line">            //步骤5 步骤6、解析视图并进行视图的渲染  </span><br><span class="line">//步骤5 由ViewResolver解析View（viewResolver.resolveViewName(viewName, locale)）  </span><br><span class="line">//步骤6 视图在渲染时会把Model传入（view.render(mv.getModelInternal(), request, response);）  </span><br><span class="line">            if (mv != null &amp;&amp; !mv.wasCleared()) &#123;  </span><br><span class="line">                render(mv, processedRequest, response);  </span><br><span class="line">                if (errorView) &#123;  </span><br><span class="line">                    WebUtils.clearErrorRequestAttributes(request);  </span><br><span class="line">                &#125;  </span><br><span class="line">            &#125;  </span><br><span class="line">            else &#123;  </span><br><span class="line">                if (logger.isDebugEnabled()) &#123;  </span><br><span class="line">                    logger.debug(&quot;Null ModelAndView returned to DispatcherServlet with name &apos;&quot; + getServletName() +  </span><br><span class="line">                            &quot;&apos;: assuming HandlerAdapter completed request handling&quot;);  </span><br><span class="line">                &#125;  </span><br><span class="line">            &#125;  </span><br><span class="line">  </span><br><span class="line">            // 执行处理器相关的拦截器的完成后处理（HandlerInterceptor.afterCompletion）  </span><br><span class="line">            //此处省略具体代码  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">        catch (Exception ex) &#123;  </span><br><span class="line">            // Trigger after-completion for thrown exception.  </span><br><span class="line">            triggerAfterCompletion(mappedHandler, interceptorIndex, processedRequest, response, ex);  </span><br><span class="line">            throw ex;  </span><br><span class="line">        &#125;  </span><br><span class="line">        catch (Error err) &#123;  </span><br><span class="line">            ServletException ex = new NestedServletException(&quot;Handler processing failed&quot;, err);  </span><br><span class="line">            // Trigger after-completion for thrown exception.  </span><br><span class="line">            triggerAfterCompletion(mappedHandler, interceptorIndex, processedRequest, response, ex);  </span><br><span class="line">            throw ex;  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">        finally &#123;  </span><br><span class="line">            // Clean up any resources used by a multipart request.  </span><br><span class="line">            if (processedRequest != request) &#123;  </span><br><span class="line">                cleanupMultipart(processedRequest);  </span><br><span class="line">            &#125;  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<p>核心架构的具体流程步骤如下：</p>
-<p>1、  首先用户发送请求——&gt;DispatcherServlet，前端控制器收到请求后自己不进行处理，而是委托给其他的解析器进行处理，作为统一访问点，进行全局的流程控制；</p>
-<p>2、  DispatcherServlet——&gt;<b>HandlerMapping</b>， HandlerMapping将会把请求映射为HandlerExecutionChain对象（包含一个Handler处理器（页面控制器）对象、多个HandlerInterceptor拦截器）对象，通过这种策略模式，很容易添加新的映射策略；</p>
-<p>3、  DispatcherServlet——&gt;HandlerAdapter，HandlerAdapter将会把处理器包装为适配器，从而支持多种类型的处理器，即适配器设计模式的应用，从而很容易支持很多类型的处理器；</p>
-<p>4、  HandlerAdapter——&gt;处理器功能处理方法的调用，HandlerAdapter将会根据适配的结果调用真正的处理器的功能处理方法，完成功能处理；并返回一个ModelAndView对象（包含模型数据、逻辑视图名）；</p>
-<p>5、  ModelAndView的逻辑视图名——&gt; ViewResolver， ViewResolver将把逻辑视图名解析为具体的View，通过这种策略模式，很容易更换其他视图技术；</p>
-<p>6、  View——&gt;渲染，View会根据传进来的Model模型数据进行渲染，此处的Model实际是一个Map数据结构，因此很容易支持其他视图技术；</p>
-<p>7、返回控制权给DispatcherServlet，由DispatcherServlet返回响应给用户，到此一个流程结束。</p>
-<p>此处我们只是讲了核心流程，没有考虑拦截器、本地解析、文件上传解析等，后边再细述。</p>
-<h1 id="hello-world"><a href="#hello-world" class="headerlink" title="hello world"></a>hello world</h1><p><img src="/images/pasted-30.png" alt="upload successful"></p>
-<p><img src="/images/pasted-60.png" alt="upload successful"></p>
-<ul>
-<li>DispatcherServlet：Spring提供的前端控制器，所有的请求都有经过它来统一分发。在DispatcherServlet将请求分发给Spring Controller之前，需要借助于Spring提供的HandlerMapping定位到具体的Controller。</li>
-<li>HandlerMapping：能够完成客户请求到Controller映射。</li>
-<li>Controller：需要为并发用户处理上述请求，因此实现Controller接口时，必须保证线程安全并且可重用。Controller将处理用户请求，这和Struts Action扮演的角色是一致的。一旦Controller处理完用户请求，则返回ModelAndView对象给DispatcherServlet前端控制器，ModelAndView中包含了模型（Model）和视图（View）。从宏观角度考虑，DispatcherServlet是整个Web应用的控制器；从微观考虑，Controller是单个Http请求处理过程中的控制器，而ModelAndView是Http请求过程中返回的模型（Model）和视图（View）。</li>
-<li>ViewResolver：Spring提供的视图解析器（ViewResolver）在Web应用中查找View对象，从而将相应结果渲染给客户。</li>
-</ul>
-<h1 id="DispatcherServlet与HttpMessageConverter的关系"><a href="#DispatcherServlet与HttpMessageConverter的关系" class="headerlink" title="DispatcherServlet与HttpMessageConverter的关系"></a>DispatcherServlet与HttpMessageConverter的关系</h1><p>//TODO</p>
-<p><a href="http://sishuok.com/forum/blogPost/list/5160.html" target="_blank" rel="noopener">http://sishuok.com/forum/blogPost/list/5160.html</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/18/java_tools/btrace-study/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/18/java_tools/btrace-study/" itemprop="url">btrace-study</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-18T07:21:23+08:00">
-                2018-01-18
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/01/18/java_tools/btrace-study/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/01/18/java_tools/btrace-study/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/01/18/java_tools/btrace-study/" class="leancloud_visitors" data-flag-title="btrace-study">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h1 id="btrace概念"><a href="#btrace概念" class="headerlink" title="btrace概念:"></a>btrace概念:</h1><ul>
-<li><p>Probe Point: </p>
-<ul>
-<li>“location” or “event” at which a set of tracing statements are executed. Probe point is “place” or “event” of interest where we want to execute some tracing statements.（探测点，就是我们想要执行一些追踪语句的地方或事件）</li>
-</ul>
-</li>
-<li><p>Trace Actions or Actions: </p>
-<ul>
-<li>Trace statements that are executed whenever a probe “fires”.（当探测触发时执行追踪语句）</li>
-</ul>
-</li>
-<li><p>Action Methods: </p>
-<ul>
-<li>BTrace trace statements that are executed when a probe fires are defined inside a static method a class. Such methods are called “action” methods.（当在类的静态方法中定义了探测触发时执行的BTrace跟踪语句。这种方法被称为“操作”方法。）</li>
-</ul>
-</li>
-</ul>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2018/01/18/java_tools/btrace-study/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/17/java_dubbo/study-dubbo/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/17/java_dubbo/study-dubbo/" itemprop="url">dubbo需求</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-17T07:43:00+08:00">
-                2018-01-17
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/dubbo/" itemprop="url" rel="index">
-                    <span itemprop="name">dubbo</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/01/17/java_dubbo/study-dubbo/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/01/17/java_dubbo/study-dubbo/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/01/17/java_dubbo/study-dubbo/" class="leancloud_visitors" data-flag-title="dubbo需求">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h1><h3 id="流程图"><a href="#流程图" class="headerlink" title="流程图"></a>流程图</h3><p><img src="/images/pasted-25.png" alt="upload successful"><br>服务授权<br>服务降级<br>软负载均衡<br>服务路由<br>服务编排<br>服务质量协定<br>服务容量<br>服务注册与发现<br>服务质量协定</p>
-<h3 id="其他需求"><a href="#其他需求" class="headerlink" title="其他需求"></a>其他需求</h3><ul>
-<li>服务注册中心 替代 f5负载均衡服务器(内部使用)<ul>
-<li>当服务越来越多时，服务 URL 配置管理变得非常困难，F5 硬件负载均衡器的单点压力也越来越大。 此时需要一个服务注册中心，动态的注册和发现服务，使服务的位置透明。并通过在消费方获取服务提供方地址列表，实现软负载均衡和 Failover，降低对 F5 硬件负载均衡器的依赖，也能减少部分成本。</li>
-</ul>
-</li>
-<li>应用依赖<ul>
-<li>当进一步发展，服务间依赖关系变得错踪复杂，甚至分不清哪个应用要在哪个应用之前启动，架构师都不能完整的描述应用的架构关系。 这时，需要自动画出应用间的依赖关系图，以帮助架构师理清理关系。</li>
-</ul>
-</li>
-<li>调用(调用量,响应时间)监控<ul>
-<li>接着，服务的调用量越来越大，服务的容量问题就暴露出来，这个服务需要多少机器支撑？什么时候该加机器？ 为了解决这些问题，第一步，要将服务现在每天的调用量，响应时间，都统计出来，作为容量规划的参考指标。其次，要可以动态调整权重，在线上，将某台机器的权重一直加大，并在加大的过程中记录响应时间的变化，直到响应时间到达阀值，记录此时的访问量，再以此访问量乘以机器数反推总容量。</li>
-</ul>
-</li>
-</ul>
-<h1 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h1><p><img src="/images/pasted-26.png" alt="upload successful"></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/15/http/advantage-api/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/15/http/advantage-api/" itemprop="url">RESTful-API概念学习</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-15T20:13:15+08:00">
-                2018-01-15
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/HTTP协议/" itemprop="url" rel="index">
-                    <span itemprop="name">HTTP协议</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/01/15/http/advantage-api/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/01/15/http/advantage-api/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/01/15/http/advantage-api/" class="leancloud_visitors" data-flag-title="RESTful-API概念学习">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="RESTful-API"><a href="#RESTful-API" class="headerlink" title="RESTful API"></a>RESTful API</h1><ul>
-<li>透明性，暴露资源存在。</li>
-<li>充分利用 HTTP 协议本身语义。</li>
-<li>无状态，这点非常重要。在调用一个接口（访问、操作资源）的时候，可以不用考虑上下文，不用考虑当前状态，极大的降低了复杂度</li>
-<li>HTTP 本身提供了丰富的内容协商手段，无论是缓存，还是资源修改的乐观并发控制，都可以以业务无关的中间件来实现</li>
-</ul>
-<h1 id="理解RESTful架构"><a href="#理解RESTful架构" class="headerlink" title="理解RESTful架构"></a>理解RESTful架构</h1><ul>
-<li>Representational State Transfer</li>
-<li>REST的名称”表现层状态转化”中，省略了主语。”表现层”其实指的是”资源”（Resources）的”表现层”。<br>所谓”资源”，就是网络上的一个实体，或者说是网络上的一个具体信息。它可以是一段文本、一张图片、一首歌曲、一种服务，总之就是一个具体的实在。你可以用一个URI（统一资源定位符）指向它，每种资源对应一个特定的URI。要获取这个资源，访问它的URI就可以，因此URI就成了每一个资源的地址或独一无二的识别符。</li>
-</ul>
-<p>所谓”上网”，就是与互联网上一系列的”资源”互动，调用它的URI。</p>
-<p>互联网通信协议HTTP协议，是一个无状态协议。这意味着，所有的状态都保存在服务器端。因此，如果客户端想要操作服务器，必须通过某种手段，让服务器端发生”状态转化”（State Transfer）。而这种转化是建立在表现层之上的，所以就是”表现层状态转化”。</p>
-<p>最常见的一种设计错误，就是URI包含动词。因为”资源”表示一种实体，所以应该是名词，URI不应该有动词，动词应该放在HTTP协议中。</p>
-<p>因为不同的版本，可以理解成同一种资源的不同表现形式，所以应该采用同一个URI。版本号可以在HTTP请求头信息的Accept字段中进行区分<br><a href="http://www.ruanyifeng.com/blog/2011/09/restful.html" target="_blank" rel="noopener">http://www.ruanyifeng.com/blog/2011/09/restful.html</a></p>
-<h1 id="RESTful-API-设计指南"><a href="#RESTful-API-设计指南" class="headerlink" title="RESTful API 设计指南"></a>RESTful API 设计指南</h1><ul>
-<li>协议</li>
-<li>域名</li>
-<li>版本（Versioning）</li>
-<li>路径（Endpoint）<br>在RESTful架构中，每个网址代表一种资源（resource），所以网址中不能有动词，只能有名词，而且所用的名词往往与数据库的表格名对应。一般来说，数据库中的表都是同种记录的”集合”（collection），所以API中的名词也应该使用复数。</li>
-<li>HTTP动词</li>
-<li>过滤信息（Filtering）</li>
-<li>状态码（Status Codes）</li>
-<li>错误处理</li>
-<li>返回结果</li>
-<li>Hypermedia API<br>RESTful API最好做到Hypermedia，即返回结果中提供链接，连向其他API方法，使得用户不查文档，也知道下一步应该做什么。</li>
-<li>其他<ul>
-<li>（1）API的身份认证应该使用OAuth 2.0框架。</li>
-<li>（2）服务器返回的数据格式，应该尽量使用JSON，避免使用XML。</li>
-</ul>
-</li>
-</ul>
-<p><a href="http://www.ruanyifeng.com/blog/2014/05/restful_api.html" target="_blank" rel="noopener">http://www.ruanyifeng.com/blog/2014/05/restful_api.html</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2304,7 +2298,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">123</span>
+                  <span class="site-state-item-count">130</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
