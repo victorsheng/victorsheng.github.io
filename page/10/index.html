@@ -326,6 +326,353 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/08/java_tools/jdk1-9-maven-fix/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/08/java_tools/jdk1-9-maven-fix/" itemprop="url">jdk1.9-maven-fix</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-08T13:59:00+08:00">
+                2018-01-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/08/java_tools/jdk1-9-maven-fix/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/08/java_tools/jdk1-9-maven-fix/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/08/java_tools/jdk1-9-maven-fix/" class="leancloud_visitors" data-flag-title="jdk1.9-maven-fix">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>在安装了多个jdk版本后,发现maven命令不好使了</p>
+<h1 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h1><ul>
+<li>maven-compiler-plugin:3.1:compile (default-compile) @ report 出现异常<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ report ---</span><br><span class="line">[INFO] Changes detected - recompiling the module!</span><br><span class="line">[INFO] Compiling 60 source files to /Users/victor/code/egenieProjects/report/target/classes</span><br><span class="line">WARNING: An illegal reflective access operation has occurred</span><br><span class="line">WARNING: Illegal reflective access by lombok.javac.apt.Processor to field com.sun.tools.javac.processing.JavacProcessingEnvironment.processorClassLoader</span><br><span class="line">WARNING: Please consider reporting this to the maintainers of lombok.javac.apt.Processor</span><br><span class="line">WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations</span><br><span class="line">WARNING: All illegal access operations will be denied in a future release</span><br><span class="line">[INFO] ------------------------------------------------------------------------</span><br><span class="line">[INFO] BUILD FAILURE</span><br><span class="line">[INFO] ------------------------------------------------------------------------</span><br><span class="line">[INFO] Total time: 5.198 s</span><br><span class="line">[INFO] Finished at: 2018-01-08T14:04:55+08:00</span><br><span class="line">[INFO] Final Memory: 35M/115M</span><br><span class="line">[INFO] ------------------------------------------------------------------------</span><br><span class="line">[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.1:compile (default-compile) on project report: Fatal error compiling: java.lang.NoSuchFieldError: pid -&gt; [Help 1]</span><br><span class="line">[ERROR]</span><br><span class="line">[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.</span><br><span class="line">[ERROR] Re-run Maven using the -X switch to enable full debug logging.</span><br><span class="line">[ERROR]</span><br><span class="line">[ERROR] For more information about the errors and possible solutions, please read the following articles:</span><br><span class="line">[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h1 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h1><ul>
+<li><p>1.9</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">victordeMacBook-Pro:report victor$ mvn -v</span><br><span class="line">Apache Maven 3.5.2 (138edd61fd100ec658bfa2d307c43b76940a5d7d; 2017-10-18T15:58:13+08:00)</span><br><span class="line">Maven home: /usr/local/Cellar/maven/3.5.2/libexec</span><br><span class="line">Java version: 9.0.1, vendor: Oracle Corporation</span><br><span class="line">Java home: /Library/Java/JavaVirtualMachines/jdk-9.0.1.jdk/Contents/Home</span><br><span class="line">Default locale: zh_CN, platform encoding: UTF-8</span><br><span class="line">OS name: &quot;mac os x&quot;, version: &quot;10.13.2&quot;, arch: &quot;x86_64&quot;, family: &quot;mac&quot;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>执行命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo -n &quot;JAVA_HOME=`/usr/libexec/java_home -v 1.8`&quot; &gt; ~/.mavenrc</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>1.8</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">victordeMacBook-Pro:report victor$ mvn -v</span><br><span class="line">Apache Maven 3.5.2 (138edd61fd100ec658bfa2d307c43b76940a5d7d; 2017-10-18T15:58:13+08:00)</span><br><span class="line">Maven home: /usr/local/Cellar/maven/3.5.2/libexec</span><br><span class="line">Java version: 1.8.0_151, vendor: Oracle Corporation</span><br><span class="line">Java home: /Library/Java/JavaVirtualMachines/jdk1.8.0_151.jdk/Contents/Home/jre</span><br><span class="line">Default locale: zh_CN, platform encoding: UTF-8</span><br><span class="line">OS name: &quot;mac os x&quot;, version: &quot;10.13.2&quot;, arch: &quot;x86_64&quot;, family: &quot;mac&quot;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h1 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h1><p>虽然此种方法解决了这个问题,但具体是什么原因导致的此问题,还需进一步研究</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://geeekr.com/fix-maven-java-version-mac-osx/" target="_blank" rel="noopener">http://geeekr.com/fix-maven-java-version-mac-osx/</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/06/egenie_bugfix/error-sql-update-lock/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/06/egenie_bugfix/error-sql-update-lock/" itemprop="url">error-sql-update-lock</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-06T14:53:37+08:00">
+                2018-01-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mysql/" itemprop="url" rel="index">
+                    <span itemprop="name">mysql</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/06/egenie_bugfix/error-sql-update-lock/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/06/egenie_bugfix/error-sql-update-lock/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/06/egenie_bugfix/error-sql-update-lock/" class="leancloud_visitors" data-flag-title="error-sql-update-lock">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>com.mysql.jdbc.exceptions.jdbc4.MySQLTransactionRollbackException: Lock wait timeout exceeded; try restarting transaction</p>
+<p>事务没有提交导致 锁等待</p>
+<p><a href="https://www.jianshu.com/p/0b4aaa93e7f6" target="_blank" rel="noopener">https://www.jianshu.com/p/0b4aaa93e7f6</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/06/java_tools/install-jenv/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1959,393 +2306,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/01/02/机器学习/jikeshijian-ai-base-study-outline/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/02/机器学习/jikeshijian-ai-base-study-outline/" itemprop="url">极客时间-学习笔记-人工智能基础课-机器学习概率</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-02T07:25:00+08:00">
-                2018-01-02
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/人工智能/" itemprop="url" rel="index">
-                    <span itemprop="name">人工智能</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/01/02/机器学习/jikeshijian-ai-base-study-outline/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/01/02/机器学习/jikeshijian-ai-base-study-outline/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/01/02/机器学习/jikeshijian-ai-base-study-outline/" class="leancloud_visitors" data-flag-title="极客时间-学习笔记-人工智能基础课-机器学习概率">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><ul>
-<li>经验学习:从大量现象中提取反复出现的规律和模式</li>
-<li>计算机给予数据构建概率统计模型并与应用模型对数据进行预测与分析的学科</li>
-</ul>
-<h1 id="根据输入输出类型的不行-预测问题分为三类"><a href="#根据输入输出类型的不行-预测问题分为三类" class="headerlink" title="根据输入输出类型的不行,预测问题分为三类"></a>根据输入输出类型的不行,预测问题分为三类</h1><ul>
-<li>分类问题:输出离散变量</li>
-<li>回归问题:连续变量</li>
-<li>标注问题:序列</li>
-</ul>
-<h1 id="实际中就会存在误差-机器学习也是一样-误差性能"><a href="#实际中就会存在误差-机器学习也是一样-误差性能" class="headerlink" title="实际中就会存在误差,机器学习也是一样(误差性能)"></a>实际中就会存在误差,机器学习也是一样(误差性能)</h1><ul>
-<li>误差并定义为学习器的实际预测与样本真实输出之间的差异</li>
-<li>误差分为训练误差和测试误差</li>
-<li>典型的过拟合现象:训练误差较低,但是训练误差较低</li>
-<li>欠拟合:学习能力太弱</li>
-<li>整体来看,测试误差与模型复杂度之间呈现得是抛物线的关系</li>
-<li>交叉验证法,重复利用有限的样本,不同模型中平均测试误差最小的模型就是最有模型</li>
-<li>调参:性能和效率之间的这种</li>
-</ul>
-<h1 id="根据训练数据是否有标签信息-可以将机器学习的任务分为三类"><a href="#根据训练数据是否有标签信息-可以将机器学习的任务分为三类" class="headerlink" title="根据训练数据是否有标签信息,可以将机器学习的任务分为三类"></a>根据训练数据是否有标签信息,可以将机器学习的任务分为三类</h1><ul>
-<li>监督学习</li>
-<li>无监督学习</li>
-<li>半监督学习</li>
-<li>监督学习分为:<ul>
-<li>生成方法:更快的收敛速度和更广的应用范围</li>
-<li>判别方法:更高的准确性和更简单的使用方式</li>
-</ul>
-</li>
-</ul>
-<hr>
-<h1 id="生成-判别方法"><a href="#生成-判别方法" class="headerlink" title="生成/判别方法"></a>生成/判别方法</h1><ul>
-<li><a href="https://www.zhihu.com/question/20446337" target="_blank" rel="noopener">https://www.zhihu.com/question/20446337</a></li>
-<li>有监督机器学习方法可以分为生成方法和判别方法<ul>
-<li>常见的生成方法有混合高斯模型、朴素贝叶斯法和隐形马尔科夫模型等</li>
-<li>常见的判别方法有SVM、LR等</li>
-<li>生成模型的求解思路是：联合分布——-&gt;求解类别先验概率和类别条件概率</li>
-<li>判别模型求解的思路是：条件分布——&gt;模型参数后验概率最大——-&gt;（似然函数\cdot 参数先验）最大——-&gt;最大似然</li>
-<li>生成模型:要知道原始数据的概率密度（或者估计参数得到），然后习惯用bayes理论去做预测</li>
-<li>判别模型是不需要知道原始数据概率密度，比较粗线条</li>
-</ul>
-</li>
-</ul>
-<p><img src="/images/pasted-2.png" alt="upload successful"></p>
-<p><img src="/images/pasted-6.png" alt="upload successful"></p>
-<ul>
-<li>wiki例子<ul>
-<li>假设有四个samples：<br><img src="/images/pasted-3.png" alt="upload successful"></li>
-<li>生成式模型的世界是这个样子：<br><img src="/images/pasted-4.png" alt="upload successful"></li>
-<li>而判定式模型的世界是这个样子：<br><img src="/images/pasted-5.png" alt="upload successful"></li>
-</ul>
-</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2017/12/28/egenie_bugfix/error-saleorder/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/12/28/egenie_bugfix/error-saleorder/" itemprop="url">error-saleorder</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-28T15:17:58+08:00">
-                2017-12-28
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/异常/" itemprop="url" rel="index">
-                    <span itemprop="name">异常</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/12/28/egenie_bugfix/error-saleorder/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/12/28/egenie_bugfix/error-saleorder/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2017/12/28/egenie_bugfix/error-saleorder/" class="leancloud_visitors" data-flag-title="error-saleorder">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">#</span><br><span class="line"># A fatal error has been detected by the Java Runtime Environment:</span><br><span class="line">#</span><br><span class="line">#  SIGSEGV (0xb) at pc=0x000000010146e882, pid=65032, tid=0x0000000000005303</span><br><span class="line">#</span><br><span class="line"># JRE version: Java(TM) SE Runtime Environment (8.0_151-b12) (build 1.8.0_151-b12)</span><br><span class="line"># Java VM: Java HotSpot(TM) 64-Bit Server VM (25.151-b12 mixed mode bsd-amd64 compressed oops)</span><br><span class="line"># Problematic frame:</span><br><span class="line"># V  [libjvm.dylib+0x534882]  Symbol::decrement_refcount()+0x4</span><br><span class="line">#</span><br><span class="line"># Failed to write core dump. Core dumps have been disabled. To enable core dumping, try &quot;ulimit -c unlimited&quot; before starting Java again</span><br><span class="line">#</span><br><span class="line"># An error report file with more information is saved as:</span><br><span class="line"># /Users/victor/code/egenieProjects/ejlerp-saleorder/hs_err_pid65032.log</span><br><span class="line">#</span><br><span class="line"># If you would like to submit a bug report, please visit:</span><br><span class="line">#   http://bugreport.java.com/bugreport/crash.jsp</span><br><span class="line">#</span><br><span class="line"></span><br><span class="line">Process finished with exit code 134 (interrupted by signal 6: SIGABRT)</span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/12/28/egenie_bugfix/error-saleorder/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/9/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><span class="page-number current">10</span><a class="page-number" href="/page/11/">11</a><span class="space">&hellip;</span><a class="page-number" href="/page/13/">13</a><a class="extend next" rel="next" href="/page/11/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/9/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><span class="page-number current">10</span><a class="page-number" href="/page/11/">11</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><a class="extend next" rel="next" href="/page/11/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2391,7 +2356,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">130</span>
+                  <span class="site-state-item-count">132</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
