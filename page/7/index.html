@@ -326,6 +326,743 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/02/18/java_jvm/jvm-gc/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/02/18/java_jvm/jvm-gc/" itemprop="url">jvm垃圾回收策略</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-18T09:11:18+08:00">
+                2018-02-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/02/18/java_jvm/jvm-gc/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/02/18/java_jvm/jvm-gc/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/02/18/java_jvm/jvm-gc/" class="leancloud_visitors" data-flag-title="jvm垃圾回收策略">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>GC（Garbage Collection）的发生时机:<br>总体来说是内存使用紧张的时候会进行GC，即新对象所需内存比剩下的内存大时发生。</p>
+<h2 id="Stop-the-world"><a href="#Stop-the-world" class="headerlink" title="Stop the world"></a>Stop the world</h2><p>VM thread在进行GC前，必须要让所有的Java线程阻塞，从而stop the world，开始标记，不管什么算法的收集器，都需要有这个标记的过程，只是时间长短的问题。这一步是非常关键的一步，关于这个部分的内容的介绍也比较少。</p>
+<h2 id="How-Stop-the-world"><a href="#How-Stop-the-world" class="headerlink" title="How Stop the world"></a>How Stop the world</h2><h3 id="安全点（safe-point）"><a href="#安全点（safe-point）" class="headerlink" title="安全点（safe point）"></a>安全点（safe point）</h3><p>在准备Stop the World时，其实就是相当于设置了一个中断标志位，而安全点其实就是一些指令，在JIT执行方式下，JIT编译的时候直接把safepoint的检查代码加入了生成的本地代码，不同线程运行到这条指令时会主动去检查这个标志位是否被设置，如果设置了就将线程停顿，否则就继续运行。</p>
+<h3 id="安全区域（safe-region）"><a href="#安全区域（safe-region）" class="headerlink" title="安全区域（safe region）"></a>安全区域（safe region）</h3><p>而一些Sleep或者被blocked的线程不能主动运行到safepoint。这些线程也需要在GC的时候被标记检查，JVM引入了safe region的概念。safe region是指一块区域，这块区域中的引用都不会被修改，比如线程被阻塞了，那么它的线程堆栈中的引用是不会被修改的，JVM可以安全地进行标记。线程进入到safe region的时候先标识自己进入了safe region，等它被唤醒准备离开safe region的时候，先检查能否离开，如果GC已经完成，那么可以离开，否则就在safe region呆在。</p>
+<h2 id="找出活的对象"><a href="#找出活的对象" class="headerlink" title="找出活的对象"></a>找出活的对象</h2><p>标记的第一步就是得先获得GC roots，也就是根节点法，引用计数法因为循环引用的问题无法解决这里就不提了。所谓“GC roots”，或者说tracing GC的“根集合”，就是一组必须活跃的引用。GC roots是下面这些数据的集合：</p>
+<ul>
+<li>JVM栈的栈帧中的局部变量表里的有效的局部变量（局部变量有作用域）所引用的对象</li>
+<li>方法区里面的类元素对象的static、常量所引用的对象</li>
+<li>运行时方法区里面的类元素对象的运行时常量所引用的对象</li>
+<li>本地方法栈里的引用所引用的对象</li>
+</ul>
+<p>Tracing GC的根本思路就是：给定一个集合的引用作为根出发，通过引用关系遍历对象图，能被遍历到的（可到达的）对象就被判定为存活，其余对象（也就是没有被遍历到的）就自然被判定为死亡。</p>
+<p>而Jvm运行时的对象很多，如果一个个去遍历必然会花费大量的时间，获取GC roots最主要的部分在解决如何快速找到JVM栈的栈帧的局部变量表中的局部变量所引用的对象。</p>
+<p>在HotSpot里实现的方式从外部记录下类型信息，存成映射表。HotSpot把这样的数据结构叫做OopMap。要实现这种功能，需要虚拟机里的解释器和JIT编译器都有相应的支持，由它们来生成足够的元数据提供给GC。</p>
+<h2 id="清理的过程"><a href="#清理的过程" class="headerlink" title="清理的过程"></a>清理的过程</h2><h1 id="新生代垃圾回收"><a href="#新生代垃圾回收" class="headerlink" title="新生代垃圾回收"></a>新生代垃圾回收</h1><p>SUN/Oracle 的HotSpot JVM 又把新生代进一步划分为3个区域：一个相对大点的区域，称为”伊甸园区(Eden)”；两个相对小点的区域称为”From 幸存区(survivor)”和”To 幸存区(survivor)”。按照规定,新对象会首先分配在 Eden 中(如果新对象过大，会直接分配在老年代中)。在GC中，Eden 中的对象会被移动到survivor中，直至对象满足一定的年纪(定义为熬过GC的次数),会被移动到老年代。</p>
+<p>基于大多数新生对象都会在GC中被收回的假设。新生代的GC 使用复制算法。在GC前To 幸存区(survivor)保持清空,对象保存在 Eden 和 From 幸存区(survivor)中，GC运行时,Eden中的幸存对象被复制到 To 幸存区(survivor)。针对 From 幸存区(survivor)中的幸存对象，会考虑对象年龄,如果年龄没达到阀值(tenuring threshold)，对象会被复制到To 幸存区(survivor)。如果达到阀值对象被复制到老年代。复制阶段完成后，Eden 和From 幸存区中只保存死对象，可以视为清空。如果在复制过程中To 幸存区被填满了，剩余的对象会被复制到老年代中。最后 From 幸存区和 To幸存区会调换下名字，在下次GC时，To 幸存区会成为From 幸存区。</p>
+<p><img src="/images/pasted-52.png" alt="upload successful"><br>上图演示GC过程，黄色表示死对象，绿色表示剩余空间，红色表示幸存对象</p>
+<h2 id="参数设置"><a href="#参数设置" class="headerlink" title="参数设置"></a>参数设置</h2><h3 id="XX-NewSize-and-XX-MaxNewSize"><a href="#XX-NewSize-and-XX-MaxNewSize" class="headerlink" title="-XX:NewSize and -XX:MaxNewSize"></a>-XX:NewSize and -XX:MaxNewSize</h3><p>就像可以通过参数(-Xms and -Xmx) 指定堆大小一样，可以通过参数指定新生代大小。设置 XX:MaxNewSize 参数时，应该考虑到新生代只是整个堆的一部分，新生代设置的越大，老年代区域就会减少。一般不允许新生代比老年代还大，因为要考虑GC时最坏情况，所有对象都晋升到老年代。(译者:会发生OOM错误) -XX:MaxNewSize 最大可以设置为-Xmx/2 .</p>
+<p>考虑性能，一般会通过参数 -XX:NewSize 设置新生代初始大小。如果知道新生代初始分配的对象大小(经过监控) ，这样设置会有帮助，可以节省新生代自动扩展的消耗。</p>
+<h3 id="XX-NewRatio"><a href="#XX-NewRatio" class="headerlink" title="-XX:NewRatio"></a>-XX:NewRatio</h3><p>可以设置新生代和老年代的相对大小。这种方式的优点是新生代大小会随着整个堆大小动态扩展。参数 -XX:NewRatio 设置老年代与新生代的比例。例如 -XX:NewRatio=3 指定老年代/新生代为3/1. 老年代占堆大小的 3/4 ，新生代占 1/4 .</p>
+<p>如果针对新生代,同时定义绝对值和相对值,绝对值将起作用。下面例子：<br>$ java -XX:NewSize=32m -XX:MaxNewSize=512m -XX:NewRatio=3 MyApp</p>
+<p>以上设置, JVM 会尝试为新生代分配四分之一的堆大小，但不会小于32MB或大于521MB</p>
+<p>在设置新生代大小问题上，使用绝对值还是相对值，不存在通用准则 。如果了解应用的内存使用情况,设置固定大小的堆和新生代更有利，当然也可以设置相对值。如果对应用的内存使用一无所知,正确的做法是不要设置任何参数，如果应用运行良好。很好，我们不用做任何额外动作.如果遇到性能或OutOfMemoryErrors, 在调优之前，首先需要进行一系列有目的的监控测试，缩小问题的根源。</p>
+<h3 id="XX-SurvivorRatio"><a href="#XX-SurvivorRatio" class="headerlink" title="-XX:SurvivorRatio"></a>-XX:SurvivorRatio</h3><p>参数 -XX:SurvivorRatio 与 -XX:NewRatio 类似，作用于新生代内部区域。-XX:SurvivorRatio 指定伊甸园区(Eden)与幸存区大小比例. 例如, -XX:SurvivorRatio=10 表示伊甸园区(Eden)是 幸存区To 大小的10倍(也是幸存区From的10倍).所以,伊甸园区(Eden)占新生代大小的10/12, 幸存区From和幸存区To 每个占新生代的1/12 .注意,两个幸存区永远是一样大的..</p>
+<p>设定幸存区大小有什么作用? 假设幸存区相对伊甸园区(Eden)太小, 相应新生对象的伊甸园区(Eden)永远很大空间, 我们当然希望,如果这些对象在GC时全部被回收,伊甸园区(Eden)被清空,一切正常.然而,如果有一部分对象在GC中幸存下来, 幸存区只有很少空间容纳这些对象.结果大部分幸存对象在一次GC后，就会被转移到老年代 ,这并不是我们希望的.考虑相反情况, 假设幸存区相对伊甸园区(Eden)太大,当然有足够的空间，容纳GC后的幸存对象. 但是过小的伊甸园区(Eden),意味着空间将越快耗尽，增加新生代GC次数，这是不可接受的。</p>
+<p>总之,我们希望最小化短命对象晋升到老年代的数量，同时也希望最小化新生代GC 的次数和持续时间.我们需要找到针对当前应用的折中方案, 寻找适合方案的起点是 了解当前应用中对象的年龄分布情况。</p>
+<h3 id="XX-PrintTenuringDistribution"><a href="#XX-PrintTenuringDistribution" class="headerlink" title="-XX:+PrintTenuringDistribution"></a>-XX:+PrintTenuringDistribution</h3><p>参数 -XX:+PrintTenuringDistribution 指定JVM 在每次新生代GC时，输出幸存区中对象的年龄分布。例如:<br>Desired survivor size 75497472 bytes, new threshold 15 (max 15)</p>
+<ul>
+<li>age 1: 19321624 bytes, 19321624 total</li>
+<li>age 2: 79376 bytes, 19401000 total</li>
+<li>age 3: 2904256 bytes, 22305256 total</li>
+</ul>
+<p>第一行说明幸存区To大小为 75 MB. 也有关于老年代阀值(tenuring threshold)的信息, 老年代阀值，意思是对象从新生代移动到老年代之前，经过几次GC(即, 对象晋升前的最大年龄). 上例中,老年代阀值为15,最大也是15.</p>
+<p>之后行表示，对于小于老年代阀值的每一个对象年龄,本年龄中对象所占字节 (如果当前年龄没有对象,这一行会忽略). 上例中,一次 GC 后幸存对象大约 19 MB, 两次GC 后幸存对象大约79 KB , 三次GC 后幸存对象大约 3 MB .每行结尾，显示直到本年龄全部对象大小.所以,最后一行的 total 表示幸存区To 总共被占用22 MB . 幸存区To 总大小为 75 MB ,当前老年代阀值为15，可以断定在本次GC中，没有对象会移动到老年代。现在假设下一次GC 输出为：</p>
+<p>Desired survivor size 75497472 bytes, new threshold 2 (max 15)</p>
+<ul>
+<li>age 1: 68407384 bytes, 68407384 total</li>
+<li>age 2: 12494576 bytes, 80901960 total</li>
+<li>age 3: 79376 bytes, 80981336 total</li>
+<li>age 4: 2904256 bytes, 83885592 total</li>
+</ul>
+<p>对比前一次老年代分布。明显的,年龄2和年龄3 的对象还保持在幸存区中，因为我们看到年龄3和4的对象大小与前一次年龄2和3的相同。同时发现幸存区中,有一部分对象已经被回收,因为本次年龄2的对象大小为 12MB ，而前一次年龄1的对象大小为 19 MB。最后可以看到最近的GC中，有68 MB 新对象，从伊甸园区移动到幸存区。</p>
+<p>注意,本次GC 幸存区占用总大小 84 MB -大于75 MB. 结果,JVM 把老年代阀值从15降低到2，在下次GC时，一部分对象会强制离开幸存区，这些对象可能会被回收(如果他们刚好死亡)或移动到老年代。</p>
+<h3 id="XX-InitialTenuringThreshold-XX-MaxTenuringThreshold-and-XX-TargetSurvivorRatio"><a href="#XX-InitialTenuringThreshold-XX-MaxTenuringThreshold-and-XX-TargetSurvivorRatio" class="headerlink" title="-XX:InitialTenuringThreshold, -XX:MaxTenuringThreshold and -XX:TargetSurvivorRatio"></a>-XX:InitialTenuringThreshold, -XX:MaxTenuringThreshold and -XX:TargetSurvivorRatio</h3><p>参数 -XX:+PrintTenuringDistribution 输出中的部分值可以通过其它参数控制。通过 -XX:InitialTenuringThreshold 和 -XX:MaxTenuringThreshold 可以设定老年代阀值的初始值和最大值。另外,可以通过参数 -XX:TargetSurvivorRatio 设定幸存区的目标使用率.例如 , -XX:MaxTenuringThreshold=10 -XX:TargetSurvivorRatio=90 设定老年代阀值的上限为10,幸存区空间目标使用率为90%。</p>
+<p>有多种方式,设置新生代行为，没有通用准则。我们必须清楚以下2中情况：<br>1 如果从年龄分布中发现，有很多对象的年龄持续增长，在到达老年代阀值之前。这表示 -XX:MaxTenuringThreshold 设置过大<br>2 如果 -XX:MaxTenuringThreshold 的值大于1，但是很多对象年龄从未大于1.应该看下幸存区的目标使用率。如果幸存区使用率从未到达，这表示对象都被GC回收，这正是我们想要的。 如果幸存区使用率经常达到，有些年龄超过1的对象被移动到老年代中。这种情况，可以尝试调整幸存区大小或目标使用率。</p>
+<h3 id="XX-NeverTenure-and-XX-AlwaysTenure"><a href="#XX-NeverTenure-and-XX-AlwaysTenure" class="headerlink" title="-XX:+NeverTenure and -XX:+AlwaysTenure"></a>-XX:+NeverTenure and -XX:+AlwaysTenure</h3><p>最后,我们介绍2个颇为少见的参数,对应2种极端的新生代GC情况.设置参数 -XX:+NeverTenure , 对象永远不会晋升到老年代.当我们确定不需要老年代时，可以这样设置。这样设置风险很大,并且会浪费至少一半的堆内存。相反设置参数 -XX:+AlwaysTenure, 表示没有幸存区,所有对象在第一次GC时，会晋升到老年代。<br>没有合理的场景使用这个参数。可以在测试环境中，看下这样设置会发生什么有趣的事.但是并不推荐使用这些参数.</p>
+<h1 id="垃圾回收"><a href="#垃圾回收" class="headerlink" title="垃圾回收"></a>垃圾回收</h1><p>在实践中我们发现对于大多数的应用领域，评估一个垃圾收集(GC)算法如何根据如下两个标准：</p>
+<ul>
+<li>吞吐量越高算法越好</li>
+<li>暂停时间越短算法越好</li>
+</ul>
+<p>高吞吐量最好因为这会让应用程序的最终用户感觉只有应用程序线程在做“生产性”工作。 直觉上，吞吐量越高程序运行越快。 低暂停时间最好因为从最终用户的角度来看不管是GC还是其他原因导致一个应用被挂起始终是不好的。 这取决于应用程序的类型，有时候甚至短暂的200毫秒暂停都可能打断终端用户体验。 因此，具有低的最大暂停时间是非常重要的，特别是对于一个交互式应用程序。</p>
+<h2 id="面向吞吐量-的垃圾收集算法"><a href="#面向吞吐量-的垃圾收集算法" class="headerlink" title="面向吞吐量-的垃圾收集算法"></a>面向吞吐量-的垃圾收集算法</h2><h3 id="XX-UseSerialGC-单核"><a href="#XX-UseSerialGC-单核" class="headerlink" title="-XX:+UseSerialGC(单核)"></a>-XX:+UseSerialGC(单核)</h3><p>我们使用该标志来激活串行垃圾收集器，例如单线程面向吞吐量垃圾收集器。 无论年轻代还是年老代都将只有一个线程执行垃圾收集。 该标志被推荐用于只有单个可用处理器核心的JVM。 在这种情况下，使用多个垃圾收集线程甚至会适得其反，因为这些线程将争用CPU资源，造成同步开销，却从未真正并行运行。</p>
+<h3 id="XX-UseParallelGC-并行执行年轻代垃圾收集"><a href="#XX-UseParallelGC-并行执行年轻代垃圾收集" class="headerlink" title="-XX:+UseParallelGC(并行执行年轻代垃圾收集)"></a>-XX:+UseParallelGC(并行执行年轻代垃圾收集)</h3><p>有了这个标志，我们告诉JVM使用多线程并行执行年轻代垃圾收集。 在我看来，Java 6中不应该使用该标志因为-XX:+UseParallelOldGC显然更合适。 需要注意的是Java 7中该情况改变了一点(详见本概述)，就是-XX:+UseParallelGC能达到-XX:+UseParallelOldGC一样的效果。</p>
+<h3 id="XX-UseParallelOldGC-并行执行老年代垃圾收集"><a href="#XX-UseParallelOldGC-并行执行老年代垃圾收集" class="headerlink" title="-XX:+UseParallelOldGC(并行执行老年代垃圾收集)"></a>-XX:+UseParallelOldGC(并行执行老年代垃圾收集)</h3><p>该标志的命名有点不巧，因为”老”听起来像”过时”。 然而，”老”实际上是指年老代，这也解释了为什么-XX:+UseParallelOldGC要优于-XX:+UseParallelGC：除了激活年轻代并行垃圾收集，也激活了年老代并行垃圾收集。 当期望高吞吐量，并且JVM有两个或更多可用处理器核心时，我建议使用该标志。</p>
+<hr>
+<p>作为旁注，HotSpot的并行面向吞吐量垃圾收集算法通常称为”吞吐量收集器”，因为它们旨在通过并行执行来提高吞吐量。</p>
+<h3 id="XX-ParallelGCThreads"><a href="#XX-ParallelGCThreads" class="headerlink" title="-XX:ParallelGCThreads"></a>-XX:ParallelGCThreads</h3><p>通过-XX:ParallelGCThreads=<value>我们可以指定并行垃圾收集的线程数量。 例如，-XX:ParallelGCThreads=6表示每次并行垃圾收集将有6个线程执行。 如果不明确设置该标志，虚拟机将使用基于可用(虚拟)处理器数量计算的默认值。 决定因素是由Java Runtime。availableProcessors()方法的返回值N，如果N&lt;=8，并行垃圾收集器将使用N个垃圾收集线程，如果N&gt;8个可用处理器，垃圾收集线程数量应为3+5N/8。<br>当JVM独占地使用系统和处理器时使用默认设置更有意义。 但是，如果有多个JVM(或其他耗CPU的系统)在同一台机器上运行，我们应该使用-XX:ParallelGCThreads来减少垃圾收集线程数到一个适当的值。 例如，如果4个以服务器方式运行的JVM同时跑在在一个具有16核处理器的机器上，设置-XX:ParallelGCThreads=4是明智的，它能使不同JVM的垃圾收集器不会相互干扰。</value></p>
+<h3 id="XX-UseAdaptiveSizePolicy"><a href="#XX-UseAdaptiveSizePolicy" class="headerlink" title="-XX:-UseAdaptiveSizePolicy"></a>-XX:-UseAdaptiveSizePolicy</h3><p>吞吐量垃圾收集器提供了一个有趣的(但常见，至少在现代JVM上)机制以提高垃圾收集配置的用户友好性。 这种机制被看做是HotSpot在Java 5中引入的”人体工程学”概念的一部分。 通过人体工程学，垃圾收集器能将堆大小动态变动像GC设置一样应用到不同的堆区域，只要有证据表明这些变动将能提高GC性能。 “提高GC性能”的确切含义可以由用户通过-XX:GCTimeRatio和-XX:MaxGCPauseMillis(见下文)标记来指定。<br>重要的是要知道人体工程学是默认激活的。 这很好，因为自适应行为是JVM最大优势之一。 不过，有时我们需要非常清楚对于特定应用什么样的设置是最合适的，在这些情况下，我们可能不希望JVM混乱我们的设置。 每当我们发现处于这种情况时，我们可以考虑通过-XX:-UseAdaptiveSizePolicy停用一些人体工程学。</p>
+<h3 id="XX-GCTimeRatio"><a href="#XX-GCTimeRatio" class="headerlink" title="-XX:GCTimeRatio"></a>-XX:GCTimeRatio</h3><p>通过-XX:GCTimeRatio=<value>我们告诉JVM吞吐量要达到的目标值。 更准确地说，-XX:GCTimeRatio=N指定目标应用程序线程的执行时间(与总的程序执行时间)达到N/(N+1)的目标比值。 例如，通过-XX:GCTimeRatio=9我们要求应用程序线程在整个执行时间中至少9/10是活动的(因此，GC线程占用其余1/10)。 基于运行时的测量，JVM将会尝试修改堆和GC设置以期达到目标吞吐量。 -XX:GCTimeRatio的默认值是99，也就是说，应用程序线程应该运行至少99%的总执行时间。</value></p>
+<h3 id="XX-MaxGCPauseMillis"><a href="#XX-MaxGCPauseMillis" class="headerlink" title="-XX:MaxGCPauseMillis"></a>-XX:MaxGCPauseMillis</h3><p>通过-XX:GCTimeRatio=<value>告诉JVM最大暂停时间的目标值(以毫秒为单位)。 在运行时，吞吐量收集器计算在暂停期间观察到的统计数据(加权平均和标准偏差)。 如果统计表明正在经历的暂停其时间存在超过目标值的风险时，JVM会修改堆和GC设置以降低它们。 需要注意的是，年轻代和年老代垃圾收集的统计数据是分开计算的，还要注意，默认情况下，最大暂停时间没有被设置。<br>如果最大暂停时间和最小吞吐量同时设置了目标值，实现最大暂停时间目标具有更高的优先级。 当然，无法保证JVM将一定能达到任一目标，即使它会努力去做。 最后，一切都取决于手头应用程序的行为。<br>当设置最大暂停时间目标时，我们应注意不要选择太小的值。 正如我们现在所知道的，为了保持低暂停时间，JVM需要增加GC次数，那样可能会严重影响可达到的吞吐量。 这就是为什么对于要求低暂停时间作为主要目标的应用程序(大多数是Web应用程序)，我会建议不要使用吞吐量收集器，而是选择CMS收集器。 CMS收集器是本系列下一部分的主题。</value></p>
+<h1 id="CMS收集器"><a href="#CMS收集器" class="headerlink" title="CMS收集器"></a>CMS收集器</h1><p><img src="/images/pasted-59.png" alt="upload successful"></p>
+<h2 id="处理阶段"><a href="#处理阶段" class="headerlink" title="处理阶段"></a>处理阶段</h2><p>CMS收集器的GC周期由6个阶段组成。其中4个阶段(名字以Concurrent开始的)与实际的应用程序是并发执行的，而其他2个阶段需要暂停应用程序线程。</p>
+<ul>
+<li>初始标记(STW initial mark)</li>
+<li>并发标记(Concurrent marking)</li>
+<li>并发预清理(Concurrent precleaning)</li>
+<li>重新标记(STW remark)</li>
+<li>并发清理(Concurrent sweeping)</li>
+<li>并发重置(Concurrent reset)</li>
+</ul>
+<hr>
+<p>初始标记 ：在这个阶段，需要虚拟机停顿正在执行的任务，官方的叫法STW(Stop The Word)。这个过程从垃圾回收的”根对象”开始，只扫描到能够和”根对象”直接关联的对象，并作标记。所以这个过程虽然暂停了整个JVM，但是很快就完成了。</p>
+<p>并发标记 ：这个阶段紧随初始标记阶段，在初始标记的基础上继续向下追溯标记。并发标记阶段，应用程序的线程和并发标记的线程并发执行，所以用户不会感受到停顿。</p>
+<p>并发预清理 ：并发预清理阶段仍然是并发的。在这个阶段，虚拟机查找在执行并发标记阶段新进入老年代的对象(可能会有一些对象从新生代晋升到老年代， 或者有一些对象被分配到老年代)。通过重新扫描，减少下一个阶段”重新标记”的工作，因为下一个阶段会Stop The World。</p>
+<p>重新标记 ：这个阶段会暂停虚拟机，收集器线程扫描在CMS堆中剩余的对象。扫描从”跟对象”开始向下追溯，并处理对象关联。</p>
+<p>并发清理 ：清理垃圾对象，这个阶段收集器线程和应用程序线程并发执行。</p>
+<p>并发重置 ：这个阶段，重置CMS收集器的数据结构，等待下一次垃圾回收。</p>
+<p>初始标记、重新标记这两个步骤仍然需要“stop the world”，初始标记仅仅只是标记一下GC Roots能直接关联到的对象，速度很快，并发标记阶段就是进行GC Roots Tracing，而重新标记阶段则是为了修正并发标记期间因用户程序继续运作而导致标记产生表动的那一部分对象的标记记录，这个阶段的停顿时间一般会比初始标记阶段稍长点，但远比并发标记的时间短。</p>
+<p>尽管CMS收集器为老年代垃圾回收提供了几乎完全并发的解决方案，然而年轻代仍然通过“stop-the-world”方法来进行收集。对于交互式应用，停顿也是可接受的，背后的原理是年轻带的垃圾回收时间通常是相当短的。</p>
+<h2 id="gc日志分析"><a href="#gc日志分析" class="headerlink" title="gc日志分析"></a>gc日志分析</h2><h3 id="39-910-GC-39-910-ParNew-261760K-gt-0K-261952K-0-2314667-secs-262017K-gt-26386K-1048384K-0-2318679-secs"><a href="#39-910-GC-39-910-ParNew-261760K-gt-0K-261952K-0-2314667-secs-262017K-gt-26386K-1048384K-0-2318679-secs" class="headerlink" title="39.910: [GC 39.910: [ParNew: 261760K-&gt;0K(261952K), 0.2314667 secs] 262017K-&gt;26386K(1048384K), 0.2318679 secs]"></a>39.910: [GC 39.910: [ParNew: 261760K-&gt;0K(261952K), 0.2314667 secs] 262017K-&gt;26386K(1048384K), 0.2318679 secs]</h3><p>新生代使用 (ParNew 并行)回收器。新生代容量为261952K，GC回收后占用从261760K降到0,耗时0.2314667秒。(译注：262017K-&gt;26386K(1048384K), 0.2318679 secs 表示整个堆占用从262017K 降至26386K,费时0.2318679)</p>
+<h3 id="40-146-GC-1-CMS-initial-mark-26386K-786432K-26404K-1048384K-0-0074495-secs"><a href="#40-146-GC-1-CMS-initial-mark-26386K-786432K-26404K-1048384K-0-0074495-secs" class="headerlink" title="40.146: [GC [1 CMS-initial-mark: 26386K(786432K)] 26404K(1048384K), 0.0074495 secs]"></a>40.146: [GC [1 CMS-initial-mark: 26386K(786432K)] 26404K(1048384K), 0.0074495 secs]</h3><p>开始使用CMS回收器进行老年代回收。初始标记(CMS-initial-mark)阶段,这个阶段标记由根可以直接到达的对象，标记期间整个应用线程会暂停。<br>老年代容量为786432K,CMS 回收器在空间占用达到 26386K 时被触发</p>
+<h3 id="40-154-CMS-concurrent-mark-start"><a href="#40-154-CMS-concurrent-mark-start" class="headerlink" title="40.154: [CMS-concurrent-mark-start]"></a>40.154: [CMS-concurrent-mark-start]</h3><p>开始并发标记(concurrent-mark-start) 阶段，在第一个阶段被暂停的线程重新开始运行，由前阶段标记过的对象出发，所有可到达的对象都在本阶段中标记。</p>
+<h3 id="40-683-CMS-concurrent-mark-0-521-0-529-secs"><a href="#40-683-CMS-concurrent-mark-0-521-0-529-secs" class="headerlink" title="40.683: [CMS-concurrent-mark: 0.521/0.529 secs]"></a>40.683: [CMS-concurrent-mark: 0.521/0.529 secs]</h3><p>并发标记阶段结束，占用 0.521秒CPU时间, 0.529秒墙钟时间(也包含线程让出CPU给其他线程执行的时间)</p>
+<h3 id="40-683-CMS-concurrent-preclean-start"><a href="#40-683-CMS-concurrent-preclean-start" class="headerlink" title="40.683: [CMS-concurrent-preclean-start]"></a>40.683: [CMS-concurrent-preclean-start]</h3><p>开始预清理阶段<br>预清理也是一个并发执行的阶段。在本阶段，会查找前一阶段执行过程中,从新生代晋升或新分配或被更新的对象。通过并发地重新扫描这些对象，预清理阶段可以减少下一个stop-the-world 重新标记阶段的工作量。</p>
+<h3 id="40-701-CMS-concurrent-preclean-0-017-0-018-secs"><a href="#40-701-CMS-concurrent-preclean-0-017-0-018-secs" class="headerlink" title="40.701: [CMS-concurrent-preclean: 0.017/0.018 secs]"></a>40.701: [CMS-concurrent-preclean: 0.017/0.018 secs]</h3><p>预清理阶段费时 0.017秒CPU时间，0.018秒墙钟时间。</p>
+<h3 id="40-704-GC40-704-Rescan-parallel-0-1790103-secs-40-883-weak-refs-processing-0-0100966-secs-1-CMS-remark-26386K-786432K-52644K-1048384K-0-1897792-secs"><a href="#40-704-GC40-704-Rescan-parallel-0-1790103-secs-40-883-weak-refs-processing-0-0100966-secs-1-CMS-remark-26386K-786432K-52644K-1048384K-0-1897792-secs" class="headerlink" title="40.704: [GC40.704: [Rescan (parallel) , 0.1790103 secs]40.883: [weak refs processing, 0.0100966 secs] [1 CMS-remark: 26386K(786432K)] 52644K(1048384K), 0.1897792 secs]"></a>40.704: [GC40.704: [Rescan (parallel) , 0.1790103 secs]40.883: [weak refs processing, 0.0100966 secs] [1 CMS-remark: 26386K(786432K)] 52644K(1048384K), 0.1897792 secs]</h3><p>Stop-the-world 阶段,从根及被其引用对象开始，重新扫描 CMS 堆中残留的更新过的对象。这里重新扫描费时0.1790103秒，处理弱引用对象费时0.0100966秒，本阶段费时0.1897792 秒。</p>
+<h3 id="40-894-CMS-concurrent-sweep-start"><a href="#40-894-CMS-concurrent-sweep-start" class="headerlink" title="40.894: [CMS-concurrent-sweep-start]"></a>40.894: [CMS-concurrent-sweep-start]</h3><p>开始并发清理阶段，在清理阶段，应用线程还在运行。</p>
+<h3 id="41-020-CMS-concurrent-sweep-0-126-0-126-secs"><a href="#41-020-CMS-concurrent-sweep-0-126-0-126-secs" class="headerlink" title="41.020: [CMS-concurrent-sweep: 0.126/0.126 secs]"></a>41.020: [CMS-concurrent-sweep: 0.126/0.126 secs]</h3><p>并发清理阶段费时0.126秒</p>
+<h3 id="41-020-CMS-concurrent-reset-start"><a href="#41-020-CMS-concurrent-reset-start" class="headerlink" title="41.020: [CMS-concurrent-reset-start]"></a>41.020: [CMS-concurrent-reset-start]</h3><p>开始并发重置</p>
+<h3 id="41-147-CMS-concurrent-reset-0-127-0-127-secs"><a href="#41-147-CMS-concurrent-reset-0-127-0-127-secs" class="headerlink" title="41.147: [CMS-concurrent-reset: 0.127/0.127 secs]"></a>41.147: [CMS-concurrent-reset: 0.127/0.127 secs]</h3><p>在本阶段，重新初始化CMS内部数据结构，以备下一轮 GC 使用。本阶段费时0.127秒</p>
+<p>这是CMS正常运行周期打印的日志，现在让我们一起看一下其他的CMS日志记录：</p>
+<h3 id="197-976-GC-197-976-ParNew-260872K-gt-260872K-261952K-0-0000688-secs-197-976-CMS197-981-CMS-concurrent-sweep-0-516-0-531-secs"><a href="#197-976-GC-197-976-ParNew-260872K-gt-260872K-261952K-0-0000688-secs-197-976-CMS197-981-CMS-concurrent-sweep-0-516-0-531-secs" class="headerlink" title="197.976: [GC 197.976: [ParNew: 260872K-&gt;260872K(261952K), 0.0000688 secs]197.976: [CMS197.981: [CMS-concurrent-sweep: 0.516/0.531 secs]"></a>197.976: [GC 197.976: [ParNew: 260872K-&gt;260872K(261952K), 0.0000688 secs]197.976: [CMS197.981: [CMS-concurrent-sweep: 0.516/0.531 secs]</h3><p>(concurrent mode failure): 402978K-&gt;248977K(786432K), 2.3728734 secs] 663850K-&gt;248977K(1048384K), 2.3733725 secs]<br>这段信息显示ParNew 收集器被请求进行新生代的回收，但收集器并没有尝试回收，因为 它 预计在最糟糕的情况下， CMS 老年代中没有足够的空间容纳新生代的幸存对象。我们把这个失败称之为”完全晋升担保失败”。</p>
+<p>因为这样，并发模式的 CMS 被中断同并且在 197.981秒时，Full GC被启动。这次Full GC，采用标记-清除-整理算法，会发生stop-the-world，费时2.3733725秒。CMS 老年代占用从 402978K 降到248977K。</p>
+<p>避免并发模式失败, 通过增加老年代空间大小或者设置参数 CMSInitiatingOccupancyFraction 同时设置UseCMSInitiatingOccupancyOnly为true。参数 CMSInitiatingOccupancyFraction 的值必须谨慎选择，设置过低会造成频繁发生 CMS 回收。</p>
+<h2 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h2><p>CMS是一款优秀的收集器，主要优点：并发收集、低停顿。</p>
+<p>缺点：</p>
+<ul>
+<li>CMS收集器对CPU资源非常敏感。在并发阶段，它虽然不会导致用户线程停顿，但是会因为占用了一部分线程而导致应用程序变慢，总吞吐量会降低。</li>
+<li>CMS是一款<b>“标记–清除”</b>算法实现的收集器，容易出现大量空间碎片。当空间碎片过多，将会给大对象分配带来很大的麻烦，往往会出现老年代还有很大空间剩余，但是无法找到足够大的连续空间来分配当前对象，不得不提前触发一次Full GC。</li>
+<li>CMS收集器无法处理浮动垃圾。如果获取对象实例的频率高于收集器清除堆里死对象的频率，并发算法将再次失败。从某种程度上说，老年代将没有足够的可用空间来容纳一个从年轻代提升过来的对象。这种情况被称为“并发模式失败”，并且JVM会执行堆碎片整理：触发Full GC。当这些情形之一出现在实践中时(经常会出现在生产系统中)，经常被证实是老年代有大量不必要的对象。一个可行的办法就是增加年轻代的堆大小，以防止年轻代短生命的对象提前进入老年代。另一个办法就似乎利用分析器，快照运行系统的堆转储，并且分析过度的对象分配，找出这些对象，最终减少这些对象的申请。</li>
+</ul>
+<h2 id="CMS收集器调优相关的JVM标志参数"><a href="#CMS收集器调优相关的JVM标志参数" class="headerlink" title="CMS收集器调优相关的JVM标志参数"></a>CMS收集器调优相关的JVM标志参数</h2><h3 id="XX：-UseConcMarkSweepGC"><a href="#XX：-UseConcMarkSweepGC" class="headerlink" title="-XX：+UseConcMarkSweepGC"></a>-XX：+UseConcMarkSweepGC</h3><p>该标志首先是激活CMS收集器。默认HotSpot JVM使用的是并行收集器。</p>
+<h3 id="XX：UseParNewGC"><a href="#XX：UseParNewGC" class="headerlink" title="-XX：UseParNewGC"></a>-XX：UseParNewGC</h3><p>当使用CMS收集器时，该标志激活年轻代使用多线程并行执行垃圾回收。这令人很惊讶，我们不能简单在并行收集器中重用-XX：UserParNewGC标志，因为概念上年轻代用的算法是一样的。然而，对于CMS收集器，年轻代GC算法和老年代GC算法是不同的，因此年轻代GC有两种不同的实现，并且是两个不同的标志。</p>
+<p>注意最新的JVM版本，当使用-XX：+UseConcMarkSweepGC时，-XX：UseParNewGC会自动开启。因此，如果年轻代的并行GC不想开启，可以通过设置-XX：-UseParNewGC来关掉。</p>
+<h3 id="XX：-CMSConcurrentMTEnabled"><a href="#XX：-CMSConcurrentMTEnabled" class="headerlink" title="-XX：+CMSConcurrentMTEnabled"></a>-XX：+CMSConcurrentMTEnabled</h3><p>当该标志被启用时，并发的CMS阶段将以多线程执行(因此，多个GC线程会与所有的应用程序线程并行工作)。该标志已经默认开启，如果顺序执行更好，这取决于所使用的硬件，多线程执行可以通过-XX：-CMSConcurremntMTEnabled禁用。</p>
+<h3 id="XX：ConcGCThreads"><a href="#XX：ConcGCThreads" class="headerlink" title="-XX：ConcGCThreads"></a>-XX：ConcGCThreads</h3><p>标志-XX：ConcGCThreads=<value>(早期JVM版本也叫-XX:ParallelCMSThreads)定义并发CMS过程运行时的线程数。比如value=4意味着CMS周期的所有阶段都以4个线程来执行。尽管更多的线程会加快并发CMS过程，但其也会带来额外的同步开销。因此，对于特定的应用程序，应该通过测试来判断增加CMS线程数是否真的能够带来性能的提升。</value></p>
+<p>如果还标志未设置，JVM会根据并行收集器中的-XX：ParallelGCThreads参数的值来计算出默认的并行CMS线程数。该公式是ConcGCThreads = (ParallelGCThreads + 3)/4。因此，对于CMS收集器， -XX:ParallelGCThreads标志不仅影响“stop-the-world”垃圾收集阶段，还影响并发阶段。</p>
+<p>总之，有不少方法可以配置CMS收集器的多线程执行。正是由于这个原因,建议第一次运行CMS收集器时使用其默认设置, 然后如果需要调优再进行测试。只有在生产系统中测量(或类生产测试系统)发现应用程序的暂停时间的目标没有达到 , 就可以通过这些标志应该进行GC调优。</p>
+<h3 id="XX-CMSInitiatingOccupancyFraction"><a href="#XX-CMSInitiatingOccupancyFraction" class="headerlink" title="-XX:CMSInitiatingOccupancyFraction"></a>-XX:CMSInitiatingOccupancyFraction</h3><p>当堆满之后，并行收集器便开始进行垃圾收集，例如，当没有足够的空间来容纳新分配或提升的对象。对于CMS收集器，长时间等待是不可取的，因为在并发垃圾收集期间应用持续在运行(并且分配对象)。因此，为了在应用程序使用完内存之前完成垃圾收集周期，CMS收集器要比并行收集器更先启动。</p>
+<p>因为不同的应用会有不同对象分配模式，JVM会收集实际的对象分配(和释放)的运行时数据，并且分析这些数据，来决定什么时候启动一次CMS垃圾收集周期。为了引导这一过程， JVM会在一开始执行CMS周期前作一些线索查找。该线索由 -XX:CMSInitiatingOccupancyFraction=<value>来设置，该值代表老年代堆空间的使用率。比如，value=75意味着第一次CMS垃圾收集会在老年代被占用75%时被触发。通常CMSInitiatingOccupancyFraction的默认值为68(之前很长时间的经历来决定的)。</value></p>
+<h3 id="XX：-UseCMSInitiatingOccupancyOnly"><a href="#XX：-UseCMSInitiatingOccupancyOnly" class="headerlink" title="-XX：+UseCMSInitiatingOccupancyOnly"></a>-XX：+UseCMSInitiatingOccupancyOnly</h3><p>我们用-XX+UseCMSInitiatingOccupancyOnly标志来命令JVM不基于运行时收集的数据来启动CMS垃圾收集周期。而是，当该标志被开启时，JVM通过CMSInitiatingOccupancyFraction的值进行每一次CMS收集，而不仅仅是第一次。然而，请记住大多数情况下，JVM比我们自己能作出更好的垃圾收集决策。因此，只有当我们充足的理由(比如测试)并且对应用程序产生的对象的生命周期有深刻的认知时，才应该使用该标志。</p>
+<h3 id="XX-CMSClassUnloadingEnabled"><a href="#XX-CMSClassUnloadingEnabled" class="headerlink" title="-XX:+CMSClassUnloadingEnabled"></a>-XX:+CMSClassUnloadingEnabled</h3><p>相对于并行收集器，CMS收集器默认不会对永久代进行垃圾回收。如果希望对永久代进行垃圾回收，可用设置标志-XX:+CMSClassUnloadingEnabled。在早期JVM版本中，要求设置额外的标志-XX:+CMSPermGenSweepingEnabled。注意，即使没有设置这个标志，一旦永久代耗尽空间也会尝试进行垃圾回收，但是收集不会是并行的，而再一次进行Full GC。</p>
+<h3 id="XX-CMSIncrementalMode"><a href="#XX-CMSIncrementalMode" class="headerlink" title="-XX:+CMSIncrementalMode"></a>-XX:+CMSIncrementalMode</h3><p>该标志将开启CMS收集器的增量模式。增量模式经常暂停CMS过程，以便对应用程序线程作出完全的让步。因此，收集器将花更长的时间完成整个收集周期。因此，只有通过测试后发现正常CMS周期对应用程序线程干扰太大时，才应该使用增量模式。由于现代服务器有足够的处理器来适应并发的垃圾收集，所以这种情况发生得很少。</p>
+<h3 id="XX-ExplicitGCInvokesConcurrent-and-XX-ExplicitGCInvokesConcurrentAndUnloadsClasses"><a href="#XX-ExplicitGCInvokesConcurrent-and-XX-ExplicitGCInvokesConcurrentAndUnloadsClasses" class="headerlink" title="-XX:+ExplicitGCInvokesConcurrent and -XX:+ExplicitGCInvokesConcurrentAndUnloadsClasses"></a>-XX:+ExplicitGCInvokesConcurrent and -XX:+ExplicitGCInvokesConcurrentAndUnloadsClasses</h3><p>如今,被广泛接受的最佳实践是避免显式地调用GC(所谓的“系统GC”)，即在应用程序中调用system.gc()。然而，这个建议是不管使用的GC算法的，值得一提的是，当使用CMS收集器时，系统GC将是一件很不幸的事，因为它默认会触发一次Full GC。幸运的是，有一种方式可以改变默认设置。标志-XX:+ExplicitGCInvokesConcurrent命令JVM无论什么时候调用系统GC，都执行CMS GC，而不是Full GC。第二个标志-XX:+ExplicitGCInvokesConcurrentAndUnloadsClasses保证当有系统GC调用时，永久代也被包括进CMS垃圾回收的范围内。因此，通过使用这些标志，我们可以防止出现意料之外的”stop-the-world”的系统GC。</p>
+<h3 id="XX-DisableExplicitGC"><a href="#XX-DisableExplicitGC" class="headerlink" title="-XX:+DisableExplicitGC"></a>-XX:+DisableExplicitGC</h3><p>然而在这个问题上…这是一个很好提到- XX:+ DisableExplicitGC标志的机会，该标志将告诉JVM完全忽略系统的GC调用(不管使用的收集器是什么类型)。对于我而言，该标志属于默认的标志集合中，可以安全地定义在每个JVM上运行，而不需要进一步思考。</p>
+<h1 id="G1收集器"><a href="#G1收集器" class="headerlink" title="G1收集器"></a>G1收集器</h1><p>不同于其他的分代回收算法、G1将堆空间划分成了互相独立的区块。每块区域既有可能属于O区、也有可能是Y区，且每类区域空间可以是不连续的（对比CMS的O区和Y区都必须是连续的）。这种将O区划分成多块的理念源于：当并发后台线程寻找可回收的对象时、有些区块包含可回收的对象要比其他区块多很多。虽然在清理这些区块时G1仍然需要暂停应用线程、但可以用相对较少的时间优先回收包含垃圾最多区块。这也是为什么G1命名为Garbage First的原因：</p>
+<p>第一时间处理垃圾最多的区块。</p>
+<h2 id="堆内存结构"><a href="#堆内存结构" class="headerlink" title="堆内存结构"></a>堆内存结构</h2><p>以往的垃圾回收算法，如CMS，使用的堆内存结构如下：<br><img src="/images/pasted-56.png" alt="upload successful"></p>
+<p>在G1算法中，采用了另外一种完全不同的方式组织堆内存，堆内存被划分为多个大小相等的内存块（Region），每个Region是逻辑连续的一段内存，结构如下：<br><img src="/images/pasted-57.png" alt="upload successful"></p>
+<p>每一个分配的Region，都可以分成两个部分，已分配的和未被分配的。它们之间的界限被称为top。总体上来说，把一个对象分配到Region内，只需要简单增加top的值。这个做法实际上就是bump-the-pointer。过程如下</p>
+<p><img src="/images/pasted-58.png" alt="upload successful"></p>
+<h2 id="G1具备如下特点："><a href="#G1具备如下特点：" class="headerlink" title="G1具备如下特点："></a>G1具备如下特点：</h2><ul>
+<li>G1在压缩空间方面有优势</li>
+<li>G1通过将内存空间分成区域（Region）的方式避免内存碎片问题</li>
+<li>Eden, Survivor, Old区不再固定、在内存使用效率上来说更灵活</li>
+<li>G1可以通过设置预期停顿时间（Pause Time）来控制垃圾收集时间避免应用雪崩现象</li>
+<li>G1在回收内存后会马上同时做合并空闲内存的工作、而CMS默认是在STW（stop the world）的时候做</li>
+<li>G1会在Young GC中使用、而CMS只能在O区使用</li>
+</ul>
+<h2 id="以下场景下G1更适合"><a href="#以下场景下G1更适合" class="headerlink" title="以下场景下G1更适合"></a>以下场景下G1更适合</h2><p>服务端多核CPU、JVM内存占用较大的应用（至少大于4G）<br>应用在运行过程中会产生大量内存碎片、需要经常压缩空间<br>想要更可控、可预期的GC停顿周期；防止高并发下应用雪崩现象</p>
+<h2 id="GC模式："><a href="#GC模式：" class="headerlink" title="GC模式："></a>GC模式：</h2><ul>
+<li>young gc</li>
+<li>mix gc</li>
+</ul>
+<p>G1提供了两种GC模式，Young GC和Mixed GC，两种都是完全Stop The World的。</p>
+<p>Young GC：选定所有年轻代里的Region。通过控制年轻代的region个数，即年轻代内存大小，来控制young GC的时间开销。<br>Mixed GC：选定所有年轻代里的Region，外加根据global concurrent marking统计得出收集收益高的若干老年代Region。在用户指定的开销目标范围内尽可能选择收益高的老年代Region。</p>
+<p>由上面的描述可知，Mixed GC不是full GC，它只能回收部分老年代的Region，如果mixed GC实在无法跟上程序分配内存的速度，导致老年代填满无法继续进行Mixed GC，就会使用serial old GC（full GC）来收集整个GC heap。所以我们可以知道，G1是不提供full GC的。</p>
+<p>上文中，多次提到了global concurrent marking，它的执行过程类似CMS，但是不同的是，在G1 GC中，它主要是为Mixed GC提供标记服务的，并不是一次GC过程的一个必须环节。global concurrent marking的执行过程分为四个步骤：</p>
+<p>初始标记（initial mark，STW）。它标记了从GC Root开始直接可达的对象。<br>并发标记（Concurrent Marking）。这个阶段从GC Root开始对heap中的对象标记，标记线程与应用程序线程并行执行，并且收集各个Region的存活对象信息。<br>最终标记（Remark，STW）。标记那些在并发标记阶段发生变化的对象，将被回收。<br>清除垃圾（Cleanup）。清除空Region（没有存活对象的），加入到free list。</p>
+<p>Young GC发生的时机大家都知道，那什么时候发生Mixed GC呢？其实是由一些参数控制着的，另外也控制着哪些老年代Region会被选入CSet。</p>
+<p>G1HeapWastePercent：在global concurrent marking结束之后，我们可以知道old gen regions中有多少空间要被回收，在每次YGC之后和再次发生Mixed GC之前，会检查垃圾占比是否达到此参数，只有达到了，下次才会发生Mixed GC。<br>G1MixedGCLiveThresholdPercent：old generation region中的存活对象的占比，只有在此参数之下，才会被选入CSet。<br>G1MixedGCCountTarget：一次global concurrent marking之后，最多执行Mixed GC的次数。<br>G1OldCSetRegionThresholdPercent：一次Mixed GC中能被选入CSet的最多old generation region数量。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/02/10/java_jvm/jvm-new-object/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/02/10/java_jvm/jvm-new-object/" itemprop="url">jvm-new-object</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-10T09:32:02+08:00">
+                2018-02-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/02/10/java_jvm/jvm-new-object/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/02/10/java_jvm/jvm-new-object/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/02/10/java_jvm/jvm-new-object/" class="leancloud_visitors" data-flag-title="jvm-new-object">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><img src="http://pic.victor123.cn/18-2-11/44324841.jpg" alt=""></p>
+<h1 id="类的初始化"><a href="#类的初始化" class="headerlink" title="类的初始化"></a>类的初始化</h1><h2 id="类加载机制概述"><a href="#类加载机制概述" class="headerlink" title="类加载机制概述"></a>类加载机制概述</h2><p>我们知道，一个.java文件在编译后会形成相应的一个或多个Class文件（若一个类中含有内部类，则编译后会产生多个Class文件），但这些Class文件中描述的各种信息，最终都需要加载到虚拟机中之后才能被运行和使用。事实上，虚拟机把描述类的数据从Class文件加载到内存，并对数据进行校验，转换解析和初始化，最终形成可以被虚拟机直接使用的Java类型的过程就是虚拟机的 类加载机制。　<br>　　与那些在编译时需要进行连接工作的语言不同，在Java语言里面，类型的加载和连接都是在程序运行期间完成，这样会在类加载时稍微增加一些性能开销，但是却能为Java应用程序提供高度的灵活性，Java中天生可以动态扩展的语言特性多态就是依赖运行期动态加载和动态链接这个特点实现的。例如，如果编写一个使用接口的应用程序，可以等到运行时再指定其实际的实现。这种组装应用程序的方式广泛应用于Java程序之中。</p>
+<h2 id="类的生命周期"><a href="#类的生命周期" class="headerlink" title="类的生命周期"></a>类的生命周期</h2><p>Java类从被加载到虚拟机内存中开始，到卸载出内存为止，它的整个生命周期包括：加载（Loading）、验证（Verification）、准备(Preparation)、解析(Resolution)、初始化(Initialization)、使用(Using) 和 卸载(Unloading)七个阶段。其中准备、验证、解析3个部分统称为连接（Linking），如图所示：</p>
+<p><img src="http://pic.victor123.cn/18-2-10/76019613.jpg" alt=""></p>
+<ul>
+<li>加载：把二进制形式的Java类型读入Java虚拟机中。</li>
+<li>连接：把装载的二进制形式的类型数据合并到虚拟机的运行时状态中去。</li>
+<li>验证：确保Java类型数据格式正确并且适合于Java虚拟机使用。</li>
+<li>准备：负责为该类型分配它所需内存。</li>
+<li>解析：把常量池中的符号引用转换为直接引用。(可推迟到运行中的程序真正使用某个符号引用时再解析)</li>
+<li>初始化：为类变量赋适当的初始值</li>
+</ul>
+<h3 id="加载（Loading）"><a href="#加载（Loading）" class="headerlink" title="加载（Loading）"></a>加载（Loading）</h3><p>　　在加载阶段（可以参考java.lang.ClassLoader的loadClass()方法），虚拟机需要完成以下三件事情：</p>
+<p>　　(1). 通过一个类的全限定名来获取定义此类的二进制字节流（并没有指明要从一个Class文件中获取，可以从其他渠道，譬如：网络、动态生成、数据库等）；</p>
+<p>　　(2). 将这个字节流所代表的静态存储结构转化为方法区的运行时数据结构；</p>
+<p>　　(3). 在内存中(对于HotSpot虚拟就而言就是方法区)生成一个代表这个类的java.lang.Class对象，作为方法区这个类的各种数据的访问入口；</p>
+<p>Java虚拟机在识别Java class文件，产生了类型的二进制数据后，Java虚拟机必须把这些二进制数据解析为与实现相关的内部数据结构。装载的最终产品就是Class实例，它称为Java程序与内部数据结构之间的接口。要访问关于该类型的信息(存储在内部数据结构中)，程序就要调用该类型对应的Class实例的方法。这样一个过程，就是把一个类型的二进制数据解析为方法区中的内部数据结构，并在堆上建立一个Class对象的过程，这被称为”创建”类型。</p>
+<p>加载阶段和连接阶段（Linking）的部分内容（如一部分字节码文件格式验证动作）是交叉进行的，加载阶段尚未完成，连接阶段可能已经开始，但这些夹在加载阶段之中进行的动作，仍然属于连接阶段的内容，这两个阶段的开始时间仍然保持着固定的先后顺序。</p>
+<p>　</p>
+<h3 id="验证（Verification）"><a href="#验证（Verification）" class="headerlink" title="验证（Verification）"></a>验证（Verification）</h3><p>验证是连接阶段的第一步，这一阶段的目的是为了确保Class文件的字节流中包含的信息符合当前虚拟机的要求，并且不会危害虚拟机自身的安全。 验证阶段大致会完成4个阶段的检验动作：</p>
+<ul>
+<li>文件格式验证：验证字节流是否符合Class文件格式的规范(例如，是否以魔术0xCAFEBABE开头、主次版本号是否在当前虚拟机的处理范围之内、常量池中的常量是否有不被支持的类型)</li>
+<li>元数据验证：对字节码描述的信息进行语义分析，以保证其描述的信息符合Java语言规范的要求(例如：这个类是否有父类，除了java.lang.Object之外)；</li>
+<li>字节码验证：通过数据流和控制流分析，确定程序语义是合法的、符合逻辑的;</li>
+<li>符号引用验证：确保解析动作能正确执行。</li>
+</ul>
+<p>验证阶段是非常重要的，但不是必须的，它对程序运行期没有影响。如果所引用的类经过反复验证，那么可以考虑采用-Xverifynone参数来关闭大部分的类验证措施，以缩短虚拟机类加载的时间。</p>
+<h3 id="准备-Preparation"><a href="#准备-Preparation" class="headerlink" title="准备(Preparation)"></a>准备(Preparation)</h3><p>准备阶段是正式为类变量(static 成员变量)分配内存并设置类变量初始值（零值）的阶段，这些变量所使用的内存都将在方法区中进行分配。这时候进行内存分配的仅包括类变量，而不包括实例变量，实例变量将会在对象实例化时随着对象一起分配在堆中。其次，这里所说的初始值“通常情况”下是数据类型的零值，假设一个类变量的定义为：</p>
+<pre><code>public static int value = 123;
+</code></pre><p>那么，变量value在准备阶段过后的值为0而不是123。因为这时候尚未开始执行任何java方法，而把value赋值为123的putstatic指令是程序被编译后，存放于类构造器方法<clinit>()之中，所以把value赋值为123的动作将在初始化阶段才会执行。至于“特殊情况”是指：当类字段的字段属性是ConstantValue时，会在准备阶段初始化为指定的值，所以标注为final之后，value的值在准备阶段初始化为123而非0。</clinit></p>
+<pre><code>public static final int value = 123;
+</code></pre><h3 id="解析-Resolution"><a href="#解析-Resolution" class="headerlink" title="解析(Resolution)"></a>解析(Resolution)</h3><p>解析阶段是虚拟机将常量池内的符号引用替换为直接引用的过程。</p>
+<p>解析动作主要针对类或接口、字段、类方法、接口方法、方法类型、方法句柄和调用点限定符7类符号引用进行。</p>
+<h3 id="初始化-Initialization"><a href="#初始化-Initialization" class="headerlink" title="初始化(Initialization)"></a>初始化(Initialization)</h3><p>类初始化阶段是类加载过程的最后一步。在前面的类加载过程中，除了在加载阶段用户应用程序可以通过自定义类加载器参与之外，其余动作完全由虚拟机主导和控制。到了初始化阶段，才真正开始执行类中定义的java程序代码(字节码)。</p>
+<p>在准备阶段，变量已经赋过一次系统要求的初始值(零值)；而在初始化阶段，则根据程序猿通过程序制定的主观计划去初始化类变量和其他资源，或者更直接地说：初始化阶段是执行类构造器<clinit>()方法的过程。<clinit>()方法是由编译器自动收集类中的所有类变量的赋值动作和静态语句块static{}中的语句合并产生的，编译器收集的顺序是由语句在源文件中出现的顺序所决定的，静态语句块只能访问到定义在静态语句块之前的变量，定义在它之后的变量，在前面的静态语句块可以赋值，但是不能访问。</clinit></clinit></p>
+<h3 id="结束生命周期"><a href="#结束生命周期" class="headerlink" title="结束生命周期"></a>结束生命周期</h3><p>在如下几种情况下，Java虚拟机将结束生命周期</p>
+<ul>
+<li>执行了System.exit()方法</li>
+<li>程序正常执行结束</li>
+<li>程序在执行过程中遇到了异常或错误而异常终止</li>
+<li>由于操作系统出现错误而导致Java虚拟机进程终止</li>
+</ul>
+<h2 id="类加载的时机"><a href="#类加载的时机" class="headerlink" title="类加载的时机"></a>类加载的时机</h2><p>那么，什么情况下虚拟机需要开始初始化一个类呢？这在虚拟机规范中是有严格规定的，虚拟机规范指明 有且只有 种情况必须立即对类进行初始化（而这一过程自然发生在加载、验证、准备之后）：</p>
+<ul>
+<li><p>遇到new、getstatic、putstatic或invokestatic这四条字节码指令（注意，newarray指令触发的只是数组类型本身的初始化，而不会导致其相关类型的初始化，比如，new String[]只会直接触发String[]类的初始化，也就是触发对类Ljava.lang.String的初始化，而直接不会触发String类的初始化）时，如果类没有进行过初始化，则需要先对其进行初始化。生成这四条指令的最常见的Java代码场景是：</p>
+<ul>
+<li><p>使用new关键字实例化对象的时候；</p>
+</li>
+<li><p>读取或设置一个类的静态字段（被final修饰，已在编译器把结果放入常量池的静态字段除外）的时候；</p>
+</li>
+<li><p>调用一个类的静态方法的时候。</p>
+</li>
+</ul>
+</li>
+<li><p>使用java.lang.reflect包的方法对类进行反射调用的时候，如果类没有进行过初始化，则需要先触发其初始化。</p>
+</li>
+<li><p>当初始化一个类的时候，如果发现其父类还没有进行过初始化，则需要先触发其父类的初始化。</p>
+</li>
+<li>当虚拟机启动时，用户需要指定一个要执行的主类（包含main()方法的那个类），虚拟机会先初始化这个主类。</li>
+<li>当使用jdk1.7动态语言支持时，如果一个java.lang.invoke.MethodHandle实例最后的解析结果REF_getstatic,REF_putstatic,REF_invokeStatic的方法句柄，并且这个方法句柄所对应的类没有进行初始化，则需要先出触发其初始化。</li>
+</ul>
+<p>注意，对于这五种会触发类进行初始化的场景，虚拟机规范中使用了一个很强烈的限定语：“有且只有”，这五种场景中的行为称为对一个类进行 主动引用。除此之外，所有引用类的方式，都不会触发初始化，称为 被动引用。<br>被动引用的几种经典场景</p>
+<ul>
+<li>通过子类引用父类的静态字段，不会导致子类初始化</li>
+<li>通过数组定义来引用类，不会触发此类的初始化</li>
+<li>常量在编译阶段会存入调用类的常量池中，本质上并没有直接引用到定义常量的类，因此不会触发定义常量的类的初始化</li>
+</ul>
+<h2 id="类加载器"><a href="#类加载器" class="headerlink" title="类加载器"></a>类加载器</h2><p>寻找类加载器，先来一个小例子</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">package com.neo.classloader;</span><br><span class="line">public class ClassLoaderTest &#123;</span><br><span class="line">     public static void main(String[] args) &#123;</span><br><span class="line">        ClassLoader loader = Thread.currentThread().getContextClassLoader();</span><br><span class="line">        System.out.println(loader);</span><br><span class="line">        System.out.println(loader.getParent());</span><br><span class="line">        System.out.println(loader.getParent().getParent());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行后，输出结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sun.misc.Launcher$AppClassLoader@64fef26a</span><br><span class="line">sun.misc.Launcher$ExtClassLoader@1ddd40f3</span><br><span class="line">null</span><br></pre></td></tr></table></figure>
+<p>从上面的结果可以看出，并没有获取到ExtClassLoader的父Loader，原因是Bootstrap Loader（引导类加载器）是用C语言实现的，找不到一个确定的返回父Loader的方式，于是就返回null。</p>
+<p>这几种类加载器的层次关系如下图所示：</p>
+<p><img src="http://pic.victor123.cn/18-2-10/68053536.jpg" alt=""></p>
+<p>站在Java虚拟机的角度来讲，只存在两种不同的类加载器：启动类加载器：它使用C++实现（这里仅限于Hotspot，也就是JDK1.5之后默认的虚拟机，有很多其他的虚拟机是用Java语言实现的），是虚拟机自身的一部分；所有其它的类加载器：这些类加载器都由Java语言实现，独立于虚拟机之外，并且全部继承自抽象类java.lang.ClassLoader，这些类加载器需要由启动类加载器加载到内存中之后才能去加载其他的类。</p>
+<h3 id="JVM三种预定义类型类加载器"><a href="#JVM三种预定义类型类加载器" class="headerlink" title="JVM三种预定义类型类加载器"></a>JVM三种预定义类型类加载器</h3><h4 id="启动（Bootstrap）类加载器："><a href="#启动（Bootstrap）类加载器：" class="headerlink" title="启动（Bootstrap）类加载器："></a>启动（Bootstrap）类加载器：</h4><p>引导类加载器是用 本地代码实现的类加载器，它负责将 &lt;JAVA_HOME&gt;/lib下面的核心类库 或 -Xbootclasspath选项指定的jar包等 虚拟机识别的类库 加载到内存中。由于引导类加载器涉及到虚拟机本地实现细节，开发者无法直接获取到启动类加载器的引用，所以 不允许直接通过引用进行操作。</p>
+<h4 id="扩展（Extension）类加载器："><a href="#扩展（Extension）类加载器：" class="headerlink" title="扩展（Extension）类加载器："></a>扩展（Extension）类加载器：</h4><p>扩展类加载器是由Sun的ExtClassLoader（sun.misc.Launcher$ExtClassLoader）实现的，它负责将 &lt;JAVA_HOME &gt;/lib/ext或者由系统变量-Djava.ext.dir指定位置中的类库 加载到内存中。开发者可以直接使用标准扩展类加载器。</p>
+<h4 id="系统（System）类加载器："><a href="#系统（System）类加载器：" class="headerlink" title="系统（System）类加载器："></a>系统（System）类加载器：</h4><p>系统类加载器是由 Sun 的 AppClassLoader（sun.misc.Launcher$AppClassLoader）实现的，它负责将 用户类路径(java -classpath或-Djava.class.path变量所指的目录，即当前类所在路径及其引用的第三方类库的路径，如第四节中的问题6所述)下的类库 加载到内存中。开发者可以直接使用系统类加载器。</p>
+<p>应用程序都是由这三种类加载器互相配合进行加载的，如果有必要，我们还可以加入自定义的类加载器。因为JVM自带的ClassLoader只是懂得从本地文件系统加载标准的java class文件，因此如果编写了自己的ClassLoader，便可以做到如下几点：</p>
+<p>1、在执行非置信代码之前，自动验证数字签名。<br>2、动态地创建符合用户特定需要的定制化构建类。<br>3、从特定的场所取得java class，例如数据库中和网络中。</p>
+<h3 id="JVM类加载机制"><a href="#JVM类加载机制" class="headerlink" title="JVM类加载机制"></a>JVM类加载机制</h3><ul>
+<li>全盘负责，当一个类加载器负责加载某个Class时，该Class所依赖的和引用的其他Class也将由该类加载器负责载入，除非显示使用另外一个类加载器来载入</li>
+<li>父类委托，先让父类加载器试图加载该类，只有在父类加载器无法加载该类时才尝试从自己的类路径中加载该类</li>
+<li>缓存机制，缓存机制将会保证所有加载过的Class都会被缓存，当程序中需要使用某个Class时，类加载器先从缓存区寻找该Class，只有缓存区不存在，系统才会读取该类对应的二进制数据，并将其转换成Class对象，存入缓存区。这就是为什么修改了Class后，必须重启JVM，程序的修改才会生效</li>
+</ul>
+<h3 id="类的加载"><a href="#类的加载" class="headerlink" title="类的加载"></a>类的加载</h3><ul>
+<li>1、命令行启动应用时候由JVM初始化加载</li>
+<li>2、通过Class.forName()方法动态加载</li>
+<li>3、通过ClassLoader.loadClass()方法动态加载</li>
+</ul>
+<p>Class.forName()和ClassLoader.loadClass()区别</p>
+<ul>
+<li>Class.forName()：将类的.class文件加载到jvm中之外，还会对类进行解释，执行类中的static块；</li>
+<li>ClassLoader.loadClass()：只干一件事情，就是将.class文件加载到jvm中，不会执行static中的内容,只有在newInstance才会去执行static块。</li>
+<li>Class.forName(name, initialize, loader)带参函数也可控制是否加载static块。并且只有调用了newInstance()方法采用调用构造函数，创建类的对象 。</li>
+</ul>
+<h3 id="类加载双亲委派机制介绍和分析"><a href="#类加载双亲委派机制介绍和分析" class="headerlink" title="类加载双亲委派机制介绍和分析"></a>类加载双亲委派机制介绍和分析</h3><ul>
+<li>1、当AppClassLoader加载一个class时，它首先不会自己去尝试加载这个类，而是把类加载请求委派给父类加载器ExtClassLoader去完成。</li>
+<li>2、当ExtClassLoader加载一个class时，它首先也不会自己去尝试加载这个类，而是把类加载请求委派给BootStrapClassLoader去完成。</li>
+<li>3、如果BootStrapClassLoader加载失败（例如在$JAVA_HOME/jre/lib里未查找到该class），会使用ExtClassLoader来尝试加载；</li>
+<li>4、若ExtClassLoader也加载失败，则会使用AppClassLoader来加载，如果AppClassLoader也加载失败，则会报出异常ClassNotFoundException。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">public Class&lt;?&gt; loadClass(String name)throws ClassNotFoundException &#123;</span><br><span class="line">        return loadClass(name, false);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">protected synchronized Class&lt;?&gt; loadClass(String name, boolean resolve)throws ClassNotFoundException &#123;</span><br><span class="line">        // 首先判断该类型是否已经被加载</span><br><span class="line">        Class c = findLoadedClass(name);</span><br><span class="line">        if (c == null) &#123;</span><br><span class="line">            //如果没有被加载，就委托给父类加载或者委派给启动类加载器加载</span><br><span class="line">            try &#123;</span><br><span class="line">                if (parent != null) &#123;</span><br><span class="line">                     //如果存在父类加载器，就委派给父类加载器加载</span><br><span class="line">                    c = parent.loadClass(name, false);</span><br><span class="line">                &#125; else &#123;</span><br><span class="line">                //如果不存在父类加载器，就检查是否是由启动类加载器加载的类，通过调用本地方法native Class findBootstrapClass(String name)</span><br><span class="line">                    c = findBootstrapClass0(name);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; catch (ClassNotFoundException e) &#123;</span><br><span class="line">             // 如果父类加载器和启动类加载器都不能完成加载任务，才调用自身的加载功能</span><br><span class="line">                c = findClass(name);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        if (resolve) &#123;</span><br><span class="line">            resolveClass(c);</span><br><span class="line">        &#125;</span><br><span class="line">        return c;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>双亲委派模型意义：</p>
+<ul>
+<li>系统类防止内存中出现多份同样的字节码</li>
+<li>保证Java程序安全稳定运行</li>
+</ul>
+<h3 id="自定义类加载器"><a href="#自定义类加载器" class="headerlink" title="自定义类加载器"></a>自定义类加载器</h3><p>通常情况下，我们都是直接使用系统类加载器。但是，有的时候，我们也需要自定义类加载器。比如应用是通过网络来传输 Java类的字节码，为保证安全性，这些字节码经过了加密处理，这时系统类加载器就无法对其进行加载，这样则需要自定义类加载器来实现。自定义类加载器一般都是继承自ClassLoader类，从上面对loadClass方法来分析来看，我们只需要重写 findClass 方法即可。下面我们通过一个示例来演示自定义类加载器的流程：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line">package com.neo.classloader;</span><br><span class="line">import java.io.*;</span><br><span class="line"></span><br><span class="line">public class MyClassLoader extends ClassLoader &#123;</span><br><span class="line">    private String root;</span><br><span class="line"></span><br><span class="line">    protected Class&lt;?&gt; findClass(String name) throws ClassNotFoundException &#123;</span><br><span class="line">        byte[] classData = loadClassData(name);</span><br><span class="line">        if (classData == null) &#123;</span><br><span class="line">            throw new ClassNotFoundException();</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            return defineClass(name, classData, 0, classData.length);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private byte[] loadClassData(String className) &#123;</span><br><span class="line">        String fileName = root + File.separatorChar</span><br><span class="line">                + className.replace(&apos;.&apos;, File.separatorChar) + &quot;.class&quot;;</span><br><span class="line">        try &#123;</span><br><span class="line">            InputStream ins = new FileInputStream(fileName);</span><br><span class="line">            ByteArrayOutputStream baos = new ByteArrayOutputStream();</span><br><span class="line">            int bufferSize = 1024;</span><br><span class="line">            byte[] buffer = new byte[bufferSize];</span><br><span class="line">            int length = 0;</span><br><span class="line">            while ((length = ins.read(buffer)) != -1) &#123;</span><br><span class="line">                baos.write(buffer, 0, length);</span><br><span class="line">            &#125;</span><br><span class="line">            return baos.toByteArray();</span><br><span class="line">        &#125; catch (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        return null;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public String getRoot() &#123;</span><br><span class="line">        return root;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setRoot(String root) &#123;</span><br><span class="line">        this.root = root;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args)  &#123;</span><br><span class="line"></span><br><span class="line">        MyClassLoader classLoader = new MyClassLoader();</span><br><span class="line">        classLoader.setRoot(&quot;E:\\temp&quot;);</span><br><span class="line"></span><br><span class="line">        Class&lt;?&gt; testClass = null;</span><br><span class="line">        try &#123;</span><br><span class="line">            testClass = classLoader.loadClass(&quot;com.neo.classloader.Test2&quot;);</span><br><span class="line">            Object object = testClass.newInstance();</span><br><span class="line">            System.out.println(object.getClass().getClassLoader());</span><br><span class="line">        &#125; catch (ClassNotFoundException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; catch (InstantiationException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; catch (IllegalAccessException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>自定义类加载器的核心在于对字节码文件的获取，如果是加密的字节码则需要在该类中对文件进行解密。由于这里只是演示，我并未对class文件进行加密，因此没有解密的过程。这里有几点需要注意：</p>
+<ul>
+<li>1、这里传递的文件名需要是类的全限定性名称，即com.paddx.test.classloading.Test格式的，因为 defineClass 方法是按这种格式进行处理的。</li>
+<li>2、最好不要重写loadClass方法，因为这样容易破坏双亲委托模式。</li>
+<li>3、这类Test 类本身可以被 AppClassLoader类加载，因此我们不能把com/paddx/test/classloading/Test.class放在类路径下。否则，由于双亲委托机制的存在，会直接导致该类由AppClassLoader加载，而不会通过我们自定义类加载器来加载。</li>
+</ul>
+<h1 id="类的实例化"><a href="#类的实例化" class="headerlink" title="类的实例化"></a>类的实例化</h1><h2 id="对象创建时机"><a href="#对象创建时机" class="headerlink" title="对象创建时机"></a>对象创建时机</h2><ul>
+<li>使用new关键字创建对象</li>
+<li>使用Class类的newInstance方法(反射机制)</li>
+<li>使用Constructor类的newInstance方法(反射机制)</li>
+<li>使用Clone方法创建对象</li>
+<li>使用(反)序列化机制创建对象</li>
+</ul>
+<p>从Java虚拟机层面看，除了使用new关键字创建对象的方式外，其他方式全部都是通过转变为invokevirtual指令直接创建对象的。</p>
+<h2 id="创建过程"><a href="#创建过程" class="headerlink" title="创建过程"></a>创建过程</h2><h3 id="实例变量初始化"><a href="#实例变量初始化" class="headerlink" title="实例变量初始化"></a>实例变量初始化</h3><p>我们在定义（声明）实例变量的同时，还可以直接对实例变量进行赋值或者使用实例代码块对其进行赋值。如果我们以这两种方式为实例变量进行初始化，那么它们将在构造函数执行之前完成这些初始化操作。实际上，如果我们对实例变量直接赋值或者使用实例代码块赋值，那么编译器会将其中的代码放到类的构造函数中去，并且这些代码会被放在对超类构造函数的调用语句之后(还记得吗？Java要求构造函数的第一条语句必须是超类构造函数的调用语句)，构造函数本身的代码之前。</p>
+<h3 id="实例代码块初始化"><a href="#实例代码块初始化" class="headerlink" title="实例代码块初始化"></a>实例代码块初始化</h3><h3 id="构造函数初始化"><a href="#构造函数初始化" class="headerlink" title="构造函数初始化"></a>构造函数初始化</h3><p>Java要求在实例化类之前，必须先实例化其超类，以保证所创建实例的完整性。</p>
+<h1 id="对象初始化"><a href="#对象初始化" class="headerlink" title="对象初始化"></a>对象初始化</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line">class Parent &#123;</span><br><span class="line">        /* 静态变量 */</span><br><span class="line">    public static String p_StaticField = &quot;父类--静态变量&quot;;</span><br><span class="line">         /* 变量 */</span><br><span class="line">    public String    p_Field = &quot;父类--变量&quot;;</span><br><span class="line">    protected int    i    = 9;</span><br><span class="line">    protected int    j    = 0;</span><br><span class="line">        /* 静态初始化块 */</span><br><span class="line">    static &#123;</span><br><span class="line">        System.out.println( p_StaticField );</span><br><span class="line">        System.out.println( &quot;父类--静态初始化块&quot; );</span><br><span class="line">    &#125;</span><br><span class="line">        /* 初始化块 */</span><br><span class="line">    &#123;</span><br><span class="line">        System.out.println( p_Field );</span><br><span class="line">        System.out.println( &quot;父类--初始化块&quot; );</span><br><span class="line">    &#125;</span><br><span class="line">        /* 构造器 */</span><br><span class="line">    public Parent()</span><br><span class="line">    &#123;</span><br><span class="line">        System.out.println( &quot;父类--构造器&quot; );</span><br><span class="line">        System.out.println( &quot;i=&quot; + i + &quot;, j=&quot; + j );</span><br><span class="line">        j = 20;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public class SubClass extends Parent &#123;</span><br><span class="line">         /* 静态变量 */</span><br><span class="line">    public static String s_StaticField = &quot;子类--静态变量&quot;;</span><br><span class="line">         /* 变量 */</span><br><span class="line">    public String s_Field = &quot;子类--变量&quot;;</span><br><span class="line">        /* 静态初始化块 */</span><br><span class="line">    static &#123;</span><br><span class="line">        System.out.println( s_StaticField );</span><br><span class="line">        System.out.println( &quot;子类--静态初始化块&quot; );</span><br><span class="line">    &#125;</span><br><span class="line">       /* 初始化块 */</span><br><span class="line">    &#123;</span><br><span class="line">        System.out.println( s_Field );</span><br><span class="line">        System.out.println( &quot;子类--初始化块&quot; );</span><br><span class="line">    &#125;</span><br><span class="line">       /* 构造器 */</span><br><span class="line">    public SubClass()</span><br><span class="line">    &#123;</span><br><span class="line">        System.out.println( &quot;子类--构造器&quot; );</span><br><span class="line">        System.out.println( &quot;i=&quot; + i + &quot;,j=&quot; + j );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        /* 程序入口 */</span><br><span class="line">    public static void main( String[] args )</span><br><span class="line">    &#123;</span><br><span class="line">        System.out.println( &quot;子类main方法&quot; );</span><br><span class="line">        new SubClass();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">父类--静态变量</span><br><span class="line">父类--静态初始化块</span><br><span class="line">子类--静态变量</span><br><span class="line">子类--静态初始化块</span><br><span class="line">子类main方法</span><br><span class="line">父类--变量</span><br><span class="line">父类--初始化块</span><br><span class="line">父类--构造器</span><br><span class="line">i=9, j=0</span><br><span class="line">子类--变量</span><br><span class="line">子类--初始化块</span><br><span class="line">子类--构造器</span><br><span class="line">i=9,j=20</span><br></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/02/07/java_jvm/jvm-memory-model/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/02/07/java_jvm/jvm-memory-model/" itemprop="url">jvm-memory-model</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-07T21:10:26+08:00">
+                2018-02-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/02/07/java_jvm/jvm-memory-model/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/02/07/java_jvm/jvm-memory-model/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/02/07/java_jvm/jvm-memory-model/" class="leancloud_visitors" data-flag-title="jvm-memory-model">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><img src="http://pic.victor123.cn/18-2-7/17364258.jpg"></p>
+<p><img src="http://pic.victor123.cn/18-2-7/21259009.jpg"></p>
+<p><img src="http://pic.victor123.cn/18-2-10/10387821.jpg"></p>
+<h1 id="程序计数器"><a href="#程序计数器" class="headerlink" title="程序计数器"></a>程序计数器</h1><p>程序计数器是一块较小的内存空间，可以看作是当前线程所执行的字节码的行号指示器。分支、循环、跳转、异常处理、线程恢复等基础功能都需要依赖这个计数器来完成。</p>
+<h1 id="虚拟机栈"><a href="#虚拟机栈" class="headerlink" title="虚拟机栈"></a>虚拟机栈</h1><p>线程私有，它的生命周期与线程相同。虚拟机栈描述的是Java 方法执行的内存模型：每个方法被执行的时候都会同时创建一个栈帧（Stack Frame）用于存储局部变量表、操作栈、动态链接、方法出口等信息。</p>
+<p>动画是由一帧一帧图片连续切换结果的结果而产生的，其实虚拟机的运行和动画也类似，每个在虚拟机中运行的程序也是由许多的帧的切换产生的结果，只是这些帧里面存放的是方法的局部变量，操作数栈，动态链接，方法返回地址和一些额外的附加信息组成。每一个方法被调用直至执行完成的过程，就对应着一个栈帧在虚拟机栈中从入栈到出栈的过程。</p>
+<p>对于执行引擎来说，活动线程中，只有栈顶的栈帧是有效的，称为当前栈帧，这个栈帧所关联的方法称为当前方法。执行引擎所运行的所有字节码指令都只针对当前栈帧进行操作。</p>
+<h2 id="局部变量表"><a href="#局部变量表" class="headerlink" title="局部变量表"></a>局部变量表</h2><p>用于存放方法参数和方法内部定义的局部变量</p>
+<ul>
+<li>虚拟机是使用局部变量表完成参数值到参数变量列表的传递过程的，如果是实例方法（非static），那么局部变量表的第0位索引的Slot默认是用于传递方法所属对象实例的引用，在方法中通过this访问。</li>
+<li>系统不会为局部变量赋予初始值（实例变量和类变量都会被赋予初始值）。也就是说不存在类变量那样的准备阶段。</li>
+</ul>
+<h2 id="操作栈"><a href="#操作栈" class="headerlink" title="操作栈"></a>操作栈</h2><h2 id="动态链接"><a href="#动态链接" class="headerlink" title="动态链接"></a>动态链接</h2><h2 id="返回地址"><a href="#返回地址" class="headerlink" title="返回地址"></a>返回地址</h2><h2 id="异常"><a href="#异常" class="headerlink" title="异常"></a>异常</h2><h1 id="本地方法栈"><a href="#本地方法栈" class="headerlink" title="本地方法栈"></a>本地方法栈</h1><h1 id="堆"><a href="#堆" class="headerlink" title="堆"></a>堆</h1><p><img src="http://pic.victor123.cn/18-2-7/51814309.jpg"></p>
+<p><img src="http://pic.victor123.cn/18-2-10/93364899.jpg"></p>
+<p>是Java 虚拟机所管理的内存中最大的一块。Java 堆是被所有线程共享的一块内存区域，在虚拟机启动时创建。此内存区域的唯一目的就是存放对象实例，几乎所有的对象实例都在这里分配内存。</p>
+<p>但是随着JIT 编译器的发展与逃逸分析技术的逐渐成熟，栈上分配、标量替换优化技术将会导致一些微妙的变化发生，所有的对象都分配在堆上也渐渐变得不是那么“绝对”了。</p>
+<p>堆是垃圾收集器管理的主要区域，因此很多时候也被称做“GC 堆”</p>
+<p>如果从内存回收的角度看，由于现在收集器基本都是采用的分代收集算法，所以Java 堆中还可以细分为：新生代和老年代；</p>
+<ul>
+<li><p>新生代：程序新创建的对象都是从新生代分配内存，新生代由Eden Space和两块相同大小的Survivor Space(通常又称S0和S1或From和To)构成，可通过-Xmn参数来指定新生代的大小，也可以通过-XX:SurvivorRation来调整Eden Space及SurvivorSpace的大小。</p>
+</li>
+<li><p>老年代：用于存放经过多次新生代GC仍然存活的对象，例如缓存对象，新建的对象也有可能直接进入老年代，主要有两种情况：1、大对象，可通过启动参数设置-XX:PretenureSizeThreshold=1024(单位为字节，默认为0)来代表超过多大时就不在新生代分配，而是直接在老年代分配。2、大的数组对象，且数组中无引用外部对象。</p>
+</li>
+</ul>
+<h1 id="方法区"><a href="#方法区" class="headerlink" title="方法区"></a>方法区</h1><p>也称”永久代” 、“非堆”， 它用于存储虚拟机加载的类信息、常量、静态变量、是各个线程共享的内存区域。</p>
+<h2 id="类信息"><a href="#类信息" class="headerlink" title="类信息"></a>类信息</h2><h2 id="常量"><a href="#常量" class="headerlink" title="常量"></a>常量</h2><h2 id="静态变量"><a href="#静态变量" class="headerlink" title="静态变量"></a>静态变量</h2><h2 id="即时编译后的代码"><a href="#即时编译后的代码" class="headerlink" title="即时编译后的代码"></a>即时编译后的代码</h2><h2 id="class文件常量池"><a href="#class文件常量池" class="headerlink" title="class文件常量池"></a>class文件常量池</h2><h2 id="运行时常量池"><a href="#运行时常量池" class="headerlink" title="运行时常量池"></a>运行时常量池</h2><p>之所以说运行时常量池关键，是因为它相对于Class文件常量池的另外一个重要特性是具备动态性，java语言并不要求常量一定只有编译器才能产生，也就是并非预置入Class文件中常量池的内容才能进入方法区运行时常量池，运行期间也可能将新的常量放入池中，比如String类的intern方法就为此类操作。运行时常量池为我们提供了一种能够在运行时动态操作常量池的方法。</p>
+<h2 id="方法区主要有以下几个特点："><a href="#方法区主要有以下几个特点：" class="headerlink" title="方法区主要有以下几个特点："></a>方法区主要有以下几个特点：</h2><p>1、方法区是线程安全的。由于所有的线程都共享方法区，所以，方法区里的数据访问必须被设计成线程安全的。例如，假如同时有两个线程都企图访问方法区中的同一个类，而这个类还没有被装入JVM，那么只允许一个线程去装载它，而其它线程必须等待</p>
+<p>2、方法区的大小不必是固定的，JVM可根据应用需要动态调整。同时，方法区也不一定是连续的，方法区可以在一个堆(甚至是JVM自己的堆)中自由分配。</p>
+<p>3、方法区也可被垃圾收集，当某个类不在被使用(不可触及)时，JVM将卸载这个类，进行垃圾收集</p>
+<h1 id="直接内存"><a href="#直接内存" class="headerlink" title="直接内存"></a>直接内存</h1><p>直接内存（Direct Memory）并不是虚拟机运行时数据区的一部分，也不是java虚拟机规范中定义的的一部分。但这部分内存在项目中也会被频繁的使用，而且也可能导致OOM异常，所以我们一起进行归类。</p>
+<p>在JDK1.4中新加入了NIO类，引入了一种基于通道与缓冲区的I/O方法，它可以使用Native函数库直接分配堆外内存，然后通过一个存储在Java堆中的对象堆这块内存进行操作。</p>
+<h1 id="各区域参数设置"><a href="#各区域参数设置" class="headerlink" title="各区域参数设置"></a>各区域参数设置</h1><p><img src="http://pic.victor123.cn/18-2-10/69248166.jpg"></p>
+<p>控制参数:</p>
+<ul>
+<li>-Xms设置堆的最小空间大小。</li>
+<li>-Xmx设置堆的最大空间大小。</li>
+<li>-XX:NewSize设置新生代最小空间大小。</li>
+<li>-XX:MaxNewSize设置新生代最大空间大小。</li>
+<li>-XX:PermSize设置永久代最小空间大小。</li>
+<li>-XX:MaxPermSize设置永久代最大空间大小。</li>
+<li>-Xss设置每个线程的堆栈大小。</li>
+</ul>
+<p>没有直接设置老年代的参数，但是可以设置堆空间大小和新生代空间大小两个参数来间接控制。<br>老年代空间大小=堆空间大小-年轻代大空间大小</p>
+<h1 id="资料"><a href="#资料" class="headerlink" title="资料"></a>资料</h1><p><a href="http://www.ityouknow.com/jvm.html" target="_blank" rel="noopener">http://www.ityouknow.com/jvm.html</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/02/06/egenie_bugfix/bugfix-dubbo-channel-close/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1486,521 +2223,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/02/02/java_dubbo/source-dubbo-thread-pool/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/02/02/java_dubbo/source-dubbo-thread-pool/" itemprop="url">dubbo线程池相关源码解析</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-02T10:55:00+08:00">
-                2018-02-02
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/dubbo/" itemprop="url" rel="index">
-                    <span itemprop="name">dubbo</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/02/02/java_dubbo/source-dubbo-thread-pool/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/02/02/java_dubbo/source-dubbo-thread-pool/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/02/02/java_dubbo/source-dubbo-thread-pool/" class="leancloud_visitors" data-flag-title="dubbo线程池相关源码解析">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="dubbo几种线程池选择"><a href="#dubbo几种线程池选择" class="headerlink" title="dubbo几种线程池选择"></a>dubbo几种线程池选择</h1><p><a href="http://dubbo.io/books/dubbo-user-book/demos/thread-model.html" target="_blank" rel="noopener">http://dubbo.io/books/dubbo-user-book/demos/thread-model.html</a><br>ThreadPool</p>
-<ul>
-<li>fixed 固定大小线程池，启动时建立线程，不关闭，一直持有。(缺省)</li>
-<li>cached 缓存线程池，空闲一分钟自动删除，需要时重建。</li>
-<li>limited 可伸缩线程池，但池中的线程数只会增长不会收缩。只增长不收缩的目的是为了避免收缩时突然来了大流量引起的性能问题。</li>
-</ul>
-<p>读取几个参数:</p>
-<ul>
-<li>threads:服务线程池大小(固定大小)</li>
-<li>queues:线程池队列大小，当线程池满时，排队等待执行的队列大小，建议不要设置，当线程程池时应立即失败，重试其它服务提供机器，而不是排队，除非有特殊需求</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">public class FixedThreadPool implements ThreadPool &#123;</span><br><span class="line"></span><br><span class="line">    public Executor getExecutor(URL url) &#123;</span><br><span class="line">        String name = url.getParameter(Constants.THREAD_NAME_KEY, Constants.DEFAULT_THREAD_NAME);</span><br><span class="line">        int threads = url.getParameter(Constants.THREADS_KEY, Constants.DEFAULT_THREADS);</span><br><span class="line">        int queues = url.getParameter(Constants.QUEUES_KEY, Constants.DEFAULT_QUEUES);</span><br><span class="line">        return new ThreadPoolExecutor(threads, threads, 0, TimeUnit.MILLISECONDS,</span><br><span class="line">                queues == 0 ? new SynchronousQueue&lt;Runnable&gt;() :</span><br><span class="line">                        (queues &lt; 0 ? new LinkedBlockingQueue&lt;Runnable&gt;()</span><br><span class="line">                                : new LinkedBlockingQueue&lt;Runnable&gt;(queues)),</span><br><span class="line">                new NamedThreadFactory(name, true), new AbortPolicyWithReport(name, url));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>iothreads:IO线程池，接收网络读写中断，以及序列化和反序列化，不处理业务，业务线程池参见threads配置，此线程池和CPU相关，不建议配置。<br>dubbo 中使用该参数初始化netty<br><code>public static final int DEFAULT_IO_THREADS = Math.min(Runtime.getRuntime().availableProcessors() + 1, 32);</code></li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">protected void doOpen() throws Throwable &#123;</span><br><span class="line">     NettyHelper.setNettyLoggerFactory();</span><br><span class="line"></span><br><span class="line">     bootstrap = new ServerBootstrap();</span><br><span class="line"></span><br><span class="line">     bossGroup = new NioEventLoopGroup(1, new DefaultThreadFactory(&quot;NettyServerBoss&quot;, true));</span><br><span class="line">     workerGroup = new NioEventLoopGroup(getUrl().getPositiveParameter(Constants.IO_THREADS_KEY, Constants.DEFAULT_IO_THREADS),</span><br><span class="line">             new DefaultThreadFactory(&quot;NettyServerWorker&quot;, true));</span><br><span class="line"></span><br><span class="line">     final NettyServerHandler nettyServerHandler = new NettyServerHandler(getUrl(), this);</span><br><span class="line">     channels = nettyServerHandler.getChannels();</span><br><span class="line"></span><br><span class="line">     bootstrap.group(bossGroup, workerGroup)</span><br><span class="line">             .channel(NioServerSocketChannel.class)</span><br><span class="line">             .childOption(ChannelOption.TCP_NODELAY, Boolean.TRUE)</span><br><span class="line">             .childOption(ChannelOption.SO_REUSEADDR, Boolean.TRUE)</span><br><span class="line">             .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)</span><br><span class="line">             .childHandler(new ChannelInitializer&lt;NioSocketChannel&gt;() &#123;</span><br><span class="line">                 @Override</span><br><span class="line">                 protected void initChannel(NioSocketChannel ch) throws Exception &#123;</span><br><span class="line">                     NettyCodecAdapter adapter = new NettyCodecAdapter(getCodec(), getUrl(), NettyServer.this);</span><br><span class="line">                     ch.pipeline()//.addLast(&quot;logging&quot;,new LoggingHandler(LogLevel.INFO))//for debug</span><br><span class="line">                             .addLast(&quot;decoder&quot;, adapter.getDecoder())</span><br><span class="line">                             .addLast(&quot;encoder&quot;, adapter.getEncoder())</span><br><span class="line">                             .addLast(&quot;handler&quot;, nettyServerHandler);</span><br><span class="line">                 &#125;</span><br><span class="line">             &#125;);</span><br><span class="line">     // bind</span><br><span class="line">     ChannelFuture channelFuture = bootstrap.bind(getBindAddress());</span><br><span class="line">     channelFuture.syncUninterruptibly();</span><br><span class="line">     channel = channelFuture.channel();</span><br><span class="line"></span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
-<h1 id="dubbo的线程池拒绝策略"><a href="#dubbo的线程池拒绝策略" class="headerlink" title="dubbo的线程池拒绝策略"></a>dubbo的线程池拒绝策略</h1><p>AbortPolicyWithReport:</p>
-<ul>
-<li>dump线程信息</li>
-<li>打印error日志</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line">public class AbortPolicyWithReport extends ThreadPoolExecutor.AbortPolicy &#123;</span><br><span class="line"></span><br><span class="line">    protected static final Logger logger = LoggerFactory.getLogger(AbortPolicyWithReport.class);</span><br><span class="line"></span><br><span class="line">    private final String threadName;</span><br><span class="line"></span><br><span class="line">    private final URL url;</span><br><span class="line"></span><br><span class="line">    private static volatile long lastPrintTime = 0;</span><br><span class="line"></span><br><span class="line">    private static Semaphore guard = new Semaphore(1);</span><br><span class="line"></span><br><span class="line">    public AbortPolicyWithReport(String threadName, URL url) &#123;</span><br><span class="line">        this.threadName = threadName;</span><br><span class="line">        this.url = url;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void rejectedExecution(Runnable r, ThreadPoolExecutor e) &#123;</span><br><span class="line">        String msg = String.format(&quot;Thread pool is EXHAUSTED!&quot; +</span><br><span class="line">                        &quot; Thread Name: %s, Pool Size: %d (active: %d, core: %d, max: %d, largest: %d), Task: %d (completed: %d),&quot; +</span><br><span class="line">                        &quot; Executor status:(isShutdown:%s, isTerminated:%s, isTerminating:%s), in %s://%s:%d!&quot;,</span><br><span class="line">                threadName, e.getPoolSize(), e.getActiveCount(), e.getCorePoolSize(), e.getMaximumPoolSize(), e.getLargestPoolSize(),</span><br><span class="line">                e.getTaskCount(), e.getCompletedTaskCount(), e.isShutdown(), e.isTerminated(), e.isTerminating(),</span><br><span class="line">                url.getProtocol(), url.getIp(), url.getPort());</span><br><span class="line">        logger.warn(msg);</span><br><span class="line">        dumpJStack();</span><br><span class="line">        throw new RejectedExecutionException(msg);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private void dumpJStack() &#123;</span><br><span class="line">        long now = System.currentTimeMillis();</span><br><span class="line"></span><br><span class="line">        //dump every 10 minutes</span><br><span class="line">        if (now - lastPrintTime &lt; 10 * 60 * 1000) &#123;</span><br><span class="line">            return;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        if (!guard.tryAcquire()) &#123;</span><br><span class="line">            return;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Executors.newSingleThreadExecutor().execute(new Runnable() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            public void run() &#123;</span><br><span class="line">                String dumpPath = url.getParameter(Constants.DUMP_DIRECTORY, System.getProperty(&quot;user.home&quot;));</span><br><span class="line"></span><br><span class="line">                SimpleDateFormat sdf;</span><br><span class="line"></span><br><span class="line">                String OS = System.getProperty(&quot;os.name&quot;).toLowerCase();</span><br><span class="line"></span><br><span class="line">                // window system don&apos;t support &quot;:&quot; in file name</span><br><span class="line">                if(OS.contains(&quot;win&quot;))&#123;</span><br><span class="line">                    sdf = new SimpleDateFormat(&quot;yyyy-MM-dd_HH-mm-ss&quot;);</span><br><span class="line">                &#125;else &#123;</span><br><span class="line">                    sdf = new SimpleDateFormat(&quot;yyyy-MM-dd_HH:mm:ss&quot;);</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                String dateStr = sdf.format(new Date());</span><br><span class="line">                FileOutputStream jstackStream = null;</span><br><span class="line">                try &#123;</span><br><span class="line">                    jstackStream = new FileOutputStream(new File(dumpPath, &quot;Dubbo_JStack.log&quot; + &quot;.&quot; + dateStr));</span><br><span class="line">                    JVMUtil.jstack(jstackStream);</span><br><span class="line">                &#125; catch (Throwable t) &#123;</span><br><span class="line">                    logger.error(&quot;dump jstack error&quot;, t);</span><br><span class="line">                &#125; finally &#123;</span><br><span class="line">                    guard.release();</span><br><span class="line">                    if (jstackStream != null) &#123;</span><br><span class="line">                        try &#123;</span><br><span class="line">                            jstackStream.flush();</span><br><span class="line">                            jstackStream.close();</span><br><span class="line">                        &#125; catch (IOException e) &#123;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                lastPrintTime = System.currentTimeMillis();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h1 id="模拟dubbo线程池满时的情景"><a href="#模拟dubbo线程池满时的情景" class="headerlink" title="模拟dubbo线程池满时的情景"></a>模拟dubbo线程池满时的情景</h1><h2 id="consumer程序"><a href="#consumer程序" class="headerlink" title="consumer程序:"></a>consumer程序:</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//Prevent to get IPV6 address,this way only work in debug mode</span></span><br><span class="line">        <span class="comment">//But you can pass use -Djava.net.preferIPv4Stack=true,then it work well whether in debug mode or not</span></span><br><span class="line">        System.setProperty(<span class="string">"java.net.preferIPv4Stack"</span>, <span class="string">"true"</span>);</span><br><span class="line">        ClassPathXmlApplicationContext context = <span class="keyword">new</span> ClassPathXmlApplicationContext(<span class="keyword">new</span> String[]&#123;<span class="string">"META-INF/spring/dubbo-demo-consumer.xml"</span>&#125;);</span><br><span class="line">        context.start();</span><br><span class="line">        DemoService demoService = (DemoService) context.getBean(<span class="string">"demoService"</span>); <span class="comment">// get remote service proxy</span></span><br><span class="line"></span><br><span class="line">        ExecutorService executorService = Executors.newFixedThreadPool(<span class="number">1000</span>);</span><br><span class="line">        MyTask myTask = <span class="keyword">new</span> MyTask(demoService);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">1000</span>; i++) &#123;</span><br><span class="line">            executorService.submit(myTask);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">MyTask</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> DemoService demoService;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">MyTask</span><span class="params">(DemoService demoService)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.demoService = demoService;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            System.out.println(Thread.currentThread().getName());</span><br><span class="line">            String hello = demoService.sayHello(<span class="string">"world"</span>); <span class="comment">// call remote method</span></span><br><span class="line">            System.out.println(hello); <span class="comment">// get result</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<h2 id="provider程序"><a href="#provider程序" class="headerlink" title="provider程序:"></a>provider程序:</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DemoServiceImpl</span> <span class="keyword">implements</span> <span class="title">DemoService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger logger = LoggerFactory.getLogger(DemoService.class);</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">sayHello</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            System.out.println(Thread.currentThread().getName());</span><br><span class="line">            Thread.sleep(<span class="number">10000000</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(<span class="string">"["</span> + <span class="keyword">new</span> SimpleDateFormat(<span class="string">"HH:mm:ss"</span>).format(<span class="keyword">new</span> Date()) + <span class="string">"] Hello "</span> + name + <span class="string">", request from consumer: "</span> + RpcContext.getContext().getRemoteAddress());</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"Hello "</span> + name + <span class="string">", response form provider: "</span> + RpcContext.getContext().getLocalAddress();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="consumer日志"><a href="#consumer日志" class="headerlink" title="consumer日志:"></a>consumer日志:</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[03/02/18 01:41:43:043 CST] DubboClientHandler-192.168.0.100:20881-thread-39  WARN support.DefaultFuture:  [DUBBO] The timeout response finally returned at 2018-02-03 13:41:43.668, response Response [id=1562, version=null, status=100, event=false, error=Server side(192.168.0.100,20881) threadpool is exhausted ,detail msg:Thread pool is EXHAUSTED! Thread Name: DubboServerHandler-192.168.0.100:20881, Pool Size: 200 (active: 200, core: 200, max: 200, largest: 200), Task: 201 (completed: 1), Executor status:(isShutdown:false, isTerminated:false, isTerminating:false), in dubbo://192.168.0.100:20881!, result=null], channel: /192.168.0.100:62100 -&gt; /192.168.0.100:20881, dubbo version: 2.0.0, current host: 192.168.0.100</span><br><span class="line">[03/02/18 01:41:43:043 CST] DubboClientHandler-192.168.0.100:20881-thread-30  WARN support.DefaultFuture:  [DUBBO] The timeout response finally returned at 2018-02-03 13:41:43.668, response Response [id=1561, version=null, status=100, event=false, error=Server side(192.168.0.100,20881) threadpool is exhausted ,detail msg:Thread pool is EXHAUSTED! Thread Name: DubboServerHandler-192.168.0.100:20881, Pool Size: 200 (active: 200, core: 200, max: 200, largest: 200), Task: 201 (completed: 1), Executor status:(isShutdown:false, isTerminated:false, isTerminating:false), in dubbo://192.168.0.100:20881!, result=null], channel: /192.168.0.100:62100 -&gt; /192.168.0.100:20881, dubbo version: 2.0.0, current host: 192.168.0.100</span><br><span class="line">[03/02/18 01:41:43:043 CST] DubboClientHandler-192.168.0.100:20881-thread-59  WARN support.DefaultFuture:  [DUBBO] The timeout response finally returned at 2018-02-03 13:41:43.668, response Response [id=1560, version=null, status=100, event=false, error=Server side(192.168.0.100,20881) threadpool is exhausted ,detail msg:Thread pool is EXHAUSTED! Thread Name: DubboServerHandler-192.168.0.100:20881, Pool Size: 200 (active: 200, core: 200, max: 200, largest: 200), Task: 201 (completed: 1), Executor status:(isShutdown:false, isTerminated:false, isTerminating:false), in dubbo://192.168.0.100:20881!, result=null], channel: /192.168.0.100:62100 -&gt; /192.168.0.100:20881, dubbo version: 2.0.0, current host: 192.168.0.100</span><br><span class="line">[03/02/18 01:41:43:043 CST] DubboClientHandler-192.168.0.100:20881-thread-57  WARN support.DefaultFuture:  [DUBBO] The timeout response finally returned at 2018-02-03 13:41:43.668, response Response [id=1559, version=null, status=100, event=false, error=Server side(192.168.0.100,20881) threadpool is exhausted ,detail msg:Thread pool is EXHAUSTED! Thread Name: DubboServerHandler-192.168.0.100:20881, Pool Size: 200 (active: 200, core: 200, max: 200, largest: 200), Task: 201 (completed: 1), Executor status:(isShutdown:false, isTerminated:false, isTerminating:false), in dubbo://192.168.0.100:20881!, result=null], channel: /192.168.0.100:62100 -&gt; /192.168.0.100:20881, dubbo version: 2.0.0, current host: 192.168.0.100</span><br></pre></td></tr></table></figure>
-<h2 id="provider日志"><a href="#provider日志" class="headerlink" title="provider日志:"></a>provider日志:</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">DubboServerHandler-192.168.0.100:20880-thread-197</span><br><span class="line">DubboServerHandler-192.168.0.100:20880-thread-198</span><br><span class="line">DubboServerHandler-192.168.0.100:20880-thread-199</span><br><span class="line">DubboServerHandler-192.168.0.100:20880-thread-200</span><br><span class="line">DubboServerHandler-192.168.0.100:20880-thread-1</span><br><span class="line">[02/02/18 10:53:44:044 CST] New I/O worker #1  WARN support.AbortPolicyWithReport:  [DUBBO] Thread pool is EXHAUSTED! Thread Name: DubboServerHandler-192.168.0.100:20880, Pool Size: 200 (active: 200, core: 200, max: 200, largest: 200), Task: 201 (completed: 1), Executor status:(isShutdown:false, isTerminated:false, isTerminating:false), in dubbo://192.168.0.100:20880!, dubbo version: 2.0.0, current host: 192.168.0.100</span><br><span class="line">[02/02/18 10:53:45:045 CST] New I/O worker #1  WARN support.AbortPolicyWithReport:  [DUBBO] Thread pool is EXHAUSTED! Thread Name: DubboServerHandler-192.168.0.100:20880, Pool Size: 200 (active: 200, core: 200, max: 200, largest: 200), Task: 201 (completed: 1), Executor status:(isShutdown:false, isTerminated:false, isTerminating:false), in dubbo://192.168.0.100:20880!, dubbo version: 2.0.0, current host: 192.168.0.100</span><br><span class="line">[02/02/18 10:53:45:045 CST] New I/O worker #1  WARN support.AbortPolicyWithReport:  [DUBBO] Thread pool is EXHAUSTED! Thread Name: DubboServerHandler-192.168.0.100:20880, Pool Size: 200 (active: 200, core: 200, max: 200, largest: 200), Task: 201 (completed: 1), Executor status:(isShutdown:false, isTerminated:false, isTerminating:false), in dubbo://192.168.0.100:20880!, dubbo version: 2.0.0, current host: 192.168.0.100</span><br><span class="line">[02/02/18 10:53:45:045 CST] New I/O worker #1  WARN support.AbortPolicyWithReport:  [DUBBO] Thread pool is EXHAUSTED! Thread Name: DubboServerHandler-192.168.0.100:20880, Pool Size: 200 (active: 200, core: 200, max: 200, largest: 200), Task: 201 (completed: 1), Executor status:(isShutdown:false, isTerminated:false, isTerminating:false), in dubbo://192.168.0.100:20880!, dubbo version: 2.0.0, current host: 192.168.0.100</span><br><span class="line">[02/02/18 10:53:45:045 CST] New I/O worker #1  WARN support.AbortPolicyWithReport:  [DUBBO] Thread pool is EXHAUSTED! Thread Name: DubboServerHandler-192.168.0.100:20880, Pool Size: 200 (active: 200, core: 200, max: 200, largest: 200), Task: 201 (completed: 1), Executor status:(isShutdown:false, isTerminated:false, isTerminating:false), in dubbo://192.168.0.100:20880!, dubbo version: 2.0.0, current host: 192.168.0.100</span><br><span class="line">[0</span><br></pre></td></tr></table></figure>
-<h2 id="dump的文件"><a href="#dump的文件" class="headerlink" title="dump的文件"></a>dump的文件</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-rw-r--r--    1 victor  staff  599770  2  2 13:41 Dubbo_JStack.log.2018-02-02_13:41:34</span><br></pre></td></tr></table></figure>
-<h2 id="其他结论1"><a href="#其他结论1" class="headerlink" title="其他结论1:"></a>其他结论1:</h2><p>奇怪的现象provider启动一次,两次启动consumer,发现第二次consumer不会报错线程池满的异常</p>
-<h2 id="其他结论2"><a href="#其他结论2" class="headerlink" title="其他结论2:"></a>其他结论2:</h2><p>只有超时时间到后,才会报线程池满的异常</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/02/01/java_jvm/study-Synchronized-lock/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/02/01/java_jvm/study-Synchronized-lock/" itemprop="url">study-Synchronized-lock</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-01T22:49:51+08:00">
-                2018-02-01
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/02/01/java_jvm/study-Synchronized-lock/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/02/01/java_jvm/study-Synchronized-lock/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/02/01/java_jvm/study-Synchronized-lock/" class="leancloud_visitors" data-flag-title="study-Synchronized-lock">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">锁的实现</span><br><span class="line"></span><br><span class="line">在关于锁的面试过程中，一般主要问Synchronized和ReentrantLock的实现原理，更有甚者会问一些读写锁。</span><br><span class="line">场景对话：</span><br><span class="line"></span><br><span class="line">面试官：都了解Java中的什么锁？</span><br><span class="line">我：比如Synchronized和ReentrantLock...读写锁用的不多，就没研究了</span><br><span class="line">面试官：那好，你先说说Synchronized的实现原理吧</span><br><span class="line">我：嗯，Synchronized是JVM实现的一种锁，其中锁的获取和释放分别是monitorenter和monitorexit指令，该锁在实现上分为了偏向锁、轻量级锁和重量级锁，其中偏向锁在1.6是默认开启的，轻量级锁在多线程竞争的情况下会膨胀成重量级锁，有关锁的数据都保存在对象头中...&amp;&amp;@@#，（嗯，说了一大堆，面试官也没打断我）</span><br><span class="line">面试官：哦，嗯，理解的还挺透彻，那你说说ReentrantLock的实现吧...</span><br><span class="line">我：ReentrantLock是基于AQS实现的</span><br><span class="line">面试官：什么是AQS？</span><br><span class="line">我：在AQS内部会保存一个状态变量state，通过CAS修改该变量的值，修改成功的线程表示获取到该锁，没有修改成功，或者发现状态state已经是加锁状态，则通过一个Waiter对象封装线程，添加到等待队列中，并挂起等待被唤醒&amp;&amp;&amp;$$（又说了一堆）</span><br><span class="line">面试官：能说说CAS的实现原理么？</span><br><span class="line">我：CAS是通过unsafe类的compareAndSwap方法实现的（心里得意的一笑）</span><br><span class="line">面试官：哦，好的，那你知道这个方法的参数的含义的么？</span><br><span class="line">我：（这是在逼我啊...努力的回想，因为我真的看过啊）我想想啊，这个方法看的时间有点久远了，第一个参数是要修改的对象，第二个参数是对象中要修改变量的偏移量，第三个参数是修改之前的值，第四个参数是预想修改后的值....（说出来之后都有点佩服自己，这个都记得，不过面试官好像还是不肯放过我...）</span><br><span class="line">面试官：嗯，对的，那你知道操作系统级别是如何实现的么？</span><br><span class="line">我：（我去你大爷...）我只记得X86中有一个cmp开头的指令，具体的我忘记了...</span><br><span class="line">面试官：嗯，好，你知道CAS指令有什么缺点么</span><br><span class="line">我：哦，CAS的缺点是存在ABA问题</span><br><span class="line">面试官：怎么讲？</span><br><span class="line">我：就是一个变量V，如果变量V初次读取的时候是A，并且在准备赋值的时候检查到它仍然是A，那能说明它的值没有被其他线程修改过了吗？如果在这段期间它的值曾经被改成了B，然后又改回A，那CAS操作就会误认为它从来没有被修改过。</span><br><span class="line">面试官：那怎么解决？</span><br><span class="line">我：（有完没完了啊...我的心里是崩溃的）针对这种情况，java并发包中提供了一个带有标记的原子引用类&quot;AtomicStampedReference&quot;，它可以通过控制变量值的版本来保证CAS的正确性。</span><br><span class="line"></span><br><span class="line">本来转载自公众号  占小狼的博客</span><br><span class="line">作者占小狼   来自 美团点评 基础架构组</span><br></pre></td></tr></table></figure>
-<h1 id="理解Java对象头与Monitor"><a href="#理解Java对象头与Monitor" class="headerlink" title="理解Java对象头与Monitor"></a>理解Java对象头与Monitor</h1><p>Java 虚拟机中的同步(Synchronization)基于进入和退出管程(Monitor)对象实现</p>
-<p>ACC_SYNCHRONIZED</p>
-<hr>
-<p>synchronized使用的锁对象是存储在Java对象头里的，jvm中采用2个字来存储对象头(如果对象是数组则会分配3个字，多出来的1个字记录的是数组长度)，其主要结构是由Mark Word 和 Class Metadata Address 组成，其结构说明如下表：</p>
-<p><img src="/images/pasted-62.png" alt="upload successful"></p>
-<p>其中Mark Word在默认情况下存储着对象的HashCode、分代年龄、锁标记位等以下是32位JVM的Mark Word默认存储结构</p>
-<p><img src="/images/pasted-63.png" alt="upload successful"></p>
-<p>由于对象头的信息是与对象自身定义的数据没有关系的额外存储成本，因此考虑到JVM的空间效率，Mark Word 被设计成为一个非固定的数据结构，以便存储更多有效的数据，它会根据对象本身的状态复用自己的存储空间，如32位JVM下，除了上述列出的Mark Word默认存储结构外，还有如下可能变化的结构：</p>
-<p><img src="/images/pasted-61.png" alt="upload successful"></p>
-<p>其中轻量级锁和偏向锁是Java 6 对 synchronized 锁进行优化后新增加的，稍后我们会简要分析。这里我们主要分析一下重量级锁也就是通常说synchronized的对象锁，锁标识位为10，其中指针指向的是monitor对象（也称为管程或监视器锁）的起始地址。每个对象都存在着一个 monitor 与之关联，对象与其 monitor 之间的关系有存在多种实现方式，如monitor可以与对象一起创建销毁或当线程试图获取对象锁时自动生成，但当一个 monitor 被某个线程持有后，它便处于锁定状态。在Java虚拟机(HotSpot)中，monitor是由ObjectMonitor实现的，其主要数据结构如下（位于HotSpot虚拟机源码ObjectMonitor.hpp文件，C++实现的）</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">ObjectMonitor() &#123;</span><br><span class="line">    _header       = NULL;</span><br><span class="line">    _count        = 0; //记录个数</span><br><span class="line">    _waiters      = 0,</span><br><span class="line">    _recursions   = 0;</span><br><span class="line">    _object       = NULL;</span><br><span class="line">    _owner        = NULL;</span><br><span class="line">    _WaitSet      = NULL; //处于wait状态的线程，会被加入到_WaitSet</span><br><span class="line">    _WaitSetLock  = 0 ;</span><br><span class="line">    _Responsible  = NULL ;</span><br><span class="line">    _succ         = NULL ;</span><br><span class="line">    _cxq          = NULL ;</span><br><span class="line">    FreeNext      = NULL ;</span><br><span class="line">    _EntryList    = NULL ; //处于等待锁block状态的线程，会被加入到该列表</span><br><span class="line">    _SpinFreq     = 0 ;</span><br><span class="line">    _SpinClock    = 0 ;</span><br><span class="line">    OwnerIsThread = 0 ;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>_WaitSet</li>
-<li>_EntryList</li>
-</ul>
-<p><img src="/images/pasted-105.png" alt="upload successful"><br>ObjectMonitor中有两个队列，_WaitSet 和 _EntryList，用来保存ObjectWaiter对象列表( 每个等待锁的线程都会被封装成ObjectWaiter对象)，_owner指向持有ObjectMonitor对象的线程，当多个线程同时访问一段同步代码时，首先会进入 _EntryList 集合，当线程获取到对象的monitor 后进入 _Owner 区域并把monitor中的owner变量设置为当前线程同时monitor中的计数器count加1，若线程调用 wait() 方法，将释放当前持有的monitor，owner变量恢复为null，count自减1，同时该线程进入 WaitSet集合中等待被唤醒。若当前线程执行完毕也将释放monitor(锁)并复位变量的值，以便其他线程进入获取monitor(锁)。如下图所示</p>
-<p><img src="/images/pasted-64.png" alt="upload successful"></p>
-<p>由此看来，monitor对象存在于每个Java对象的对象头中(存储的指针的指向)，synchronized锁便是通过这种方式获取锁的，也是为什么Java中任意对象可以作为锁的原因，同时也是notify/notifyAll/wait等方法存在于顶级对象Object中的原因(关于这点稍后还会进行分析)，ok~，有了上述知识基础后，下面我们将进一步分析synchronized在字节码层面的具体语义实现。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">3: monitorenter  //进入同步方法</span><br><span class="line">//..........省略其他  </span><br><span class="line">15: monitorexit   //退出同步方法</span><br><span class="line">16: goto          24</span><br><span class="line">//省略其他.......</span><br><span class="line">21: monitorexit //退出同步方法 --抛异常时退出同步方法</span><br></pre></td></tr></table></figure>
-<p>从字节码中可知同步语句块的实现使用的是monitorenter 和 monitorexit 指令，其中monitorenter指令指向同步代码块的开始位置，monitorexit指令则指明同步代码块的结束位置，当执行monitorenter指令时，当前线程将试图获取 objectref(即对象锁) 所对应的 monitor 的持有权，当 objectref 的 monitor 的进入计数器为 0，那线程可以成功取得 monitor，并将计数器值设置为 1，取锁成功。如果当前线程已经拥有 objectref 的 monitor 的持有权，那它可以重入这个 monitor (关于重入性稍后会分析)，重入时计数器的值也会加 1。倘若其他线程已经拥有 objectref 的 monitor 的所有权，那当前线程将被阻塞，直到正在执行线程执行完毕，即monitorexit指令被执行，执行线程将释放 monitor(锁)并设置计数器值为0 ，其他线程将有机会持有 monitor 。值得注意的是编译器将会确保无论方法通过何种方式完成，方法中调用过的每条 monitorenter 指令都有执行其对应 monitorexit 指令，而无论这个方法是正常结束还是异常结束。为了保证在方法异常完成时 monitorenter 和 monitorexit 指令依然可以正确配对执行，编译器会自动产生一个异常处理器，这个异常处理器声明可处理所有的异常，它的目的就是用来执行 monitorexit 指令。从字节码中也可以看出多了一个monitorexit指令，它就是异常结束时被执行的释放monitor 的指令。</p>
-<h1 id="synchronized代码块底层原理"><a href="#synchronized代码块底层原理" class="headerlink" title="synchronized代码块底层原理"></a>synchronized代码块底层原理</h1><p>方法级的同步是隐式，即无需通过字节码指令来控制的，它实现在方法调用和返回操作之中。JVM可以从方法常量池中的方法表结构(method_info Structure) 中的 ACC_SYNCHRONIZED 访问标志区分一个方法是否同步方法。当方法调用时，调用指令将会 检查方法的 ACC_SYNCHRONIZED 访问标志是否被设置，如果设置了，执行线程将先持有monitor（虚拟机规范中用的是管程一词）， 然后再执行方法，最后再方法完成(无论是正常完成还是非正常完成)时释放monitor。在方法执行期间，执行线程持有了monitor，其他任何线程都无法再获得同一个monitor。如果一个同步方法执行期间抛 出了异常，并且在方法内部无法处理此异常，那这个同步方法所持有的monitor将在异常抛到同步方法之外时自动释放。下面我们看看字节码层面如何实现：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"> Last modified 2017-6-2; size 308 bytes</span><br><span class="line">  MD5 checksum f34075a8c059ea65e4cc2fa610e0cd94</span><br><span class="line">  Compiled from &quot;SyncMethod.java&quot;</span><br><span class="line">public class com.zejian.concurrencys.SyncMethod</span><br><span class="line">  minor version: 0</span><br><span class="line">  major version: 52</span><br><span class="line">  flags: ACC_PUBLIC, ACC_SUPER</span><br><span class="line">Constant pool;</span><br><span class="line"></span><br><span class="line">   //省略没必要的字节码</span><br><span class="line">  //==================syncTask方法======================</span><br><span class="line">  public synchronized void syncTask();</span><br><span class="line">    descriptor: ()V</span><br><span class="line">    //方法标识ACC_PUBLIC代表public修饰，ACC_SYNCHRONIZED指明该方法为同步方法</span><br><span class="line">    flags: ACC_PUBLIC, ACC_SYNCHRONIZED</span><br><span class="line">    Code:</span><br><span class="line">      stack=3, locals=1, args_size=1</span><br><span class="line">         0: aload_0</span><br><span class="line">         1: dup</span><br><span class="line">         2: getfield      #2                  // Field i:I</span><br><span class="line">         5: iconst_1</span><br><span class="line">         6: iadd</span><br><span class="line">         7: putfield      #2                  // Field i:I</span><br><span class="line">        10: return</span><br><span class="line">      LineNumberTable:</span><br><span class="line">        line 12: 0</span><br><span class="line">        line 13: 10</span><br><span class="line">&#125;</span><br><span class="line">SourceFile: &quot;SyncMethod.java&quot;</span><br></pre></td></tr></table></figure>
-<p>从字节码中可以看出，synchronized修饰的方法并没有monitorenter指令和monitorexit指令，取得代之的确实是ACC_SYNCHRONIZED标识，该标识指明了该方法是一个同步方法，JVM通过该ACC_SYNCHRONIZED访问标志来辨别一个方法是否声明为同步方法，从而执行相应的同步调用。这便是synchronized锁在同步代码块和同步方法上实现的基本原理。同时我们还必须注意到的是在Java早期版本中，synchronized属于重量级锁，效率低下，因为监视器锁（monitor）是依赖于底层的操作系统的Mutex Lock来实现的，而操作系统实现线程之间的切换时需要从用户态转换到核心态，这个状态之间的转换需要相对比较长的时间，时间成本相对较高，这也是为什么早期的synchronized效率低的原因。庆幸的是在Java 6之后Java官方对从JVM层面对synchronized较大优化，所以现在的synchronized锁效率也优化得很不错了，Java 6之后，为了减少获得锁和释放锁所带来的性能消耗，引入了轻量级锁和偏向锁，接下来我们将简单了解一下Java官方在JVM层面对synchronized锁的优化。</p>
-<h1 id="Java虚拟机对synchronized的优化"><a href="#Java虚拟机对synchronized的优化" class="headerlink" title="Java虚拟机对synchronized的优化"></a>Java虚拟机对synchronized的优化</h1><p>锁的状态总共有四种，无锁状态、偏向锁、轻量级锁和重量级锁。随着锁的竞争，锁可以从偏向锁升级到轻量级锁，再升级的重量级锁，但是锁的升级是单向的，也就是说只能从低到高升级，不会出现锁的降级，关于重量级锁，前面我们已详细分析过，下面我们将介绍偏向锁和轻量级锁以及JVM的其他优化手段，这里并不打算深入到每个锁的实现和转换过程更多地是阐述Java虚拟机所提供的每个锁的核心优化思想，毕竟涉及到具体过程比较繁琐，如需了解详细过程可以查阅《深入理解Java虚拟机原理》。</p>
-<h2 id="偏向锁-单线程"><a href="#偏向锁-单线程" class="headerlink" title="偏向锁(单线程)"></a>偏向锁(单线程)</h2><p>偏向锁是Java 6之后加入的新锁，它是一种针对加锁操作的优化手段，经过研究发现，在大多数情况下，锁不仅不存在多线程竞争，而且总是由同一线程多次获得，因此为了减少同一线程获取锁(会涉及到一些CAS操作,耗时)的代价而引入偏向锁。偏向锁的核心思想是，如果一个线程获得了锁，那么锁就进入偏向模式，此时Mark Word 的结构也变为偏向锁结构，当这个线程再次请求锁时，无需再做任何同步操作，即获取锁的过程，这样就省去了大量有关锁申请的操作，从而也就提供程序的性能。所以，对于没有锁竞争的场合，偏向锁有很好的优化效果，毕竟极有可能连续多次是同一个线程申请相同的锁。但是对于锁竞争比较激烈的场合，偏向锁就失效了，因为这样场合极有可能每次申请锁的线程都是不相同的，因此这种场合下不应该使用偏向锁，否则会得不偿失，需要注意的是，偏向锁失败后，并不会立即膨胀为重量级锁，而是先升级为轻量级锁。下面我们接着了解轻量级锁。</p>
-<h2 id="轻量级锁-线程交替执行同步块的场合"><a href="#轻量级锁-线程交替执行同步块的场合" class="headerlink" title="轻量级锁(线程交替执行同步块的场合)"></a>轻量级锁(线程交替执行同步块的场合)</h2><p>倘若偏向锁失败，虚拟机并不会立即升级为重量级锁，它还会尝试使用一种称为轻量级锁的优化手段(1.6之后加入的)，此时Mark Word 的结构也变为轻量级锁的结构。轻量级锁能够提升程序性能的依据是“对绝大部分的锁，在整个同步周期内都不存在竞争”，注意这是经验数据。需要了解的是，轻量级锁所适应的场景是线程交替执行同步块的场合，如果存在同一时间访问同一锁的场合，就会导致轻量级锁膨胀为重量级锁。</p>
-<h2 id="自旋锁-针对线程持有锁的时间都不会太长"><a href="#自旋锁-针对线程持有锁的时间都不会太长" class="headerlink" title="自旋锁(针对线程持有锁的时间都不会太长)"></a>自旋锁(针对线程持有锁的时间都不会太长)</h2><p>轻量级锁失败后，虚拟机为了避免线程真实地在操作系统层面挂起，还会进行一项称为自旋锁的优化手段。这是基于在大多数情况下，线程持有锁的时间都不会太长，如果直接挂起操作系统层面的线程可能会得不偿失，毕竟操作系统实现线程之间的切换时需要从用户态转换到核心态，这个状态之间的转换需要相对比较长的时间，时间成本相对较高，因此自旋锁会假设在不久将来，当前的线程可以获得锁，因此虚拟机会让当前想要获取锁的线程做几个空循环(这也是称为自旋的原因)，一般不会太久，可能是50个循环或100循环，在经过若干次循环后，如果得到锁，就顺利进入临界区。如果还不能获得锁，那就会将线程在操作系统层面挂起，这就是自旋锁的优化方式，这种方式确实也是可以提升效率的。最后没办法也就只能升级为重量级锁了。</p>
-<h2 id="锁消除-针对局部变量"><a href="#锁消除-针对局部变量" class="headerlink" title="锁消除(针对局部变量)"></a>锁消除(针对局部变量)</h2><p>消除锁是虚拟机另外一种锁的优化，这种优化更彻底，Java虚拟机在JIT编译时(可以简单理解为当某段代码即将第一次被执行时进行编译，又称即时编译)，通过对运行上下文的扫描，去除不可能存在共享资源竞争的锁，通过这种方式消除没有必要的锁，可以节省毫无意义的请求锁时间，如下StringBuffer的append是一个同步方法，但是在add方法中的StringBuffer属于一个局部变量，并且不会被其他线程所使用，因此StringBuffer不可能存在共享资源竞争的情景，JVM会自动将其锁消除。</p>
-<h1 id="关于synchronized-可能需要了解的关键点"><a href="#关于synchronized-可能需要了解的关键点" class="headerlink" title="关于synchronized 可能需要了解的关键点"></a>关于synchronized 可能需要了解的关键点</h1><h2 id="synchronized的可重入性"><a href="#synchronized的可重入性" class="headerlink" title="synchronized的可重入性"></a>synchronized的可重入性</h2><p>从互斥锁的设计上来说，当一个线程试图操作一个由其他线程持有的对象锁的临界资源时，将会处于阻塞状态，但当一个线程再次请求自己持有对象锁的临界资源时，这种情况属于重入锁，请求将会成功，在java中synchronized是基于原子性的内部锁机制，是可重入的，因此在一个线程调用synchronized方法的同时在其方法体内部调用该对象另一个synchronized方法，也就是说一个线程得到一个对象锁后再次请求该对象锁，是允许的，这就是synchronized的可重入性。<br>每次重入，monitor中的计数器仍会加1。</p>
-<h1 id="线程中断与synchronized"><a href="#线程中断与synchronized" class="headerlink" title="线程中断与synchronized"></a>线程中断与synchronized</h1><h2 id="线程中断"><a href="#线程中断" class="headerlink" title="线程中断"></a>线程中断</h2><p>当一个线程处于被阻塞状态或者试图执行一个阻塞操作时，使用Thread.interrupt()方式中断该线程，注意此时将会抛出一个InterruptedException的异常，同时中断状态将会被复位(由中断状态改为非中断状态)</p>
-<p>除了阻塞中断的情景，我们还可能会遇到处于运行期且非阻塞的状态的线程，这种情况下，直接调用Thread.interrupt()中断线程是不会得到任响应的.应该使用了实例方法isInterrupted判断线程是否已被中断，如果被中断将跳出循环以此结束线程,注意非阻塞状态调用interrupt()并不会导致中断状态重置。<br>综合所述，可以简单总结一下中断两种情况，一种是当线程处于阻塞状态或者试图执行一个阻塞操作时，我们可以使用实例方法interrupt()进行线程中断，执行中断操作后将会抛出interruptException异常(该异常必须捕捉无法向外抛出)并将中断状态复位，另外一种是当线程处于运行状态时，我们也可调用实例方法interrupt()进行线程中断，但同时必须手动判断中断状态，并编写中断线程的代码(其实就是结束run方法体的代码)。有时我们在编码时可能需要兼顾以上两种情况，那么就可以如下编写：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">public void run()&#123;</span><br><span class="line">    try &#123;</span><br><span class="line">    //判断当前线程是否已中断,注意interrupted方法是静态的,执行后会对中断状态进行复位</span><br><span class="line">    while (!Thread.interrupted()) &#123;</span><br><span class="line">        TimeUnit.SECONDS.sleep(2);</span><br><span class="line">    &#125;</span><br><span class="line">    &#125; catch (InterruptedException e) &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="中断与synchronized"><a href="#中断与synchronized" class="headerlink" title="中断与synchronized"></a>中断与synchronized</h2><p>事实上线程的中断操作对于正在等待获取的锁对象的synchronized方法或者代码块并不起作用，也就是对于synchronized来说，如果一个线程在等待锁，那么结果只有两种，要么它获得这把锁继续执行，要么它就保存等待，即使调用中断线程的方法，也不会生效。</p>
-<h2 id="等待唤醒机制与synchronized"><a href="#等待唤醒机制与synchronized" class="headerlink" title="等待唤醒机制与synchronized"></a>等待唤醒机制与synchronized</h2><p>所谓等待唤醒机制本篇主要指的是notify/notifyAll和wait方法，在使用这3个方法时，必须处于synchronized代码块或者synchronized方法中，否则就会抛出IllegalMonitorStateException异常，这是因为调用这几个方法前必须拿到当前对象的监视器monitor对象，也就是说notify/notifyAll和wait方法依赖于monitor对象，在前面的分析中，我们知道monitor 存在于对象头的Mark Word 中(存储monitor引用指针)，而synchronized关键字可以获取 monitor ，这也就是为什么notify/notifyAll和wait方法必须在synchronized代码块或者synchronized方法调用的原因。</p>
-<p>需要特别理解的一点是，与sleep方法不同的是wait方法调用完成后，线程将被暂停，但wait方法将会释放当前持有的监视器锁(monitor)，直到有线程调用notify/notifyAll方法后方能继续执行，而sleep方法只让线程休眠并不释放锁。同时notify/notifyAll方法调用后，并不会马上释放监视器锁，而是在相应的synchronized(){}/synchronized方法执行结束后才自动释放锁。</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://blog.csdn.net/javazejian/article/details/72828483" target="_blank" rel="noopener">http://blog.csdn.net/javazejian/article/details/72828483</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/02/01/java_thread/study-java-lock/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/02/01/java_thread/study-java-lock/" itemprop="url">study-java-lock</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-01T22:49:51+08:00">
-                2018-02-01
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/02/01/java_thread/study-java-lock/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/02/01/java_thread/study-java-lock/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/02/01/java_thread/study-java-lock/" class="leancloud_visitors" data-flag-title="study-java-lock">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">锁的实现</span><br><span class="line"></span><br><span class="line">在关于锁的面试过程中，一般主要问Synchronized和ReentrantLock的实现原理，更有甚者会问一些读写锁。</span><br><span class="line">场景对话：</span><br><span class="line"></span><br><span class="line">面试官：都了解Java中的什么锁？</span><br><span class="line">我：比如Synchronized和ReentrantLock...读写锁用的不多，就没研究了</span><br><span class="line">面试官：那好，你先说说Synchronized的实现原理吧</span><br><span class="line">我：嗯，Synchronized是JVM实现的一种锁，其中锁的获取和释放分别是monitorenter和monitorexit指令，该锁在实现上分为了偏向锁、轻量级锁和重量级锁，其中偏向锁在1.6是默认开启的，轻量级锁在多线程竞争的情况下会膨胀成重量级锁，有关锁的数据都保存在对象头中...&amp;&amp;@@#，（嗯，说了一大堆，面试官也没打断我）</span><br><span class="line">面试官：哦，嗯，理解的还挺透彻，那你说说ReentrantLock的实现吧...</span><br><span class="line">我：ReentrantLock是基于AQS实现的</span><br><span class="line">面试官：什么是AQS？</span><br><span class="line">我：在AQS内部会保存一个状态变量state，通过CAS修改该变量的值，修改成功的线程表示获取到该锁，没有修改成功，或者发现状态state已经是加锁状态，则通过一个Waiter对象封装线程，添加到等待队列中，并挂起等待被唤醒&amp;&amp;&amp;$$（又说了一堆）</span><br><span class="line">面试官：能说说CAS的实现原理么？</span><br><span class="line">我：CAS是通过unsafe类的compareAndSwap方法实现的（心里得意的一笑）</span><br><span class="line">面试官：哦，好的，那你知道这个方法的参数的含义的么？</span><br><span class="line">我：（这是在逼我啊...努力的回想，因为我真的看过啊）我想想啊，这个方法看的时间有点久远了，第一个参数是要修改的对象，第二个参数是对象中要修改变量的偏移量，第三个参数是修改之前的值，第四个参数是预想修改后的值....（说出来之后都有点佩服自己，这个都记得，不过面试官好像还是不肯放过我...）</span><br><span class="line">面试官：嗯，对的，那你知道操作系统级别是如何实现的么？</span><br><span class="line">我：（我去你大爷...）我只记得X86中有一个cmp开头的指令，具体的我忘记了...</span><br><span class="line">面试官：嗯，好，你知道CAS指令有什么缺点么</span><br><span class="line">我：哦，CAS的缺点是存在ABA问题</span><br><span class="line">面试官：怎么讲？</span><br><span class="line">我：就是一个变量V，如果变量V初次读取的时候是A，并且在准备赋值的时候检查到它仍然是A，那能说明它的值没有被其他线程修改过了吗？如果在这段期间它的值曾经被改成了B，然后又改回A，那CAS操作就会误认为它从来没有被修改过。</span><br><span class="line">面试官：那怎么解决？</span><br><span class="line">我：（有完没完了啊...我的心里是崩溃的）针对这种情况，java并发包中提供了一个带有标记的原子引用类&quot;AtomicStampedReference&quot;，它可以通过控制变量值的版本来保证CAS的正确性。</span><br><span class="line"></span><br><span class="line">本来转载自公众号  占小狼的博客</span><br><span class="line">作者占小狼   来自 美团点评 基础架构组</span><br></pre></td></tr></table></figure>
-<p>Java 虚拟机中的同步(Synchronization)基于进入和退出管程(Monitor)对象实现</p>
-<p>ACC_SYNCHRONIZED</p>
-<table><br><thead><br><tr><br>  <th align="center">虚拟机位数</th><br>  <th align="center">头对象结构</th><br>  <th>说明</th><br></tr><br></thead><br><tbody><tr><br>  <td align="center">32/64bit</td><br>  <td align="center">Mark Word</td><br>  <td>存储对象的hashCode、锁信息或分代年龄或GC标志等信息</td><br></tr><br><tr><br>  <td align="center">32/64bit</td><br>  <td align="center">Class Metadata Address</td><br>  <td>类型指针指向对象的类元数据，JVM通过这个指针确定该对象是哪个类的实例。</td><br></tr><br></tbody></table>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2051,7 +2273,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">132</span>
+                  <span class="site-state-item-count">135</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
