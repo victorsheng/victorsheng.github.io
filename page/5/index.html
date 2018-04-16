@@ -326,6 +326,334 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/03/26/redis/redis-fast/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/26/redis/redis-fast/" itemprop="url">Redis 快的原因</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-26T18:21:00+08:00">
+                2018-03-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/redis/" itemprop="url" rel="index">
+                    <span itemprop="name">redis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/26/redis/redis-fast/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/03/26/redis/redis-fast/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/03/26/redis/redis-fast/" class="leancloud_visitors" data-flag-title="Redis 快的原因">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>R<br>edis 采用的是基于内存的采用的是单进程单线程模型的 KV 数据库，由 C 语言编写。官方提供的数据是可以达到100000+的 qps。这个数据不比采用单进程多线程的同样基于内存的 KV 数据库 Memcached 差。</p>
+<p>Redis 快的主要原因有：</p>
+<ol>
+<li>完全基于内存；</li>
+<li>数据结构简单，对数据操作也简单；</li>
+<li>使用多路 I/O 复用模型；</li>
+</ol>
+<p>第一、二点不细讲，主要围绕第三点采用多路 I/O 复用技术来展开。</p>
+<p>多路 I/O 复用模型是利用 select、poll、epoll 可以<strong>同时监察多个流的 I/O 事件</strong>的能力，在空闲的时候，会把当前线程阻塞掉，当有一个或多个流有 I/O 事件时，就从阻塞态中唤醒，于是程序就会轮询一遍所有的流（epoll 是只轮询那些真正发出了事件的流），并且只依次顺序的处理就绪的流，这种做法就避免了大量的无用操作。这里“多路”指的是多个网络连接，“复用”指的是复用同一个线程。采用多路 I/O 复用技术可以让单个线程高效的处理多个连接请求（尽量减少网络 IO 的时间消耗），且 Redis 在内存中操作数据的速度非常快（内存内的操作不会成为这里的性能瓶颈），主要以上两点造就了 Redis 具有很高的吞吐量。</p>
+<p><img src="http://www.syyong.com/usr/uploads/2016/07/3587411016.png" alt=""></p>
+<p>和 Memcached 不同，Redis 并没有直接使用 Libevent，而是自己完成了一个非常轻量级的对 select、epoll、evport、kqueue 这些通用的接口的实现。在不同的系统调用选用适合的接口，linux 下默认是 epoll。因为 Libevent 比较重，更通用，代码量也就很庞大，拥有很多 Redis 用不上的功能，Redis 为了追求“轻巧”并且去除依赖，就选择自己去封装了一套。</p>
+<h3 id="单进程单线程好处"><a href="#单进程单线程好处" class="headerlink" title="单进程单线程好处"></a>单进程单线程好处</h3><ol>
+<li>代码更清晰，处理逻辑更简单</li>
+<li>不用去考虑各种锁的问题，不存在加锁释放锁操作，没有因为可能出现死锁而导致的性能消耗</li>
+<li>不存在多进程或者多线程导致的切换而消耗 CPU</li>
+</ol>
+<h3 id="单进程单线程弊端"><a href="#单进程单线程弊端" class="headerlink" title="单进程单线程弊端"></a>单进程单线程弊端</h3><ol>
+<li>无法发挥多核 CPU 性能，不过可以通过在单机开多个 Redis 实例来完善；</li>
+</ol>
+<h3 id="其他一些优秀的开源软件采用的模型"><a href="#其他一些优秀的开源软件采用的模型" class="headerlink" title="其他一些优秀的开源软件采用的模型"></a>其他一些优秀的开源软件采用的模型</h3><ul>
+<li>多进程单线程模型：Nginx</li>
+<li>单进程多线程模型：Memcached</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/03/25/java_netty/netty_thread_model/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/25/java_netty/netty_thread_model/" itemprop="url">netty线程模型</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-25T02:14:00+08:00">
+                2018-03-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/25/java_netty/netty_thread_model/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/03/25/java_netty/netty_thread_model/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/03/25/java_netty/netty_thread_model/" class="leancloud_visitors" data-flag-title="netty线程模型">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>Proactor和Reactor是两种经典的多路复用I/O模型，主要用于在高并发、高吞吐量的环境中进行I/O处理。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/03/25/messages/2018-03-25-ali-message/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1858,330 +2186,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/03/21/data_warehouse/data-warehouse-layering/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/21/data_warehouse/data-warehouse-layering/" itemprop="url">data-warehouse-layering</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-21T17:05:26+08:00">
-                2018-03-21
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/03/21/data_warehouse/data-warehouse-layering/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/21/data_warehouse/data-warehouse-layering/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/03/21/data_warehouse/data-warehouse-layering/" class="leancloud_visitors" data-flag-title="data-warehouse-layering">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="传统分层"><a href="#传统分层" class="headerlink" title="传统分层"></a>传统分层</h1><p><img src="/images/pasted-91.png" alt="upload successful"></p>
-<h1 id="阿里数据分层"><a href="#阿里数据分层" class="headerlink" title="阿里数据分层"></a>阿里数据分层</h1><p><a href="https://oss-cn-hangzhou.aliyuncs.com/yqfiles/ceea30ef3e4db4ec980c5a3fb8dee73d.pdf?spm=a2c4e.11153959.blogcont69316.176.367f2caePvjO9h&amp;file=ceea30ef3e4db4ec980c5a3fb8dee73d.pdf" target="_blank" rel="noopener">https://oss-cn-hangzhou.aliyuncs.com/yqfiles/ceea30ef3e4db4ec980c5a3fb8dee73d.pdf?spm=a2c4e.11153959.blogcont69316.176.367f2caePvjO9h&amp;file=ceea30ef3e4db4ec980c5a3fb8dee73d.pdf</a></p>
-<p><img src="/images/pasted-97.png" alt="upload successful"></p>
-<p><img src="/images/pasted-92.png" alt="upload successful"></p>
-<p>基础层</p>
-<p><img src="/images/pasted-93.png" alt="upload successful"></p>
-<p>数据中间层</p>
-<p><img src="/images/pasted-94.png" alt="upload successful"></p>
-<p>数据集市层<br><img src="/images/pasted-95.png" alt="upload successful"></p>
-<p>流式数据集<br><img src="/images/pasted-96.png" alt="upload successful"></p>
-<h1 id="美团分层"><a href="#美团分层" class="headerlink" title="美团分层"></a>美团分层</h1><p><a href="https://tech.meituan.com/traffic_data_product.html" target="_blank" rel="noopener">https://tech.meituan.com/traffic_data_product.html</a></p>
-<p><img src="/images/pasted-103.png" alt="upload successful"><br>A层（也称ODS层），包含美团App的大搜日志、页面流量日志、模块事件日志以及描述埋点内容的信息日志。<br>公共维度，其中重要的流量入口维度、页面维度都是从具有统一规则的埋点标记日志中，抽象形成的维度。<br>B3层（酒旅基础明细层），通过对A层的抽取转换，初步形成只含酒旅业务所需的基础流量日志。<br>B2层（酒旅多维模型层），对已有的基础层数据和公共维度的轻加工，扩展出业务常用的维度信息，例如页面类型、商家门店、产品、城市，以及平台等。<br>B1层（主题宽表层），主题宽表层主要是对多维模型层的聚合计算，包括多个复杂业务口径的输出、少数维度的深加工，以及来源入口的增加，保证数据的一致性。<br>App层，该层是针对各自的流量应用（流量罗盘）设计的，满足该产品应用所需且具有一定扩展容量的聚合模型结构。<br>视图层，作为App层与Kylin cube的缓冲层，依靠其本身视图的特性，能够很好地解决顶层扩展、查询延时、资源分配，以及表意理解等多个问题。<br>cube层，每个Kylin cube是由单个视图与多个维度的雪花组合，输出计算数据给罗盘后台服务。<br>后台服务层，包含查询引擎和配置模块两部分的内容。处理前端的查询请求。<br>权限层，对各个业务线分平台和终端控制权限。<br>前端展示层，与用户交互并提交用户的查询请求。</p>
-<h1 id="数据仓库分层的原因"><a href="#数据仓库分层的原因" class="headerlink" title="数据仓库分层的原因"></a>数据仓库分层的原因</h1><p>1通过数据预处理提高效率，因为预处理，所以会存在冗余数据</p>
-<p>2如果不分层而业务系统的业务规则发生变化，就会影响整个数据清洗过程，工作量巨大</p>
-<p>3通过分层管理来实现分步完成工作，这样每一层的处理逻辑就简单了</p>
-<h1 id="标准的数据仓库分层："><a href="#标准的数据仓库分层：" class="headerlink" title="标准的数据仓库分层："></a>标准的数据仓库分层：</h1><p><img src="/images/pasted-90.png" alt="upload successful"></p>
-<ul>
-<li>ods（临时存储层）</li>
-<li>pdw（数据仓库层）</li>
-<li>mid（数据集市层） 轻度汇总(宽表几百个字段)</li>
-<li>app（应用层）OLAP/OLAM/app</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">中间层是数据仓库最重要的一层。直接决定了数据仓库的性能。</span><br><span class="line"></span><br><span class="line">一般的做法是：</span><br><span class="line"></span><br><span class="line">1）数据汇总。将底层数据按维度进行小颗粒度汇总</span><br><span class="line"></span><br><span class="line">2）信息聚合。将多张表的信息聚合在一个表中。这样的好处，是避免使用表关联，提高查询性能。</span><br></pre></td></tr></table></figure>
-<p>ods：历史存储层，它和源系统数据是同构的，而且这一层数据粒度是最细的，这层的表分为两种，一种是存储当前需要加载的数据，一种是用于存储处理完后的数据。</p>
-<p>pdw：数据仓库层，它的数据是干净的数据，是一致的准确的，也就是清洗后的数据，它的数据一般都遵循数据库第三范式，数据粒度和ods的粒度相同，它会保存bi系统中所有历史数据</p>
-<p>mid：数据集市层，它是<strong>面向主题</strong>组织数据的，通常是星状和雪花状数据，从数据粒度将，它是轻度汇总级别的数据，<strong>已经不存在明细的数据</strong>了，从广度来说，它包含了所有业务数量。从分析角度讲，大概就是近几年</p>
-<p>app：应用层，数据粒度高度汇总，倒不一定涵盖所有业务数据，只是mid层数据的一个子集。</p>
-<p>数据仓库的目的是构建面向分析的集成化数据环境，为企业提供决策支持。数据仓库的context也可以理解为：数据源，数据仓库，数据应用</p>
-<p>数据仓库可以理解为中间集成化数据管理的一个平台</p>
-<p>etl（抽取extra，转化transfer，装载load）是数据仓库的流水线，也可以认为是数据仓库的血液。</p>
-<p>数据仓库的存储并不需要存储所有原始数据，因为比如你存储冗长的文本数据完全没必要，但需要存储细节数据，因为需求是多变的，而且数据仓库是导入数据必须经过整理和转换使它面向主题，因为前台数据库的数据是基于oltp操作组织优化的，这些可能不适合做分析，面向主题的组织形式才有利于分析。</p>
-<p>多维数据模型就是说可以多维度交叉查询和细分，应用一般都是基于联机分析处理<strong>（online analytical process OLAP）</strong>，面向特定需求群体的数据集市会基于多位数据模型构建</p>
-<p>而报表展示就是将聚合数据和多维分析数据展示到报表，提供简单和直观的数据。</p>
-<p>元数据，也叫解释性数据，或者数据字典，会记录数据仓库中模型的定义，各层级之间的映射关系，监控数据仓库的数据状态和etl的任务运行状态。一般通过元数据资料库来统一存储和管理元数据。</p>
-<h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><h2 id="数据来源层"><a href="#数据来源层" class="headerlink" title="数据来源层"></a>数据来源层</h2><p>日志或者关系型数据库，并通过Flume、Sqoop、Kettle等etl工具导入到HDFS，并映射到HIVE的数据仓库表中。</p>
-<h2 id="事实表"><a href="#事实表" class="headerlink" title="事实表"></a>事实表</h2><p>是数据仓库结构中的中央表，它包含联系事实与维度表的数字度量值和键。事实数据表包含描述业务（例如产品销售）内特定事件的数据。</p>
-<h2 id="维度表"><a href="#维度表" class="headerlink" title="维度表"></a>维度表</h2><p>是维度属性的集合。是分析问题的一个窗口。是人们观察数据的特定角度，是考虑问题时的一类属性，属性的集合构成一个维。数据库结构中的星型结构，该结构在位于结构中心的单个事实数据表中维护数据，其它维度数据存储在维度表中。每个维度表与事实数据表直接相关，且通常通过一个键联接到事实数据表中。星型架构是数据仓库比较流向的一种架构</p>
-<h2 id="主题表：主题（Subject）"><a href="#主题表：主题（Subject）" class="headerlink" title="主题表：主题（Subject）"></a>主题表：主题（Subject）</h2><p>是在较高层次上将企业信息系统中的数据进行综合、归类和分析利用的一个抽象概念，每一个主题基本对应一个宏观的分析领域。在逻辑意义上，它是对应企业中某一宏观分析领域所涉及的分析对象。例如“销售分析”就是一个分析领域，因此这个数据仓库应用的主题就是“销售分析”。</p>
-<p>面向主题的数据组织方式，就是在较高层次上对分析对象数据的一个完整并且一致的描述，能刻画各个分析对象所涉及的企业各项数据，以及数据之间的联系。所谓较高层次是相对面向应用的数据组织方式而言的，是指按照主题进行数据组织的方式具有更高的数据抽象级别。与传统数据库面向应用进行数据组织的特点相对应，数据仓库中的数据是面向主题进行组织的。例如，一个生产企业的数据仓库所组织的主题可能有产品订货分析和货物发运分析等。而按应用来组织则可能为财务子系统、销售子系统、供应子系统、人力资源子系统和生产调度子系统。</p>
-<h2 id="汇总数据层-周报、月报、季报、年报"><a href="#汇总数据层-周报、月报、季报、年报" class="headerlink" title="汇总数据层(周报、月报、季报、年报)"></a>汇总数据层(周报、月报、季报、年报)</h2><p>聚合原子粒度事实表及维度表，为满足固定分析需求，以提高查询性能为目的，形成的高粒度表，如周报、月报、季报、年报等。</p>
-<h2 id="应用层："><a href="#应用层：" class="headerlink" title="应用层："></a>应用层：</h2><p>为应用层，这层数据是完全为了满足具体的分析需求而构建的数据，也是星形结构的数据。应用层为前端应用的展现提现数据，可以为关系型数据库组成。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.victor123.cn/2018/03/21/java_tools/keymap-idea/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/21/java_tools/keymap-idea/" itemprop="url">keymap-idea</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-21T16:43:36+08:00">
-                2018-03-21
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/03/21/java_tools/keymap-idea/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/21/java_tools/keymap-idea/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/03/21/java_tools/keymap-idea/" class="leancloud_visitors" data-flag-title="keymap-idea">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>代码包围<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">alt+comand+t</span><br></pre></td></tr></table></figure></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2232,7 +2236,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">137</span>
+                  <span class="site-state-item-count">138</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
