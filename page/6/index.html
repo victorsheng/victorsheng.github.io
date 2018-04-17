@@ -326,6 +326,539 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/23/分布式/study-cap/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/23/分布式/study-cap/" itemprop="url">study-cap</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-23T23:09:04+08:00">
+                2018-03-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/23/分布式/study-cap/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/03/23/分布式/study-cap/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/03/23/分布式/study-cap/" class="leancloud_visitors" data-flag-title="study-cap">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>CAP（Consistency一致性、Availability可用性、Partition-tolerance分区可容忍性）理论普遍被看成是大数据技术的理论基础。同时，凭据该理论，业界有一种极度流行、极度“专业”的认识，那就是：关系型数据库设计选择了C（一致性）与A（可用性），NoSQL数据库设计则差别。其中，HBase选择了C（一致性）与P（分区可容忍性），Cassandra选择了A（可用性）与P（分区可容忍性）。</p>
+<ul>
+<li>Consistency一致性：你的客户再次来电时总能查到他们刚来电更新的信息，不论相隔多短</li>
+<li>Availability可用性：不论你和你妻子谁来工作，记忆公司总能接听来电，处理客户请求</li>
+<li>Partition-tolerance分区可容忍性：即便你和你妻子失联，记忆公司依然能正常运转</li>
+</ul>
+<p>● 一致性(C): 在分布式系统中的所有数据备份，在同一时刻是否同样的值。(等同于所有节点访问同一份最新的数据副本)</p>
+<p>● 可用性(A): 在集群中一部分节点故障后，集群整体是否还能响应客户端 的读写请求。(对数据更新具备高可用性)</p>
+<p>● 分区容忍性(P): 以实际效果而言，分区相当于对通信的时限要求。系统如果不能在时限内达成数据一致性，就意味着发生了分区的情况，必须就当前 操作在 C 和 A 之间做出选择。(分区状态可以理解为部分机器不连通了，比如机器挂了，繁忙失去响应，单机房故障等)</p>
+<p>Partition 字面意思是网络分区，即因网络因素将系统分隔为多个单独的部 分，有人可能会说，网络分区的情况发生概率非常小啊，是不是不用考虑 P， 保证 CA 就好。要理解 P，我们看回 CAP 证明中 P 的定义:</p>
+<p>In order to model partition tolerance, the network will be allowed to lose arbitrarily many messages sent from one node to another。</p>
+<p>网络分区的情况符合该定义，网络丢包的情况也符合以上定义，另外节点宕 机，其他节点发往宕机节点的包也将丢失，这种情况同样符合定义。现实情况 下我们面对的是一个不可靠的网络、有一定概率宕机的设备，这两个因素都会 导致 Partition，因而分布式系统实现中 P 是一个必须项，而不是可选项。</p>
+<h2 id="解读"><a href="#解读" class="headerlink" title="解读"></a>解读</h2><p>CP without A:如果不要求 A(可用)，相当于每个请求都需要在 Server 之间 强一致，而 P(分区)会导致同步时间无限延长，如此 CP 也是可以保证的。很 多传统的数据库分布式事务都属于这种模式。</p>
+<p>AP wihtout C:要高可用并允许分区，则需放弃一致性。一旦分区发生，节点 之间可能会失去联系，为了高可用，每个节点只能用本地数据提供服务，而这样会导致全局数据的不一致性。现在众多的 NoSQL 都属于此类。</p>
+<h2 id="伪命题"><a href="#伪命题" class="headerlink" title="伪命题"></a>伪命题</h2><p>“三选二”是一个伪命题</p>
+<p>不是为了 P(分区容忍性)，要在 A 和 C 之间选择一个。分区很少出现，CAP 在大多数时候允许完美的 C 和 A。但当分区存在或可感知其影响的情况下，就要预备一种策略去探知分区并显式处理其影响。</p>
+<h1 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h1><table>
+<thead>
+<tr>
+<th style="text-align:left">Feature</th>
+<th style="text-align:left">Consul</th>
+<th style="text-align:left">zookeeper</th>
+<th style="text-align:left">etcd</th>
+<th style="text-align:left">euerka</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">服务健康检查</td>
+<td style="text-align:left">服务状态，内存，硬盘等</td>
+<td style="text-align:left">(弱)长连接，keepalive</td>
+<td style="text-align:left">连接心跳</td>
+<td style="text-align:left">可配支持</td>
+</tr>
+<tr>
+<td style="text-align:left">多数据中心</td>
+<td style="text-align:left">支持</td>
+<td style="text-align:left">—</td>
+<td style="text-align:left">—</td>
+<td style="text-align:left">—</td>
+</tr>
+<tr>
+<td style="text-align:left">kv存储服务</td>
+<td style="text-align:left">支持</td>
+<td style="text-align:left">支持</td>
+<td style="text-align:left">支持</td>
+<td style="text-align:left">—</td>
+</tr>
+<tr>
+<td style="text-align:left">一致性</td>
+<td style="text-align:left">raft</td>
+<td style="text-align:left">paxos</td>
+<td style="text-align:left">raft</td>
+<td style="text-align:left">—</td>
+</tr>
+<tr>
+<td style="text-align:left">cap</td>
+<td style="text-align:left">ca</td>
+<td style="text-align:left">cp</td>
+<td style="text-align:left">cp</td>
+<td style="text-align:left">ap</td>
+</tr>
+<tr>
+<td style="text-align:left">使用接口(多语言能力)</td>
+<td style="text-align:left">支持http和dns</td>
+<td style="text-align:left">客户端</td>
+<td style="text-align:left">http/grpc</td>
+<td style="text-align:left">http（sidecar）</td>
+</tr>
+<tr>
+<td style="text-align:left">watch支持</td>
+<td style="text-align:left">全量/支持long polling</td>
+<td style="text-align:left">支持</td>
+<td style="text-align:left">支持 long polling</td>
+<td style="text-align:left">支持 long polling/大部分增量</td>
+</tr>
+<tr>
+<td style="text-align:left">自身监控</td>
+<td style="text-align:left">metrics</td>
+<td style="text-align:left">—</td>
+<td style="text-align:left">metrics</td>
+<td style="text-align:left">metrics</td>
+</tr>
+<tr>
+<td style="text-align:left">安全</td>
+<td style="text-align:left">acl /https</td>
+<td style="text-align:left">acl</td>
+<td style="text-align:left">https支持（弱）</td>
+<td style="text-align:left">—</td>
+</tr>
+<tr>
+<td style="text-align:left">spring cloud集成</td>
+<td style="text-align:left">已支持</td>
+<td style="text-align:left">已支持</td>
+<td style="text-align:left">已支持</td>
+<td style="text-align:left">已支持</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">特性</th>
+<th style="text-align:left">HBase</th>
+<th style="text-align:left">Cassandra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">语言</td>
+<td style="text-align:left">Java</td>
+<td style="text-align:left">Java</td>
+</tr>
+<tr>
+<td style="text-align:left">出发点</td>
+<td style="text-align:left">BigTable</td>
+<td style="text-align:left">BigTable and Dynamo</td>
+</tr>
+<tr>
+<td style="text-align:left">License</td>
+<td style="text-align:left">Apache</td>
+<td style="text-align:left">Apache</td>
+</tr>
+<tr>
+<td style="text-align:left">Protocol</td>
+<td style="text-align:left">HTTP/REST (also Thrift)</td>
+<td style="text-align:left">Custom, binary (Thrift)</td>
+</tr>
+<tr>
+<td style="text-align:left">数据分布</td>
+<td style="text-align:left">表划分为多个region存在不同region server上</td>
+<td style="text-align:left">改进的一致性哈希（虚拟节点）</td>
+</tr>
+<tr>
+<td style="text-align:left">存储目标</td>
+<td style="text-align:left">大文件</td>
+<td style="text-align:left">小文件</td>
+</tr>
+<tr>
+<td style="text-align:left">一致性</td>
+<td style="text-align:left">强一致性</td>
+<td style="text-align:left">最终一致性，Quorum NRW策略</td>
+</tr>
+<tr>
+<td style="text-align:left">架构</td>
+<td style="text-align:left">master/slave</td>
+<td style="text-align:left">p2p</td>
+</tr>
+<tr>
+<td style="text-align:left">高可用性</td>
+<td style="text-align:left">NameNode是HDFS的单点故障点</td>
+<td style="text-align:left">P2P和去中心化设计，不会出现单点故障</td>
+</tr>
+<tr>
+<td style="text-align:left">伸缩性</td>
+<td style="text-align:left">Region Server扩容，通过将自身发布到Master，Master均匀分布Region</td>
+<td style="text-align:left">扩容需在Hash Ring上多个节点间调整数据分布</td>
+</tr>
+<tr>
+<td style="text-align:left">读写性能</td>
+<td style="text-align:left">数据读写定位可能要通过最多6次的网络RPC，性能较低。</td>
+<td style="text-align:left">数据读写定位非常快</td>
+</tr>
+<tr>
+<td style="text-align:left">数据冲突处理</td>
+<td style="text-align:left">乐观并发控制（optimistic concurrency control）</td>
+<td style="text-align:left">向量时钟</td>
+</tr>
+<tr>
+<td style="text-align:left">临时故障处理</td>
+<td style="text-align:left">Region Server宕机，重做HLog</td>
+<td style="text-align:left">数据回传机制：某节点宕机，hash到该节点的新数据自动路由到下一节点做 hinted handoff，源节点恢复后，推送回源节点。</td>
+</tr>
+<tr>
+<td style="text-align:left">永久故障恢复</td>
+<td style="text-align:left">Region Server恢复，master重新给其分配region</td>
+<td style="text-align:left">Merkle 哈希树，通过Gossip协议同步Merkle Tree，维护集群节点间的数据一致性</td>
+</tr>
+<tr>
+<td style="text-align:left">成员通信及错误检测</td>
+<td style="text-align:left">Zookeeper</td>
+<td style="text-align:left">基于Gossip</td>
+</tr>
+<tr>
+<td style="text-align:left">CAP</td>
+<td style="text-align:left">1，强一致性，0数据丢失。2，可用性低。3，扩容方便。</td>
+<td style="text-align:left">1，弱一致性，数据可能丢失。2，可用性高。3，扩容方便。</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>cap</li>
+</ul>
+<p>有这样两种情况：一种情况是要求节点A、B、C的三份数据完全一致后返回。也就是说，这时从任何一个网络节点读取的数据都是一样的，这就是所谓的强一致性读。很明显，这时数据读取的Latency要高一些（由于要等数据在网络中的复制），同时A、B、C三个节点中任何一个宕机，都会导致数据不行用。也就是说，要保证强一致性，网络中的副本越多，数据的可用性就越差；</p>
+<p>另一种情况是，允许读操作立刻返回，容忍B节点的读取与A节点的读取不一致的情况发生。这样一来，可用性显然获得了提高，网络中的副本也可以多一些，唯一得不到保证的是数据一致性。当然，对写操作同样也有多个节点一致性的情况，在此不再赘述。</p>
+<ul>
+<li>cap</li>
+</ul>
+<p>分布式系统分区容忍肯定是要保证的，因为总会有网络延迟，网络波动导致每个节点互相有短暂或长时间的通讯不通。所以我们在这个基础上，如果我们解决了一致性问题，也就是我们在网络波动和延迟的时候也让每个节点的数据是一样的，保证同时从任意节点取到的数据是一样的。</p>
+<p>那么我们就得舍弃可用性，也就是说我们在网络波动或者延迟的时候让整个分布式系统不可用，等到数据都同步完了，每个节点的数据都一样了，这时候我们在让分布式系统可用。这就是舍弃了可用性。</p>
+<p>那什么是舍弃一致性呢？就是在有网络延迟的时候，我整个的分布式系统还对外提供服务，这时就有可能短暂的出现获取的数据不是一致的。这就是舍弃了一致性。所以一般来说我们都是保证可用性，虽然有短暂的数据不一致，但我们只要最终保证了一致性在有些时候也是可以满足需要的。</p>
+<h1 id="解读-1"><a href="#解读-1" class="headerlink" title="解读"></a>解读</h1><p><a href="http://kongchen.github.io/how-cap-defines-avaiability/" target="_blank" rel="noopener">http://kongchen.github.io/how-cap-defines-avaiability/</a><br>C容易理解，所有节点上的数据都一样。<br>P是说一旦集群因为内部通信故障发生分裂，集群还能正常运转。</p>
+<p>关键是这个A。</p>
+<p>说白了就是，CAP里的A指的是，只要是活着的节点能返回响应，那么就认为它是availability的。</p>
+<p>用汽车来做个比喻：<br>汽车一切良好，故障灯一个都不亮，能开能刹，这是我们理解的传统的Available。只要是出了任何问题，例如车胎爆了，发动机坏了，或者是没油开不动了，这都已经是不可用了。</p>
+<p>CAP理论里，车不能开不要紧，只要是这车车门还能打开，那就是Available的：车胎破了能从胎压监测里看到，发动机坏了打火打不着，没油了油表灯会亮……这都是车返回的response，只要是有response，那么就是”可用的“。</p>
+<p>理解了A的真正含义以后再来看CAP。</p>
+<h2 id="只满足CA的系统"><a href="#只满足CA的系统" class="headerlink" title="只满足CA的系统"></a>只满足CA的系统</h2><p>根据P的定义： 一旦集群因为内部通信故障发生分裂，集群还能正常运转。 舍弃P意味着一旦集群发生分裂，整个集群都将无法运转。这是符合A的，因为这是的节点是fail的，不需要给任何响应。<br>单机服务器显然是CA的，只要结点活着，那自然是C+A。而结点一旦挂了，整个集群也就没了，符合舍弃P的选择。</p>
+<h2 id="只满足CP的系统"><a href="#只满足CP的系统" class="headerlink" title="只满足CP的系统"></a>只满足CP的系统</h2><p>一旦集群内部因为内部通信故障发生分裂（假设分裂成两部分），为了满足P，集群需要提供服务。而为了满足C，只能保留其中一部分提供服务，让另一部分整体退役。</p>
+<h2 id="只满足AP的系统"><a href="#只满足AP的系统" class="headerlink" title="只满足AP的系统"></a>只满足AP的系统</h2><p>整个最容易理解，一旦集群内部因为内部通信故障发生分裂（假设分裂成两部分），为了满足P，而又不需要满足C，那么可以让分裂出来的两部分都提供服务，因为暂时数据不一致没关系。</p>
+<h1 id="CAP-的意义"><a href="#CAP-的意义" class="headerlink" title="CAP 的意义"></a>CAP 的意义</h1><p>在系统架构时，应该根据具体的业务场景，来权衡 CAP。比如，对于大多数互联网应用来说（如门户网站），因为机器数量庞大，部署节点分散，网络故障是常态，可用性是必须需要保证的，所以只有舍弃一致性来保证服务的 AP。而对于银行等，需要确保一致性的场景，通常会权衡 CA 和 CP 模型，CA 模型网络故障时完全不可用，CP 模型具备部分可用性。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://yq.aliyun.com/articles/552548?spm=a2c4e.11153959.teamhomeleft.38.63cb356fpQ5C54" target="_blank" rel="noopener">https://yq.aliyun.com/articles/552548?spm=a2c4e.11153959.teamhomeleft.38.63cb356fpQ5C54</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/21/data_warehouse/data-warehouse-build/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/21/data_warehouse/data-warehouse-build/" itemprop="url">data-warehouse-build</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-21T19:55:08+08:00">
+                2018-03-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/21/data_warehouse/data-warehouse-build/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/03/21/data_warehouse/data-warehouse-build/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/03/21/data_warehouse/data-warehouse-build/" class="leancloud_visitors" data-flag-title="data-warehouse-build">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><a href="https://tech.meituan.com/tag/%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93" target="_blank" rel="noopener">https://tech.meituan.com/tag/%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93</a></p>
+<p><a href="https://tech.meituan.com/mtdp_travel_yydp_present.html" target="_blank" rel="noopener">https://tech.meituan.com/mtdp_travel_yydp_present.html</a></p>
+<h1 id="架构图"><a href="#架构图" class="headerlink" title="架构图"></a>架构图</h1><p><img src="/images/pasted-98.png" alt="upload successful"></p>
+<h1 id="领域内常见的建模方法"><a href="#领域内常见的建模方法" class="headerlink" title="领域内常见的建模方法"></a>领域内常见的建模方法</h1><p>① 3NF模型</p>
+<p>3NF模型（又叫“范式模型”）是数据仓库之父Inmon提出的，它用实体加关系的数据模型描述业务架构，在范式理论上符合3NF，是站在全局角度面向主题的抽象。它更多的是面向数据的一致性治理。</p>
+<p>3NF模型最基本的要素是实体、属性和关系：</p>
+<p>实体：相同特征和性质的属性抽象，用抽象的实体名和属性名集合共同刻画的逻辑实体；<br>关系：实体之间的关系；<br>属性：实体的某种特性，一般实体具有多个属性。<br>② 维度模型</p>
+<p>维度模型是Kimball提出的。维度模型多为分析和决策提供服务，因此它重点解决快速完成分析，同时提供大规模复杂查询的响应性能（预聚合），更直接地面向业务。例如熟知的星形模型，以及特殊场景的雪花模型。</p>
+<p>维度建模最基本的要素是事实和维度：</p>
+<p>事实表：一般由两部分组成，纬度和指标，通常理解为“某人在某时间某地点通过某手段做了什么事情”的事实记录，它体现了业务流程的核心内容；<br>维度表：看待事实的角度，用以描述和还原事实发生的场景，比如通过地址、时间等维度还原业务场景。<br>③ DV模型（DataVault）</p>
+<p>DataVault是Dan Linstedt发起的，是一种介于3NF和维度建模之间的建模方法。它的设计主要是满足灵活性、可扩展性、一致性和对需求的适应性。它强调建立一个可审计的基础数据层，主要包括Hub（核心实体）、Link（关系）、Satellite（实体属性）三个要素。</p>
+<p>④ Anchor模型</p>
+<p>Anchor模型由Lars. Rönnbäck提出，是DataVault模型的进一步范式化处理，核心思想是只添加、不修改的可扩展模型，Anchor模型构建的表极窄，类似于K-V结构化模型。它主要包括Anchors（实体且只有主键），Atributes（属性），Ties（关系），Knots（公用枚举属性)）。Anchor是应用中比较少的建模方法，只有传统企业和少数几家互联网公司有应用，例如：蚂蜂窝等。</p>
+<h1 id="运营专题数据如何构建"><a href="#运营专题数据如何构建" class="headerlink" title="运营专题数据如何构建"></a>运营专题数据如何构建</h1><p>随着促销系统不断发展，平台趋于稳定，再结合各活动类型，及对需求的整理和进一步产品化，选择了3NF+维度建模为基础的模型方法论，对数据进行合理划分和整合，构建了运营专题数据体系。</p>
+<p>① 数据规范制定</p>
+<p>数据规范的制定也是指标字典和服务层规则引擎抽象的基础。首先同业务达成共识，制定数据一致性标准，统一口径。同时将核心指标和个性化指标进行抽象，抽取统一规范定义，例如：月初到月末的整体交易类GMV和补贴类GMV，其原子指标是GMV，其它要素都属于指标的修饰。</p>
+<p><img src="/images/pasted-99.png" alt="upload successful"></p>
+<p>② 数仓模型架构</p>
+<p>将数据分为ODS层、BAS层、FACT层、TOPIC层。</p>
+<p>ODS层主要功能</p>
+<p>从分布式消息队列中消费Binlog和Click-log，并对埋点数据进行清洗和业务库数据还原，并根据需要增量或全量同步到Hive，同时积累历史数据并保存。</p>
+<p>BAS层主要功能</p>
+<p>采用3NF建模方法，对整体业务进行概念抽象及适当冗余，在保证数据一致的同时将同属性实体归纳整合到同一逻辑域。BAS层主要是为了减少数据的不一致，减少存储空间，响应业务系统的变化，避免更新异常。</p>
+<p>FACT层主要功能</p>
+<p>采用维度建模方法，根据活动特点及事实场景，对代金券、现金券、促销等的事件进一步整合。经过对维度的预处理，在使用信息的时候，不但减少时间成本、提高数据的提取效率，又为用户在Ad-Hoc平台查询提供很好的支撑，同时它成为了上层数据应用的关键出口。</p>
+<p>TOPIC层主要功能</p>
+<p>该层建设不是必须的，是针对业务中个性化诉求，根据需要建设专题数据。服务小范围业务群体和用户，用来支撑核心业务指标外的某一块个性化指标和应用。</p>
+<p><img src="/images/pasted-100.png" alt="upload successful"></p>
+<p>如图所示，数仓模型整体架构图。通过构建运营专题的底层数据，针对数据一致性等问题，在数仓层面上得到了很好的解决，同时在数据提取效率上有很大的提升。数仓建设为接下来的业务支撑打好了充分的基础。</p>
+<h1 id="多维预计算层"><a href="#多维预计算层" class="headerlink" title="多维预计算层"></a>多维预计算层</h1><p>预计算层是连接数据和应用之间的管道，是应用层垂直模块的专项支持。它是在Fact层数据之上的预聚合，强依赖于数仓模型中事实和维度的构建以及预关联。预计算采用Kylin引擎构建Cube聚合组，来解决取数门槛和数据处理耗时等问题，同是提供多维分析的能力，不但提供了新的Ad-Hoc(Query Engine)平台，在提高查询响应的同时，又能为产品带来更流畅的交互，增强用户体验。例如：创建一个交易数据cube，它包含日期（datakey）、用户（userid）、付款方式（paytype）、购买城市（city）。为满足不同消费方式在不同城市的应用情况和查看用户在不同城市的消费行为，建立以下两个聚合组，包含的维度和方式如图所示：</p>
+<p><img src="/images/pasted-101.png" alt="upload successful"></p>
+<h1 id="中台服务层"><a href="#中台服务层" class="headerlink" title="中台服务层"></a>中台服务层</h1><p>数据预计算之后，需要分别对PC和移动端提供计算和装载，并且要针对不同端的特定模块做特定的开发，为了应对多变的业务逻辑，以及未来的可扩展能力，需要提供可插拔的、统一的服务层，该层主要可以解决如下问题：</p>
+<ul>
+<li>服务与预计算数据同步，数据模型的修改只影响到预计算层，同时服务层还可以完全感知预计算数据的变化，不需要对服务做开发调整，实现数据变更的同步响应；</li>
+<li>服务与端解耦，针对不同端产品提供统一数据服务，避免重复开发，同时产品的迭代升级与服务层隔离，应对多变的业务发展和增长；</li>
+<li>服务扩展能力增强，支持服务的横向扩展，不影响正常业务的同时提高服务能力，同时在该层实现可抽象通用操作以及规范管理。</li>
+</ul>
+<h1 id="总体"><a href="#总体" class="headerlink" title="总体"></a>总体</h1><p><img src="/images/pasted-102.png" alt="upload successful"></p>
+<p>整个服务由独立的Web应用端发起请求，通过权限验证后对中台发起调用，然后读取配置中心的配置，由计算引擎对数据进行并行计算，同时规则引擎按业务线和指标修饰词等生产衍生指标，然后将引擎完成的数据按周期进行快照，存入备忘录，同时关联指标字典将数据与文案返回前台，最后按功能再对数据做可视化处理。下面分别对服务中交互的几个模块做简单的介绍。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/21/data_warehouse/data-warehouse-layering/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1684,309 +2217,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/05/java_data_structure/study-binary-heap/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/05/java_data_structure/study-binary-heap/" itemprop="url">study-binary-heap</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-05T10:20:49+08:00">
-                2018-03-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/03/05/java_data_structure/study-binary-heap/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/05/java_data_structure/study-binary-heap/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/03/05/java_data_structure/study-binary-heap/" class="leancloud_visitors" data-flag-title="study-binary-heap">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="什么是二叉堆"><a href="#什么是二叉堆" class="headerlink" title="什么是二叉堆"></a>什么是二叉堆</h1><h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p> 二叉堆故名思议是一种特殊的堆，二叉堆具有堆的性质（父节点的键值总是大于或等于（小于或等于）任何一个子节点的键值），二叉堆又具有二叉树的性质（二叉堆是完全二叉树或者是近似完全二叉树）。当父节点的键值大于或等于（小于或等于）它的每一个子节点的键值时我们称它为最大堆（最小堆）。<br>      二叉堆多数是以数组作为它们底层元素的存储，根节点在数组中的索引是1，存储在第n个位置的父节点它的子节点在数组中的存储位置为2n与2n+1。可以借用网上的一幅图来标示这种存储结构。其中数字表明节点在数组中的存储位置。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">       1               </span><br><span class="line">     /   \           </span><br><span class="line">    2     3             </span><br><span class="line">   / \   / \       </span><br><span class="line">  4   5  6  7     </span><br><span class="line"> / \ / \        </span><br><span class="line">8  9 10 11</span><br></pre></td></tr></table></figure>
-<h2 id="二叉堆支持的操作"><a href="#二叉堆支持的操作" class="headerlink" title="二叉堆支持的操作"></a>二叉堆支持的操作</h2><p>二叉堆通常支持以下操作：删除，插入节点,创建二叉堆。这些操作复杂对都是O(log2n)</p>
-<p>二叉堆也可以支持这些操作：查找。O(n)复杂度。</p>
-<h2 id="二叉堆的特点"><a href="#二叉堆的特点" class="headerlink" title="二叉堆的特点"></a>二叉堆的特点</h2><p>二叉堆是专门为取出最大或最小节点而设计点数据结构，这种数据结构在查找一般元素方面性能和一般数组是没有多大区别的。二叉堆在取出最大或最最小值的性能表现是O(1)，取出操作完成之后，二叉堆需要一次整形操作，以便得到下一个最值，这个操作复杂度O(log2n)。这是一个相当理想的操作时间。但是二叉堆也有一个缺点，就是二叉堆对存储在内存中的数据操作太过分散，这导致了二叉堆在cpu高速缓存的利用与内存击中率上面表现不是很好，这也是一个二叉堆理想操作时间所需要付出的代价。</p>
-<h1 id="二叉堆的实现"><a href="#二叉堆的实现" class="headerlink" title="二叉堆的实现"></a>二叉堆的实现</h1><h1 id="二叉堆的应用"><a href="#二叉堆的应用" class="headerlink" title="二叉堆的应用"></a>二叉堆的应用</h1>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/04/blockchain/draft-blockchain/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/04/blockchain/draft-blockchain/" itemprop="url">draft-blockchain</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-04T15:13:55+08:00">
-                2018-03-04
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/03/04/blockchain/draft-blockchain/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/04/blockchain/draft-blockchain/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/03/04/blockchain/draft-blockchain/" class="leancloud_visitors" data-flag-title="draft-blockchain">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="区块链的本质"><a href="#区块链的本质" class="headerlink" title="区块链的本质"></a>区块链的本质</h1><p>分布式数据库</p>
-<p>首先，区块链的主要作用是储存信息。任何需要保存的信息，都可以写入区块链，也可以从里面读取，所以它是数据库。</p>
-<p>其次，任何人都可以架设服务器，加入区块链网络，成为一个节点。区块链的世界里面，没有中心节点，每个节点都是平等的，都保存着整个数据库。你可以向任何一个节点，写入/读取数据，因为所有节点最后都会同步，保证区块链一致。</p>
-<h1 id="区块链的最大特点"><a href="#区块链的最大特点" class="headerlink" title="区块链的最大特点"></a>区块链的最大特点</h1><p>分布式数据库并非新发明，市场上早有此类产品。但是，区块链有一个革命性特点。</p>
-<p>区块链没有管理员，它是彻底无中心的。其他的数据库都有管理员，但是区块链没有。如果有人想对区块链添加审核，也实现不了，因为它的设计目标就是防止出现居于中心地位的管理当局。</p>
-<p>正是因为无法管理，区块链才能做到无法被控制。否则一旦大公司大集团控制了管理权，他们就会控制整个平台，其他使用者就都必须听命于他们了。</p>
-<p>但是，没有了管理员，人人都可以往里面写入数据，怎么才能保证数据是可信的呢？被坏人改了怎么办？请接着往下读，这就是区块链奇妙的地方。</p>
-<h1 id="区块"><a href="#区块" class="headerlink" title="区块"></a>区块</h1><p>区块链由一个个区块（block）组成。区块很像数据库的记录，每次写入数据，就是创建一个区块。</p>
-<p>每个区块包含两个部分。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">区块头（Head）：记录当前区块的特征值</span><br><span class="line">区块体（Body）：实际数据</span><br></pre></td></tr></table></figure>
-<p>区块头包含了当前区块的多项特征值。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">生成时间</span><br><span class="line">实际数据（即区块体）的哈希</span><br><span class="line">上一个区块的哈希</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-<p>这里，你需要理解什么叫哈希（hash），这是理解区块链必需的。</p>
-<p>所谓”哈希”就是计算机可以对任意内容，计算出一个长度相同的特征值。区块链的 哈希长度是256位，这就是说，不管原始内容是什么，最后都会计算出一个256位的二进制数字。而且可以保证，只要原始内容不同，对应的哈希一定是不同的。</p>
-<p>举例来说，字符串123的哈希是a8fdc205a9f19cc1c7507a60c4f01b13d11d7fd0（十六进制），转成二进制就是256位，而且只有123能得到这个哈希。（理论上，其他字符串也有可能得到这个哈希，但是概率极低，可以近似认为不可能发生。）</p>
-<p>因此，就有两个重要的推论。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">推论1：每个区块的哈希都是不一样的，可以通过哈希标识区块。</span><br><span class="line">推论2：如果区块的内容变了，它的哈希一定会改变。</span><br></pre></td></tr></table></figure>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2037,7 +2267,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">138</span>
+                  <span class="site-state-item-count">140</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
