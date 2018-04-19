@@ -79,17 +79,19 @@
 
 
 
-<meta name="description" content="why现在很多互联网上面的项目比如Dubbo、Hadoop系列，MQ等都在使用netty了 原生jdk nio（1）NIO的类库和API繁杂，使用麻烦，你需要熟练掌握Selector、ServerSocketChannel、SocketChannel、ByteBuffer等； （2）需要具备其他的额外技能做铺垫，例如熟悉Java多线程编程。这是因为NIO编程涉及到Reactor模式，你必须对多线程">
+<meta name="description" content="why Netty 是一个提供 asynchronous event-driven （异步事件驱动）的网络应用框架，是一个用以快速开发高性能、可扩展协议的服务器和客户端。 换句话说，Netty 是一个 NIO 客户端服务器框架，使用它可以快速简单地开发网络应用程序，比如服务器和客户端的协议。Netty 大大简化了网络程序的开发过程比如 TCP 和 UDP 的 socket 服务的开发。 现在很多互">
 <meta property="og:type" content="article">
 <meta property="og:title" content="netty-study">
 <meta property="og:url" content="http://yoursite.com/2018/04/17/java_netty/netty-study/index.html">
 <meta property="og:site_name" content="Victor的博客">
-<meta property="og:description" content="why现在很多互联网上面的项目比如Dubbo、Hadoop系列，MQ等都在使用netty了 原生jdk nio（1）NIO的类库和API繁杂，使用麻烦，你需要熟练掌握Selector、ServerSocketChannel、SocketChannel、ByteBuffer等； （2）需要具备其他的额外技能做铺垫，例如熟悉Java多线程编程。这是因为NIO编程涉及到Reactor模式，你必须对多线程">
+<meta property="og:description" content="why Netty 是一个提供 asynchronous event-driven （异步事件驱动）的网络应用框架，是一个用以快速开发高性能、可扩展协议的服务器和客户端。 换句话说，Netty 是一个 NIO 客户端服务器框架，使用它可以快速简单地开发网络应用程序，比如服务器和客户端的协议。Netty 大大简化了网络程序的开发过程比如 TCP 和 UDP 的 socket 服务的开发。 现在很多互">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-04-17T15:55:58.910Z">
+<meta property="og:image" content="https://waylau.gitbooks.io/netty-4-user-guide/images/components.png">
+<meta property="og:updated_time" content="2018-04-19T14:58:51.581Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="netty-study">
-<meta name="twitter:description" content="why现在很多互联网上面的项目比如Dubbo、Hadoop系列，MQ等都在使用netty了 原生jdk nio（1）NIO的类库和API繁杂，使用麻烦，你需要熟练掌握Selector、ServerSocketChannel、SocketChannel、ByteBuffer等； （2）需要具备其他的额外技能做铺垫，例如熟悉Java多线程编程。这是因为NIO编程涉及到Reactor模式，你必须对多线程">
+<meta name="twitter:description" content="why Netty 是一个提供 asynchronous event-driven （异步事件驱动）的网络应用框架，是一个用以快速开发高性能、可扩展协议的服务器和客户端。 换句话说，Netty 是一个 NIO 客户端服务器框架，使用它可以快速简单地开发网络应用程序，比如服务器和客户端的协议。Netty 大大简化了网络程序的开发过程比如 TCP 和 UDP 的 socket 服务的开发。 现在很多互">
+<meta name="twitter:image" content="https://waylau.gitbooks.io/netty-4-user-guide/images/components.png">
 
 
 
@@ -415,14 +417,40 @@
       
 
       
-        <h1 id="why"><a href="#why" class="headerlink" title="why"></a>why</h1><p>现在很多互联网上面的项目比如Dubbo、Hadoop系列，MQ等都在使用netty了</p>
+        <h1 id="why"><a href="#why" class="headerlink" title="why"></a>why</h1><ul>
+<li>Netty 是一个提供 asynchronous event-driven （异步事件驱动）的网络应用框架，是一个用以快速开发高性能、可扩展协议的服务器和客户端。</li>
+<li>换句话说，Netty 是一个 NIO 客户端服务器框架，使用它可以快速简单地开发网络应用程序，比如服务器和客户端的协议。Netty 大大简化了网络程序的开发过程比如 TCP 和 UDP 的 socket 服务的开发。</li>
+<li>现在很多互联网上面的项目比如Dubbo、Hadoop系列，MQ等都在使用netty了</li>
+<li></li>
+</ul>
 <h2 id="原生jdk-nio"><a href="#原生jdk-nio" class="headerlink" title="原生jdk nio"></a>原生jdk nio</h2><p>（1）NIO的类库和API繁杂，使用麻烦，你需要熟练掌握Selector、ServerSocketChannel、SocketChannel、ByteBuffer等；</p>
 <p>（2）需要具备其他的额外技能做铺垫，例如熟悉Java多线程编程。这是因为NIO编程涉及到Reactor模式，你必须对多线程和网路编程非常熟悉，才能编写出高质量的NIO程序；</p>
 <p>（3）可靠性能力补齐，工作量和难度都非常大。例如客户端面临断连重连、网络闪断、半包读写、失败缓存、网络拥塞和异常码流的处理等问题，NIO编程的特点是功能开发相对容易，但是可靠性能力补齐的工作量和难度都非常大；</p>
 <p>（4）JDK NIO的BUG，例如臭名昭著的epoll bug，它会导致Selector空轮询，最终导致CPU 100%。官方声称在JDK1.6版本的update18修复了该问题，但是直到JDK1.7版本该问题仍旧存在，只不过该BUG发生概率降低了一些而已，它并没有被根本解决。该BUG以及与该BUG相关的问题单可以参见以下链接内容：</p>
 <p>◎ <a href="http://bugs.java.com/bugdatabase/view_bug.do?bug_id=6403933" target="_blank" rel="noopener">http://bugs.java.com/bugdatabase/view_bug.do?bug_id=6403933</a></p>
 <p>◎ <a href="http://bugs.java.com/bugdatabase/view_bug.do?bug_id=2147719" target="_blank" rel="noopener">http://bugs.java.com/bugdatabase/view_bug.do?bug_id=2147719</a></p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://www.infoq.com/cn/articles/practice-of-java-nio-communication-framework" target="_blank" rel="noopener">http://www.infoq.com/cn/articles/practice-of-java-nio-communication-framework</a></p>
+<h1 id="整体架构预览"><a href="#整体架构预览" class="headerlink" title="整体架构预览"></a>整体架构预览</h1><p><img src="https://waylau.gitbooks.io/netty-4-user-guide/images/components.png" alt="components"></p>
+<ul>
+<li>灵拷贝</li>
+<li>统一的异步io api,方便更改</li>
+<li>基于拦截链模式的事件模型</li>
+<li>适用快速开发的高级组件<ul>
+<li>Codec 框架</li>
+<li>SSL / TLS 支持</li>
+<li>HTTP 实现</li>
+<li>WebSockets 实现</li>
+<li>Google Protocol Buffer 整合</li>
+</ul>
+</li>
+</ul>
+<p>缓冲（buffer），通道（channel），事件模型（event model）</p>
+<h1 id="demo案例"><a href="#demo案例" class="headerlink" title="demo案例"></a>demo案例</h1><h2 id="discard服务器"><a href="#discard服务器" class="headerlink" title="discard服务器"></a>discard服务器</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">public class DiscardServerHandler extends ChannelInboundHandlerAdapter &#123; // (1)</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void channelRead(ChannelHandlerContext ctx, Object msg) &#123; // (2)</span><br><span class="line">        // 以静默方式丢弃接收的数据</span><br><span class="line">        ((ByteBuf) msg).release(); // (3)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) &#123; // (4)</span><br><span class="line">        // 出现异常时关闭连接。</span><br><span class="line">        cause.printStackTrace();</span><br><span class="line">        ctx.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">public class DiscardServer &#123;</span><br><span class="line"></span><br><span class="line">    private int port;</span><br><span class="line"></span><br><span class="line">    public DiscardServer(int port) &#123;</span><br><span class="line">        this.port = port;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void run() throws Exception &#123;</span><br><span class="line">        EventLoopGroup bossGroup = new NioEventLoopGroup(); // (1)</span><br><span class="line">        EventLoopGroup workerGroup = new NioEventLoopGroup();</span><br><span class="line">        try &#123;</span><br><span class="line">            ServerBootstrap b = new ServerBootstrap(); // (2)</span><br><span class="line">            b.group(bossGroup, workerGroup)</span><br><span class="line">             .channel(NioServerSocketChannel.class) // (3)</span><br><span class="line">             .childHandler(new ChannelInitializer&lt;SocketChannel&gt;() &#123; // (4)</span><br><span class="line">                 @Override</span><br><span class="line">                 public void initChannel(SocketChannel ch) throws Exception &#123;</span><br><span class="line">                     ch.pipeline().addLast(new DiscardServerHandler());</span><br><span class="line">                 &#125;</span><br><span class="line">             &#125;)</span><br><span class="line">             .option(ChannelOption.SO_BACKLOG, 128)          // (5)</span><br><span class="line">             .childOption(ChannelOption.SO_KEEPALIVE, true); // (6)</span><br><span class="line"></span><br><span class="line">            // Bind and start to accept incoming connections.</span><br><span class="line">            ChannelFuture f = b.bind(port).sync(); // (7)</span><br><span class="line"></span><br><span class="line">            // Wait until the server socket is closed.</span><br><span class="line">            // In this example, this does not happen, but you can do that to gracefully</span><br><span class="line">            // shut down your server.</span><br><span class="line">            f.channel().closeFuture().sync();</span><br><span class="line">        &#125; finally &#123;</span><br><span class="line">            workerGroup.shutdownGracefully();</span><br><span class="line">            bossGroup.shutdownGracefully();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) throws Exception &#123;</span><br><span class="line">        int port;</span><br><span class="line">        if (args.length &gt; 0) &#123;</span><br><span class="line">            port = Integer.parseInt(args[0]);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            port = 8080;</span><br><span class="line">        &#125;</span><br><span class="line">        new DiscardServer(port).run();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="echo服务"><a href="#echo服务" class="headerlink" title="echo服务"></a>echo服务</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">public void channelRead(ChannelHandlerContext ctx, Object msg) &#123;</span><br><span class="line">    ctx.write(msg); // (1)</span><br><span class="line">    ctx.flush(); // (2)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="time服务器"><a href="#time服务器" class="headerlink" title="time服务器"></a>time服务器</h2><p><a href="https://waylau.gitbooks.io/netty-4-user-guide/Getting%20Started/Writing%20a%20Time%20Server.html" target="_blank" rel="noopener">https://waylau.gitbooks.io/netty-4-user-guide/Getting%20Started/Writing%20a%20Time%20Server.html</a></p>
+<h2 id="处理一个基于流的传输"><a href="#处理一个基于流的传输" class="headerlink" title="处理一个基于流的传输"></a>处理一个基于流的传输</h2><p>基于流的传输比如 TCP/IP, 接收到数据是存在 socket 接收的 buffer 中。不幸的是，基于流的传输并不是一个数据包队列，而是一个字节队列。意味着，即使你发送了2个独立的数据包，操作系统也不会作为2个消息处理而仅仅是作为一连串的字节而言。因此这是不能保证你远程写入的数据就会准确地读取。举个例子，让我们假设操作系统的 TCP/TP 协议栈已经接收了3个数据包：</p>
+<p>由于基于流传输的协议的这种普通的性质，在你的应用程序里读取数据的时候会有很高的可能性被分成下面的片段<br>因此，一个接收方不管他是客户端还是服务端，都应该把接收到的数据整理成一个或者多个更有意思并且能够让程序的业务逻辑更好理解的数据。在上面的例子中，接收到的数据应该被构造成下面的格式</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://www.infoq.com/cn/articles/practice-of-java-nio-communication-framework" target="_blank" rel="noopener">http://www.infoq.com/cn/articles/practice-of-java-nio-communication-framework</a><br><a href="https://waylau.gitbooks.io/netty-4-user-guide" target="_blank" rel="noopener">https://waylau.gitbooks.io/netty-4-user-guide</a><br><a href="https://github.com/netty/netty/tree/4.0/example/src/main/java/io/netty/example" target="_blank" rel="noopener">https://github.com/netty/netty/tree/4.0/example/src/main/java/io/netty/example</a></p>
 
       
     </div>
@@ -564,7 +592,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">140</span>
+                  <span class="site-state-item-count">146</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -621,7 +649,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#why"><span class="nav-number">1.</span> <span class="nav-text">why</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#原生jdk-nio"><span class="nav-number">1.1.</span> <span class="nav-text">原生jdk nio</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">2.</span> <span class="nav-text">参考</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#why"><span class="nav-number">1.</span> <span class="nav-text">why</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#原生jdk-nio"><span class="nav-number">1.1.</span> <span class="nav-text">原生jdk nio</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#整体架构预览"><span class="nav-number">2.</span> <span class="nav-text">整体架构预览</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#demo案例"><span class="nav-number">3.</span> <span class="nav-text">demo案例</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#discard服务器"><span class="nav-number">3.1.</span> <span class="nav-text">discard服务器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#echo服务"><span class="nav-number">3.2.</span> <span class="nav-text">echo服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#time服务器"><span class="nav-number">3.3.</span> <span class="nav-text">time服务器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#处理一个基于流的传输"><span class="nav-number">3.4.</span> <span class="nav-text">处理一个基于流的传输</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
             
 
           </div>

@@ -326,6 +326,914 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/13/http/http-ajax-compare/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/13/http/http-ajax-compare/" itemprop="url">http和ajax区别和练习</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-13T19:03:38+08:00">
+                2018-04-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/13/http/http-ajax-compare/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/04/13/http/http-ajax-compare/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/04/13/http/http-ajax-compare/" class="leancloud_visitors" data-flag-title="http和ajax区别和练习">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="AJAX和HTTP请求的区别"><a href="#AJAX和HTTP请求的区别" class="headerlink" title="AJAX和HTTP请求的区别"></a>AJAX和HTTP请求的区别</h1><p>从本质上将：AJAX就是浏览器发出的HTTP请求，只不过是浏览器加上了一个同源策略限制而已。</p>
+<p>AJAX请求的XMLHTTPRequest对象就是浏览器开放给JS调用HTTP请求用的。</p>
+<p>那么AJAX和HTTP的区别呢？列出以下几点：</p>
+<ul>
+<li><p>AJAX请求受到浏览器的同源策略限制，存在跨域问题</p>
+</li>
+<li><p>AJAX在进行复杂请求时，浏览器会预先发出OPTIONS预检（HTTP自己是不会预检的）</p>
+</li>
+<li><p>从使用角度上说，AJAX使用简单一点，少了些底层细节，多了些浏览器特性（如自动带上同域cookie等）</p>
+</li>
+<li><p>所以说，和认证上的HTTP请求的区别就是-多了一次浏览器的封装而已（浏览器会有自己的预处理，加上特定限制）</p>
+</li>
+</ul>
+<p>但是，从最终发出的报文来看，内容都是一样的（HTTP协议规范的内容），AJAX是发送HTTP请求的一种方式</p>
+<p><img src="/images/pasted-151.png" alt="upload successful"></p>
+<h1 id="CORS与AJAX安全性之间的关联"><a href="#CORS与AJAX安全性之间的关联" class="headerlink" title="CORS与AJAX安全性之间的关联"></a>CORS与AJAX安全性之间的关联</h1><p>这是一个跨域共享方案，大致流程就是：（仅以复杂请求的预检举例-这一部分要求提前掌握CORS相关知识）</p>
+<ol>
+<li><p>前端AJAX请求前发出一个OPTIONS预检，会带一堆相关头部发送给服务端</p>
+</li>
+<li><p>服务端在接受到预检时，检查头部，来源等信息是否合法，合法则接下来允许正常的请求，<br>否则直接无情的拒绝掉</p>
+</li>
+<li><p>浏览器端如果收到服务端拒绝的信息（响应头部检查），就抛出对应错误。<br>否则就是正常的响应，接下来发出真正的请求（如POST）<br>请求和响应的头部信息大概如下：</p>
+</li>
+</ol>
+<ul>
+<li><p>Request Headers</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 在CORS中专门作为Origin信息供后端比对，表示来源域。</span><br><span class="line">Origin: http://xxx</span><br><span class="line">Access-Control-Request-Headers: X-Requested-With</span><br><span class="line">// 所有用setRequestHeader方法设置的头部都将会以逗号隔开的形式包含在这个头中，一般POST请求中就会带上</span><br><span class="line">Access-Control-Request-Method: OPTIONS</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Response Headers</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept</span><br><span class="line">Access-Control-Allow-Methods: GET, POST, OPTIONS</span><br><span class="line">Access-Control-Allow-Origin: http://xxx</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>最终，客户端发出的请求，必须符合服务端的校验规则才能正确，服务端才会返回正确头部，否则只会请求失败。报跨域错误。</p>
+<p>关键问题来了，在上面的CORS配置是这样的：</p>
+<p><code>Access-Control-Allow-Origin: http://xxx</code><br>但是这个配置只允许特定域名访问，鉴于前端的复杂性，有时候调试起来不是很方便，因此有时候，会偷懒的设置为：</p>
+<p><code>Access-Control-Allow-Origin: *</code></p>
+<ul>
+<li>会对cookie认证造成影响么？</li>
+</ul>
+<p>不会。虽然*代表了所有来源都能正常请求，但是同源策略下，是无法带上跨域cookie的。因此根本无法用身份验证。</p>
+<p>而且，就算用withCredentials强行带上跨域cookie，因为后台没有支持，所以会报错。（这可以看成是CORSs模型的最后一道防线）</p>
+<p>再者，后台就算配置Access-Control-Allow-Credentials允许跨域cookie，但是这时候的安全策略是Origin不允许为，必须是一个明确的地址。<br>（否则你就可以看到浏览器的报错信息-跨域cookie时，Origin不允许为）</p>
+<p><img src="/images/pasted-152.png" alt="upload successful"></p>
+<h1 id="两种请求"><a href="#两种请求" class="headerlink" title="两种请求"></a>两种请求</h1><p>浏览器将CORS请求分成两类：简单请求（simple request）和非简单请求（not-so-simple request）。</p>
+<p>只要同时满足以下两大条件，就属于简单请求。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">（1) 请求方法是以下三种方法之一：</span><br><span class="line"></span><br><span class="line">HEAD</span><br><span class="line">GET</span><br><span class="line">POST</span><br><span class="line">（2）HTTP的头信息不超出以下几种字段：</span><br><span class="line"></span><br><span class="line">Accept</span><br><span class="line">Accept-Language</span><br><span class="line">Content-Language</span><br><span class="line">Last-Event-ID</span><br><span class="line">Content-Type：只限于三个值application/x-www-form-urlencoded、multipart/form-data、text/plain</span><br></pre></td></tr></table></figure></p>
+<p>凡是不同时满足上面两个条件，就属于非简单请求。</p>
+<p>浏览器对这两种请求的处理，是不一样的。</p>
+<h1 id="简单请求"><a href="#简单请求" class="headerlink" title="简单请求"></a>简单请求</h1><h2 id="基本流程"><a href="#基本流程" class="headerlink" title="基本流程"></a>基本流程</h2><p>对于简单请求，浏览器直接发出CORS请求。具体来说，就是在头信息之中，增加一个Origin字段。</p>
+<p>下面是一个例子，浏览器发现这次跨源AJAX请求是简单请求，就自动在头信息之中，添加一个Origin字段。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">GET /cors HTTP/1.1</span><br><span class="line">Origin: http://api.bob.com</span><br><span class="line">Host: api.alice.com</span><br><span class="line">Accept-Language: en-US</span><br><span class="line">Connection: keep-alive</span><br><span class="line">User-Agent: Mozilla/5.0...</span><br></pre></td></tr></table></figure>
+<p>上面的头信息中，Origin字段用来说明，本次请求来自哪个源（协议 + 域名 + 端口）。服务器根据这个值，决定是否同意这次请求。</p>
+<p>如果Origin指定的源，不在许可范围内，服务器会返回一个正常的HTTP回应。浏览器发现，这个回应的头信息没有包含Access-Control-Allow-Origin字段（详见下文），就知道出错了，从而抛出一个错误，被XMLHttpRequest的onerror回调函数捕获。注意，这种错误无法通过状态码识别，因为HTTP回应的状态码有可能是200。</p>
+<p>如果Origin指定的域名在许可范围内，服务器返回的响应，会多出几个头信息字段。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Access-Control-Allow-Origin: http://api.bob.com</span><br><span class="line">Access-Control-Allow-Credentials: true</span><br><span class="line">Access-Control-Expose-Headers: FooBar</span><br><span class="line">Content-Type: text/html; charset=utf-8</span><br></pre></td></tr></table></figure>
+<p>上面的头信息之中，有三个与CORS请求相关的字段，都以Access-Control-开头。</p>
+<p>（1）Access-Control-Allow-Origin</p>
+<p>该字段是必须的。它的值要么是请求时Origin字段的值，要么是一个*，表示接受任意域名的请求。</p>
+<p>（2）Access-Control-Allow-Credentials</p>
+<p>该字段可选。它的值是一个布尔值，表示是否允许发送Cookie。默认情况下，Cookie不包括在CORS请求之中。设为true，即表示服务器明确许可，Cookie可以包含在请求中，一起发给服务器。这个值也只能设为true，如果服务器不要浏览器发送Cookie，删除该字段即可。</p>
+<p>（3）Access-Control-Expose-Headers</p>
+<p>该字段可选。CORS请求时，XMLHttpRequest对象的getResponseHeader()方法只能拿到6个基本字段：Cache-Control、Content-Language、Content-Type、Expires、Last-Modified、Pragma。如果想拿到其他字段，就必须在Access-Control-Expose-Headers里面指定。上面的例子指定，getResponseHeader(‘FooBar’)可以返回FooBar字段的值。</p>
+<p>3.2 withCredentials 属性<br>上面说到，CORS请求默认不发送Cookie和HTTP认证信息。如果要把Cookie发到服务器，一方面要服务器同意，指定Access-Control-Allow-Credentials字段。</p>
+<p>Access-Control-Allow-Credentials: true<br>另一方面，开发者必须在AJAX请求中打开withCredentials属性。</p>
+<p>var xhr = new XMLHttpRequest();<br>xhr.withCredentials = true;<br>否则，即使服务器同意发送Cookie，浏览器也不会发送。或者，服务器要求设置Cookie，浏览器也不会处理。</p>
+<p>但是，如果省略withCredentials设置，有的浏览器还是会一起发送Cookie。这时，可以显式关闭withCredentials。</p>
+<p>xhr.withCredentials = false;<br>需要注意的是，如果要发送Cookie，Access-Control-Allow-Origin就不能设为星号，必须指定明确的、与请求网页一致的域名。同时，Cookie依然遵循同源政策，只有用服务器域名设置的Cookie才会上传，其他域名的Cookie并不会上传，且（跨源）原网页代码中的document.cookie也无法读取服务器域名下的Cookie。</p>
+<h2 id="withCredentials-属性"><a href="#withCredentials-属性" class="headerlink" title="withCredentials 属性"></a>withCredentials 属性</h2><p>上面说到，CORS请求默认不发送Cookie和HTTP认证信息。如果要把Cookie发到服务器，一方面要服务器同意，指定Access-Control-Allow-Credentials字段。</p>
+<p><code>Access-Control-Allow-Credentials: true</code><br>另一方面，开发者必须在AJAX请求中打开withCredentials属性。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var xhr = new XMLHttpRequest();</span><br><span class="line">xhr.withCredentials = true;</span><br></pre></td></tr></table></figure>
+<p>否则，即使服务器同意发送Cookie，浏览器也不会发送。或者，服务器要求设置Cookie，浏览器也不会处理。</p>
+<h1 id="非简单请求"><a href="#非简单请求" class="headerlink" title="非简单请求"></a>非简单请求</h1><h2 id="预检请求"><a href="#预检请求" class="headerlink" title="预检请求"></a>预检请求</h2><p>非简单请求是那种对服务器有特殊要求的请求，比如请求方法是PUT或DELETE，或者Content-Type字段的类型是application/json。</p>
+<p>非简单请求的CORS请求，会在正式通信之前，增加一次HTTP查询请求，称为”预检”请求（preflight）。</p>
+<p>浏览器先询问服务器，当前网页所在的域名是否在服务器的许可名单之中，以及可以使用哪些HTTP动词和头信息字段。只有得到肯定答复，浏览器才会发出正式的XMLHttpRequest请求，否则就报错。</p>
+<p>下面是一段浏览器的JavaScript脚本。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">var url = &apos;http://api.alice.com/cors&apos;;</span><br><span class="line">var xhr = new XMLHttpRequest();</span><br><span class="line">xhr.open(&apos;PUT&apos;, url, true);</span><br><span class="line">xhr.setRequestHeader(&apos;X-Custom-Header&apos;, &apos;value&apos;);</span><br><span class="line">xhr.send();</span><br></pre></td></tr></table></figure>
+<p>上面代码中，HTTP请求的方法是PUT，并且发送一个自定义头信息X-Custom-Header。</p>
+<p>浏览器发现，这是一个非简单请求，就自动发出一个”预检”请求，要求服务器确认可以这样请求。下面是这个”预检”请求的HTTP头信息。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">OPTIONS /cors HTTP/1.1</span><br><span class="line">Origin: http://api.bob.com</span><br><span class="line">Access-Control-Request-Method: PUT</span><br><span class="line">Access-Control-Request-Headers: X-Custom-Header</span><br><span class="line">Host: api.alice.com</span><br><span class="line">Accept-Language: en-US</span><br><span class="line">Connection: keep-alive</span><br><span class="line">User-Agent: Mozilla/5.0...</span><br></pre></td></tr></table></figure>
+<p>“预检”请求用的请求方法是OPTIONS，表示这个请求是用来询问的。头信息里面，关键字段是Origin，表示请求来自哪个源。</p>
+<p>除了Origin字段，”预检”请求的头信息包括两个特殊字段。</p>
+<p>（1）Access-Control-Request-Method</p>
+<p>该字段是必须的，用来列出浏览器的CORS请求会用到哪些HTTP方法，上例是PUT。</p>
+<p>（2）Access-Control-Request-Headers</p>
+<p>该字段是一个逗号分隔的字符串，指定浏览器CORS请求会额外发送的头信息字段，上例是X-Custom-Header。</p>
+<h2 id="预检请求的回应"><a href="#预检请求的回应" class="headerlink" title="预检请求的回应"></a>预检请求的回应</h2><p>服务器收到”预检”请求以后，检查了Origin、Access-Control-Request-Method和Access-Control-Request-Headers字段以后，确认允许跨源请求，就可以做出回应。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Date: Mon, 01 Dec 2008 01:15:39 GMT</span><br><span class="line">Server: Apache/2.0.61 (Unix)</span><br><span class="line">Access-Control-Allow-Origin: http://api.bob.com</span><br><span class="line">Access-Control-Allow-Methods: GET, POST, PUT</span><br><span class="line">Access-Control-Allow-Headers: X-Custom-Header</span><br><span class="line">Content-Type: text/html; charset=utf-8</span><br><span class="line">Content-Encoding: gzip</span><br><span class="line">Content-Length: 0</span><br><span class="line">Keep-Alive: timeout=2, max=100</span><br><span class="line">Connection: Keep-Alive</span><br><span class="line">Content-Type: text/plain</span><br></pre></td></tr></table></figure>
+<p>上面的HTTP回应中，关键的是Access-Control-Allow-Origin字段，表示<a href="http://api.bob.com可以请求数据。该字段也可以设为星号，表示同意任意跨源请求。" target="_blank" rel="noopener">http://api.bob.com可以请求数据。该字段也可以设为星号，表示同意任意跨源请求。</a></p>
+<p><code>Access-Control-Allow-Origin: *</code><br>如果浏览器否定了”预检”请求，会返回一个正常的HTTP回应，但是没有任何CORS相关的头信息字段。这时，浏览器就会认定，服务器不同意预检请求，因此触发一个错误，被XMLHttpRequest对象的onerror回调函数捕获。控制台会打印出如下的报错信息。</p>
+<p>XMLHttpRequest cannot load <a href="http://api.alice.com" target="_blank" rel="noopener">http://api.alice.com</a>.<br>Origin <a href="http://api.bob.com" target="_blank" rel="noopener">http://api.bob.com</a> is not allowed by Access-Control-Allow-Origin.<br>服务器回应的其他CORS相关字段如下。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Access-Control-Allow-Methods: GET, POST, PUT</span><br><span class="line">Access-Control-Allow-Headers: X-Custom-Header</span><br><span class="line">Access-Control-Allow-Credentials: true</span><br><span class="line">Access-Control-Max-Age: 1728000</span><br></pre></td></tr></table></figure>
+<p>（1）Access-Control-Allow-Methods</p>
+<p>该字段必需，它的值是逗号分隔的一个字符串，表明服务器支持的所有跨域请求的方法。注意，返回的是所有支持的方法，而不单是浏览器请求的那个方法。这是为了避免多次”预检”请求。</p>
+<p>（2）Access-Control-Allow-Headers</p>
+<p>如果浏览器请求包括Access-Control-Request-Headers字段，则Access-Control-Allow-Headers字段是必需的。它也是一个逗号分隔的字符串，表明服务器支持的所有头信息字段，不限于浏览器在”预检”中请求的字段。</p>
+<p>（3）Access-Control-Allow-Credentials</p>
+<p>该字段与简单请求时的含义相同。</p>
+<p>（4）Access-Control-Max-Age</p>
+<p>该字段可选，用来指定本次预检请求的有效期，单位为秒。上面结果中，有效期是20天（1728000秒），即允许缓存该条回应1728000秒（即20天），在此期间，不用发出另一条预检请求。</p>
+<h2 id="浏览器的正常请求和回应"><a href="#浏览器的正常请求和回应" class="headerlink" title="浏览器的正常请求和回应"></a>浏览器的正常请求和回应</h2><p>一旦服务器通过了”预检”请求，以后每次浏览器正常的CORS请求，就都跟简单请求一样，会有一个Origin头信息字段。服务器的回应，也都会有一个Access-Control-Allow-Origin头信息字段。</p>
+<p>下面是”预检”请求之后，浏览器的正常CORS请求。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">PUT /cors HTTP/1.1</span><br><span class="line">Origin: http://api.bob.com</span><br><span class="line">Host: api.alice.com</span><br><span class="line">X-Custom-Header: value</span><br><span class="line">Accept-Language: en-US</span><br><span class="line">Connection: keep-alive</span><br><span class="line">User-Agent: Mozilla/5.0...</span><br></pre></td></tr></table></figure>
+<p>上面头信息的Origin字段是浏览器自动添加的。</p>
+<p>下面是服务器正常的回应。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Access-Control-Allow-Origin: http://api.bob.com</span><br><span class="line">Content-Type: text/html; charset=utf-8</span><br></pre></td></tr></table></figure>
+<p>上面头信息中，Access-Control-Allow-Origin字段是每次回应都必定包含的。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://www.ruanyifeng.com/blog/2016/04/cors.html" target="_blank" rel="noopener">http://www.ruanyifeng.com/blog/2016/04/cors.html</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/10/tools/manual-proxy-setting/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/10/tools/manual-proxy-setting/" itemprop="url">通过浏览器插件SwitchyOmega进行代理</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-10T13:21:38+08:00">
+                2018-04-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/10/tools/manual-proxy-setting/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/04/10/tools/manual-proxy-setting/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/04/10/tools/manual-proxy-setting/" class="leancloud_visitors" data-flag-title="通过浏览器插件SwitchyOmega进行代理">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>由于公司安全原因，需要在本地安装Pulse-Secure vpn工具，导致之前使用的ShadowsocksX-NG PAC自动模式无法使用</p>
+<h1 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h1><ul>
+<li>ShadowsocksX-NG设置为手动模式</li>
+<li>查看ShadowsocksX的偏好设置，查找http端口1087</li>
+<li>下载chrome的SwitchyOmega插件</li>
+<li>配置 制定域名下走proxy情景模式</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/10/tools/multi-ssl-key/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/10/tools/multi-ssl-key/" itemprop="url">管理多个ssl私钥</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-10T11:29:00+08:00">
+                2018-04-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/10/tools/multi-ssl-key/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/04/10/tools/multi-ssl-key/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/04/10/tools/multi-ssl-key/" class="leancloud_visitors" data-flag-title="管理多个ssl私钥">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>由于本地的sshkey已经绑定了gitlab,github等多个账号，如果换的话很麻烦<br>但是公司要求需要有公司邮箱的一个ssl私钥，so有了多个ssl管理的需求</p>
+<h1 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h1><p>大体参照<a href="https://www.cnblogs.com/popfisher/p/5731232.html" target="_blank" rel="noopener">https://www.cnblogs.com/popfisher/p/5731232.html</a> 这篇文章即可</p>
+<h2 id="指定名称生成私钥"><a href="#指定名称生成私钥" class="headerlink" title="指定名称生成私钥"></a>指定名称生成私钥</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">[appusr@iZ2zed4vtb8cdfk7pw69dzZ ~]$ ssh-keygen -t rsa -C &quot;邮箱&quot; -f newkey</span><br><span class="line">Generating public/private rsa key pair.</span><br><span class="line">Enter passphrase (empty for no passphrase):</span><br><span class="line">Enter same passphrase again:</span><br><span class="line">Your identification has been saved in newkey.</span><br><span class="line">Your public key has been saved in newkey.pub.</span><br><span class="line">The key fingerprint is:</span><br><span class="line">bb:7a:24:8c:a7:ae:c8:81:6c:7a:b5:1a:82:19:84:d6 邮箱</span><br><span class="line">The key&apos;s randomart image is:</span><br><span class="line">+--[ RSA 2048]----+</span><br><span class="line">|                 |</span><br><span class="line">|. .              |</span><br><span class="line">|.o E             |</span><br><span class="line">|o                |</span><br><span class="line">|.    o  S        |</span><br><span class="line">|+o  o + ..       |</span><br><span class="line">|=+.. + o.        |</span><br><span class="line">|+oo.o   ..       |</span><br><span class="line">|ooo+. .o.        |</span><br><span class="line">+-----------------+</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">-rw-------  1 appusr appusr     1675 4月  10 19:36 newkey</span><br><span class="line">-rw-r--r--  1 appusr appusr      388 4月  10 19:36 newkey.pub</span><br></pre></td></tr></table></figure>
+<h2 id="配置-ssh-config文件"><a href="#配置-ssh-config文件" class="headerlink" title="配置.ssh/config文件"></a>配置.ssh/config文件</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># 配置github.com</span><br><span class="line">Host github.com                 </span><br><span class="line">    HostName github.com</span><br><span class="line">    IdentityFile C:\\Users\\popfisher\\.ssh\\id_rsa_github</span><br><span class="line">    PreferredAuthentications publickey</span><br><span class="line">    User username1</span><br><span class="line"></span><br><span class="line"># 配置git.oschina.net </span><br><span class="line">Host git.oschina.net </span><br><span class="line">    HostName git.oschina.net</span><br><span class="line">    IdentityFile C:\\Users\\popfisher\\.ssh\\id_rsa_oschina</span><br><span class="line">    PreferredAuthentications publickey</span><br><span class="line">    User username2</span><br></pre></td></tr></table></figure>
+<h2 id="完成"><a href="#完成" class="headerlink" title="完成"></a>完成</h2><p>只有指定的域名通过指定的ssl进行访问<br>其他域名，还是走默认的路径<br><code>~/.ssh/id_rsa</code></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/10/运维/normal-online-problem-fix/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/10/运维/normal-online-problem-fix/" itemprop="url">normal-online-problem-fix</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-10T09:19:55+08:00">
+                2018-04-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/10/运维/normal-online-problem-fix/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/04/10/运维/normal-online-problem-fix/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/04/10/运维/normal-online-problem-fix/" class="leancloud_visitors" data-flag-title="normal-online-problem-fix">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="处理步骤"><a href="#处理步骤" class="headerlink" title="处理步骤"></a>处理步骤</h1><h2 id="发现问题"><a href="#发现问题" class="headerlink" title="发现问题"></a>发现问题</h2><p>发现问题通常通过自动化的监控和报警系统来实现，线上游戏服搭建了一个完善、有效的日志中心、监控和报警系统，通常我们会从系统层面、应用层面和数据库层面进行监控。</p>
+<h3 id="系统层"><a href="#系统层" class="headerlink" title="系统层"></a>系统层</h3><p>对系统层面的监控包括对系统的CPU利用率、系统负载、内存使用情况、网络I/O负载、磁盘负载、I/O等待、交换区的使用、线程数及打开的文件句柄数等进行的监控，一旦超出阈值，就需要报警。</p>
+<h3 id="应用层"><a href="#应用层" class="headerlink" title="应用层"></a>应用层</h3><p>对应用层面的监控包括对服务接口的响应时间、吞吐量、调用频次、接口成功率及接口的波动率等进行的监控。</p>
+<h3 id="数据库-缓存-消息队列"><a href="#数据库-缓存-消息队列" class="headerlink" title="数据库,缓存,消息队列"></a>数据库,缓存,消息队列</h3><p>对资源层的监控包括对数据库、缓存和消息队列的监控。我们通常会对数据库的负载、慢SQL、连接数等进行监控；对缓存的连接数、占用内存、吞吐量、响应时间等进行监控；并对消息队列的响应时间、吞吐量、负载、积压情况等进行监控。</p>
+<h2 id="定位问题"><a href="#定位问题" class="headerlink" title="定位问题"></a>定位问题</h2><p>定位问题时，首先要根据经验来分析，如果应急团队中有人对相应的问题有经验，并确定能够通过某种手段进行恢复，则应该第一时间恢复，同时保留现场，然后定位问题。<br>应急人员在定位过程中需要与业务负责人、技术负责人、核心技术开发人员、技术专家、架构师、运营人员和运维人员一起，对产生问题的原因进行快速分析。在分析的过程中要先考虑系统最近的变化，考虑如下问题。</p>
+<ul>
+<li>问题系统最近是否进行了上线？(系统本身)</li>
+<li>依赖的基础平台和资源是否进行了上线或者升级？（基础资源）</li>
+<li>依赖的系统最近是否进行了上线？（以来系统）</li>
+<li>运营人员是否在系统里做过运营变更？（运营）</li>
+<li>网络是否有波动？（网络）</li>
+<li>最近的业务是否上量？（访问量）</li>
+<li>服务的使用方是否有促销活动？（促销）</li>
+</ul>
+<h2 id="解决问题"><a href="#解决问题" class="headerlink" title="解决问题"></a>解决问题</h2><p>解决问题的阶段有时处于应急处理中，有时处于应急处理后。在理想情况下，每个系统都会对各种严重情况设计止损和降级开关，因此在发生严重问题时先使用止损策略，在恢复问题后再定位和解决问题。解决问题要以定位问题为基础，必须清晰地定位问题产生的根本原因，再提出解决问题的有效方案，切记在没有明确原因之前，不要使用各种可能的方法来尝试修复问题，这样可能导致还没有解决这个问题又引出另一个问题。</p>
+<h2 id="消除影响"><a href="#消除影响" class="headerlink" title="消除影响"></a>消除影响</h2><p>在解决问题时，某个问题可能还没被解决就已恢复，在任何情况下都需要消除问题带来的影响。</p>
+<ul>
+<li>技术人员在应急过程中对系统做的临时性改变，若在后面证明是无效的，则要尝试恢复到原来的状态。</li>
+<li>技术人员在应急过程中对系统进行的降级开关操作，在事后需要恢复。</li>
+<li>运营人员在应急过程中对系统做的特殊设置如某些流量路由的开关，在事后需要恢复。</li>
+<li>对使用方或者用户造成的问题，尽量采取补偿的策略进行修复，在极端情况下需要一一核实。</li>
+<li>对外由专门的客服团队整理话术，统一对外宣布发生故障的原因并安抚用户，话术要贴近客观事实，并从用户的角度出发。</li>
+</ul>
+<h1 id="实际应用"><a href="#实际应用" class="headerlink" title="实际应用"></a>实际应用</h1><ul>
+<li>首先，找运维看日志。如果在日志监控系统中有报错，则能很好地定位问题，我们只需根据日志报错的堆栈信息来解决问题即可。如果在日志监控系统中没有任何异常信息，就得保存现场了。</li>
+<li>其次，保存现场并恢复服务。在日志系统中找不到任何线索的情况下，我们需要赶紧保存现场快照，并尽快恢复服务，以达到最大程度止损的目的。</li>
+</ul>
+<h2 id="保存现场"><a href="#保存现场" class="headerlink" title="保存现场"></a>保存现场</h2><p>在JVM中保存现场快照通常包括保存当前运行线程的快照和保存JVM内存堆栈快照。如下所述。</p>
+<p>（1）保存当前运行线程的快照，可以使用jstack [pid]命令实现，在通常情况下需要保存三份不同时刻的线程快照，时间间隔为1～2分钟。<br>（2）保存JVM内存堆栈快照，可以使用jmap –heap、jmap –histo、jmap -dump:format=b、file=xxx.hprof等命令实现。</p>
+<h2 id="快速恢复"><a href="#快速恢复" class="headerlink" title="快速恢复"></a>快速恢复</h2><p>（1）隔离出现问题的服务，使其退出线上服务，便于后续的分析处理。<br>（2）尝试快速重启服务，第一时间恢复系统，而不是彻底解决问题。<br>（3）对服务降级处理，只使用少量的请求来重现问题，以便我们全程跟踪观察，因为之前可能没太注意这个问题是如何发生的。<br>通过上面的一系列操作后，要分析日志并定位问题。这一步很关键，也需要有很多实战经验，需要先查看服务器的“当前症状”，才能进一步对症下药。下面提供从服务器的CPU、内存和I/O三方面查看症状的基本方法。</p>
+<h3 id="查看CPU或内存情况的命令如下："><a href="#查看CPU或内存情况的命令如下：" class="headerlink" title="查看CPU或内存情况的命令如下："></a>查看CPU或内存情况的命令如下：</h3><ul>
+<li>top：查看服务器的负载状况。</li>
+<li>top+1：在top视图中按键盘数字“1”查看每个逻辑CPU的使用情况。</li>
+<li>jstat –gcutil pid：查看堆中各内存区域的变化及GC的工作状态。</li>
+<li>top+H：查看线程的使用情况。</li>
+<li>ps -mp pid -o THREAD,tid,time | sort -rn：查看指定进程中各个线程占用CPU的状态，选出耗时最多、最繁忙的线程id。</li>
+<li>jstack pid：打印进程中的线程堆栈信息。<br>判断内存溢出（OOM）方法如下。</li>
+<li>堆外内存溢出：由JNI的调用或NIO中的DirectByteBuffer等使用不当造成。</li>
+<li>堆内内存溢出：容易由程序中创建的大对象、全局集合、缓存、ClassLoader加载的类或大量的线程消耗等造成。</li>
+<li>使用jmap –heap命令、jmap –histo命令或者jmap-dump:format=b,file=xxx.hprof等命令查看JVM内存的使用情况。</li>
+</ul>
+<h3 id="分析I-O读写问题的方法如下。"><a href="#分析I-O读写问题的方法如下。" class="headerlink" title="分析I/O读写问题的方法如下。"></a>分析I/O读写问题的方法如下。</h3><ul>
+<li>文件I/O：使用命令vmstat、lsof –c -ppid等。</li>
+<li>网络I/O：使用命令netstat –anp、tcpdump -i eth0 ‘dst host 239.33.24.212’ -w raw.pcap和wireshark工具等。</li>
+<li>MySQL数据库：查看慢查询日志、数据库的磁盘空间、排查索引是否缺失，或使用show processlist检查具体的SQL语句情况。<br>最后，在Hotfix后继续观察情况。在测试环境或预生产环境修改测试后，如果问题不能再复现了，就可以根据公司的Hotfix流程进行线上的Bug更新，并继续观察。如果一切都正常，就需要消除之前可能造成的影响。</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/08/mysql/mysql-where/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/08/mysql/mysql-where/" itemprop="url">mysql-where</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-08T07:06:26+08:00">
+                2018-04-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mysql/" itemprop="url" rel="index">
+                    <span itemprop="name">mysql</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/08/mysql/mysql-where/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/04/08/mysql/mysql-where/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/04/08/mysql/mysql-where/" class="leancloud_visitors" data-flag-title="mysql-where">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="where条件"><a href="#where条件" class="headerlink" title="where条件"></a>where条件</h1><p>所有SQL的where条件，均可归纳为3大类：Index Key (First Key &amp; Last Key)，Index Filter，Table Filter。</p>
+<p>接下来，让我们来详细分析者3大类分别是如何定义，以及如何提取的。</p>
+<h2 id="Index-Key"><a href="#Index-Key" class="headerlink" title="Index Key"></a>Index Key</h2><p>用于确定SQL查询在索引中的连续范围(起始范围+结束范围)的查询条件，被称之为Index Key。由于一个范围，至少包含一个起始与一个终止，因此Index Key也被拆分为Index First Key和Index Last Key，分别用于定位索引查找的起始，以及索引查询的终止条件。</p>
+<h3 id="Index-First-Key"><a href="#Index-First-Key" class="headerlink" title="Index First Key"></a>Index First Key</h3><p>用于确定索引查询的起始范围。提取规则：从索引的第一个键值开始，检查其在where条件中是否存在，若存在并且条件是=、&gt;=，则将对应的条件加入Index First Key之中，继续读取索引的下一个键值，使用同样的提取规则；若存在并且条件是&gt;，则将对应的条件加入Index First Key中，同时终止Index First Key的提取；若不存在，同样终止Index First Key的提取。</p>
+<p>针对上面的SQL，应用这个提取规则，提取出来的Index First Key为(b &gt;= 2, c &gt; 1)。由于c的条件为 &gt;，提取结束，不包括d。</p>
+<h3 id="Index-Last-Key"><a href="#Index-Last-Key" class="headerlink" title="Index Last Key"></a>Index Last Key</h3><p>Index Last Key的功能与Index First Key正好相反，用于确定索引查询的终止范围。提取规则：从索引的第一个键值开始，检查其在where条件中是否存在，若存在并且条件是=、&lt;=，则将对应条件加入到Index Last Key中，继续提取索引的下一个键值，使用同样的提取规则；若存在并且条件是 &lt; ，则将条件加入到Index Last Key中，同时终止提取；若不存在，同样终止Index Last Key的提取。</p>
+<p>针对上面的SQL，应用这个提取规则，提取出来的Index Last Key为(b &lt; 8)，由于是 &lt; 符号，因此提取b之后结束。</p>
+<h2 id="Index-Filter"><a href="#Index-Filter" class="headerlink" title="Index Filter"></a>Index Filter</h2><p>在完成Index Key的提取之后，我们根据where条件固定了索引的查询范围，但是此范围中的项，并不都是满足查询条件的项。在上面的SQL用例中，(3,1,1)，(6,4,4)均属于范围中，但是又均不满足SQL的查询条件。</p>
+<p>Index Filter的提取规则：同样从索引列的第一列开始，检查其在where条件中是否存在：若存在并且where条件仅为 =，则跳过第一列继续检查索引下一列，下一索引列采取与索引第一列同样的提取规则；若where条件为 &gt;=、&gt;、&lt;、&lt;= 其中的几种，则跳过索引第一列，将其余where条件中索引相关列全部加入到Index Filter之中；若索引第一列的where条件包含 =、&gt;=、&gt;、&lt;、&lt;= 之外的条件，则将此条件以及其余where条件中索引相关列全部加入到Index Filter之中；若第一列不包含查询条件，则将所有索引相关条件均加入到Index Filter之中。</p>
+<p>针对上面的用例SQL，索引第一列只包含 &gt;=、&lt; 两个条件，因此第一列可跳过，将余下的c、d两列加入到Index Filter中。因此获得的Index Filter为 c &gt; 1 and d != 4 。</p>
+<h2 id="Table-Filter"><a href="#Table-Filter" class="headerlink" title="Table Filter"></a>Table Filter</h2><p>Table Filter是最简单，最易懂，也是提取最为方便的。提取规则：所有不属于索引列的查询条件，均归为Table Filter之中。</p>
+<p>同样，针对上面的用例SQL，Table Filter就为 e != ‘a’。</p>
+<h1 id="Index-Key-Index-Filter-Table-Filter小结"><a href="#Index-Key-Index-Filter-Table-Filter小结" class="headerlink" title="Index Key/Index Filter/Table Filter小结"></a>Index Key/Index Filter/Table Filter小结</h1><p>SQL语句中的where条件，使用以上的提取规则，最终都会被提取到Index Key (First Key &amp; Last Key)，Index Filter与Table Filter之中。</p>
+<p>Index First Key，只是用来定位索引的起始范围，因此只在索引第一次Search Path(沿着索引B+树的根节点一直遍历，到索引正确的叶节点位置)时使用，一次判断即可；</p>
+<p>Index Last Key，用来定位索引的终止范围，因此对于起始范围之后读到的每一条索引记录，均需要判断是否已经超过了Index Last Key的范围，若超过，则当前查询结束；</p>
+<p>Index Filter，用于过滤索引查询范围中不满足查询条件的记录，因此对于索引范围中的每一条记录，均需要与Index Filter进行对比，若不满足Index Filter则直接丢弃，继续读取索引下一条记录；</p>
+<p>Table Filter，则是最后一道where条件的防线，用于过滤通过前面索引的层层考验的记录，此时的记录已经满足了Index First Key与Index Last Key构成的范围，并且满足Index Filter的条件，回表读取了完整的记录，判断完整记录是否满足Table Filter中的查询条件，同样的，若不满足，跳过当前记录，继续读取索引的下一条记录，若满足，则返回记录，此记录满足了where的所有条件，可以返回给前端用户。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/07/mysql/mysql-lock/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1545,776 +2453,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/05/java_thread/JUC-LongAdder/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/05/java_thread/JUC-LongAdder/" itemprop="url">JUC-LongAdder</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-05T21:11:06+08:00">
-                2018-04-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/04/05/java_thread/JUC-LongAdder/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/04/05/java_thread/JUC-LongAdder/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/04/05/java_thread/JUC-LongAdder/" class="leancloud_visitors" data-flag-title="JUC-LongAdder">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/05/java_thread/ali-concurrent-rule/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/05/java_thread/ali-concurrent-rule/" itemprop="url">ali-concurrent-rule</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-05T20:49:44+08:00">
-                2018-04-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/04/05/java_thread/ali-concurrent-rule/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/04/05/java_thread/ali-concurrent-rule/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/04/05/java_thread/ali-concurrent-rule/" class="leancloud_visitors" data-flag-title="ali-concurrent-rule">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <ol>
-<li>【强制】获取单例对象需要保证线程安全，其中的方法也要保证线程安全。<br>说明:资源驱动类、工具类、单例工厂类都需要注意。</li>
-<li>【强制】创建线程或线程池时请指定有意义的线程名称，方便出错时回溯。<br>正例:<br>public class TimerTaskThread extends Thread { public TimerTaskThread() {<br>super.setName(“TimerTaskThread”); … }</li>
-<li>【强制】线程资源必须通过线程池提供，不允许在应用中自行显式创建线程。<br>说明:使用线程池的好处是减少在创建和销毁线程上所花的时间以及系统资源的开销，解决资 源不足的问题。如果不使用线程池，有可能造成系统创建大量同类线程而导致消耗完内存或者 “过度切换”的问题。</li>
-<li>【强制】线程池不允许使用 Executors 去创建，而是通过 ThreadPoolExecutor 的方式，这样 的处理方式让写的同学更加明确线程池的运行规则，规避资源耗尽的风险。 说明:Executors 返回的线程池对象的弊端如下:<br>1)FixedThreadPool 和 SingleThreadPool:<br>允许的请求队列长度为 Integer.MAX_VALUE，可能会堆积大量的请求，从而导致 OOM。<br>2)CachedThreadPool 和 ScheduledThreadPool:<br>允许的创建线程数量为 Integer.MAX_VALUE，可能会创建大量的线程，从而导致 OOM。<br>5.【强制】SimpleDateFormat 是线程不安全的类，一般不要定义为static变量，如果定义为<br>static，必须加锁，或者使用 DateUtils 工具类。<br>正例:注意线程安全，使用 DateUtils。亦推荐如下处理:<br>private static final ThreadLocal<dateformat> df = new ThreadLocal<dateformat>() { @Override<br>protected DateFormat initialValue() {<br>return new SimpleDateFormat(“yyyy-MM-dd”);<br>} };<br>说明:如果是 JDK8 的应用，可以使用 Instant 代替 Date，LocalDateTime 代替 Calendar， DateTimeFormatter 代替 Simpledateformatter，官方给出的解释:simple beautiful strong immutable thread-safe。</dateformat></dateformat></li>
-<li>【强制】高并发时，同步调用应该去考量锁的性能损耗。能用无锁数据结构，就不要用锁;能 锁区块，就不要锁整个方法体;能用对象锁，就不要用类锁。</li>
-<li>【强制】对多个资源、数据库表、对象同时加锁时，需要保持一致的加锁顺序，否则可能会造 成死锁。<br>说明:线程一需要对表 A、B、C 依次全部加锁后才可以进行更新操作，那么线程二的加锁顺序 也必须是 A、B、C，否则可能出现死锁。</li>
-<li>【强制】并发修改同一记录时，避免更新丢失，需要加锁。要么在应用层加锁，要么在缓存加 锁，要么在数据库层使用乐观锁，使用 version 作为更新依据。 说明:如果每次访问冲突概率小于 20%，推荐使用乐观锁，否则使用悲观锁。乐观锁的重试次 数不得小于 3 次。</li>
-<li>【强制】多线程并行处理定时任务时，Timer 运行多个 TimeTask 时，只要其中之一没有捕获 抛出的异常，其它任务便会自动终止运行，使用 ScheduledExecutorService 则没有这个问题。</li>
-<li>【推荐】使用 CountDownLatch 进行异步转同步操作，每个线程退出前必须调用 countDown<br>方法，线程执行代码注意 catch 异常，确保 countDown 方法可以执行，避免主线程无法执行 至 await 方法，直到超时才返回结果。<br>说明:注意，子线程抛出异常堆栈，不能在主线程 try-catch 到。</li>
-<li>【推荐】避免 Random 实例被多线程使用，虽然共享该实例是线程安全的，但会因竞争同一 seed 导致的性能下降。<br>说明:Random 实例包括 java.util.Random 的实例或者 Math.random()实例。<br>正例:在 JDK7 之后，可以直接使用 API ThreadLocalRandom，在 JDK7 之前，可以做到每个 线程一个实例。</li>
-<li>【推荐】在并发场景下，通过双重检查锁(double-checked locking)实现延迟初始化的优化问题隐患(可参考 The “Double-Checked Locking is Broken” Declaration)，推荐问题解决方案中较为简单一种(适用于 JDK5 及以上版本)，将目标属性声明为 volatile 型。 反例:</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">class Foo &#123;</span><br><span class="line">private Helper helper = null; public Helper getHelper() &#123;</span><br><span class="line">if (helper == null) synchronized(this) &#123; if (helper == null)</span><br><span class="line">helper = new Helper();</span><br><span class="line">&#125;</span><br><span class="line">return helper; &#125;</span><br><span class="line">// other functions and members...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>13.【参考】volatile 解决多线程内存不可见问题。对于一写多读，是可以解决变量同步问题， 但是如果多写，同样无法解决线程安全问题。如果是 count++操作，使用如下类实现: AtomicInteger count = new AtomicInteger(); count.addAndGet(1); 如果是 JDK8，推 荐使用 LongAdder 对象，比 AtomicLong 性能更好(减少乐观锁的重试次数)。</p>
-<ol start="14">
-<li>【参考】 HashMap 在容量不够进行 resize 时由于高并发可能出现死链，导致 CPU 飙升，在 开发过程中注意规避此风险。</li>
-<li>【参考】ThreadLocal 无法解决共享对象的更新问题，ThreadLocal 对象建议使用 static 修饰。这个变量是针对一个线程内所有操作共有的，所以设置为静态变量，所有此类实例共享 此静态变量 ，也就是说在类第一次被使用时装载，只分配一块存储空间，所有此类的对象(只 要是这个线程内定义的)都可以操控这个变量。</li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/05/java_thread/JUC-AtomicReference/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/05/java_thread/JUC-AtomicReference/" itemprop="url">JUC-AtomicReference</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-05T09:52:37+08:00">
-                2018-04-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/04/05/java_thread/JUC-AtomicReference/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/04/05/java_thread/JUC-AtomicReference/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/04/05/java_thread/JUC-AtomicReference/" class="leancloud_visitors" data-flag-title="JUC-AtomicReference">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>只能保证一个共享变量的原子操作。当对一个共享变量执行操作时，我们可以使用循环CAS的方式来保证原子操作，但是对多个共享变量操作时，循环CAS就无法保证操作的原子性，这个时候就可以用锁，或者有一个取巧的办法，就是把多个共享变量合并成一个共享变量来操作。<br>从Java1.5开始JDK提供了AtomicReference类来保证引用对象之间的原子性，你可以把多个变量放在一个对象里来进行CAS操作。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/04/java_thread/JUC-5-future-task/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/04/java_thread/JUC-5-future-task/" itemprop="url">future-task</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-04T08:53:18+08:00">
-                2018-04-04
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/04/04/java_thread/JUC-5-future-task/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/04/04/java_thread/JUC-5-future-task/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/04/04/java_thread/JUC-5-future-task/" class="leancloud_visitors" data-flag-title="future-task">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public &lt;T&gt; Future&lt;T&gt; submit(Callable&lt;T&gt; task) &#123;</span><br><span class="line">    if (task == null) throw new NullPointerException();</span><br><span class="line">    RunnableFuture&lt;T&gt; ftask = newTaskFor(task);</span><br><span class="line">    execute(ftask);</span><br><span class="line">    return ftask;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>从上面看到就是对Callable封装成一个新的任务，即FutureTask，调用Executor的原始接口execute方法来执行FutureTask，并且返回给用户FutureTask对象，用于追踪任务的状态和数据，下面就需要我们来详细看看FutureTask如何对任务进行封装的</p>
-<h1 id="FutureTask"><a href="#FutureTask" class="headerlink" title="FutureTask"></a>FutureTask</h1><h2 id="FutureTask的属性和构造函数"><a href="#FutureTask的属性和构造函数" class="headerlink" title="FutureTask的属性和构造函数"></a>FutureTask的属性和构造函数</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">private volatile int state;</span><br><span class="line">private static final int NEW          = 0;</span><br><span class="line">private static final int COMPLETING   = 1;</span><br><span class="line">private static final int NORMAL       = 2;</span><br><span class="line">private static final int EXCEPTIONAL  = 3;</span><br><span class="line">private static final int CANCELLED    = 4;</span><br><span class="line">private static final int INTERRUPTING = 5;</span><br><span class="line">private static final int INTERRUPTED  = 6;</span><br><span class="line"></span><br><span class="line">/** The underlying callable; nulled out after running */</span><br><span class="line">private Callable&lt;V&gt; callable;</span><br><span class="line">/** The result to return or exception to throw from get() */</span><br><span class="line">private Object outcome; // non-volatile, protected by state reads/writes</span><br><span class="line">/** The thread running the callable; CASed during run() */</span><br><span class="line">private volatile Thread runner;</span><br><span class="line">/** Treiber stack of waiting threads */</span><br><span class="line">private volatile WaitNode waiters;</span><br><span class="line"></span><br><span class="line">public FutureTask(Callable&lt;V&gt; callable) &#123;</span><br><span class="line">    if (callable == null)</span><br><span class="line">        throw new NullPointerException();</span><br><span class="line">    this.callable = callable;</span><br><span class="line">    this.state = NEW;       // ensure visibility of callable</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>有一个状态变量state,</li>
-<li>一个Callable callable即原始任务，</li>
-<li>Object outcome存放原始任务的输出结果或者异常，</li>
-<li>Thread runner运行该任务的线程，</li>
-<li>WaitNode waiters等待获取任务结果的等待者</li>
-</ul>
-<h2 id="3-2-FutureTask的get方法实现"><a href="#3-2-FutureTask的get方法实现" class="headerlink" title="3.2 FutureTask的get方法实现"></a>3.2 FutureTask的get方法实现</h2><p>使用FutureTask阻塞式等待任务执行结果，一种是永远阻塞另一种就是阻塞一定时间否则报超时异常，如下2个方法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">public V get() throws InterruptedException, ExecutionException &#123;</span><br><span class="line">    int s = state;</span><br><span class="line">    if (s &lt;= COMPLETING)</span><br><span class="line">        s = awaitDone(false, 0L);</span><br><span class="line">    return report(s);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public V get(long timeout, TimeUnit unit)</span><br><span class="line">    throws InterruptedException, ExecutionException, TimeoutException &#123;</span><br><span class="line">    if (unit == null)</span><br><span class="line">        throw new NullPointerException();</span><br><span class="line">    int s = state;</span><br><span class="line">    if (s &lt;= COMPLETING &amp;&amp;</span><br><span class="line">        (s = awaitDone(true, unit.toNanos(timeout))) &lt;= COMPLETING)</span><br><span class="line">        throw new TimeoutException();</span><br><span class="line">    return report(s);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>阻塞式等待的核心逻辑就在上述awaitDone方法中，来详细看看<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">private int awaitDone(boolean timed, long nanos)</span><br><span class="line">    throws InterruptedException &#123;</span><br><span class="line">    final long deadline = timed ? System.nanoTime() + nanos : 0L;</span><br><span class="line">    WaitNode q = null;</span><br><span class="line">    boolean queued = false;</span><br><span class="line">    for (;;) &#123;</span><br><span class="line">        if (Thread.interrupted()) &#123;</span><br><span class="line">            removeWaiter(q);</span><br><span class="line">            throw new InterruptedException();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        int s = state;</span><br><span class="line">        if (s &gt; COMPLETING) &#123;</span><br><span class="line">            if (q != null)</span><br><span class="line">                q.thread = null;</span><br><span class="line">            return s;</span><br><span class="line">        &#125;</span><br><span class="line">        else if (s == COMPLETING) // cannot time out yet</span><br><span class="line">            Thread.yield();</span><br><span class="line">        else if (q == null)</span><br><span class="line">            q = new WaitNode();</span><br><span class="line">        else if (!queued)</span><br><span class="line">            queued = UNSAFE.compareAndSwapObject(this, waitersOffset,</span><br><span class="line">                                                 q.next = waiters, q);</span><br><span class="line">        else if (timed) &#123;</span><br><span class="line">            nanos = deadline - System.nanoTime();</span><br><span class="line">            if (nanos &lt;= 0L) &#123;</span><br><span class="line">                removeWaiter(q);</span><br><span class="line">                return state;</span><br><span class="line">            &#125;</span><br><span class="line">            LockSupport.parkNanos(this, nanos);</span><br><span class="line">        &#125;</span><br><span class="line">        else</span><br><span class="line">            LockSupport.park(this);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>可以看到有一个for循环不断处理着各种情况：</p>
-<ul>
-<li>1 从最开始的WaitNode q = null，构建了一个WaitNode，即代表着当前线程作为一个等待者，WaitNode就是一个简单的链表，如下</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">static final class WaitNode &#123;</span><br><span class="line">    volatile Thread thread;</span><br><span class="line">    volatile WaitNode next;</span><br><span class="line">    WaitNode() &#123; thread = Thread.currentThread(); &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li><p>2 构建好WaitNode之后就要将该WaitNode放入链表中，这时候就会涉及多线程问题，使用UNSAFE的CAS来解决，这种方式也是AtomicLong等众多原子类的底层实现方式</p>
-</li>
-<li><p>3 成功放入WaitNode链表之后，采用LockSupport的park阻塞当前线程，要么只阻塞一定时间要么一直阻塞，直到被LockSupport的unpark唤醒。LockSupport在锁的底层实现AQS中也非常常见，使用了LockSupport就可以不用在for循环里不断判断当前任务状态而浪费CPU，只需要当前任务完成之后，使用LockSupport对等待线程进行unpark，就可以使等待的线程退出等待继续往下执行</p>
-</li>
-<li><p>4 如果LockSupport阻塞时间到了，还未收到unpark，则需要从等待者链表中删除当前线程代表的等待者</p>
-</li>
-</ul>
-<h2 id="FutureTask的任务执行过程"><a href="#FutureTask的任务执行过程" class="headerlink" title="FutureTask的任务执行过程"></a>FutureTask的任务执行过程</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">public void run() &#123;</span><br><span class="line">    if (state != NEW ||</span><br><span class="line">        !UNSAFE.compareAndSwapObject(this, runnerOffset,</span><br><span class="line">                                     null, Thread.currentThread()))</span><br><span class="line">        return;</span><br><span class="line">    try &#123;</span><br><span class="line">        Callable&lt;V&gt; c = callable;</span><br><span class="line">        if (c != null &amp;&amp; state == NEW) &#123;</span><br><span class="line">            V result;</span><br><span class="line">            boolean ran;</span><br><span class="line">            try &#123;</span><br><span class="line">                result = c.call();</span><br><span class="line">                ran = true;</span><br><span class="line">            &#125; catch (Throwable ex) &#123;</span><br><span class="line">                result = null;</span><br><span class="line">                ran = false;</span><br><span class="line">                setException(ex);</span><br><span class="line">            &#125;</span><br><span class="line">            if (ran)</span><br><span class="line">                set(result);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; finally &#123;</span><br><span class="line">        // runner must be non-null until state is settled to</span><br><span class="line">        // prevent concurrent calls to run()</span><br><span class="line">        runner = null;</span><br><span class="line">        // state must be re-read after nulling runner to prevent</span><br><span class="line">        // leaked interrupts</span><br><span class="line">        int s = state;</span><br><span class="line">        if (s &gt;= INTERRUPTING)</span><br><span class="line">            handlePossibleCancellationInterrupt(s);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>1 一旦FutureTask任务开始执行了，就需要将当前执行线程设置到FutureTask的volatile Thread runner属性中</p>
-<p>2 执行原始任务Callable的call方法，可能成功也可能失败也可能被中断被取消</p>
-<p>文档中有如下状态的迁移过程：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Possible state transitions:</span><br><span class="line"> * NEW -&gt; COMPLETING -&gt; NORMAL</span><br><span class="line"> * NEW -&gt; COMPLETING -&gt; EXCEPTIONAL</span><br><span class="line"> * NEW -&gt; CANCELLED</span><br><span class="line"> * NEW -&gt; INTERRUPTING -&gt; INTERRUPTED</span><br></pre></td></tr></table></figure>
-<p>成功和失败方法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">protected void set(V v) &#123;</span><br><span class="line">    if (UNSAFE.compareAndSwapInt(this, stateOffset, NEW, COMPLETING)) &#123;</span><br><span class="line">        outcome = v;</span><br><span class="line">        UNSAFE.putOrderedInt(this, stateOffset, NORMAL); // final state</span><br><span class="line">        finishCompletion();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">protected void setException(Throwable t) &#123;</span><br><span class="line">    if (UNSAFE.compareAndSwapInt(this, stateOffset, NEW, COMPLETING)) &#123;</span><br><span class="line">        outcome = t;</span><br><span class="line">        UNSAFE.putOrderedInt(this, stateOffset, EXCEPTIONAL); // final state</span><br><span class="line">        finishCompletion();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>都是首先将状态变成COMPLETING正在结束中，然后设置outcome，成功则设置正常的返回值，失败则设置成异常，然后根据划定最终的状态结果，成功就是NORMAL，失败就是EXCEPTIONAL，最后呢调用finishCompletion，去unpark之前说的WaitNode中对应的线程们</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">private void finishCompletion() &#123;</span><br><span class="line">    // assert state &gt; COMPLETING;</span><br><span class="line">    for (WaitNode q; (q = waiters) != null;) &#123;</span><br><span class="line">        if (UNSAFE.compareAndSwapObject(this, waitersOffset, q, null)) &#123;</span><br><span class="line">            for (;;) &#123;</span><br><span class="line">                Thread t = q.thread;</span><br><span class="line">                if (t != null) &#123;</span><br><span class="line">                    q.thread = null;</span><br><span class="line">                    LockSupport.unpark(t);</span><br><span class="line">                &#125;</span><br><span class="line">                WaitNode next = q.next;</span><br><span class="line">                if (next == null)</span><br><span class="line">                    break;</span><br><span class="line">                q.next = null; // unlink to help gc</span><br><span class="line">                q = next;</span><br><span class="line">            &#125;</span><br><span class="line">            break;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    done();</span><br><span class="line"></span><br><span class="line">    callable = null;        // to reduce footprint</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这里就是遍历WaitNode链表，对每一个WaitNode对应的线程依次进行LockSupport.unpark(t)，使其结束阻塞。WaitNode通知完毕后，调用一个done方法，目前该方法是空的实现，所以你如果想在任务完成后执行一些动作的时候就可以重写该方法</p>
-<h2 id="FutureTask任务的取消"><a href="#FutureTask任务的取消" class="headerlink" title="FutureTask任务的取消"></a>FutureTask任务的取消</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">public boolean cancel(boolean mayInterruptIfRunning) &#123;</span><br><span class="line">    if (state != NEW)</span><br><span class="line">        return false;</span><br><span class="line">    if (mayInterruptIfRunning) &#123;</span><br><span class="line">        if (!UNSAFE.compareAndSwapInt(this, stateOffset, NEW, INTERRUPTING))</span><br><span class="line">            return false;</span><br><span class="line">        Thread t = runner;</span><br><span class="line">        if (t != null)</span><br><span class="line">            t.interrupt();</span><br><span class="line">        UNSAFE.putOrderedInt(this, stateOffset, INTERRUPTED); // final state</span><br><span class="line">    &#125;</span><br><span class="line">    else if (!UNSAFE.compareAndSwapInt(this, stateOffset, NEW, CANCELLED))</span><br><span class="line">        return false;</span><br><span class="line">    finishCompletion();</span><br><span class="line">    return true;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>取消任务，有2种情况，一种该任务正在运行，一种就是非运行状态，所以需要用户给出明示是否中断正在运行的任务，即需要一个参数mayInterruptIfRunning</p>
-<p>中断任务就是通过中断运行该任务的线程，即直接调用该线程的interrupt()方法</p>
-<h1 id="结束语"><a href="#结束语" class="headerlink" title="结束语"></a>结束语</h1><p>FutureTask大部分就简单分析完了，其他的自己去看下就行了。至此我们了解了一个任务被提交经过了封装，变成了一个新的任务FutureTask,同时FutureTask也明确了该任务的整个执行过程，只留出核心execute(futureTask)方法需要被子类来实现</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://my.oschina.net/pingpangkuangmo/blog/666762" target="_blank" rel="noopener">https://my.oschina.net/pingpangkuangmo/blog/666762</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/03/tools/idea-keymap/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/03/tools/idea-keymap/" itemprop="url">idea快捷键</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-03T21:55:52+08:00">
-                2018-04-03
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/04/03/tools/idea-keymap/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/04/03/tools/idea-keymap/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/04/03/tools/idea-keymap/" class="leancloud_visitors" data-flag-title="idea快捷键">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="快捷键"><a href="#快捷键" class="headerlink" title="快捷键"></a>快捷键</h1><h2 id="查看继承关系"><a href="#查看继承关系" class="headerlink" title="查看继承关系:"></a>查看继承关系:</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Ctrl + T</span><br></pre></td></tr></table></figure>
-<h2 id="代码包围"><a href="#代码包围" class="headerlink" title="代码包围"></a>代码包围</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">alt+comand+t</span><br></pre></td></tr></table></figure>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/15/">15</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2360,7 +2503,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">140</span>
+                  <span class="site-state-item-count">146</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
