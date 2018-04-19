@@ -12,7 +12,7 @@ https://github.com/neoremind/navi-pbrpc
 
 ## 客户端
 
-顺序：
+handler链条的顺序：
 - 序列化
 - 反序列化
 - 客户端处理
@@ -55,6 +55,7 @@ SimplePbrpcClient(PbrpcClientConfiguration pbrpcClientConfiguration, boolean isS
 
 ### 序列化handler
 拼装协议
+
 ```
     @Override
     protected void encode(ChannelHandlerContext ctx, PbrpcMsg pbrpcMsg, List<Object> out)
@@ -74,6 +75,8 @@ SimplePbrpcClient(PbrpcClientConfiguration pbrpcClientConfiguration, boolean isS
 ### 反序列化handler
 - 处理半包问题
 - 反序列化
+
+
 ```
 @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
@@ -207,6 +210,9 @@ public class PbrpcClientHandler extends SimpleChannelInboundHandler<PbrpcMsg> {
 - 反序列化
 - 客户端处理
 - 序列化
+
+
+
 ```
 public PbrpcServer(PbrpcServerConfiguration pbrpcServerConfiguration, int port) {
         // use default conf otherwise use specified one
@@ -250,7 +256,9 @@ public PbrpcServer(PbrpcServerConfiguration pbrpcServerConfiguration, int port) 
 ```
 
 ### ide handler
+
 处理一些空闲的连接闭关它们，防止占用服务端资源
+
 ```
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
@@ -269,6 +277,7 @@ public PbrpcServer(PbrpcServerConfiguration pbrpcServerConfiguration, int port) 
 ```
 
 ### 服务端handler
+
 ```
 public class PbrpcServerHandler extends SimpleChannelInboundHandler<PbrpcMsg> {
 
@@ -382,3 +391,35 @@ public class PbrpcServerHandler extends SimpleChannelInboundHandler<PbrpcMsg> {
 
 }
 ```
+
+
+# gateway项目
+
+```
+  @Override
+  protected void initChannel(SocketChannel ch) throws Exception {
+    
+    
+    CorsConfig corsConfig = CorsConfigBuilder.forOrigins(parseCorsAllowHostList())
+        .allowedRequestHeaders("X-Access-Token", "content-type")
+        .allowedRequestMethods(HttpMethod.GET, HttpMethod.POST, HttpMethod.PUT).build();
+
+    ch.pipeline().addLast("codec", new HttpServerCodec());
+    ch.pipeline().addLast("aggegator", new HttpObjectAggregator(maxContentLength));
+    ch.pipeline().addLast("cors", new CorsHandler(corsConfig));
+    ch.pipeline().addLast("idleStateHandler", new IdleStateHandler(0, 0, 300, TimeUnit.SECONDS));
+    //zipkin相关的
+    if (ZipkinHelper.httpTracing().isPresent())
+      ch.pipeline().addLast("tracing", new RequestTracingHandler());
+    //业务相关的handler
+    for (ChannelHandler handler : handlers) {
+      ch.pipeline().addLast(handler.getClass().getSimpleName(), handler); // Use this if need
+    }
+```
+
+
+
+# 聊天室
+https://waylau.com/netty-chat/
+
+# 聊天室websocket版本
