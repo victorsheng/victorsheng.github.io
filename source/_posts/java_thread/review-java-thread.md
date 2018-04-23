@@ -116,6 +116,8 @@ Condition conditionB=lock.newCondition();
 # 线程状态切换
 
 ![upload successful](/images/pasted-42.png)
+
+![upload successful](/images/pasted-167.png)
 - 监视器代表synchronized
 - lock代表锁
 
