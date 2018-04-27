@@ -512,6 +512,390 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/26/redis/redis-persist/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/26/redis/redis-persist/" itemprop="url">Redis持久化方式</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-26T18:21:00+08:00">
+                2018-03-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/redis/" itemprop="url" rel="index">
+                    <span itemprop="name">redis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/26/redis/redis-persist/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/03/26/redis/redis-persist/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/03/26/redis/redis-persist/" class="leancloud_visitors" data-flag-title="Redis持久化方式">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>为防止数据丢失，需要将 Redis 中的数据从内存中 dump 到磁盘，这就是持久化。Redis 提供两种持久化方式：RDB 和 AOF。Redis 允许两者结合，也允许两者同时关闭。</p>
+<p>RDB 可以定时备份内存中的数据集。服务器启动的时候，可以从 RDB 文件中恢复数据集。</p>
+<p>AOF(append only file) 可以记录服务器的所有写操作。在服务器重新启动的时候，会把所有的写操作重新执行一遍，从而实现数据备份。当写操作集过大（比原有的数据集还大），Redis 会重写写操作集。</p>
+<p>为什么称为 append only file 呢？AOF 持久化是类似于生成一个关于 Redis 写操作的文件，写操作（增删）总是以追加的方式追加到文件中。</p>
+<p>因此，在 RDB 持久化的时候可以将 RDB 保存到磁盘中，也可以保存到内存中，当然保存到内存中就不是持久化了。</p>
+<h1 id="RDB-持久化的运作机制-快照模式"><a href="#RDB-持久化的运作机制-快照模式" class="headerlink" title="RDB 持久化的运作机制(快照模式)"></a>RDB 持久化的运作机制(快照模式)</h1><p><img src="http://wiki.jikexueyuan.com/project/redis/images/redis16.png" alt="image.png"></p>
+<p>Redis 支持两种方式进行 RDB 持久化：当前进程执行和后台执行（BGSAVE）。RDB BGSAVE 策略是 fork 出一个子进程，把内存中的数据集整个 dump 到硬盘上。两个场景举例：</p>
+<ol>
+<li>Redis 服务器初始化过程中，设定了定时事件，每隔一段时间就会触发持久化操作； 进入定时事件处理程序中，就会 fork 产生子进程执行持久化操作。</li>
+<li>Redis 服务器预设了 save 指令，客户端可要求服务器进程中断服务，执行持久化操作。</li>
+</ol>
+<p>这里主要展开的内容是 RDB 持久化操作的写文件过程，读过程和写过程相反。子进程的产生发生在 rdbSaveBackground() 中，真正的 RDB 持久化操作是在 rdbSave()，想要直接进行 RDB 持久化，调用 rdbSave() 即可。</p>
+<h2 id="RDB-的优点"><a href="#RDB-的优点" class="headerlink" title="RDB 的优点"></a>RDB 的优点</h2><ul>
+<li>RDB 是一个非常紧凑（compact）的文件，它保存了 Redis 在某个时间点上的数据集。 这种文件非常适合用于进行备份： 比如说，你可以在最近的 24 小时内，每小时备份一次 RDB 文件，并且在每个月的每一天，也备份一个 RDB 文件。 这样的话，即使遇上问题，也可以随时将数据集还原到不同的版本。</li>
+<li>RDB 非常适用于灾难恢复（disaster recovery）：它只有一个文件，并且内容都非常紧凑，可以（在加密后）将它传送到别的数据中心，或者亚马逊 S3 中。</li>
+<li>RDB 可以最大化 Redis 的性能：父进程在保存 RDB 文件时唯一要做的就是 fork 出一个子进程，然后这个子进程就会处理接下来的所有保存工作，父进程无须执行任何磁盘 I/O 操作。<br>RDB 在恢复大数据集时的速度比 AOF 的恢复速度要快。<h2 id="RDB-的缺点"><a href="#RDB-的缺点" class="headerlink" title="RDB 的缺点"></a>RDB 的缺点</h2></li>
+<li>如果你需要尽量避免在服务器故障时丢失数据，那么 RDB 不适合你。 虽然 Redis 允许你设置不同的保存点（save point）来控制保存 RDB 文件的频率， 但是， 因为RDB 文件需要保存整个数据集的状态， 所以它并不是一个轻松的操作。 因此你可能会至少 5 分钟才保存一次 RDB 文件。 在这种情况下， 一旦发生故障停机， 你就可能会丢失好几分钟的数据。</li>
+<li>每次保存 RDB 的时候，Redis 都要 fork() 出一个子进程，并由子进程来进行实际的持久化工作。 在数据集比较庞大时， fork() 可能会非常耗时，<strong>造成服务器在某某毫秒内停止处理客户端</strong>； 如果数据集非常巨大，并且 CPU 时间非常紧张的话，那么这种停止时间甚至可能会长达整整一秒。 虽然 AOF 重写也需要进行 fork() ，但无论 AOF 重写的执行间隔有多长，数据的耐久性都不会有任何损失。</li>
+</ul>
+<h2 id="RDB-快照"><a href="#RDB-快照" class="headerlink" title="RDB 快照"></a>RDB 快照</h2><p>在默认情况下， Redis 将数据库快照保存在名字为 dump.rdb 的二进制文件中。</p>
+<p>你可以对 Redis 进行设置， 让它在“ N 秒内数据集至少有 M 个改动”这一条件被满足时， 自动保存一次数据集。</p>
+<p>你也可以通过调用 SAVE 或者 BGSAVE ， 手动让 Redis 进行数据集保存操作。</p>
+<p>比如说， 以下设置会让 Redis 在满足“ 60 秒内有至少有 1000 个键被改动”这一条件时， 自动保存一次数据集：</p>
+<p><code>save 60 1000</code><br>这种持久化方式被称为快照（snapshot）。</p>
+<h2 id="快照的运作方式"><a href="#快照的运作方式" class="headerlink" title="快照的运作方式"></a>快照的运作方式</h2><p>当 Redis 需要保存 dump.rdb 文件时， 服务器执行以下操作：</p>
+<p>Redis 调用 fork() ，同时拥有父进程和子进程。<br>子进程将数据集写入到一个临时 RDB 文件中。<br>当子进程完成对新 RDB 文件的写入时，Redis 用新 RDB 文件替换原来的 RDB 文件，并删除旧的 RDB 文件。<br>这种工作方式使得 Redis 可以从写时复制（copy-on-write）机制中获益。</p>
+<h1 id="AOF-持久化运作机制-日志模式"><a href="#AOF-持久化运作机制-日志模式" class="headerlink" title="AOF 持久化运作机制(日志模式)"></a>AOF 持久化运作机制(日志模式)</h1><p>和 redis RDB 持久化运作机制不同，redis AOF 有后台执行和边服务边备份两种方式。</p>
+<p><img src="http://wiki.jikexueyuan.com/project/redis/images/redis18.png" alt="image.png"></p>
+<p>1）AOF 后台执行的方式和 RDB 有类似的地方，fork 一个子进程，主进程仍进行服务，子进程执行AOF 持久化，数据被dump 到磁盘上。与 RDB 不同的是，后台子进程持久化过程中，主进程会记录期间的所有数据变更（主进程还在服务），并存储在 server.aof_rewrite_buf_blocks 中；后台子进程结束后，Redis 更新缓存追加到 AOF 文件中，是 RDB 持久化所不具备的。</p>
+<p>来说说更新缓存这个东西。Redis 服务器产生数据变更的时候，譬如 set name Jhon，不仅仅会修改内存数据集，也会记录此更新（修改）操作，记录的方式就是上面所说的数据组织方式。</p>
+<p>更新缓存可以存储在 server.aof_buf 中，你可以把它理解为一个小型临时中转站，所有累积的更新缓存都会先放入这里，它会在特定时机写入文件或者插入到server.aof_-rewrite_buf_blocks 下链表（下面会详述）；server.aof_buf 中的数据在 propagrate() 添加，在涉及数据更新的地方都会调用propagrate() 以累积变更。更新缓存也可以存储在 server.aof_-rewrite_buf_blocks，这是一个元素类型为 struct aofrwblock 的链表，你可以把它理解为一个仓库，当后台有AOF 子进程的时候，会将累积的更新缓存（在 server.aof_buf 中）插入到链表中，而当 AOF 子进程结束，它会被整个写入到文件。两者是有关联的。</p>
+<p>这里的意图即是不用每次出现数据变更的时候都触发一个写操作，可以将写操作先缓存到内存中，待到合适的时机写入到磁盘，如此避免频繁的写操作。当然，完全可以实现让数据变更及时更新到磁盘中。两种做法的好坏就是一种博弈了。</p>
+<p>Redis允许同时开启AOF和RDB，既保证了数据安全又使得进行备份等操作十分容易。此时重新启动Redis后Redis会使用AOF文件来恢复数据，因为AOF方式的持久化可能丢失的数据更少。</p>
+<h2 id="AOF-的优点"><a href="#AOF-的优点" class="headerlink" title="AOF 的优点"></a>AOF 的优点</h2><ul>
+<li>使用 AOF 持久化会让 Redis 变得非常耐久（much more durable）：你可以设置不同的 fsync 策略，比如无 fsync ，每秒钟一次 fsync ，或者每次执行写入命令时 fsync 。 AOF 的默认策略为每秒钟 fsync 一次，在这种配置下，Redis 仍然可以保持良好的性能，并且就算发生故障停机，也最多只会丢失一秒钟的数据（ fsync 会在后台线程执行，所以主线程可以继续努力地处理命令请求）。</li>
+<li>AOF 文件是一个只进行追加操作的日志文件（append only log）， 因此对 AOF 文件的写入不需要进行 seek ， 即使日志因为某些原因而包含了未写入完整的命令（比如写入时磁盘已满，写入中途停机，等等）， redis-check-aof 工具也可以轻易地修复这种问题。</li>
+<li>Redis 可以在 AOF 文件体积变得过大时，自动地在后台对 AOF 进行重写： 重写后的新 AOF 文件包含了恢复当前数据集所需的最小命令集合。 整个重写操作是绝对安全的，因为 Redis 在创建新 AOF 文件的过程中，会继续将命令追加到现有的 AOF 文件里面，即使重写过程中发生停机，现有的 AOF 文件也不会丢失。 而一旦新 AOF 文件创建完毕，Redis 就会从旧 AOF 文件切换到新 AOF 文件，并开始对新 AOF 文件进行追加操作。</li>
+<li>AOF 文件有序地保存了对数据库执行的所有写入操作， 这些写入操作以 Redis 协议的格式保存， 因此 AOF 文件的内容非常容易被人读懂， 对文件进行分析（parse）也很轻松。 导出（export） AOF 文件也非常简单： 举个例子， 如果你不小心执行了 FLUSHALL 命令， 但只要 AOF 文件未被重写， 那么只要停止服务器， 移除 AOF 文件末尾的 FLUSHALL 命令， 并重启 Redis ， 就可以将数据集恢复到 FLUSHALL 执行之前的状态。<h2 id="AOF-的缺点"><a href="#AOF-的缺点" class="headerlink" title="AOF 的缺点"></a>AOF 的缺点</h2></li>
+<li>对于相同的数据集来说，AOF 文件的体积通常要大于 RDB 文件的体积。</li>
+<li>根据所使用的 fsync 策略，AOF 的速度可能会慢于 RDB 。 在一般情况下， 每秒 fsync 的性能依然非常高， 而关闭 fsync 可以让 AOF 的速度和 RDB 一样快， 即使在高负荷之下也是如此。 不过在处理巨大的写入载入时，RDB 可以提供更有保证的最大延迟时间（latency）。</li>
+<li>AOF 在过去曾经发生过这样的 bug ： 因为个别命令的原因，导致 AOF 文件在重新载入时，无法将数据集恢复成保存时的原样。 （举个例子，阻塞命令 BRPOPLPUSH 就曾经引起过这样的 bug 。） 测试套件里为这种情况添加了测试： 它们会自动生成随机的、复杂的数据集， 并通过重新载入这些数据来确保一切正常。 虽然这种 bug 在 AOF 文件中并不常见， 但是对比来说， RDB 几乎是不可能出现这种 bug 的。</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/26/redis/redis-data-type/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/26/redis/redis-data-type/" itemprop="url">redis数据类型</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-26T18:21:00+08:00">
+                2018-03-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/redis/" itemprop="url" rel="index">
+                    <span itemprop="name">redis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/26/redis/redis-data-type/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/03/26/redis/redis-data-type/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/03/26/redis/redis-data-type/" class="leancloud_visitors" data-flag-title="redis数据类型">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><em>
+</em>在Redis中有五种数据类型**</p>
+<p><strong>String———-</strong>字符串</p>
+<p><strong>Hash————</strong>字典</p>
+<p><strong>List————-</strong>列表</p>
+<p><strong>Set————–</strong>集合</p>
+<p><strong>Sorted Set——</strong>有序集合</p>
+<h1 id="一-数据类型"><a href="#一-数据类型" class="headerlink" title="一 数据类型"></a>一 数据类型</h1><h2 id="String—字符串"><a href="#String—字符串" class="headerlink" title="String—字符串"></a>String—字符串</h2><p>string是redis最基本的类型，你可以理解成与Memcached一模一样的类型，一个key对应一个value。string类型是二进制安全的。意思是redis的string可以包含任何数据。比如jpg图片或者序列化的对象 。string类型是Redis最基本的数据类型，一个键最大能存储512MB。**</p>
+<p>String 数据结构是简单的 key-value 类型，value 不仅可以是 String，也可以是数字（当数字类型用 Long 可以表示的时候encoding 就是整型，其他都存储在 sdshdr 当做字符串）。使用 Strings 类型，可以完全实现目前 Memcached 的功能，并且效率更高。还可以享受 Redis 的定时持久化（可以选择 RDB 模式或者 AOF 模式），操作日志及 Replication 等功能。除了提供与 Memcached 一样的 get、set、incr、decr 等操作外，Redis 还提供了下面一些操作：</p>
+<p>1.LEN：O(1)获取字符串长度<br>2.APPEND ：往字符串 append 内容，而且采用智能分配内存（每次2倍）<br>3.设置和获取字符串的某一段内容<br>4.设置及获取字符串的某一位（bit）<br>5.批量设置一系列字符串的内容<br>6.原子计数器<br>7.GET SET 命令的妙用，请于清空旧值的同时设置一个新值，配合原子计数器使用</p>
+<h2 id="Hash——字典-哈希"><a href="#Hash——字典-哈希" class="headerlink" title="Hash——字典(哈希)"></a>Hash——字典(哈希)</h2><p>Hash是一个健值对集合，是一个String类型的key与value的映射表，特别适合用于存储对象。<br>使用场景：存储、读取、修改用户属性<br>在 Memcached 中，我们经常将一些结构化的信息打包成 hashmap，在客户端序列化后存储为一个字符串的值（一般是 JSON 格式），比如用户的昵称、年龄、性别、积分等。这时候在需要修改其中某一项时，通常需要将字符串（JSON）取出来，然后进行反序列化，修改某一项的值，再序列化成字符串（JSON）存储回去。简单修改一个属性就干这么多事情，消耗必定是很大的，也不适用于一些可能并发操作的场合（比如两个并发的操作都需要修改积分）。而 Redis 的 Hash 结构可以使你像在数据库中 Update 一个属性一样只修改某一项属性值。</p>
+<h2 id="List——列表"><a href="#List——列表" class="headerlink" title="List——列表"></a>List——列表</h2><p>使用场景：微博 TimeLine、消息队列*<em><br>List 说白了就是链表（redis 使用双端链表实现的 List），相信学过数据结构知识的人都应该能理解其结构。使用 List 结构，我们可以轻松地实现最新消息排行等功能（比如新浪微博的 TimeLine ）。List 的另一个应用就是消息队列，可以利用 List 的 \</em>PUSH 操作，将任务存在 List 中，然后工作线程再用 POP 操作将任务取出进行执行。Redis 还提供了操作 List 中某一段元素的 API，你可以直接查询，删除 List 中某一段的元素</p>
+<h2 id="Set——集合"><a href="#Set——集合" class="headerlink" title="Set——集合"></a>Set——集合</h2><p>集合是通过哈希表实现的，所以添加，删除，查找的复杂度都是O(1)<br>使用场景：1.共同好友、二度好友 2.利用唯一性，可以统计访问网站的所有独立 IP 3.好友推荐的时候，根据 tag 求交集，大于某个 threshold 就可以推荐<strong><br>Set 就是一个集合，集合的概念就是一堆不重复值的组合。利用 Redis 提供的 Set 数据结构，可以存储一些集合性的数据。比如在微博应用中，可以将一个用户所有的关注人存在一个集合中，将其所有粉丝存在一个集合。因为 Redis 非常人性化的为集合提供了</strong>求交集、并集、差集等操作**，那么就可以非常方便的实现如共同关注、共同喜好、二度好友等功能，对上面的所有集合操作，你还可以使用不同的命令选择将结果返回给客户端还是存集到一个新的集合中。</p>
+<h2 id="Sorted-Set——有序集合"><a href="#Sorted-Set——有序集合" class="headerlink" title="Sorted Set——有序集合"></a>Sorted Set——有序集合</h2><p>使用场景：1.带有权重的元素，比如一个游戏的用户得分排行榜 2.比较复杂的数据结构，一般用到的场景不算太多**<br>和Sets相比，Sorted Sets是将 Set 中的元素增加了一个权重参数 score，使得集合中的元素能够按 score 进行有序排列，比如一个存储全班同学成绩的 Sorted Sets，其集合 value 可以是同学的学号，而 score 就可以是其考试得分，这样在数据插入集合的时候，就已经进行了天然的排序。另外还可以用 Sorted Sets 来做带权重的队列，比如普通消息的 score 为1，重要消息的 score 为2，然后工作线程可以选择按 score 的倒序来获取工作任务。让重要的任务优先执行。</p>
+<h1 id="二-redis-其他功能使用场景"><a href="#二-redis-其他功能使用场景" class="headerlink" title="二 redis 其他功能使用场景"></a>二 redis 其他功能使用场景</h1><h2 id="订阅-发布系统"><a href="#订阅-发布系统" class="headerlink" title="订阅-发布系统"></a>订阅-发布系统</h2><p>Pub/Sub 从字面上理解就是发布（Publish）与订阅（Subscribe），在 Redis 中，你可以设定对某一个 key 值进行消息发布及消息订阅，当一个 key 值上进行了消息发布后，所有订阅它的客户端都会收到相应的消息。这一功能最明显的用法就是用作实时消息系统，比如普通的即时聊天，群聊等功能。</p>
+<h2 id="事务——Transactions"><a href="#事务——Transactions" class="headerlink" title="事务——Transactions"></a>事务——Transactions</h2><p>谁说 NoSQL 都不支持事务，虽然 Redis 的 Transactions 提供的并不是严格的 ACID 的事务（比如一串用 EXEC 提交执行的命令，在执行中服务器宕机，那么会有一部分命令执行了，剩下的没执行），但是这个 Transactions 还是提供了基本的命令打包执行的功能（在服务器不出问题的情况下，可以保证一连串的命令是顺序在一起执行的，中间不会有其它客户端命令插进来执行）。Redis 还提供了一个 Watch 功能，你可以对一个 key 进行 Watch，然后再执行 Transactions，在这过程中，如果这个 Watched 的值进行了修改，那么这个 Transactions 会发现并拒绝执行。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/26/redis/redis-key-timeout/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -753,7 +1137,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/26/redis/redis-persist/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/25/messages/2018-03-25-ali-message/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
@@ -772,7 +1156,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/03/26/redis/redis-persist/" itemprop="url">Redis持久化方式</a></h1>
+                <a class="post-title-link" href="/2018/03/25/messages/2018-03-25-ali-message/" itemprop="url">阿里消息队列服务</a></h1>
         
 
         <div class="post-meta">
@@ -784,8 +1168,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-26T18:21:00+08:00">
-                2018-03-26
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-25T02:14:00+08:00">
+                2018-03-25
               </time>
             
 
@@ -795,28 +1179,6 @@
           </span>
 
           
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/redis/" itemprop="url" rel="index">
-                    <span itemprop="name">redis</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
 
           
             
@@ -825,9 +1187,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/03/26/redis/redis-persist/#comments" itemprop="discussionUrl">
+                <a href="/2018/03/25/messages/2018-03-25-ali-message/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/26/redis/redis-persist/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/03/25/messages/2018-03-25-ali-message/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -835,7 +1197,7 @@
 
           
           
-             <span id="/2018/03/26/redis/redis-persist/" class="leancloud_visitors" data-flag-title="Redis持久化方式">
+             <span id="/2018/03/25/messages/2018-03-25-ali-message/" class="leancloud_visitors" data-flag-title="阿里消息队列服务">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -868,48 +1230,89 @@
       
         
           
-            <p>为防止数据丢失，需要将 Redis 中的数据从内存中 dump 到磁盘，这就是持久化。Redis 提供两种持久化方式：RDB 和 AOF。Redis 允许两者结合，也允许两者同时关闭。</p>
-<p>RDB 可以定时备份内存中的数据集。服务器启动的时候，可以从 RDB 文件中恢复数据集。</p>
-<p>AOF(append only file) 可以记录服务器的所有写操作。在服务器重新启动的时候，会把所有的写操作重新执行一遍，从而实现数据备份。当写操作集过大（比原有的数据集还大），Redis 会重写写操作集。</p>
-<p>为什么称为 append only file 呢？AOF 持久化是类似于生成一个关于 Redis 写操作的文件，写操作（增删）总是以追加的方式追加到文件中。</p>
-<p>因此，在 RDB 持久化的时候可以将 RDB 保存到磁盘中，也可以保存到内存中，当然保存到内存中就不是持久化了。</p>
-<h1 id="RDB-持久化的运作机制-快照模式"><a href="#RDB-持久化的运作机制-快照模式" class="headerlink" title="RDB 持久化的运作机制(快照模式)"></a>RDB 持久化的运作机制(快照模式)</h1><p><img src="http://wiki.jikexueyuan.com/project/redis/images/redis16.png" alt="image.png"></p>
-<p>Redis 支持两种方式进行 RDB 持久化：当前进程执行和后台执行（BGSAVE）。RDB BGSAVE 策略是 fork 出一个子进程，把内存中的数据集整个 dump 到硬盘上。两个场景举例：</p>
-<ol>
-<li>Redis 服务器初始化过程中，设定了定时事件，每隔一段时间就会触发持久化操作； 进入定时事件处理程序中，就会 fork 产生子进程执行持久化操作。</li>
-<li>Redis 服务器预设了 save 指令，客户端可要求服务器进程中断服务，执行持久化操作。</li>
-</ol>
-<p>这里主要展开的内容是 RDB 持久化操作的写文件过程，读过程和写过程相反。子进程的产生发生在 rdbSaveBackground() 中，真正的 RDB 持久化操作是在 rdbSave()，想要直接进行 RDB 持久化，调用 rdbSave() 即可。</p>
-<h2 id="RDB-的优点"><a href="#RDB-的优点" class="headerlink" title="RDB 的优点"></a>RDB 的优点</h2><ul>
-<li>RDB 是一个非常紧凑（compact）的文件，它保存了 Redis 在某个时间点上的数据集。 这种文件非常适合用于进行备份： 比如说，你可以在最近的 24 小时内，每小时备份一次 RDB 文件，并且在每个月的每一天，也备份一个 RDB 文件。 这样的话，即使遇上问题，也可以随时将数据集还原到不同的版本。</li>
-<li>RDB 非常适用于灾难恢复（disaster recovery）：它只有一个文件，并且内容都非常紧凑，可以（在加密后）将它传送到别的数据中心，或者亚马逊 S3 中。</li>
-<li>RDB 可以最大化 Redis 的性能：父进程在保存 RDB 文件时唯一要做的就是 fork 出一个子进程，然后这个子进程就会处理接下来的所有保存工作，父进程无须执行任何磁盘 I/O 操作。<br>RDB 在恢复大数据集时的速度比 AOF 的恢复速度要快。<h2 id="RDB-的缺点"><a href="#RDB-的缺点" class="headerlink" title="RDB 的缺点"></a>RDB 的缺点</h2></li>
-<li>如果你需要尽量避免在服务器故障时丢失数据，那么 RDB 不适合你。 虽然 Redis 允许你设置不同的保存点（save point）来控制保存 RDB 文件的频率， 但是， 因为RDB 文件需要保存整个数据集的状态， 所以它并不是一个轻松的操作。 因此你可能会至少 5 分钟才保存一次 RDB 文件。 在这种情况下， 一旦发生故障停机， 你就可能会丢失好几分钟的数据。</li>
-<li>每次保存 RDB 的时候，Redis 都要 fork() 出一个子进程，并由子进程来进行实际的持久化工作。 在数据集比较庞大时， fork() 可能会非常耗时，<strong>造成服务器在某某毫秒内停止处理客户端</strong>； 如果数据集非常巨大，并且 CPU 时间非常紧张的话，那么这种停止时间甚至可能会长达整整一秒。 虽然 AOF 重写也需要进行 fork() ，但无论 AOF 重写的执行间隔有多长，数据的耐久性都不会有任何损失。</li>
+            <h1 id="顺序消息"><a href="#顺序消息" class="headerlink" title="顺序消息"></a>顺序消息</h1><h2 id="全局顺序"><a href="#全局顺序" class="headerlink" title="全局顺序"></a>全局顺序</h2><p>对于指定的一个 Topic，所有消息按照严格的先入先出（FIFO）的顺序进行发布和消费。</p>
+<p><img src="http://docs-aliyun.cn-hangzhou.oss.aliyun-inc.com/assets/pic/49319/cn_zh/1483698857982/ordermsg1.png" alt="" title="ordered-msg-1"></p>
+<h3 id="适用场景："><a href="#适用场景：" class="headerlink" title="适用场景："></a>适用场景：</h3><ul>
+<li>性能要求不高，所有的消息严格按照 FIFO 原则进行消息发布和消费的场景。</li>
 </ul>
-<h2 id="RDB-快照"><a href="#RDB-快照" class="headerlink" title="RDB 快照"></a>RDB 快照</h2><p>在默认情况下， Redis 将数据库快照保存在名字为 dump.rdb 的二进制文件中。</p>
-<p>你可以对 Redis 进行设置， 让它在“ N 秒内数据集至少有 M 个改动”这一条件被满足时， 自动保存一次数据集。</p>
-<p>你也可以通过调用 SAVE 或者 BGSAVE ， 手动让 Redis 进行数据集保存操作。</p>
-<p>比如说， 以下设置会让 Redis 在满足“ 60 秒内有至少有 1000 个键被改动”这一条件时， 自动保存一次数据集：</p>
-<p><code>save 60 1000</code><br>这种持久化方式被称为快照（snapshot）。</p>
-<h2 id="快照的运作方式"><a href="#快照的运作方式" class="headerlink" title="快照的运作方式"></a>快照的运作方式</h2><p>当 Redis 需要保存 dump.rdb 文件时， 服务器执行以下操作：</p>
-<p>Redis 调用 fork() ，同时拥有父进程和子进程。<br>子进程将数据集写入到一个临时 RDB 文件中。<br>当子进程完成对新 RDB 文件的写入时，Redis 用新 RDB 文件替换原来的 RDB 文件，并删除旧的 RDB 文件。<br>这种工作方式使得 Redis 可以从写时复制（copy-on-write）机制中获益。</p>
-<h1 id="AOF-持久化运作机制-日志模式"><a href="#AOF-持久化运作机制-日志模式" class="headerlink" title="AOF 持久化运作机制(日志模式)"></a>AOF 持久化运作机制(日志模式)</h1><p>和 redis RDB 持久化运作机制不同，redis AOF 有后台执行和边服务边备份两种方式。</p>
-<p><img src="http://wiki.jikexueyuan.com/project/redis/images/redis18.png" alt="image.png"></p>
-<p>1）AOF 后台执行的方式和 RDB 有类似的地方，fork 一个子进程，主进程仍进行服务，子进程执行AOF 持久化，数据被dump 到磁盘上。与 RDB 不同的是，后台子进程持久化过程中，主进程会记录期间的所有数据变更（主进程还在服务），并存储在 server.aof_rewrite_buf_blocks 中；后台子进程结束后，Redis 更新缓存追加到 AOF 文件中，是 RDB 持久化所不具备的。</p>
-<p>来说说更新缓存这个东西。Redis 服务器产生数据变更的时候，譬如 set name Jhon，不仅仅会修改内存数据集，也会记录此更新（修改）操作，记录的方式就是上面所说的数据组织方式。</p>
-<p>更新缓存可以存储在 server.aof_buf 中，你可以把它理解为一个小型临时中转站，所有累积的更新缓存都会先放入这里，它会在特定时机写入文件或者插入到server.aof_-rewrite_buf_blocks 下链表（下面会详述）；server.aof_buf 中的数据在 propagrate() 添加，在涉及数据更新的地方都会调用propagrate() 以累积变更。更新缓存也可以存储在 server.aof_-rewrite_buf_blocks，这是一个元素类型为 struct aofrwblock 的链表，你可以把它理解为一个仓库，当后台有AOF 子进程的时候，会将累积的更新缓存（在 server.aof_buf 中）插入到链表中，而当 AOF 子进程结束，它会被整个写入到文件。两者是有关联的。</p>
-<p>这里的意图即是不用每次出现数据变更的时候都触发一个写操作，可以将写操作先缓存到内存中，待到合适的时机写入到磁盘，如此避免频繁的写操作。当然，完全可以实现让数据变更及时更新到磁盘中。两种做法的好坏就是一种博弈了。</p>
-<p>Redis允许同时开启AOF和RDB，既保证了数据安全又使得进行备份等操作十分容易。此时重新启动Redis后Redis会使用AOF文件来恢复数据，因为AOF方式的持久化可能丢失的数据更少。</p>
-<h2 id="AOF-的优点"><a href="#AOF-的优点" class="headerlink" title="AOF 的优点"></a>AOF 的优点</h2><ul>
-<li>使用 AOF 持久化会让 Redis 变得非常耐久（much more durable）：你可以设置不同的 fsync 策略，比如无 fsync ，每秒钟一次 fsync ，或者每次执行写入命令时 fsync 。 AOF 的默认策略为每秒钟 fsync 一次，在这种配置下，Redis 仍然可以保持良好的性能，并且就算发生故障停机，也最多只会丢失一秒钟的数据（ fsync 会在后台线程执行，所以主线程可以继续努力地处理命令请求）。</li>
-<li>AOF 文件是一个只进行追加操作的日志文件（append only log）， 因此对 AOF 文件的写入不需要进行 seek ， 即使日志因为某些原因而包含了未写入完整的命令（比如写入时磁盘已满，写入中途停机，等等）， redis-check-aof 工具也可以轻易地修复这种问题。</li>
-<li>Redis 可以在 AOF 文件体积变得过大时，自动地在后台对 AOF 进行重写： 重写后的新 AOF 文件包含了恢复当前数据集所需的最小命令集合。 整个重写操作是绝对安全的，因为 Redis 在创建新 AOF 文件的过程中，会继续将命令追加到现有的 AOF 文件里面，即使重写过程中发生停机，现有的 AOF 文件也不会丢失。 而一旦新 AOF 文件创建完毕，Redis 就会从旧 AOF 文件切换到新 AOF 文件，并开始对新 AOF 文件进行追加操作。</li>
-<li>AOF 文件有序地保存了对数据库执行的所有写入操作， 这些写入操作以 Redis 协议的格式保存， 因此 AOF 文件的内容非常容易被人读懂， 对文件进行分析（parse）也很轻松。 导出（export） AOF 文件也非常简单： 举个例子， 如果你不小心执行了 FLUSHALL 命令， 但只要 AOF 文件未被重写， 那么只要停止服务器， 移除 AOF 文件末尾的 FLUSHALL 命令， 并重启 Redis ， 就可以将数据集恢复到 FLUSHALL 执行之前的状态。<h2 id="AOF-的缺点"><a href="#AOF-的缺点" class="headerlink" title="AOF 的缺点"></a>AOF 的缺点</h2></li>
-<li>对于相同的数据集来说，AOF 文件的体积通常要大于 RDB 文件的体积。</li>
-<li>根据所使用的 fsync 策略，AOF 的速度可能会慢于 RDB 。 在一般情况下， 每秒 fsync 的性能依然非常高， 而关闭 fsync 可以让 AOF 的速度和 RDB 一样快， 即使在高负荷之下也是如此。 不过在处理巨大的写入载入时，RDB 可以提供更有保证的最大延迟时间（latency）。</li>
-<li>AOF 在过去曾经发生过这样的 bug ： 因为个别命令的原因，导致 AOF 文件在重新载入时，无法将数据集恢复成保存时的原样。 （举个例子，阻塞命令 BRPOPLPUSH 就曾经引起过这样的 bug 。） 测试套件里为这种情况添加了测试： 它们会自动生成随机的、复杂的数据集， 并通过重新载入这些数据来确保一切正常。 虽然这种 bug 在 AOF 文件中并不常见， 但是对比来说， RDB 几乎是不可能出现这种 bug 的。</li>
+<h3 id="举例说明："><a href="#举例说明：" class="headerlink" title="举例说明："></a>举例说明：</h3><ul>
+<li>【例一】证券处理中，以人民币兑换美元为 Topic，在价格相同的情况下，先出价者优先处理，则可以通过全局顺序的方式按照 FIFO 的方式进行发布和订阅。</li>
 </ul>
+<h2 id="分区顺序"><a href="#分区顺序" class="headerlink" title="分区顺序"></a>分区顺序</h2><p>对于指定的一个 Topic，所有消息根据 sharding key 进行区块分区。同一个分区内的消息按照严格的 FIFO 顺序进行发布和消费。Sharding key 是顺序消息中用来区分不同分区的关键字段，和普通消息的 Key 是完全不同的概念。</p>
+<p><img src="http://docs-aliyun.cn-hangzhou.oss.aliyun-inc.com/assets/pic/49319/cn_zh/1483698891347/ordermsg2.png" alt="" title="ordered-msg-2"></p>
+<h3 id="适用场景：-1"><a href="#适用场景：-1" class="headerlink" title="适用场景："></a>适用场景：</h3><ul>
+<li>性能要求高，以 sharding key 作为分区字段，在同一个区块中严格的按照 FIFO 原则进行消息发布和消费的场景。</li>
+</ul>
+<h3 id="举例说明：-1"><a href="#举例说明：-1" class="headerlink" title="举例说明："></a>举例说明：</h3><ul>
+<li><p>【例一】用户注册需要发送发验证码，以用户 ID 作为 sharding key， 那么同一个用户发送的消息都会按照先后顺序来发布和订阅。</p>
+</li>
+<li><p>【例二】电商的订单创建，以订单 ID 作为 sharding key，那么同一个订单相关的创建订单消息、订单支付消息、订单退款消息、订单物流消息都会按照先后顺序来发布和订阅。</p>
+</li>
+</ul>
+<p>阿里巴巴集团内部电商系统均使用此种分区顺序消息，既保证业务的顺序，同时又能保证业务的高性能。</p>
+<h2 id="全局顺序与分区顺序对比"><a href="#全局顺序与分区顺序对比" class="headerlink" title="全局顺序与分区顺序对比"></a>全局顺序与分区顺序对比</h2><p>在控制台创建顺序消息使用的 Topic，各种类型 Topic 对比如下。</p>
+<p><strong>消息类型对比</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Topic 类型</th>
+<th style="text-align:left">支持事务消息</th>
+<th style="text-align:left">支持定时消息</th>
+<th style="text-align:left">性能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">无序消息</td>
+<td style="text-align:left">是</td>
+<td style="text-align:left">是</td>
+<td style="text-align:left">最高</td>
+</tr>
+<tr>
+<td style="text-align:left">分区顺序</td>
+<td style="text-align:left">否</td>
+<td style="text-align:left">否</td>
+<td style="text-align:left">高</td>
+</tr>
+<tr>
+<td style="text-align:left">全局顺序</td>
+<td style="text-align:left">否</td>
+<td style="text-align:left">否</td>
+<td style="text-align:left">一般</td>
+</tr>
+</tbody>
+</table>
+<p><strong>发送方式对比</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">消息类型</th>
+<th style="text-align:left">支持可靠同步发送</th>
+<th style="text-align:left">支持可靠异步发送</th>
+<th style="text-align:left">支持 Oneway 发送</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">无序消息</td>
+<td style="text-align:left">是</td>
+<td style="text-align:left">是</td>
+<td style="text-align:left">是</td>
+</tr>
+<tr>
+<td style="text-align:left">分区顺序</td>
+<td style="text-align:left">是</td>
+<td style="text-align:left">否</td>
+<td style="text-align:left">否</td>
+</tr>
+<tr>
+<td style="text-align:left">全局顺序</td>
+<td style="text-align:left">是</td>
+<td style="text-align:left">否</td>
+<td style="text-align:left">否</td>
+</tr>
+</tbody>
+</table>
 
           
         
@@ -1206,230 +1609,6 @@
         
           
             <p>Proactor和Reactor是两种经典的多路复用I/O模型，主要用于在高并发、高吞吐量的环境中进行I/O处理。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/25/messages/2018-03-25-ali-message/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/25/messages/2018-03-25-ali-message/" itemprop="url">阿里消息队列服务</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-25T02:14:00+08:00">
-                2018-03-25
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/03/25/messages/2018-03-25-ali-message/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/25/messages/2018-03-25-ali-message/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/03/25/messages/2018-03-25-ali-message/" class="leancloud_visitors" data-flag-title="阿里消息队列服务">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="顺序消息"><a href="#顺序消息" class="headerlink" title="顺序消息"></a>顺序消息</h1><h2 id="全局顺序"><a href="#全局顺序" class="headerlink" title="全局顺序"></a>全局顺序</h2><p>对于指定的一个 Topic，所有消息按照严格的先入先出（FIFO）的顺序进行发布和消费。</p>
-<p><img src="http://docs-aliyun.cn-hangzhou.oss.aliyun-inc.com/assets/pic/49319/cn_zh/1483698857982/ordermsg1.png" alt="" title="ordered-msg-1"></p>
-<h3 id="适用场景："><a href="#适用场景：" class="headerlink" title="适用场景："></a>适用场景：</h3><ul>
-<li>性能要求不高，所有的消息严格按照 FIFO 原则进行消息发布和消费的场景。</li>
-</ul>
-<h3 id="举例说明："><a href="#举例说明：" class="headerlink" title="举例说明："></a>举例说明：</h3><ul>
-<li>【例一】证券处理中，以人民币兑换美元为 Topic，在价格相同的情况下，先出价者优先处理，则可以通过全局顺序的方式按照 FIFO 的方式进行发布和订阅。</li>
-</ul>
-<h2 id="分区顺序"><a href="#分区顺序" class="headerlink" title="分区顺序"></a>分区顺序</h2><p>对于指定的一个 Topic，所有消息根据 sharding key 进行区块分区。同一个分区内的消息按照严格的 FIFO 顺序进行发布和消费。Sharding key 是顺序消息中用来区分不同分区的关键字段，和普通消息的 Key 是完全不同的概念。</p>
-<p><img src="http://docs-aliyun.cn-hangzhou.oss.aliyun-inc.com/assets/pic/49319/cn_zh/1483698891347/ordermsg2.png" alt="" title="ordered-msg-2"></p>
-<h3 id="适用场景：-1"><a href="#适用场景：-1" class="headerlink" title="适用场景："></a>适用场景：</h3><ul>
-<li>性能要求高，以 sharding key 作为分区字段，在同一个区块中严格的按照 FIFO 原则进行消息发布和消费的场景。</li>
-</ul>
-<h3 id="举例说明：-1"><a href="#举例说明：-1" class="headerlink" title="举例说明："></a>举例说明：</h3><ul>
-<li><p>【例一】用户注册需要发送发验证码，以用户 ID 作为 sharding key， 那么同一个用户发送的消息都会按照先后顺序来发布和订阅。</p>
-</li>
-<li><p>【例二】电商的订单创建，以订单 ID 作为 sharding key，那么同一个订单相关的创建订单消息、订单支付消息、订单退款消息、订单物流消息都会按照先后顺序来发布和订阅。</p>
-</li>
-</ul>
-<p>阿里巴巴集团内部电商系统均使用此种分区顺序消息，既保证业务的顺序，同时又能保证业务的高性能。</p>
-<h2 id="全局顺序与分区顺序对比"><a href="#全局顺序与分区顺序对比" class="headerlink" title="全局顺序与分区顺序对比"></a>全局顺序与分区顺序对比</h2><p>在控制台创建顺序消息使用的 Topic，各种类型 Topic 对比如下。</p>
-<p><strong>消息类型对比</strong></p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">Topic 类型</th>
-<th style="text-align:left">支持事务消息</th>
-<th style="text-align:left">支持定时消息</th>
-<th style="text-align:left">性能</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">无序消息</td>
-<td style="text-align:left">是</td>
-<td style="text-align:left">是</td>
-<td style="text-align:left">最高</td>
-</tr>
-<tr>
-<td style="text-align:left">分区顺序</td>
-<td style="text-align:left">否</td>
-<td style="text-align:left">否</td>
-<td style="text-align:left">高</td>
-</tr>
-<tr>
-<td style="text-align:left">全局顺序</td>
-<td style="text-align:left">否</td>
-<td style="text-align:left">否</td>
-<td style="text-align:left">一般</td>
-</tr>
-</tbody>
-</table>
-<p><strong>发送方式对比</strong></p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">消息类型</th>
-<th style="text-align:left">支持可靠同步发送</th>
-<th style="text-align:left">支持可靠异步发送</th>
-<th style="text-align:left">支持 Oneway 发送</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">无序消息</td>
-<td style="text-align:left">是</td>
-<td style="text-align:left">是</td>
-<td style="text-align:left">是</td>
-</tr>
-<tr>
-<td style="text-align:left">分区顺序</td>
-<td style="text-align:left">是</td>
-<td style="text-align:left">否</td>
-<td style="text-align:left">否</td>
-</tr>
-<tr>
-<td style="text-align:left">全局顺序</td>
-<td style="text-align:left">是</td>
-<td style="text-align:left">否</td>
-<td style="text-align:left">否</td>
-</tr>
-</tbody>
-</table>
 
           
         
@@ -1957,148 +2136,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/24/egenie_bugfix/loft-delete-unquie-key/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/24/egenie_bugfix/loft-delete-unquie-key/" itemprop="url">软删除唯一索引解决</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-24T09:30:51+08:00">
-                2018-03-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/03/24/egenie_bugfix/loft-delete-unquie-key/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/24/egenie_bugfix/loft-delete-unquie-key/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/03/24/egenie_bugfix/loft-delete-unquie-key/" class="leancloud_visitors" data-flag-title="软删除唯一索引解决">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>软件中使用软删除is_usable=1改为0来代表删除，但是遇到唯一索引时，<br>例如：username+is_usable的唯一索引<br>第二次删除则会失败，解决办法，将is_usable 改为其他不重复的数字及可</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2149,7 +2186,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">152</span>
+                  <span class="site-state-item-count">153</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

@@ -326,6 +326,185 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/22/java_common/study-fastjson-formatter/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/22/java_common/study-fastjson-formatter/" itemprop="url">springboot配置FastJsonHttpMessageConverter(实战篇)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-22T15:12:00+08:00">
+                2018-01-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring/" itemprop="url" rel="index">
+                    <span itemprop="name">spring</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/22/java_common/study-fastjson-formatter/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/22/java_common/study-fastjson-formatter/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/22/java_common/study-fastjson-formatter/" class="leancloud_visitors" data-flag-title="springboot配置FastJsonHttpMessageConverter(实战篇)">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><h2 id="老的方式-controller的参数与返回值"><a href="#老的方式-controller的参数与返回值" class="headerlink" title="老的方式:controller的参数与返回值"></a>老的方式:controller的参数与返回值</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public JsonResult queryDrillDetail(@RequestBody String body) &#123;</span><br><span class="line">List&lt;Map&lt;String, Object&gt;&gt; detailMapList = new ArrayList&lt;&gt;();</span><br><span class="line">.......</span><br><span class="line">return new JsonResult(JsonResult.SUCCESSFUL, new PagedList&lt;&gt;(query.getPage() + 1, pageable.getPageSize(),</span><br><span class="line">                query.getTotalCount(), detailMapList));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="老的方式-问题"><a href="#老的方式-问题" class="headerlink" title="老的方式:问题"></a>老的方式:问题</h2><ul>
+<li>入参不明确</li>
+<li>返回值类型不明确</li>
+<li>Map的key只有在运行时,才会知道,且不知道类型</li>
+</ul>
+<h2 id="期望的方式-使用vo"><a href="#期望的方式-使用vo" class="headerlink" title="期望的方式:使用vo"></a>期望的方式:使用vo</h2><h1 id="改造步骤"><a href="#改造步骤" class="headerlink" title="改造步骤:"></a>改造步骤:</h1><p>1.在使用converters的最后一个优先级,添加FastJsonHttpMessageConverter</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">@Component</span><br><span class="line">public class MyWebAppConfigurer extends WebMvcConfigurerAdapter &#123;</span><br><span class="line"></span><br><span class="line">    // 添加converter的第三种方式</span><br><span class="line">    // 同一个WebMvcConfigurerAdapter中的configureMessageConverters方法先于extendMessageConverters方法执行</span><br><span class="line">    // 可以理解为是三种方式中最后执行的一种，不过这里可以通过add指定顺序来调整优先级，也可以使用remove/clear来删除converter，功能强大</span><br><span class="line">    // 使用converters.add(xxx)会放在最低优先级（List的尾部）</span><br><span class="line">    // 使用converters.add(0,xxx)会放在最高优先级（List的头部）</span><br><span class="line">    @Override</span><br><span class="line">    public void extendMessageConverters(List&lt;HttpMessageConverter&lt;?&gt;&gt; converters) &#123;</span><br><span class="line">        converters.add(new FastJsonHttpMessageConverter());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>2.model遵循老的接口原则,转为下划线分割的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">@JSONType(naming = PropertyNamingStrategy.SnakeCase)</span><br><span class="line">public class PurchaseDetailDrillVo &#123;</span><br><span class="line"></span><br><span class="line">    private Long pmsPurchaseOrderId;</span><br><span class="line">    private Long pmsPurchaseOrderDetailId;</span><br><span class="line">    private String pmsPurchaseOrderNo;</span><br><span class="line">    private Integer productType;</span><br><span class="line">    private String deliverAddress;</span><br><span class="line">    private Long provinceId;</span><br><span class="line">    ....</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>3.使用@RequestBody注解,类型改为vo</p>
+<p>测试,接受参数和返回参数都是vo,而接口的字段映射依然为下划线,</p>
+<hr>
+<p>以下为项目本身的问题<br>4.pom文件中排除jackson的依赖<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;com.ejlerp&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;ejlerp-common&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;3.2.0-SNAPSHOT&lt;/version&gt;</span><br><span class="line">    &lt;exclusions&gt;</span><br><span class="line">        &lt;exclusion&gt;</span><br><span class="line">            &lt;artifactId&gt;jackson-core&lt;/artifactId&gt;</span><br><span class="line">            &lt;groupId&gt;com.fasterxml.jackson.core&lt;/groupId&gt;</span><br><span class="line">        &lt;/exclusion&gt;</span><br><span class="line">    &lt;/exclusions&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure></p>
+<p>5.fastjason默认支持所有的contentType,及*, 与springmvc校验相冲突,so需要声明fastjason能支持的contentType,在初始化FastJsonHttpMessageConverter,注入参数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">public void extendMessageConverters(List&lt;HttpMessageConverter&lt;?&gt;&gt; converters) &#123;</span><br><span class="line">    FastJsonHttpMessageConverter fastJsonHttpMessageConverter = new FastJsonHttpMessageConverter();</span><br><span class="line">    ArrayList&lt;MediaType&gt; supportedMediaTypes = Lists.newArrayList();</span><br><span class="line">    supportedMediaTypes.add(MediaType.APPLICATION_FORM_URLENCODED);</span><br><span class="line">    supportedMediaTypes.add(MediaType.APPLICATION_JSON);</span><br><span class="line">    supportedMediaTypes.add(MediaType.TEXT_HTML);</span><br><span class="line">    supportedMediaTypes.add(MediaType.TEXT_PLAIN);</span><br><span class="line">    fastJsonHttpMessageConverter.setSupportedMediaTypes(supportedMediaTypes);</span><br><span class="line">    converters.add(fastJsonHttpMessageConverter);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="fastjson官网"><a href="#fastjson官网" class="headerlink" title="fastjson官网"></a>fastjson官网</h1><p><a href="https://github.com/alibaba/fastjson/issues/1555" target="_blank" rel="noopener">https://github.com/alibaba/fastjson/issues/1555</a><br><a href="https://github.com/alibaba/fastjson/wiki/PropertyNamingStrategy_cn" target="_blank" rel="noopener">https://github.com/alibaba/fastjson/wiki/PropertyNamingStrategy_cn</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/22/java_common/study-equals-and-hashCode/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1726,6 +1905,201 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/15/http/advantage-api/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/15/http/advantage-api/" itemprop="url">RESTful-API概念学习</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-15T20:13:15+08:00">
+                2018-01-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HTTP协议/" itemprop="url" rel="index">
+                    <span itemprop="name">HTTP协议</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/15/http/advantage-api/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/15/http/advantage-api/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/15/http/advantage-api/" class="leancloud_visitors" data-flag-title="RESTful-API概念学习">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="RESTful-API"><a href="#RESTful-API" class="headerlink" title="RESTful API"></a>RESTful API</h1><ul>
+<li>透明性，暴露资源存在。</li>
+<li>充分利用 HTTP 协议本身语义。</li>
+<li>无状态，这点非常重要。在调用一个接口（访问、操作资源）的时候，可以不用考虑上下文，不用考虑当前状态，极大的降低了复杂度</li>
+<li>HTTP 本身提供了丰富的内容协商手段，无论是缓存，还是资源修改的乐观并发控制，都可以以业务无关的中间件来实现</li>
+</ul>
+<h1 id="理解RESTful架构"><a href="#理解RESTful架构" class="headerlink" title="理解RESTful架构"></a>理解RESTful架构</h1><ul>
+<li>Representational State Transfer</li>
+<li>REST的名称”表现层状态转化”中，省略了主语。”表现层”其实指的是”资源”（Resources）的”表现层”。<br>所谓”资源”，就是网络上的一个实体，或者说是网络上的一个具体信息。它可以是一段文本、一张图片、一首歌曲、一种服务，总之就是一个具体的实在。你可以用一个URI（统一资源定位符）指向它，每种资源对应一个特定的URI。要获取这个资源，访问它的URI就可以，因此URI就成了每一个资源的地址或独一无二的识别符。</li>
+</ul>
+<p>所谓”上网”，就是与互联网上一系列的”资源”互动，调用它的URI。</p>
+<p>互联网通信协议HTTP协议，是一个无状态协议。这意味着，所有的状态都保存在服务器端。因此，如果客户端想要操作服务器，必须通过某种手段，让服务器端发生”状态转化”（State Transfer）。而这种转化是建立在表现层之上的，所以就是”表现层状态转化”。</p>
+<p>最常见的一种设计错误，就是URI包含动词。因为”资源”表示一种实体，所以应该是名词，URI不应该有动词，动词应该放在HTTP协议中。</p>
+<p>因为不同的版本，可以理解成同一种资源的不同表现形式，所以应该采用同一个URI。版本号可以在HTTP请求头信息的Accept字段中进行区分<br><a href="http://www.ruanyifeng.com/blog/2011/09/restful.html" target="_blank" rel="noopener">http://www.ruanyifeng.com/blog/2011/09/restful.html</a></p>
+<h1 id="RESTful-API-设计指南"><a href="#RESTful-API-设计指南" class="headerlink" title="RESTful API 设计指南"></a>RESTful API 设计指南</h1><ul>
+<li>协议</li>
+<li>域名</li>
+<li>版本（Versioning）</li>
+<li>路径（Endpoint）<br>在RESTful架构中，每个网址代表一种资源（resource），所以网址中不能有动词，只能有名词，而且所用的名词往往与数据库的表格名对应。一般来说，数据库中的表都是同种记录的”集合”（collection），所以API中的名词也应该使用复数。</li>
+<li>HTTP动词</li>
+<li>过滤信息（Filtering）</li>
+<li>状态码（Status Codes）</li>
+<li>错误处理</li>
+<li>返回结果</li>
+<li>Hypermedia API<br>RESTful API最好做到Hypermedia，即返回结果中提供链接，连向其他API方法，使得用户不查文档，也知道下一步应该做什么。</li>
+<li>其他<ul>
+<li>（1）API的身份认证应该使用OAuth 2.0框架。</li>
+<li>（2）服务器返回的数据格式，应该尽量使用JSON，避免使用XML。</li>
+</ul>
+</li>
+</ul>
+<p><a href="http://www.ruanyifeng.com/blog/2014/05/restful_api.html" target="_blank" rel="noopener">http://www.ruanyifeng.com/blog/2014/05/restful_api.html</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/15/http/api-doc/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2519,407 +2893,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/15/http/advantage-api/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/15/http/advantage-api/" itemprop="url">RESTful-API概念学习</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-15T20:13:15+08:00">
-                2018-01-15
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/HTTP协议/" itemprop="url" rel="index">
-                    <span itemprop="name">HTTP协议</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/01/15/http/advantage-api/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/01/15/http/advantage-api/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/01/15/http/advantage-api/" class="leancloud_visitors" data-flag-title="RESTful-API概念学习">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="RESTful-API"><a href="#RESTful-API" class="headerlink" title="RESTful API"></a>RESTful API</h1><ul>
-<li>透明性，暴露资源存在。</li>
-<li>充分利用 HTTP 协议本身语义。</li>
-<li>无状态，这点非常重要。在调用一个接口（访问、操作资源）的时候，可以不用考虑上下文，不用考虑当前状态，极大的降低了复杂度</li>
-<li>HTTP 本身提供了丰富的内容协商手段，无论是缓存，还是资源修改的乐观并发控制，都可以以业务无关的中间件来实现</li>
-</ul>
-<h1 id="理解RESTful架构"><a href="#理解RESTful架构" class="headerlink" title="理解RESTful架构"></a>理解RESTful架构</h1><ul>
-<li>Representational State Transfer</li>
-<li>REST的名称”表现层状态转化”中，省略了主语。”表现层”其实指的是”资源”（Resources）的”表现层”。<br>所谓”资源”，就是网络上的一个实体，或者说是网络上的一个具体信息。它可以是一段文本、一张图片、一首歌曲、一种服务，总之就是一个具体的实在。你可以用一个URI（统一资源定位符）指向它，每种资源对应一个特定的URI。要获取这个资源，访问它的URI就可以，因此URI就成了每一个资源的地址或独一无二的识别符。</li>
-</ul>
-<p>所谓”上网”，就是与互联网上一系列的”资源”互动，调用它的URI。</p>
-<p>互联网通信协议HTTP协议，是一个无状态协议。这意味着，所有的状态都保存在服务器端。因此，如果客户端想要操作服务器，必须通过某种手段，让服务器端发生”状态转化”（State Transfer）。而这种转化是建立在表现层之上的，所以就是”表现层状态转化”。</p>
-<p>最常见的一种设计错误，就是URI包含动词。因为”资源”表示一种实体，所以应该是名词，URI不应该有动词，动词应该放在HTTP协议中。</p>
-<p>因为不同的版本，可以理解成同一种资源的不同表现形式，所以应该采用同一个URI。版本号可以在HTTP请求头信息的Accept字段中进行区分<br><a href="http://www.ruanyifeng.com/blog/2011/09/restful.html" target="_blank" rel="noopener">http://www.ruanyifeng.com/blog/2011/09/restful.html</a></p>
-<h1 id="RESTful-API-设计指南"><a href="#RESTful-API-设计指南" class="headerlink" title="RESTful API 设计指南"></a>RESTful API 设计指南</h1><ul>
-<li>协议</li>
-<li>域名</li>
-<li>版本（Versioning）</li>
-<li>路径（Endpoint）<br>在RESTful架构中，每个网址代表一种资源（resource），所以网址中不能有动词，只能有名词，而且所用的名词往往与数据库的表格名对应。一般来说，数据库中的表都是同种记录的”集合”（collection），所以API中的名词也应该使用复数。</li>
-<li>HTTP动词</li>
-<li>过滤信息（Filtering）</li>
-<li>状态码（Status Codes）</li>
-<li>错误处理</li>
-<li>返回结果</li>
-<li>Hypermedia API<br>RESTful API最好做到Hypermedia，即返回结果中提供链接，连向其他API方法，使得用户不查文档，也知道下一步应该做什么。</li>
-<li>其他<ul>
-<li>（1）API的身份认证应该使用OAuth 2.0框架。</li>
-<li>（2）服务器返回的数据格式，应该尽量使用JSON，避免使用XML。</li>
-</ul>
-</li>
-</ul>
-<p><a href="http://www.ruanyifeng.com/blog/2014/05/restful_api.html" target="_blank" rel="noopener">http://www.ruanyifeng.com/blog/2014/05/restful_api.html</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/13/java_thread/review-java-thread/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/13/java_thread/review-java-thread/" itemprop="url">java-线程复习</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-13T10:13:27+08:00">
-                2018-01-13
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/01/13/java_thread/review-java-thread/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/01/13/java_thread/review-java-thread/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/01/13/java_thread/review-java-thread/" class="leancloud_visitors" data-flag-title="java-线程复习">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h1><p>创建线程有两种方式：<br>一、继承 Thread 类，扩展线程。<br>二、实现 Runnable 接口。</p>
-<p>Callable接口<br>Future接口<br>FutureTask实现了 Future 接口<br>FutureTask 的好处是 FutureTask 是为了弥补 Thread 的不足而设计的，它可以让程序员准确地知道线程什么时候执行完成并获得到线程执行完成后返回的结果。FutureTask 是一种可以取消的异步的计算任务，它的计算是通过 Callable 实现的，它等价于可以携带结果的 Runnable，并且有三个状态：等待、运行和完成。完成包括所有计算以任意的方式结束，包括正常结束、取消和异常。</p>
-<h1 id="多线程"><a href="#多线程" class="headerlink" title="多线程"></a>多线程</h1><p>多线程的概念很好理解就是多条线程同时存在，但要用好多线程确不容易，涉及到多线程间通信，多线程共用一个资源等诸多问题。</p>
-<h2 id="synchronized"><a href="#synchronized" class="headerlink" title="synchronized"></a>synchronized</h2><p>解决多个线程之间访问资源的同步性</p>
-<ul>
-<li>对于同步方法，锁是当前实例对象。</li>
-<li>对于静态同步方法，锁是当前对象的Class对象。</li>
-<li>对于同步方法块，锁是Synchonized括号里配置的对象。</li>
-</ul>
-<p>锁提供了两种主要特性：互斥（mutual exclusion） 和可见性（visibility）。互斥即一次只允许一个线程持有某个特定的锁，因此可使用该特性实现对共享数据的协调访问协议，这样，一次就只有一个线程能够使用该共享数据。可见性要更加复杂一些，它必须确保释放锁之前对共享数据做出的更改对于随后获得该锁的另一个线程是可见的 —— 如果没有同步机制提供的这种可见性保证，线程看到的共享变量可能是修改前的值或不一致的值，这将引发许多严重问题。</p>
-<h2 id="volatile"><a href="#volatile" class="headerlink" title="volatile"></a>volatile</h2><p>解决变量在多个线程之间的可见性</p>
-<p>出于简易性或可伸缩性的考虑，您可能倾向于使用 volatile 变量而不是锁。当使用 volatile 变量而非锁时，某些习惯用法（idiom）更加易于编码和阅读。此外，volatile 变量不会像锁那样造成线程阻塞，因此也很少造成可伸缩性问题。在某些情况下，如果读操作远远大于写操作，volatile 变量还可以提供优于锁的性能优势。</p>
-<h3 id="正确使用-volatile-变量的条件"><a href="#正确使用-volatile-变量的条件" class="headerlink" title="正确使用 volatile 变量的条件"></a>正确使用 volatile 变量的条件</h3><p>您只能在有限的一些情形下使用 volatile 变量替代锁。要使 volatile 变量提供理想的线程安全，必须同时满足下面两个条件：</p>
-<p>对变量的写操作不依赖于当前值。<br>该变量没有包含在具有其他变量的不变式中。<br>实际上，这些条件表明，可以被写入 volatile 变量的这些有效值独立于任何程序的状态，包括变量的当前状态。</p>
-<p>第一个条件的限制使 volatile 变量不能用作线程安全计数器。虽然增量操作（x++）看上去类似一个单独操作，实际上它是一个由读取－修改－写入操作序列组成的组合操作，必须以原子方式执行，而 volatile 不能提供必须的原子特性。实现正确的操作需要使 x 的值在操作期间保持不变，而 volatile 变量无法实现这点。（然而，如果将值调整为只从单个线程写入，那么可以忽略第一个条件。）</p>
-<p>大多数编程情形都会与这两个条件的其中之一冲突，使得 volatile 变量不能像 synchronized 那样普遍适用于实现线程安全。清单 1 显示了一个非线程安全的数值范围类。它包含了一个不变式 —— 下界总是小于或等于上界。</p>
-<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>与锁相比，Volatile 变量是一种非常简单但同时又非常脆弱的同步机制，它在某些情况下将提供优于锁的性能和伸缩性。如果严格遵循 volatile 的使用条件 —— 即变量真正独立于其他变量和自己以前的值 —— 在某些情况下可以使用 volatile 代替 synchronized 来简化代码。然而，使用 volatile 的代码往往比使用锁的代码更加容易出错。本文介绍的模式涵盖了可以使用 volatile 代替 synchronized 的最常见的一些用例。遵循这些模式（注意使用时不要超过各自的限制）可以帮助您安全地实现大多数用例，使用 volatile 变量获得更佳性能。</p>
-<h2 id="wait-、notify-、notifyAll"><a href="#wait-、notify-、notifyAll" class="headerlink" title="wait()、notify()、notifyAll()"></a>wait()、notify()、notifyAll()</h2><p>wait():我的部分已经做完了,等别人让我做的时候再做,释放锁<br>notify():等我做完了,释放锁后,让其他一个人做<br>wait() 与 Thread.sleep(long time) 的区别:sleep傻等,sleep不释放锁</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">作者：孙立伟</span><br><span class="line">链接：https://www.zhihu.com/question/23328075/answer/24228413</span><br><span class="line">来源：知乎</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br><span class="line"></span><br><span class="line">首先，要记住这个差别，“sleep是Thread类的方法,wait是Object类中定义的方法”。尽管这两个方法都会影响线程的执行行为，但是本质上是有区别的。</span><br><span class="line"></span><br><span class="line">Thread.sleep不会导致锁行为的改变，如果当前线程是拥有锁的，那么Thread.sleep不会让线程释放锁。如果能够帮助你记忆的话，可以简单认为和锁相关的方法都定义在Object类中，因此调用Thread.sleep是不会影响锁的相关行为。</span><br><span class="line"></span><br><span class="line">Thread.sleep和Object.wait都会暂停当前的线程，对于CPU资源来说，不管是哪种方式暂停的线程，都表示它暂时不再需要CPU的执行时间。OS会将执行时间分配给其它线程。区别是，调用wait后，需要别的线程执行notify/notifyAll才能够重新获得CPU执行时间。</span><br><span class="line"></span><br><span class="line">线程的状态参考 Thread.State的定义。新创建的但是没有执行（还没有调用start())的线程处于“就绪”，或者说Thread.State.NEW状态。</span><br><span class="line"></span><br><span class="line">Thread.State.BLOCKED（阻塞）表示线程正在获取锁时，因为锁不能获取到而被迫暂停执行下面的指令，一直等到这个锁被别的线程释放。BLOCKED状态下线程，OS调度机制需要决定下一个能够获取锁的线程是哪个，这种情况下，就是产生锁的争用，无论如何这都是很耗时的操作。</span><br></pre></td></tr></table></figure>
-<h2 id="ThreadLocal-变量"><a href="#ThreadLocal-变量" class="headerlink" title="ThreadLocal 变量"></a>ThreadLocal 变量</h2><p>线程隔离<br>InheritableTreadLocal让子线程获取父线程中取得值</p>
-<h2 id="join-方法"><a href="#join-方法" class="headerlink" title="join() 方法"></a>join() 方法</h2><p>等待线程对象销毁<br>等待子进程执行完,我再执行<br>Thread.yield() 方法</p>
-<h1 id="ReentrantLock"><a href="#ReentrantLock" class="headerlink" title="ReentrantLock"></a>ReentrantLock</h1><h2 id="lock"><a href="#lock" class="headerlink" title="lock()"></a>lock()</h2><h2 id="unlock"><a href="#unlock" class="headerlink" title="unlock()"></a>unlock()</h2><h2 id="condition"><a href="#condition" class="headerlink" title="condition"></a>condition</h2><h3 id="等待-通知"><a href="#等待-通知" class="headerlink" title="等待/通知"></a>等待/通知</h3><ul>
-<li>awiate() 相当于Object类中的wait()方法</li>
-<li>await(long time,TImeUnit unit) 相当于Object类中的wait()方法</li>
-<li>signal() 相当于Object类中的notify()方法</li>
-<li>sigalAll() 相当于Object类中的notifyAll()方法</li>
-</ul>
-<h3 id="通知部分线程"><a href="#通知部分线程" class="headerlink" title="通知部分线程"></a>通知部分线程</h3><p>Lock lock=new Reentrantock();<br>Condition conditionA=lock.newCondition();<br>Condition conditionB=lock.newCondition();</p>
-<h3 id="公平锁-非公平锁"><a href="#公平锁-非公平锁" class="headerlink" title="公平锁,非公平锁"></a>公平锁,非公平锁</h3><ul>
-<li>获取锁的顺序是按照线程加锁的顺序来分配的,及先来先得的FIFO先进先出顺序</li>
-</ul>
-<h3 id="getHoldCount-getQueueLength-getWaiteQueueLength"><a href="#getHoldCount-getQueueLength-getWaiteQueueLength" class="headerlink" title="getHoldCount(),getQueueLength(),getWaiteQueueLength()"></a>getHoldCount(),getQueueLength(),getWaiteQueueLength()</h3><ul>
-<li>getHoldCount()查询当前线程保持此锁定的个数,调用lock()方法的次数</li>
-<li>getQueueLength()返回正在等待次锁定的线程估计数</li>
-<li>getWaiteQueueLength(Condition condition)返回等待与此锁定翔安的给定条件Condition的线程估计数</li>
-</ul>
-<h1 id="线程状态切换"><a href="#线程状态切换" class="headerlink" title="线程状态切换"></a>线程状态切换</h1><p><img src="/images/pasted-42.png" alt="upload successful"></p>
-<p><img src="/images/pasted-167.png" alt="upload successful"></p>
-<ul>
-<li>监视器代表synchronized</li>
-<li>lock代表锁</li>
-</ul>
-<h1 id="AtomicInteger类"><a href="#AtomicInteger类" class="headerlink" title="AtomicInteger类"></a>AtomicInteger类</h1><h1 id="ReentrantReadWriteLock"><a href="#ReentrantReadWriteLock" class="headerlink" title="ReentrantReadWriteLock"></a>ReentrantReadWriteLock</h1><h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://www.ibm.com/developerworks/cn/java/j-jtp06197.html" target="_blank" rel="noopener">https://www.ibm.com/developerworks/cn/java/j-jtp06197.html</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2970,7 +2943,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">152</span>
+                  <span class="site-state-item-count">153</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
