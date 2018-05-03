@@ -326,6 +326,721 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/02/java_thread/JUC-3-AQS/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/02/java_thread/JUC-3-AQS/" itemprop="url">AbstractQueuedSynchronizer学习</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-02T12:38:41+08:00">
+                2018-04-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/02/java_thread/JUC-3-AQS/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/04/02/java_thread/JUC-3-AQS/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/04/02/java_thread/JUC-3-AQS/" class="leancloud_visitors" data-flag-title="AbstractQueuedSynchronizer学习">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="背景和简介"><a href="#背景和简介" class="headerlink" title="背景和简介"></a>背景和简介</h1><p>AbstractQueuedSynchronizer简称AQS是一个抽象同步框架，可以用来实现一个依赖状态的同步器。<br>JDK1.5中提供的java.util.concurrent包中的大多数的同步器(Synchronizer)如Lock, Semaphore, Latch, Barrier等，这些类之间大多可以互相实现，如使用Lock实现一个Semaphore或者反过来，但是它们都是基于java.util.concurrent.locks.AbstractQueuedSynchronizer这个类的框架实现的，理解了这个稍微复杂抽象的类再去理解其他的同步器就很轻松了。</p>
+<p>等待条件发生的操作是开发中常见的需求，例如实现一个生产者消费者，当队列为空时，消费者获取消息可以立即返回并不断轮询，另外一种方式是阻塞直到有新的消息，后者对调用方更加友好一些。</p>
+<h1 id="设计与现实"><a href="#设计与现实" class="headerlink" title="设计与现实"></a>设计与现实</h1><p>要完成这些，可以抽象出一些基本功能。<br>首先，需要保存状态提供给子类去表示具体的含义，并且提供查询、设置、原子修改的操作。<br>其次，要能够阻塞、唤醒线程。<br>然后，还需要有一个容器来存放等待的线程</p>
+<h2 id="初步设计"><a href="#初步设计" class="headerlink" title="初步设计"></a>初步设计</h2><p>AQS内部通过一个int类型的state字段表示同步状态，状态的具体含义可以子类来定义，例如ReentrantLock中用state表示线程重入的次数，Semaphore表示可用的许可的数量等。使用int是由于int能够应对大部分的场景，而long在很多平台需要使用额外锁来保证一致性的读取。</p>
+<p>类似模板模式，AQS暴露给子类一些方法实现(如tryAcquire，tryRelease), 获取操作通常是依赖state状态的，当状态允许时获取成功否则加入等待队列一直等待到允许的状态发生时重新获取，例如，Semaphore中当state(即许可数量)小于等于0时，获取不能成功。释放操作通过会修改状态并判断是否能让其他等待的线程能够重新获取，例如ReentrantLock中释放会减少重入次数并检查重入次数是否达到了0，达到0说明已经解锁，这时会通知其他等待线程重新获取。所以AQS的acquire和release会通过组合应用到不同的同步器实现中实现不同的语义，如</p>
+<ul>
+<li>Reentrant.lock</li>
+<li>ReentrantReadWriteLock</li>
+<li>Semaphore.acquire,</li>
+<li>CountDownLatch.await</li>
+<li>SynchronousQueue</li>
+<li>FutureTask.get(1.5以后不再使用AQS)</li>
+</ul>
+<p>另外AQS还提供其他功能，如非阻塞的获取tryAcquire, 带有超时时间的获取，可以中断的获取等。<br>AQS可以根据具体的场景提供exclusive模式和shared模式，在exclusive模式下，同一时刻最多只能有一个线程能够处于成功获取的状态，排他锁是一个exclusive模式的例子，shared模式则可以多个线程一起获取成功，如多个许可的Semaphore。<br>另外在java.util.concurrent包中还定义了Condition接口，用来提供监视器风格的等待通知操作，可以替换Object中基于synchronized、监视器锁的wait和notify机制。</p>
+<p>实现具体的同步器时，需要将实现类作为具体同步器的内部类，然后调用实现类的acquire、acquireShared、release等方法。</p>
+<h2 id="更具体的设计"><a href="#更具体的设计" class="headerlink" title="更具体的设计"></a>更具体的设计</h2><h3 id="同步状态synchronization管理-state字段"><a href="#同步状态synchronization管理-state字段" class="headerlink" title="同步状态synchronization管理(state字段)"></a>同步状态synchronization管理(state字段)</h3><p>state字段可以通过volatile修饰，这样get和set方法具有了voaltile的相关语义，通过可以通过AtomicInteger或Unsafe类来实现原子CAS更新操作，基于减少indirection的考虑，JDK中一般都是使用Unsafe类。</p>
+<h3 id="阻塞、唤醒线程"><a href="#阻塞、唤醒线程" class="headerlink" title="阻塞、唤醒线程"></a>阻塞、唤醒线程</h3><p>除了基于内置的监视器的synchronizer机制外，唯一可用的似乎是已经Deprecated的Thread.stop、Thread.suspend、Thread.resume, 而这几个个方法有严重的安全问题比如可能造成死锁。JDK1.5增加了一个LockSupport类来解决这个问题, LockSupport给每个线程绑定一个类似Semaphore的permit许可数量，不过permit最大为1，初始时permit为0。park()操作阻塞一直到permit为1并且将permit减1。unpark则进行加1，不过unpark并不会累加permit。<br>而且如果先调用unpark()的话，之后调用park()会立即返回。<br>park()返回的几个情况是</p>
+<p>之前有其他线程调用剩余的unpark()或在park()之后其他调用了unpark()<br>其他线程中断了目标线程<br>调用虚假返回（类似Object.wait()的伪通知, 所以调用返回时需要检查是否等待条件已经达成<br>hotspot的LockSupport最终还是使用了Unsafe的功能</p>
+<h3 id="线程等待队列"><a href="#线程等待队列" class="headerlink" title="线程等待队列"></a>线程等待队列</h3><p>AQS的核心是一个线程等待队列，采用的是一个先进先出FIFO队列。用来实现一个非阻塞的同步器队列有主要有两个选择Mellor-Crummey and Scott (MCS) locks和Craig, Landin, and Hagersten (CLH) locks的变种。CLH锁更适合处理取消和超时，所以AQS基于CLH进行修改作为线程等待队列。<br>CLH队列使用pred引用前节点形成一个队列，入队enqueue和出队dequeue操作都可以通过原子操作完成。</p>
+<p>CLH队列有很多优点，包括入队和出队非常快、无锁、非阻塞，并且是否有线程等待只需要判断head和tail是否相等。<br>CLH中并没有只有向后的指针引用后继节点，每个节点只需要修改自己的状态就能通知后继节点。但是在AQS这样的阻塞同步器中，需要主动唤醒(unpark)后继节点。所以在AQS中增加了next引用引用后继节点，但是并没有合适的方法使用CAS进行无锁插入双向链表的方法，所以节点的插入并不是原子完成的，需要在CAS替换tail完成后调用pred.next=node。</p>
+<h3 id="ConditionObject"><a href="#ConditionObject" class="headerlink" title="ConditionObject"></a>ConditionObject</h3><p>AQS还提供了一个ConditionObject类来表示监视器风格的等待通知操作，主要用在Lock中，和传统的监视器的区别在于一个Lock可以创建多个Condition。ConditionObject使用相同的内部队列节点，但是维护在一个单独的条件队列中，当收到signal操作的时候将条件队列的节点转移到等待队列。</p>
+<h1 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h1><h2 id="节点"><a href="#节点" class="headerlink" title="节点"></a>节点</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">static final class Node &#123;</span><br><span class="line"></span><br><span class="line">	// 省略部分代码...</span><br><span class="line"></span><br><span class="line">	volatile Node prev; // 前节点</span><br><span class="line"></span><br><span class="line">	volatile Node next; // 后节点</span><br><span class="line"></span><br><span class="line">	volatile int waitStatus;// 等待状态</span><br><span class="line"></span><br><span class="line">	volatile Thread thread; // 节点线程</span><br><span class="line"></span><br><span class="line">	Node nextWaiter; // 节点模式</span><br><span class="line"></span><br><span class="line">	Node() &#123; &#125;</span><br><span class="line"></span><br><span class="line">	Node(Thread thread, Node mode) &#123;</span><br><span class="line">		this.nextWaiter = mode;</span><br><span class="line">		this.thread = thread;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	Node(Thread thread, int waitStatus) &#123;</span><br><span class="line">		this.waitStatus = waitStatus;</span><br><span class="line">		this.thread = thread;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="节点状态"><a href="#节点状态" class="headerlink" title="节点状态"></a>节点状态</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">// 表示当前节点的后续节点中的线程通过 park 被阻塞了，需要通过unpark解除它的阻塞</span><br><span class="line">static final int SIGNAL = -1;</span><br><span class="line"></span><br><span class="line">// 表示当前节点在 condition 队列中</span><br><span class="line">static final int CONDITION = -2;</span><br><span class="line"></span><br><span class="line">// 共享模式的头结点可能处于此状态，表示无条件往下传播</span><br><span class="line">// 引入此状态是为了优化锁竞争，使队列中线程有序地一个一个唤醒</span><br><span class="line">static final int PROPAGATE = -3;</span><br><span class="line"></span><br><span class="line">//表示当前节点的线程因为超时或中断被取消了</span><br><span class="line">static final int CANCELLED = 1;</span><br><span class="line"></span><br><span class="line">// 关键 -&gt; 0 表示初始化状态</span><br></pre></td></tr></table></figure>
+<p>Node 的等待状态，因为大于 0 的只有 CANCELLED 一种状态。因此在很多地方也用 waitStatus &gt; 0 表示该状态</p>
+<h2 id="CLH-队列-基本可以保持公平"><a href="#CLH-队列-基本可以保持公平" class="headerlink" title="CLH 队列(基本可以保持公平)"></a>CLH 队列(基本可以保持公平)</h2><ul>
+<li>在 JUC 框架中，若有线程尝试获取锁时失败时，该线程会被包装成节点添加进此队列，也称入队。</li>
+<li>在 JUC 框架中，若有线程释放锁时，等待队列的头节点会从队列中移除，表示不用再等待，也称出队。</li>
+</ul>
+<h3 id="入队"><a href="#入队" class="headerlink" title="入队"></a>入队</h3><p>在 AQS 中通过 addWaiter 方法将节点加入等待队列：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">// 头节点</span><br><span class="line">private transient volatile Node head;</span><br><span class="line"></span><br><span class="line">// 尾节点</span><br><span class="line">private transient volatile Node tail;</span><br><span class="line"></span><br><span class="line">private Node addWaiter(Node mode) &#123;</span><br><span class="line"></span><br><span class="line">	Node node = new Node(Thread.currentThread(), mode);</span><br><span class="line"></span><br><span class="line">	Node pred = tail;</span><br><span class="line"></span><br><span class="line">	// 为空表示等待队列为空</span><br><span class="line">	if (pred != null) &#123;</span><br><span class="line">		node.prev = pred;</span><br><span class="line">		// 通过 CAS 操作设置 tail 为 node</span><br><span class="line">		// 关键 -&gt;失败表示在这期间有其他线程的节点被设置为新的尾节点</span><br><span class="line">		if (compareAndSetTail(pred, node)) &#123;</span><br><span class="line">			pred.next = node;</span><br><span class="line">			return node;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	// 关键 -&gt; 当[等待队列]为空，或者新节点入队失败时（说明存在并发），代码才会执行到这</span><br><span class="line">	enq(node);</span><br><span class="line"></span><br><span class="line">	return node;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 往等待队列中（尾部）插入一个节点</span><br><span class="line">private Node enq(final Node node) &#123;</span><br><span class="line">	// 关键 -&gt; 自旋直至成功</span><br><span class="line">	for (;;) &#123;</span><br><span class="line">		Node t = tail;</span><br><span class="line"></span><br><span class="line">		// t 为空表示等待队列为空</span><br><span class="line">		if (t == null) &#123;</span><br><span class="line">			// 构建等待队列的头节点，实质是创建一个空的循环双链表</span><br><span class="line">			if (compareAndSetHead(new Node()))&#123;</span><br><span class="line">				tail = head;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125; else &#123;</span><br><span class="line">			// 设置该节点为新的尾节点</span><br><span class="line">			node.prev = t;</span><br><span class="line">			if (compareAndSetTail(t, node)) &#123;</span><br><span class="line">				t.next = node;</span><br><span class="line">				return t;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>入队操作只与队列的尾节点有关，通过原子操作将新节点设置成新的尾节点。若操作失败则通过不断自旋直至成功。</p>
+<h3 id="出队"><a href="#出队" class="headerlink" title="出队"></a>出队</h3><p>出队操作跟头节点有关，将要执行出队的节点设置为新的头节点，并置空旧的头节点从等待队列移除即可。</p>
+<ul>
+<li>设置新的 head</li>
+<li>清除节点上的线程</li>
+<li>将旧的头节点从等待队列移除（ 断开前指针和后指针）</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">if (p == head &amp;&amp; tryAcquire(arg)) &#123;</span><br><span class="line">	// 设置新的头节点</span><br><span class="line">    setHead(node);</span><br><span class="line"></span><br><span class="line">	// 将旧头节点后指针置空，表示从等待队列移除</span><br><span class="line">    p.next = null;</span><br><span class="line">    failed = false;</span><br><span class="line">    return interrupted;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">private void setHead(Node node) &#123;</span><br><span class="line">	head = node;</span><br><span class="line">	node.thread = null;</span><br><span class="line">	node.prev = null;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="共享模式"><a href="#共享模式" class="headerlink" title="共享模式"></a>共享模式</h2><p>共享式的操作与独占式的主要区别在于，每次acquire竞争失败后，独占式将立即阻塞当前线程，而共享式需要在多次acquire失败后才会阻塞当前线程。简单来说，共享式是有一定限额的独占式。限额的满足方式，根据不同的子类不同的实现方式。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><h2 id="AbstractQueuedSynchronizer方法概述"><a href="#AbstractQueuedSynchronizer方法概述" class="headerlink" title="AbstractQueuedSynchronizer方法概述"></a>AbstractQueuedSynchronizer方法概述</h2><p>Lock的接口方法是针对用户的使用而定义的，我们在实现Lock的时候，就需要做如下事情，重点关注下这些事情的共性和异性</p>
+<ul>
+<li><p>指明什么情况下才叫获取到锁：如独占锁，一旦有人占据了，就不能获取到锁。如共享锁，有人占据，但是没超过限制也能获取锁。这一部分应该是锁的实现的业务代码，每种锁都有自己的业务逻辑。这一部分其实就是AbstractQueuedSynchronizer对子类留出的tryAcquire方法</p>
+</li>
+<li><p>获取不到锁的时候该如何处理呢：我们当然希望它们能够继续等待，有一个队列就最好不过了，一旦获取锁失败就加入到等待队列中排队，队列中的等待者依次再去竞争获取锁。这一部分代码其实就和哪种锁没太大关系了，所以应该是锁的共性部分，这一部分其实就是AbstractQueuedSynchronizer实现的共性部分acquireQueued</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">if (!tryAcquire(arg) &amp;&amp;</span><br><span class="line">        acquireQueued(addWaiter(Node.EXCLUSIVE), arg))</span><br></pre></td></tr></table></figure>
+<p>代表着先试着获取一下锁，如果获取不成功，就把之后的处理逻辑交给AbstractQueuedSynchronizer来处理。反正你只管告诉AbstractQueuedSynchronizer它怎样才叫获取到锁，其他的等待处理逻辑你就可以不用再关心了。</p>
+<p>以上也仅仅是部分内容，下面来全面看下AbstractQueuedSynchronizer对外留出的接口和已实现的共性部分</p>
+<h3 id="对外留出的接口："><a href="#对外留出的接口：" class="headerlink" title="对外留出的接口："></a>对外留出的接口：</h3><p>tryAcquire：该方法向AQS解释了怎么才叫获取一把独占锁</p>
+<p>tryRelease：该方法向AQS解释了怎么才叫释放一把独占锁</p>
+<p>tryAcquireShared：该方法向AQS解释了怎么才叫获取一把共享锁</p>
+<p>tryReleaseShared：该方法向AQS解释了怎么才叫释放一把共享锁</p>
+<p>这些内容就是各种锁本身的业务逻辑，属于异性部分。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">public class AbstractQueuedSynchronizerChild  extends AbstractQueuedSynchronizer &#123;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected boolean tryAcquire(int arg) &#123;</span><br><span class="line">        return super.tryAcquire(arg);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected boolean tryRelease(int arg) &#123;</span><br><span class="line">        return super.tryRelease(arg);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected int tryAcquireShared(int arg) &#123;</span><br><span class="line">        return super.tryAcquireShared(arg);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected boolean tryReleaseShared(int arg) &#123;</span><br><span class="line">        return super.tryReleaseShared(arg);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="来看看锁的共性部分相关方法："><a href="#来看看锁的共性部分相关方法：" class="headerlink" title="来看看锁的共性部分相关方法："></a>来看看锁的共性部分相关方法：</h3><p>来看看锁的共性部分相关方法：</p>
+<ul>
+<li><p>acquire：获取一把独占锁的过程</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public final void acquire(int arg) &#123;</span><br><span class="line">    if (!tryAcquire(arg) &amp;&amp;</span><br><span class="line">        acquireQueued(addWaiter(Node.EXCLUSIVE), arg))</span><br><span class="line">        selfInterrupt();</span><br><span class="line">&#125;</span><br><span class="line">就是先拿锁实现的tryAcquire方法去尝试获取独占锁，一旦获取锁失败就进入队列，交给AQS来处理，一旦成功就表示获取到了一把锁。</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>release：释放一把独占锁的过程</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public final boolean release(int arg) &#123;</span><br><span class="line">    if (tryRelease(arg)) &#123;</span><br><span class="line">        Node h = head;</span><br><span class="line">        if (h != null &amp;&amp; h.waitStatus != 0)</span><br><span class="line">            unparkSuccessor(h);</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line">    return false;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>就是先拿锁实现的tryRelease方法尝试释放独占锁，一旦释放成功，就通知队列，有人释放锁了，队列前面的可以再次去竞争锁了（这一部分下面详细说明）</p>
+<ul>
+<li>acquireShared：获取一把共享锁的过程<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">public final void acquireShared(int arg) &#123;</span><br><span class="line">    if (tryAcquireShared(arg) &lt; 0)</span><br><span class="line">        doAcquireShared(arg);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>就是先拿锁实现的tryAcquireShared方法尝试获取共享锁，一旦获取失败，就进入队列，交给AQS来处理</p>
+<ul>
+<li>releaseShared：释放一把共享锁的过程<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public final boolean releaseShared(int arg) &#123;</span><br><span class="line">    if (tryReleaseShared(arg)) &#123;</span><br><span class="line">        doReleaseShared();</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line">    return false;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>就是先拿锁实现的tryReleaseShared方法尝试释放共享锁，一旦释放成功，就通知队列，有人释放锁了</p>
+<h2 id="AbstractQueuedSynchronizer的状态属性state"><a href="#AbstractQueuedSynchronizer的状态属性state" class="headerlink" title="AbstractQueuedSynchronizer的状态属性state"></a>AbstractQueuedSynchronizer的状态属性state</h2><p>从上面我们就看到老是方法中会有各种的int参数，其实这是AbstractQueuedSynchronizer将获取锁的过程量化对数字的操作，而state变量就是用于记录当前数字值的。以独占锁为例:</p>
+<ul>
+<li><p>state=0 表示该锁未被其他线程获取</p>
+</li>
+<li><p>一旦有线程想获取锁，就可以对state进行CAS增量操作，这个增量可以是任意值，不过大多数都默认取1。也就是说一旦一个线程对state CAS操作成功就代表该线程获取到了锁，则state就变成1了。其他操作对state CAS操作失败的就代表没获取到锁，就自动进入AQS管理流程</p>
+</li>
+<li><p>其他线程发现当前state值不等于0表示锁已被其他线程获取，就自动进入AQS管理流程</p>
+</li>
+<li><p>一旦获取锁的线程想释放锁，就可以对state进行自减，即减到0，其他线程又可以去获取锁了</p>
+</li>
+</ul>
+<p>从上面的例子中可以看到对state的几种线程安全和非安全操作：</p>
+<ul>
+<li><p>compareAndSetState(int expect, int update)：线程安全的设置状态，因为可能多个线程并发调用该方法，所以需要CAS来保证线程安全</p>
+</li>
+<li><p>setState(int newState)：非线程安全的设置状态，这种一般是针对只有一个线程获取锁的时候来释放锁，此时没有并发的可能性，所以就不需要上述的compareAndSetState操作</p>
+</li>
+<li><p>getState()：获取状态值</p>
+</li>
+</ul>
+<p>AQS提供了上述线程安全和非安全的设置状态state的方法，供我们在实现锁的tryAcquire、tryRelease等方法的时候合理的时候它们。</p>
+<h2 id="AbstractQueuedSynchronizer的FIFO队列"><a href="#AbstractQueuedSynchronizer的FIFO队列" class="headerlink" title="AbstractQueuedSynchronizer的FIFO队列"></a>AbstractQueuedSynchronizer的FIFO队列</h2><p>前面简单提到了，就是先拿锁实现的tryAcquire方法去尝试获取独占锁，一旦获取锁失败就进入队列，交给AQS来处理。AQS的处理简单描述下就是将当前线程包装成Node节点然后放到队列中进程排队，等待前面的Node节点都出队了，被唤醒轮到自己再次去竞争锁。</p>
+<p>我们先来认识下Node节点,大致如下结构：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">static final class Node &#123;</span><br><span class="line"></span><br><span class="line">    volatile Node prev;</span><br><span class="line">    volatile Node next;</span><br><span class="line"></span><br><span class="line">    volatile Thread thread;</span><br><span class="line"></span><br><span class="line">    Node nextWaiter;</span><br><span class="line"></span><br><span class="line">	volatile int waitStatus;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">private transient volatile Node head;</span><br><span class="line"></span><br><span class="line">private transient volatile Node tail;</span><br></pre></td></tr></table></figure></p>
+<p>首先就是prev、next节点可以构成一个双向队列。AQS中含有上述的head和tail两个属性一起来构成FIFO队列。</p>
+<p>Thread thread则代表的是构成此节点的线程。</p>
+<p>Node nextWaiter：是用于condition queue，用于构成一个单向的FIFO队列，详见下面。</p>
+<p>volatile int waitStatus：则表示该节点当前的状态，目前有如下状态：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">/** waitStatus value to indicate thread has cancelled */</span><br><span class="line">static final int CANCELLED =  1;</span><br><span class="line">/** waitStatus value to indicate successor&apos;s thread needs unparking */</span><br><span class="line">static final int SIGNAL    = -1;</span><br><span class="line">/** waitStatus value to indicate thread is waiting on condition */</span><br><span class="line">static final int CONDITION = -2;</span><br><span class="line">/**</span><br><span class="line"> * waitStatus value to indicate the next acquireShared should</span><br><span class="line"> * unconditionally propagate</span><br><span class="line"> */</span><br><span class="line">static final int PROPAGATE = -3;</span><br></pre></td></tr></table></figure></p>
+<p>CANCELLED：表示该节点所对应的线程因为获取锁的过程中超时或者被中断而被设置成此状态</p>
+<p>SIGNAL：表示该节点所对应的线程被阻塞，不再被调度执行，需要等待其他线程释放锁之后来唤醒它，才能再次加入锁的竞争</p>
+<p>CONDITION：表示该节点所对应的线程被阻塞，不再被调度执行，在等待某一个condition的signal、signalAll方法的唤醒</p>
+<p>PROPAGATE：只用于共享状态的HEAD节点，目前还没弄清楚，欢迎一起来探讨</p>
+<p>节点创建后默认状态值是0。</p>
+<h2 id="AbstractQueuedSynchronizer的condition-queue"><a href="#AbstractQueuedSynchronizer的condition-queue" class="headerlink" title="AbstractQueuedSynchronizer的condition queue"></a>AbstractQueuedSynchronizer的condition queue</h2><h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://my.oschina.net/pingpangkuangmo/blog/679636" target="_blank" rel="noopener">https://my.oschina.net/pingpangkuangmo/blog/679636</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/02/java_thread/JUC-CountDownLatch/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/02/java_thread/JUC-CountDownLatch/" itemprop="url">CountDownLatch学习</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-02T11:02:32+08:00">
+                2018-04-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/02/java_thread/JUC-CountDownLatch/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/04/02/java_thread/JUC-CountDownLatch/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/04/02/java_thread/JUC-CountDownLatch/" class="leancloud_visitors" data-flag-title="CountDownLatch学习">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>CountDownLatch是通过一个计数器来实现的，计数器的初始值为线程的数量。每当一个线程完成了自己的任务后，计数器的值就会减1。当计数器值到达0时，它表示所有的线程已经完成了任务，然后在闭锁上等待的线程就可以恢复执行任务。</p>
+<p><img src="/images/pasted-115.png" alt="upload successful"></p>
+<h1 id="一个countdownlatch的使用案例"><a href="#一个countdownlatch的使用案例" class="headerlink" title="一个countdownlatch的使用案例"></a>一个countdownlatch的使用案例</h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><p>n个赛车，让他们都在起跑线上就绪后，同时出发,并监控结束比赛的结束</p>
+<h2 id="答案"><a href="#答案" class="headerlink" title="答案"></a>答案</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">public class CountDownTest &#123;</span><br><span class="line">    private static class ProcessJob implements Runnable &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        private CountDownLatch startLatch;</span><br><span class="line">        private CountDownLatch stopLatch;</span><br><span class="line"></span><br><span class="line">        public ProcessJob(CountDownLatch startLatch, CountDownLatch stopLatch) &#123;</span><br><span class="line">            this.startLatch = startLatch;</span><br><span class="line">            this.stopLatch = stopLatch;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        public void run() &#123;</span><br><span class="line">            try &#123;</span><br><span class="line">                startLatch.await();</span><br><span class="line">                TimeUnit.SECONDS.sleep(2);</span><br><span class="line">            &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">            System.out.println(&quot;Some Job&quot;);</span><br><span class="line">            stopLatch.countDown();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) throws InterruptedException &#123;</span><br><span class="line">        ExecutorService executorService = Executors.newCachedThreadPool();</span><br><span class="line">        int jobSize = 20;</span><br><span class="line">        CountDownLatch startLatch = new CountDownLatch(1);</span><br><span class="line">        CountDownLatch stopLatch = new CountDownLatch(jobSize);</span><br><span class="line">        for (int i = 0; i &lt; jobSize; i++) &#123;</span><br><span class="line">            executorService.submit(new ProcessJob(startLatch, stopLatch));</span><br><span class="line">        &#125;</span><br><span class="line">        long start = System.currentTimeMillis();</span><br><span class="line">        startLatch.countDown();</span><br><span class="line">        // 等待所有线程执行完任务</span><br><span class="line">        stopLatch.await();</span><br><span class="line">        long end = System.currentTimeMillis();</span><br><span class="line">        System.out.println(&quot;Total cost time: &quot; + (end - start));</span><br><span class="line">        executorService.shutdown();</span><br><span class="line">        executorService.awaitTermination(1, TimeUnit.MINUTES);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="核心代码"><a href="#核心代码" class="headerlink" title="核心代码"></a>核心代码</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">private static final class Sync extends AbstractQueuedSynchronizer &#123;</span><br><span class="line">    private static final long serialVersionUID = 4982264981922014374L;</span><br><span class="line"></span><br><span class="line">    Sync(int count) &#123;</span><br><span class="line">        setState(count);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    int getCount() &#123;</span><br><span class="line">        return getState();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    protected int tryAcquireShared(int acquires) &#123;</span><br><span class="line">   		 // 只有当当前state为0即count为0的时候能够返回</span><br><span class="line">        return (getState() == 0) ? 1 : -1;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    protected boolean tryReleaseShared(int releases) &#123;</span><br><span class="line">        // Decrement count; signal when transition to zero</span><br><span class="line">        for (;;) &#123;</span><br><span class="line">            int c = getState();</span><br><span class="line">            if (c == 0)</span><br><span class="line">                return false;</span><br><span class="line">            int nextc = c-1;</span><br><span class="line">            if (compareAndSetState(c, nextc))</span><br><span class="line">            // 成功CAS将count变为0的线程负责唤醒等待线程</span><br><span class="line">                return nextc == 0;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="重写的aqs接口"><a href="#重写的aqs接口" class="headerlink" title="重写的aqs接口"></a>重写的aqs接口</h1><h2 id="tryAcquireShared"><a href="#tryAcquireShared" class="headerlink" title="tryAcquireShared"></a>tryAcquireShared</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">protected int tryAcquireShared(int arg)</span><br><span class="line">试图在共享模式下获取对象状态。此方法应该查询是否允许它在共享模式下获取对象状态，如果允许，则获取它。</span><br><span class="line">此方法总是由执行 acquire 线程来调用。如果此方法报告失败，则 acquire 方法可以将线程加入队列（如果还没有将它加入队列），直到获得其他某个线程释放了该线程的信号。</span><br><span class="line"></span><br><span class="line">默认实现将抛出 UnsupportedOperationException。</span><br><span class="line"></span><br><span class="line">参数：</span><br><span class="line">arg - acquire 参数。该值总是传递给 acquire 方法的那个值，或者是因某个条件等待而保存在条目上的值。该值是不间断的，并且可以表示任何内容。</span><br><span class="line">返回：</span><br><span class="line">在失败时返回负值；如果共享模式下的获取成功但其后续共享模式下的获取不能成功，则返回 0；如果共享模式下的获取成功并且其后续共享模式下的获取可能够成功，则返回正值，在这种情况下，后续等待线程必须检查可用性。（对三种返回值的支持使得此方法可以在只是有时候以独占方式获取对象的上下文中使用。）在成功的时候，此对象已被获取。</span><br><span class="line">抛出：</span><br><span class="line">IllegalMonitorStateException - 如果正在进行的获取操作将在非法状态下放置此同步器。必须以一致的方式抛出此异常，以便同步正确运行。</span><br><span class="line">UnsupportedOperationException - 如果不支持共享模式</span><br></pre></td></tr></table></figure>
+<h2 id="tryReleaseShared"><a href="#tryReleaseShared" class="headerlink" title="tryReleaseShared"></a>tryReleaseShared</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">protected boolean tryReleaseShared(int arg)</span><br><span class="line">试图设置状态来反映共享模式下的一个释放。</span><br><span class="line">此方法总是由正在执行释放的线程调用。</span><br><span class="line"></span><br><span class="line">默认实现将抛出 UnsupportedOperationException。</span><br><span class="line"></span><br><span class="line">参数：</span><br><span class="line">arg - release 参数。该值总是传递给 release 方法的那个值，或者是因某个条件等待而保存在条目上的当前状态值。该值是不间断的，并且可以表示任何内容。</span><br><span class="line">返回：</span><br><span class="line">如果此对象现在处于完全释放状态，从而使正在等待的线程都可以试图获得此对象，则返回 true；否则返回 false</span><br><span class="line">抛出：</span><br><span class="line">IllegalMonitorStateException - 如果正在进行的释放操作将在非法状态下放置此同步器。必须以一致的方式抛出此异常，以便同步正确运行</span><br><span class="line">UnsupportedOperationException - 如果不支持共享模式</span><br></pre></td></tr></table></figure>
+<h2 id="外部调用"><a href="#外部调用" class="headerlink" title="外部调用"></a>外部调用</h2><p>await()调用acquireShared的不可中断的方法acquireSharedInterruptibly，acquireSharedInterruptibly又会调用到上面Sync实现的tryAcquire方法判断是否能够返回还是继续等待。</p>
+<p>countDown调用sync的releaseShared方法，releaseShared方法又会调用上面Sync实现的tryReleaseShared方法根据返回结果判定是否唤醒线程</p>
+<h1 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h1><p><a href="https://liuzhengyang.github.io/2017/05/22/countdownlatch/" target="_blank" rel="noopener">https://liuzhengyang.github.io/2017/05/22/countdownlatch/</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/30/java_thread/JUC-1-overview/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/30/java_thread/JUC-1-overview/" itemprop="url">juc概览</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-30T10:14:33+08:00">
+                2018-03-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/30/java_thread/JUC-1-overview/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/03/30/java_thread/JUC-1-overview/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/03/30/java_thread/JUC-1-overview/" class="leancloud_visitors" data-flag-title="juc概览">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://www.cnblogs.com/chenpi/p/5614290.html" target="_blank" rel="noopener">http://www.cnblogs.com/chenpi/p/5614290.html</a><br><a href="http://ifeve.com/doug-lea/" target="_blank" rel="noopener">http://ifeve.com/doug-lea/</a></p>
+<h1 id="J-U-C："><a href="#J-U-C：" class="headerlink" title="J.U.C："></a>J.U.C：</h1><h2 id="什么是JSR-Java-Specification-Requests-："><a href="#什么是JSR-Java-Specification-Requests-：" class="headerlink" title="什么是JSR(Java Specification Requests)："></a>什么是JSR(Java Specification Requests)：</h2><p>JSR，全称 Java Specification Requests， 即Java规范提案， 主要是用于向JCP(Java Community Process)提出新增标准化技术规范的正式请求。每次JAVA版本更新都会有对应的JSR更新，比如在Java 8版本中，其新特性Lambda表达式对应的是JSR 335，新的日期和时间API对应的是JSR 310。</p>
+<h2 id="什么是JSR-166："><a href="#什么是JSR-166：" class="headerlink" title="什么是JSR 166："></a>什么是JSR 166：</h2><p>当然，本文的关注点仅仅是JSR 166，它是一个关于Java并发编程的规范提案，在JDK中，该规范由java.util.concurrent包实现，是在JDK 5.0的时候被引入的；</p>
+<ul>
+<li>JDK6引入Deques、Navigable collections，对应的是JSR 166x，</li>
+<li>JDK7引入fork-join框架，用于并行执行任务，对应的是JSR 166y。</li>
+</ul>
+<h2 id="什么是J-U-C："><a href="#什么是J-U-C：" class="headerlink" title="什么是J.U.C："></a>什么是J.U.C：</h2><p>即java.util.concurrent的缩写，该包参考自EDU.oswego.cs.dl.util.concurrent，是JSR 166标准规范的一个实现；</p>
+<ul>
+<li>同步器(Synchronizers)<ul>
+<li>闭锁 CountDownLatch</li>
+<li>栅栏 CyclicBarrier</li>
+<li>信号量 Semaphore</li>
+<li>交换器 Exchanger<ul>
+<li>Phaser</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>显示锁<ul>
+<li>ReentrantLock</li>
+<li>ReentrantReadWriteLock</li>
+<li>StampedLock</li>
+</ul>
+</li>
+<li>原子变量类(Atomic Variables)</li>
+<li>并发集合(Concurrent Collections)</li>
+<li>Executor框架（线程池、 Callable 、Future）</li>
+<li>Fork/Join并行计算框架</li>
+<li>BlockingQueue（阻塞队列）</li>
+<li>TimeUnit枚举</li>
+</ul>
+<p><img src="/images/pasted-113.png" alt="upload successful"></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/29/redis/study-gossip/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/29/redis/study-gossip/" itemprop="url">study-gossip</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-29T09:40:49+08:00">
+                2018-03-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/29/redis/study-gossip/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/03/29/redis/study-gossip/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/03/29/redis/study-gossip/" class="leancloud_visitors" data-flag-title="study-gossip">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><a href="https://github.com/aCoder2013/blog/issues/2" target="_blank" rel="noopener">https://github.com/aCoder2013/blog/issues/2</a></p>
+<p>Cassandra<br>redis</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/29/mysql/mysql-master-slave/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1639,728 +2354,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/27/redis/redis-getall/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/27/redis/redis-getall/" itemprop="url">redis中获取全部的方法</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-27T13:07:36+08:00">
-                2018-03-27
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/redis/" itemprop="url" rel="index">
-                    <span itemprop="name">redis</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/03/27/redis/redis-getall/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/27/redis/redis-getall/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/03/27/redis/redis-getall/" class="leancloud_visitors" data-flag-title="redis中获取全部的方法">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="String"><a href="#String" class="headerlink" title="String"></a>String</h1><h1 id="hash"><a href="#hash" class="headerlink" title="hash"></a>hash</h1><h2 id="HGETALL"><a href="#HGETALL" class="headerlink" title="HGETALL"></a>HGETALL</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; HSET people jack &quot;Jack Sparrow&quot;</span><br><span class="line">(integer) 1</span><br><span class="line"></span><br><span class="line">redis&gt; HSET people gump &quot;Forrest Gump&quot;</span><br><span class="line">(integer) 1</span><br><span class="line"></span><br><span class="line">redis&gt; HGETALL people</span><br><span class="line">1) &quot;jack&quot;          # 域(key)</span><br><span class="line">2) &quot;Jack Sparrow&quot;  # 值(value)</span><br><span class="line">3) &quot;gump&quot;</span><br><span class="line">4) &quot;Forrest Gump&quot;</span><br></pre></td></tr></table></figure>
-<h1 id="List-链表"><a href="#List-链表" class="headerlink" title="List(链表)"></a>List(链表)</h1><h2 id="LRANGE"><a href="#LRANGE" class="headerlink" title="LRANGE"></a>LRANGE</h2><p>LRANGE key start stop</p>
-<p>返回列表 key 中指定区间内的元素，区间以偏移量 start 和 stop 指定。</p>
-<p>下标(index)参数 start 和 stop 都以 0 为底，也就是说，以 0 表示列表的第一个元素，以 1 表示列表的第二个元素，以此类推。</p>
-<p>你也可以使用负数下标，以 -1 表示列表的最后一个元素， -2 表示列表的倒数第二个元素，以此类推。</p>
-<p>注意LRANGE命令和编程语言区间函数的区别</p>
-<p>假如你有一个包含一百个元素的列表，对该列表执行 LRANGE list 0 10 ，结果是一个包含11个元素的列表，这表明 stop 下标也在 LRANGE 命令的取值范围之内(闭区间)，这和某些语言的区间函数可能不一致，比如Ruby的 Range.new 、 Array#slice 和Python的 range() 函数。</p>
-<p>超出范围的下标</p>
-<p>超出范围的下标值不会引起错误。</p>
-<p>如果 start 下标比列表的最大下标 end ( LLEN list 减去 1 )还要大，那么 LRANGE 返回一个空列表。</p>
-<p>如果 stop 下标比 end 下标还要大，Redis将 stop 的值设置为 end 。</p>
-<p>时间复杂度:<br>O(S+N)， S 为偏移量 start ， N 为指定区间内元素的数量。<br>返回值:<br>一个列表，包含指定区间内的元素。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; RPUSH fp-language lisp</span><br><span class="line">(integer) 1</span><br><span class="line"></span><br><span class="line">redis&gt; LRANGE fp-language 0 0</span><br><span class="line">1) &quot;lisp&quot;</span><br><span class="line"></span><br><span class="line">redis&gt; RPUSH fp-language scheme</span><br><span class="line">(integer) 2</span><br><span class="line"></span><br><span class="line">redis&gt; LRANGE fp-language 0 1</span><br><span class="line">1) &quot;lisp&quot;</span><br><span class="line">2) &quot;scheme&quot;</span><br></pre></td></tr></table></figure>
-<h1 id="set"><a href="#set" class="headerlink" title="set"></a>set</h1><h2 id="SMEMBERS"><a href="#SMEMBERS" class="headerlink" title="SMEMBERS"></a>SMEMBERS</h2><p>SMEMBERS key</p>
-<p>返回集合 key 中的所有成员。</p>
-<p>不存在的 key 被视为空集合。</p>
-<p>时间复杂度:<br>O(N)， N 为集合的基数。<br>返回值:<br>集合中的所有成员。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"># key 不存在或集合为空</span><br><span class="line"></span><br><span class="line">redis&gt; EXISTS not_exists_key</span><br><span class="line">(integer) 0</span><br><span class="line"></span><br><span class="line">redis&gt; SMEMBERS not_exists_key</span><br><span class="line">(empty list or set)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 非空集合</span><br><span class="line"></span><br><span class="line">redis&gt; SADD language Ruby Python Clojure</span><br><span class="line">(integer) 3</span><br><span class="line"></span><br><span class="line">redis&gt; SMEMBERS language</span><br><span class="line">1) &quot;Python&quot;</span><br><span class="line">2) &quot;Ruby&quot;</span><br><span class="line">3) &quot;Clojure&quot;</span><br></pre></td></tr></table></figure>
-<h1 id="sortset"><a href="#sortset" class="headerlink" title="sortset"></a>sortset</h1><h2 id="ZRANGE"><a href="#ZRANGE" class="headerlink" title="ZRANGE"></a>ZRANGE</h2><p>返回有序集 key 中，指定区间内的成员。</p>
-<p>其中成员的位置按 score 值递增(从小到大)来排序。</p>
-<p>具有相同 score 值的成员按字典序(lexicographical order )来排列。</p>
-<p>如果你需要成员按 score 值递减(从大到小)来排列，请使用 ZREVRANGE 命令。</p>
-<p>下标参数 start 和 stop 都以 0 为底，也就是说，以 0 表示有序集第一个成员，以 1 表示有序集第二个成员，以此类推。<br>你也可以使用负数下标，以 -1 表示最后一个成员， -2 表示倒数第二个成员，以此类推。<br>超出范围的下标并不会引起错误。<br>比如说，当 start 的值比有序集的最大下标还要大，或是 start &gt; stop 时， ZRANGE 命令只是简单地返回一个空列表。<br>另一方面，假如 stop 参数的值比有序集的最大下标还要大，那么 Redis 将 stop 当作最大下标来处理。<br>可以通过使用 WITHSCORES 选项，来让成员和它的 score 值一并返回，返回列表以 value1,score1, …, valueN,scoreN 的格式表示。<br>客户端库可能会返回一些更复杂的数据类型，比如数组、元组等。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">redis &gt; ZRANGE salary 0 -1 WITHSCORES             # 显示整个有序集成员</span><br><span class="line">1) &quot;jack&quot;</span><br><span class="line">2) &quot;3500&quot;</span><br><span class="line">3) &quot;tom&quot;</span><br><span class="line">4) &quot;5000&quot;</span><br><span class="line">5) &quot;boss&quot;</span><br><span class="line">6) &quot;10086&quot;</span><br><span class="line"></span><br><span class="line">redis &gt; ZRANGE salary 1 2 WITHSCORES              # 显示有序集下标区间 1 至 2 的成员</span><br><span class="line">1) &quot;tom&quot;</span><br><span class="line">2) &quot;5000&quot;</span><br><span class="line">3) &quot;boss&quot;</span><br><span class="line">4) &quot;10086&quot;</span><br><span class="line"></span><br><span class="line">redis &gt; ZRANGE salary 0 200000 WITHSCORES         # 测试 end 下标超出最大下标时的情况</span><br><span class="line">1) &quot;jack&quot;</span><br><span class="line">2) &quot;3500&quot;</span><br><span class="line">3) &quot;tom&quot;</span><br><span class="line">4) &quot;5000&quot;</span><br><span class="line">5) &quot;boss&quot;</span><br><span class="line">6) &quot;10086&quot;</span><br><span class="line"></span><br><span class="line">redis &gt; ZRANGE salary 200000 3000000 WITHSCORES   # 测试当给定区间不存在于有序集时的情况</span><br><span class="line">(empty list or set)</span><br></pre></td></tr></table></figure>
-<h2 id="ZRANGEBYSCORE"><a href="#ZRANGEBYSCORE" class="headerlink" title="ZRANGEBYSCORE"></a>ZRANGEBYSCORE</h2><p>ZRANGEBYSCORE key min max [WITHSCORES] [LIMIT offset count]</p>
-<p>返回有序集 key 中，所有 score 值介于 min 和 max 之间(包括等于 min 或 max )的成员。有序集成员按 score 值递增(从小到大)次序排列。</p>
-<p>具有相同 score 值的成员按字典序(lexicographical order)来排列(该属性是有序集提供的，不需要额外的计算)。</p>
-<p>可选的 LIMIT 参数指定返回结果的数量及区间(就像SQL中的 SELECT LIMIT offset, count )，注意当 offset 很大时，定位 offset 的操作可能需要遍历整个有序集，此过程最坏复杂度为 O(N) 时间。</p>
-<p>可选的 WITHSCORES 参数决定结果集是单单返回有序集的成员，还是将有序集成员及其 score 值一起返回。<br>该选项自 Redis 2.0 版本起可用。<br>区间及无限</p>
-<p>min 和 max 可以是 -inf 和 +inf ，这样一来，你就可以在不知道有序集的最低和最高 score 值的情况下，使用 ZRANGEBYSCORE 这类命令。</p>
-<p>默认情况下，区间的取值使用闭区间 (小于等于或大于等于)，你也可以通过给参数前增加 ( 符号来使用可选的开区间 (小于或大于)。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; ZADD salary 2500 jack                        # 测试数据</span><br><span class="line">(integer) 0</span><br><span class="line">redis&gt; ZADD salary 5000 tom</span><br><span class="line">(integer) 0</span><br><span class="line">redis&gt; ZADD salary 12000 peter</span><br><span class="line">(integer) 0</span><br><span class="line"></span><br><span class="line">redis&gt; ZRANGEBYSCORE salary -inf +inf               # 显示整个有序集</span><br><span class="line">1) &quot;jack&quot;</span><br><span class="line">2) &quot;tom&quot;</span><br><span class="line">3) &quot;peter&quot;</span><br><span class="line"></span><br><span class="line">redis&gt; ZRANGEBYSCORE salary -inf +inf WITHSCORES    # 显示整个有序集及成员的 score 值</span><br><span class="line">1) &quot;jack&quot;</span><br><span class="line">2) &quot;2500&quot;</span><br><span class="line">3) &quot;tom&quot;</span><br><span class="line">4) &quot;5000&quot;</span><br><span class="line">5) &quot;peter&quot;</span><br><span class="line">6) &quot;12000&quot;</span><br><span class="line"></span><br><span class="line">redis&gt; ZRANGEBYSCORE salary -inf 5000 WITHSCORES    # 显示工资 &lt;=5000 的所有成员</span><br><span class="line">1) &quot;jack&quot;</span><br><span class="line">2) &quot;2500&quot;</span><br><span class="line">3) &quot;tom&quot;</span><br><span class="line">4) &quot;5000&quot;</span><br><span class="line"></span><br><span class="line">redis&gt; ZRANGEBYSCORE salary (5000 400000            # 显示工资大于 5000 小于等于 400000 的成员</span><br><span class="line">1) &quot;peter&quot;</span><br></pre></td></tr></table></figure>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/27/redis/redis-key-persist/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/27/redis/redis-key-persist/" itemprop="url">redis移除过期时间的命令</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-27T13:05:30+08:00">
-                2018-03-27
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/redis/" itemprop="url" rel="index">
-                    <span itemprop="name">redis</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/03/27/redis/redis-key-persist/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/27/redis/redis-key-persist/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/03/27/redis/redis-key-persist/" class="leancloud_visitors" data-flag-title="redis移除过期时间的命令">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="PERSIST-mykey"><a href="#PERSIST-mykey" class="headerlink" title="PERSIST mykey"></a>PERSIST mykey</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">起始版本：2.2.0</span><br><span class="line"></span><br><span class="line">时间复杂度：O(1)</span><br></pre></td></tr></table></figure>
-<p>移除给定key的生存时间，将这个 key 从『易失的』(带生存时间 key )转换成『持久的』(一个不带生存时间、永不过期的 key )。</p>
-<p>##返回值</p>
-<p>integer-reply, 只有以下两种值:</p>
-<p>当生存时间移除成功时，返回 1 .<br>如果 key 不存在或 key 没有设置生存时间，返回 0 .</p>
-<p>##例子</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; SET mykey &quot;Hello&quot;</span><br><span class="line">OK</span><br><span class="line">redis&gt; EXPIRE mykey 10</span><br><span class="line">(integer) 1</span><br><span class="line">redis&gt; TTL mykey</span><br><span class="line">(integer) 10</span><br><span class="line">redis&gt; PERSIST mykey</span><br><span class="line">(integer) 1</span><br><span class="line">redis&gt; TTL mykey</span><br><span class="line">(integer) -1</span><br><span class="line">redis&gt;</span><br></pre></td></tr></table></figure>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/27/http/study-https/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/27/http/study-https/" itemprop="url">study-https</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-27T09:46:57+08:00">
-                2018-03-27
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/03/27/http/study-https/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/27/http/study-https/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/03/27/http/study-https/" class="leancloud_visitors" data-flag-title="study-https">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="一、HTTP和HTTPS的基本概念"><a href="#一、HTTP和HTTPS的基本概念" class="headerlink" title="一、HTTP和HTTPS的基本概念"></a>一、HTTP和HTTPS的基本概念</h1><p>HTTP：是互联网上应用最为广泛的一种网络协议，是一个客户端和服务器端请求和应答的标准（TCP），用于从WWW服务器传输超文本到本地浏览器的传输协议，它可以使浏览器更加高效，使网络传输减少。</p>
-<p>HTTPS：是以安全为目标的HTTP通道，简单讲是HTTP的安全版，即HTTP下加入SSL层，HTTPS的安全基础是SSL，因此加密的详细内容就需要SSL。</p>
-<p>HTTPS协议的主要作用可以分为两种：</p>
-<ul>
-<li>一种是建立一个信息安全通道，来保证数据传输的安全；</li>
-<li>另一种就是确认网站的真实性。</li>
-</ul>
-<h1 id="二、HTTP与HTTPS有什么区别？"><a href="#二、HTTP与HTTPS有什么区别？" class="headerlink" title="二、HTTP与HTTPS有什么区别？"></a>二、HTTP与HTTPS有什么区别？</h1><p>HTTP协议传输的数据都是未加密的，也就是明文的，因此使用HTTP协议传输隐私信息非常不安全，为了保证这些隐私数据能加密传输，于是网景公司设计了SSL（Secure Sockets Layer）协议用于对HTTP协议传输的数据进行加密，从而就诞生了HTTPS。</p>
-<p>简单来说，HTTPS协议是由SSL+HTTP协议构建的可进行加密传输、身份认证的网络协议，要比http协议安全。</p>
-<p>HTTPS和HTTP的区别主要如下：</p>
-<p>1、https协议需要到ca申请证书，一般免费证书较少，因而需要一定费用。</p>
-<p>2、http是超文本传输协议，信息是明文传输，https则是具有安全性的ssl加密传输协议。</p>
-<p>3、http和https使用的是完全不同的连接方式，用的端口也不一样，前者是80，后者是443。</p>
-<p>4、http的连接很简单，是无状态的；HTTPS协议是由SSL+HTTP协议构建的可进行加密传输、身份认证的网络协议，比http协议安全。</p>
-<h1 id="HTTPS的工作原理"><a href="#HTTPS的工作原理" class="headerlink" title="HTTPS的工作原理"></a>HTTPS的工作原理</h1><p>1、客户端发起HTTPS请求</p>
-<p>这个没什么好说的，就是用户在浏览器里输入一个https网址，然后连接到server的443端口。</p>
-<p>2、服务端的配置</p>
-<p>采用HTTPS协议的服务器必须要有一套数字证书，可以自己制作，也可以向组织申请，区别就是自己颁发的证书需要客户端验证通过，才可以继续访问，而使用受信任的公司申请的证书则不会弹出提示页面(startssl就是个不错的选择，有1年的免费服务)。</p>
-<p>这套证书其实就是一对公钥和私钥，如果对公钥和私钥不太理解，可以想象成一把钥匙和一个锁头，只是全世界只有你一个人有这把钥匙，你可以把锁头给别人，别人可以用这个锁把重要的东西锁起来，然后发给你，因为只有你一个人有这把钥匙，所以只有你才能看到被这把锁锁起来的东西。</p>
-<p>3、传送证书</p>
-<p>这个证书其实就是公钥，只是包含了很多信息，如证书的颁发机构，过期时间等等。</p>
-<p>4、客户端解析证书(验证公钥)</p>
-<p>这部分工作是有客户端的TLS来完成的，首先会验证公钥是否有效，比如颁发机构，过期时间等等，如果发现异常，则会弹出一个警告框，提示证书存在问题。</p>
-<p>如果证书没有问题，那么就生成一个随机值，然后用证书对该随机值进行加密，就好像上面说的，把随机值用锁头锁起来，这样除非有钥匙，不然看不到被锁住的内容。</p>
-<p>5、传送加密信息</p>
-<p>这部分传送的是用证书加密后的随机值，目的就是让服务端得到这个随机值，以后客户端和服务端的通信就可以通过这个随机值来进行加密解密了。</p>
-<p>6、服务段解密信息</p>
-<p>服务端用私钥解密后，得到了客户端传过来的随机值(私钥)，然后把内容通过该值进行<strong>对称加密</strong>，所谓对称加密就是，将信息和私钥通过某种算法混合在一起，这样除非知道私钥，不然无法获取内容，而正好客户端和服务端都知道这个私钥，所以只要加密算法够彪悍，私钥够复杂，数据就够安全。</p>
-<p>7、传输加密后的信息</p>
-<p>这部分信息是服务段用私钥加密后的信息，可以在客户端被还原。</p>
-<p>8、客户端解密信息</p>
-<p>客户端用之前生成的私钥解密服务段传过来的信息，于是获取了解密后的内容，整个过程第三方即使监听到了数据，也束手无策。x</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/27/design/study-idempotence/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/27/design/study-idempotence/" itemprop="url">常见用来保证幂等的手段</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-27T09:28:00+08:00">
-                2018-03-27
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/03/27/design/study-idempotence/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/27/design/study-idempotence/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/03/27/design/study-idempotence/" class="leancloud_visitors" data-flag-title="常见用来保证幂等的手段">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="幂等性定义"><a href="#幂等性定义" class="headerlink" title="幂等性定义"></a>幂等性定义</h1><h2 id="数学定义"><a href="#数学定义" class="headerlink" title="数学定义"></a>数学定义</h2><p>在数学里，幂等有两种主要的定义：</p>
-<p>在某二元运算下，幂等元素是指被自己重复运算(或对于函数是为复合)的结果等于它自己的元素。例如，乘法下唯一两个幂等实数为0和1。 即 s *s = s<br>某一元运算为幂等的时，其作用在任一元素两次后会和其作用一次的结果相同。例如，高斯符号便是幂等的，即f(f(x)) = f(x)。</p>
-<h2 id="HTTP规范的定义"><a href="#HTTP规范的定义" class="headerlink" title="HTTP规范的定义"></a>HTTP规范的定义</h2><p>HTTP的幂等性指的是一次和多次请求某一个资源应该具有相同的副作用。如通过PUT接口将数据的Status置为1，无论是第一次执行还是多次执行，获取到的结果应该是相同的，即执行完成之后Status =1。</p>
-<h1 id="何种接口提供幂等性"><a href="#何种接口提供幂等性" class="headerlink" title="何种接口提供幂等性"></a>何种接口提供幂等性</h1><p>在HTTP规范中定义GET,PUT和DELETE方法应该具有幂等性。</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">重要</th>
-<th style="text-align:left">安全？</th>
-<th style="text-align:left">幂等？</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">GET</td>
-<td style="text-align:left">是</td>
-<td style="text-align:left">是</td>
-</tr>
-<tr>
-<td style="text-align:left">DELETE</td>
-<td style="text-align:left">否</td>
-<td style="text-align:left">是</td>
-</tr>
-<tr>
-<td style="text-align:left">PUT</td>
-<td style="text-align:left">否</td>
-<td style="text-align:left">是</td>
-</tr>
-<tr>
-<td style="text-align:left">POST</td>
-<td style="text-align:left">否</td>
-<td style="text-align:left">否</td>
-</tr>
-</tbody>
-</table>
-<h1 id="常见用来保证幂等的手段"><a href="#常见用来保证幂等的手段" class="headerlink" title="常见用来保证幂等的手段:"></a>常见用来保证幂等的手段:</h1><h2 id="1-查询性质-天然支持"><a href="#1-查询性质-天然支持" class="headerlink" title="1.查询性质(天然支持)"></a>1.查询性质(天然支持)</h2><p>  查询的API，可以说是天然的幂等性，因为你查询一次和查询两次，对于系统来讲，没有任何数据的变更，所以，查询一次和查询多次一样的；</p>
-<h2 id="2-MVCC方案"><a href="#2-MVCC方案" class="headerlink" title="2.MVCC方案"></a>2.MVCC方案</h2><p>   多版本并发控制，update with condition更新带条件，这也是在系统设计的时候，合理的选择乐观锁，通过version或者其他条件，来做乐观锁，这样保证更新及时在并发的情况下，也不会有太大的问题。</p>
-<p>   例如update table_xxx set name=#name#,version=version+1 where version=#version# ,或者是 update table_xxx set quality=quality-#subQuality# where quality-#subQuality# &gt;= 0</p>
-<h2 id="3-插入数据的唯一索引-单库单表可行"><a href="#3-插入数据的唯一索引-单库单表可行" class="headerlink" title="3.插入数据的唯一索引(单库单表可行)"></a>3.插入数据的唯一索引(单库单表可行)</h2><p>   插入数据的唯一性，可以通过业务主键来进行约束，例如一个特定的业务场景，三个字段肯定确定唯一性，那么，可以在数据库表添加唯一索引来进行标示。</p>
-<h2 id="3-1-select-insert-并发不高的情况下-分库分表支持"><a href="#3-1-select-insert-并发不高的情况下-分库分表支持" class="headerlink" title="3.1 select + insert (并发不高的情况下,分库分表支持)"></a>3.1 select + insert (并发不高的情况下,分库分表支持)</h2><p>　　并发不高的后台系统，或者一些任务JOB，为了支持幂等，支持重复执行，简单的处理方法是，先查询下一些关键数据，判断是否已经执行过，在进行业务处理，就可以了。注意：核心高并发流程不要用这种方法</p>
-<h2 id="3-2-select-insert-锁-并发高的情况下-分库分表支持"><a href="#3-2-select-insert-锁-并发高的情况下-分库分表支持" class="headerlink" title="3.2 select + insert + 锁 (并发高的情况下,分库分表支持)"></a>3.2 select + insert + 锁 (并发高的情况下,分库分表支持)</h2><p>　　并发不高的后台系统，或者一些任务JOB，为了支持幂等，支持重复执行，简单的处理方法是，先查询下一些关键数据，判断是否已经执行过，在进行业务处理，就可以了。注意：核心高并发流程不要用这种方法</p>
-<h2 id="4-分布式锁"><a href="#4-分布式锁" class="headerlink" title="4.分布式锁"></a>4.分布式锁</h2><p>   还是拿插入数据的例子，如果是分布是系统，构建唯一索引比较困难，例如唯一性的字段没法确定，这时候可以引入分布式锁，通过第三方的系统，在业务系统插入数据或者更新数据，获取分布式锁，然后做操作，之后释放锁，这样其实是把多线程并发的锁的思路，引入多个系统，也就是分布式系统中得解决思路；</p>
-<h2 id="5-状态机幂等"><a href="#5-状态机幂等" class="headerlink" title="5.状态机幂等"></a>5.状态机幂等</h2><p>   在设计单据相关的业务，或者是任务相关的业务，肯定会涉及到状态机，就是业务单据上面有个状态，状态在不同的情况下会发生变更，一般情况下存在有限状态机，这时候，如果状态机已经处于下一个状态，这时候来了一个上一个状态的变更，理论上是不能够变更的，这样的话，保证了有限状态机的幂等</p>
-<h2 id="6-token机制，防止页面重复提交"><a href="#6-token机制，防止页面重复提交" class="headerlink" title="6.token机制，防止页面重复提交"></a>6.token机制，防止页面重复提交</h2><p>　　业务要求：页面的数据只能被点击提交一次<br>　　发生原因：由于重复点击或者网络重发，或者nginx重发等情况会导致数据被重复提交 </p>
-<h1 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h1><p>通常，客户端只需要在500（InternalErrorInternalError）或503（ServiceUnavailable）错误、或者无法得到响应结果的情况下进行重试操作。返回结果是200时，重试可以得到上次相同的结果，但不会对服务端状态带来任何影响。而对4xx的返回错误，除非提示信息里明确出现“try it later”，通常重试也是不能成功的。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2411,7 +2404,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">153</span>
+                  <span class="site-state-item-count">157</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
