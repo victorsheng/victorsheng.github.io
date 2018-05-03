@@ -14,3 +14,8 @@ Ctrl + T
 ```
 alt+comand+t
 ```
+
+## debug时查看变量的value
+```
+option+f8
+```
