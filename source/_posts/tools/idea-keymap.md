@@ -19,3 +19,8 @@ alt+comand+t
 ```
 option+f8
 ```
+
+
+# Live Templates
+
+![upload successful](/images/pasted-168.png)
