@@ -1,40 +1,12 @@
----
 title: ScheduledExecutorService
+date: 2018-06-05 19:59:03
 tags:
 categories:
 ---
-
 # 官网api
 ```
 /*
  * ORACLE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- */
-
-/*
- *
- *
- *
- *
  *
  * Written by Doug Lea with assistance from members of JCP JSR-166
  * Expert Group and released to the public domain, as explained at

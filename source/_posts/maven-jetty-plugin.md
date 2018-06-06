@@ -1,8 +1,24 @@
----
-title: maven-jetty-plugin
+title: '通过mvn jetty:run启动项目'
+date: 2018-06-05 19:56:54
 tags:
 categories:
 ---
+# maven配置例子
+
+```
+      <plugin>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-maven-plugin</artifactId>
+        <version>9.2.8.v20150217</version>
+        <configuration>
+          <httpConnector>
+            <port>8081</port>
+          </httpConnector>
+          <stopKey>shutdown</stopKey>
+          <stopPort>9966</stopPort>
+        </configuration>
+      </plugin>
+```
 
 # 参考文档
 http://www.blogjava.net/fancydeepin/archive/2012/06/23/maven-jetty-plugin.html

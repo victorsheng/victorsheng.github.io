@@ -1,19 +1,15 @@
----
-title: loadbalance
+title: 负载均衡算法
+date: 2018-06-05 19:59:53
 tags:
 categories:
 ---
-http://blog.51cto.com/wangwx/72842
-+dubbo负载聚恒
-+nginx负载均衡
-
-
-随机 (Random)
-轮询 (RoundRobin)
-一致性哈希 (ConsistentHash)
-哈希 (Hash)
-加权（Weighted）
-最小连接数
+# 种类:
+- 随机 (Random)
+- 轮询 (RoundRobin)
+- 一致性哈希 (ConsistentHash)
+- 哈希 (Hash)
+- 加权（Weighted）
+- 最小连接数
 
 
 ```
@@ -43,3 +39,6 @@ public Server choose(Object key) {
     }
 }public Server choose(Object key) { 
 ```
+
+
+参考:http://blog.51cto.com/wangwx/72842
