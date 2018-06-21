@@ -326,7 +326,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/25/java_netty/netty_thread_model/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/02/java/java_thread/JUC-ReentrantReadWriteLock/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
@@ -345,7 +345,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/03/25/java_netty/netty_thread_model/" itemprop="url">netty线程模型</a></h1>
+                <a class="post-title-link" href="/2018/04/02/java/java_thread/JUC-ReentrantReadWriteLock/" itemprop="url">AQS-ReentrantReadWriteLock</a></h1>
         
 
         <div class="post-meta">
@@ -357,8 +357,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-25T02:14:00+08:00">
-                2018-03-25
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-02T23:02:00+08:00">
+                2018-04-02
               </time>
             
 
@@ -376,9 +376,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/03/25/java_netty/netty_thread_model/#comments" itemprop="discussionUrl">
+                <a href="/2018/04/02/java/java_thread/JUC-ReentrantReadWriteLock/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/25/java_netty/netty_thread_model/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/04/02/java/java_thread/JUC-ReentrantReadWriteLock/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -386,7 +386,7 @@
 
           
           
-             <span id="/2018/03/25/java_netty/netty_thread_model/" class="leancloud_visitors" data-flag-title="netty线程模型">
+             <span id="/2018/04/02/java/java_thread/JUC-ReentrantReadWriteLock/" class="leancloud_visitors" data-flag-title="AQS-ReentrantReadWriteLock">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -419,7 +419,21 @@
       
         
           
-            <p>Proactor和Reactor是两种经典的多路复用I/O模型，主要用于在高并发、高吞吐量的环境中进行I/O处理。</p>
+            <p><strong>读写所允许同一时刻被多个读线程访问，但是在写线程访问时，所有的读线程和其他的写线程都会被阻塞。</strong></p>
+<p>ReentrantReadWriteLock维护了一对相关的锁：共享锁readLock和独占锁writeLock。共享锁readLock用于读操作，能同时被多个线程获取；独占锁writeLock用于写入操作，只能被一个线程持有。独占锁的实现和我们上篇所讨论的ReentrantLock相似，共享锁我们接下来会详细分析。ReentrantReadWriteLock具有以下几种特性：</p>
+<ol>
+<li>公平性：</li>
+</ol>
+<p>非公平模式：默认模式。一个持续争用的非公平锁，可能会使其他读线程或写线程无限延期，但它比公平锁有更高的吞吐量。<br>公平模式：当构造一个公平锁时，线程争用使用一个近似顺序到达的策略。当目前持有的锁被释放，要么是等待时间最长的单个写入线程被分配写入锁，或者如果有一组读线程比所有等待写线程等待更长的时间，该组将被分配读取锁。<br>如果已经持有写锁，或者有一个正在等待写的线程，尝试获取公平读锁的线程（非重入）将会阻塞。在等待时间最长的写线程获取并释放写锁之前，当前线程将不能获取读锁。如果一个等待写入的线程放弃等待，并且在队列中等待时间最长的一个或多个读线程正在等待写锁空闲，那么这些读线程将被分配读取锁。</p>
+<p>当读锁和写锁都是空闲时（这意味着已经没有等待线程）， 一个尝试获取公平写锁（非重入）的线程才会获取成功。注意非阻塞方法tryLock()会立即尝试获取锁，它并不会按照公平原则那样去等待前继节点。</p>
+<ol start="2">
+<li><p>重入性：<br>ReentrantReadWriteLock允许读线程和写线程重复获取读锁或写锁。当所有写锁都被释放，不可重入读线程才允许获取锁。此外，一个写入线程可以获取读锁，但是一个读线程不能获取写锁。</p>
+</li>
+<li><p>锁降级：<br>重入性允许从写锁降级到读锁：首先获取写锁，然后获取读锁，然后释放写锁。不过，从一个读锁升级到写锁是不允许的。读锁和写锁在获取过程中都支持中断。</p>
+</li>
+<li><p>Condition支持：<br>Condition只有在写锁中用到，读锁是不支持Condition的。</p>
+</li>
+</ol>
 
           
         
@@ -468,7 +482,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/24/tools/2018-03-24-atom-proxy-set/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/02/java/java_thread/study-locksupport/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
@@ -487,7 +501,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/03/24/tools/2018-03-24-atom-proxy-set/" itemprop="url">atom设置本地代理</a></h1>
+                <a class="post-title-link" href="/2018/04/02/java/java_thread/study-locksupport/" itemprop="url">study-locksupport</a></h1>
         
 
         <div class="post-meta">
@@ -499,8 +513,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-24T17:46:00+08:00">
-                2018-03-24
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-02T18:39:55+08:00">
+                2018-04-02
               </time>
             
 
@@ -518,9 +532,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/03/24/tools/2018-03-24-atom-proxy-set/#comments" itemprop="discussionUrl">
+                <a href="/2018/04/02/java/java_thread/study-locksupport/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/24/tools/2018-03-24-atom-proxy-set/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/04/02/java/java_thread/study-locksupport/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -528,7 +542,7 @@
 
           
           
-             <span id="/2018/03/24/tools/2018-03-24-atom-proxy-set/" class="leancloud_visitors" data-flag-title="atom设置本地代理">
+             <span id="/2018/04/02/java/java_thread/study-locksupport/" class="leancloud_visitors" data-flag-title="study-locksupport">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -561,7 +575,27 @@
       
         
           
-            <p>atom设置proxy<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">apm config set strict-ssl false</span><br><span class="line">apm config set https-proxy http://localhost:1087</span><br></pre></td></tr></table></figure></p>
+            <h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>这个类比较简单，是一个静态类，不需要实例化直接使用，底层是通过java未开源的Unsafe直接调用底层操作系统来完成对线程的阻塞。</p>
+<h1 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h1><p>park函数是将当前调用Thread阻塞，而unpark函数则是将指定线程Thread唤醒。</p>
+<h2 id="park"><a href="#park" class="headerlink" title="park()"></a>park()</h2><h2 id="unpark-Thread-thread"><a href="#unpark-Thread-thread" class="headerlink" title="unpark(Thread thread)"></a>unpark(Thread thread)</h2><h2 id="parkNanos-long-nanos"><a href="#parkNanos-long-nanos" class="headerlink" title="parkNanos(long nanos)"></a>parkNanos(long nanos)</h2><p>阻塞当前线程，最长不超过nanos纳秒，返回条件在park()的基础上增加了超时返回。</p>
+<h2 id="parkUntil-long-deadline"><a href="#parkUntil-long-deadline" class="headerlink" title="parkUntil(long deadline)"></a>parkUntil(long deadline)</h2><p>阻塞当前线程，知道deadline时间（deadline - 毫秒数）。</p>
+<h2 id="park-Object-blocker"><a href="#park-Object-blocker" class="headerlink" title="park(Object blocker)"></a>park(Object blocker)</h2><p>记录当前线程等待的对象（阻塞对象）；</p>
+<p>阻塞当前线程；</p>
+<p>当前线程等待对象置为null。</p>
+<p>为什么在java6要在入参引入blocker呢？blocker的作用到底是什么？</p>
+<p>从线程dump结果可以看出：<br>有blocker的可以传递给开发人员更多的现场信息，可以查看到当前线程的阻塞对象，方便定位问题。所以java6新增加带blocker入参的系列park方法，替代原有的park方法。</p>
+<h1 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h1><p>与Object类的wait/notify机制相比，park/unpark有两个优点：</p>
+<ul>
+<li>以thread为操作对象更符合阻塞线程的直观定义</li>
+<li>操作更精准，可以准确地唤醒某一个线程（notify随机唤醒一个线程，notifyAll唤醒所有等待的线程），增加了灵活性。</li>
+</ul>
+<p>（2）关于“许可”</p>
+<p>在上面的文字中，我使用了阻塞和唤醒，是为了和wait/notify做对比。</p>
+<p>其实park/unpark的设计原理核心是“许可”：park是等待一个许可，unpark是为某线程提供一个许可。<br>如果某线程A调用park，那么除非另外一个线程调用unpark(A)给A一个许可，否则线程A将阻塞在park操作上。</p>
+<p>有一点比较难理解的，是unpark操作可以再park操作之前。<br>也就是说，先提供许可。当某线程调用park时，已经有许可了，它就消费这个许可，然后可以继续运行。这其实是必须的。考虑最简单的生产者(Producer)消费者(Consumer)模型：Consumer需要消费一个资源，于是调用park操作等待；Producer则生产资源，然后调用unpark给予Consumer使用的许可。非常有可能的一种情况是，Producer先生产，这时候Consumer可能还没有构造好（比如线程还没启动，或者还没切换到该线程）。那么等Consumer准备好要消费时，显然这时候资源已经生产好了，可以直接用，那么park操作当然可以直接运行下去。如果没有这个语义，那将非常难以操作。</p>
+<p>但是这个“许可”是不能叠加的，“许可”是一次性的。<br>比如线程B连续调用了三次unpark函数，当线程A调用park函数就使用掉这个“许可”，如果线程A再次调用park，则进入等待状态。</p>
+<h1 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) &#123;</span><br><span class="line"></span><br><span class="line">        final Thread mainThread = Thread.currentThread();</span><br><span class="line"></span><br><span class="line">        Thread thread = new Thread(new Runnable() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            public void run() &#123;</span><br><span class="line">                System.out.println(&quot;3秒后解锁主线程&quot;);</span><br><span class="line">                try &#123;</span><br><span class="line">                    Thread.sleep(3000);</span><br><span class="line">                    LockSupport.unpark(mainThread);</span><br><span class="line">                &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        thread.start();</span><br><span class="line">        LockSupport.park();</span><br><span class="line"></span><br><span class="line">        System.out.println(&quot;Demo.main()&quot;);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="底层实现原理"><a href="#底层实现原理" class="headerlink" title="底层实现原理"></a>底层实现原理</h1><p>在Linux系统下，是用的Posix线程库pthread中的mutex（互斥量），condition（条件变量）来实现的。<br>mutex和condition保护了一个_counter的变量，当park时，这个变量被设置为0，当unpark时，这个变量被设置为1。</p>
 
           
         
@@ -610,7 +644,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/24/mysql/optimizie-sql-order-by/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/02/java/java_thread/JUC-3-AQS/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
@@ -629,7 +663,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/03/24/mysql/optimizie-sql-order-by/" itemprop="url">优化mysql排序</a></h1>
+                <a class="post-title-link" href="/2018/04/02/java/java_thread/JUC-3-AQS/" itemprop="url">AbstractQueuedSynchronizer学习</a></h1>
         
 
         <div class="post-meta">
@@ -641,8 +675,723 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-24T15:34:50+08:00">
-                2018-03-24
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-02T12:38:41+08:00">
+                2018-04-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/02/java/java_thread/JUC-3-AQS/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/04/02/java/java_thread/JUC-3-AQS/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/04/02/java/java_thread/JUC-3-AQS/" class="leancloud_visitors" data-flag-title="AbstractQueuedSynchronizer学习">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="背景和简介"><a href="#背景和简介" class="headerlink" title="背景和简介"></a>背景和简介</h1><p>AbstractQueuedSynchronizer简称AQS是一个抽象同步框架，可以用来实现一个依赖状态的同步器。<br>JDK1.5中提供的java.util.concurrent包中的大多数的同步器(Synchronizer)如Lock, Semaphore, Latch, Barrier等，这些类之间大多可以互相实现，如使用Lock实现一个Semaphore或者反过来，但是它们都是基于java.util.concurrent.locks.AbstractQueuedSynchronizer这个类的框架实现的，理解了这个稍微复杂抽象的类再去理解其他的同步器就很轻松了。</p>
+<p>等待条件发生的操作是开发中常见的需求，例如实现一个生产者消费者，当队列为空时，消费者获取消息可以立即返回并不断轮询，另外一种方式是阻塞直到有新的消息，后者对调用方更加友好一些。</p>
+<h1 id="设计与现实"><a href="#设计与现实" class="headerlink" title="设计与现实"></a>设计与现实</h1><p>要完成这些，可以抽象出一些基本功能。<br>首先，需要保存状态提供给子类去表示具体的含义，并且提供查询、设置、原子修改的操作。<br>其次，要能够阻塞、唤醒线程。<br>然后，还需要有一个容器来存放等待的线程</p>
+<h2 id="初步设计"><a href="#初步设计" class="headerlink" title="初步设计"></a>初步设计</h2><p>AQS内部通过一个int类型的state字段表示同步状态，状态的具体含义可以子类来定义，例如ReentrantLock中用state表示线程重入的次数，Semaphore表示可用的许可的数量等。使用int是由于int能够应对大部分的场景，而long在很多平台需要使用额外锁来保证一致性的读取。</p>
+<p>类似模板模式，AQS暴露给子类一些方法实现(如tryAcquire，tryRelease), 获取操作通常是依赖state状态的，当状态允许时获取成功否则加入等待队列一直等待到允许的状态发生时重新获取，例如，Semaphore中当state(即许可数量)小于等于0时，获取不能成功。释放操作通过会修改状态并判断是否能让其他等待的线程能够重新获取，例如ReentrantLock中释放会减少重入次数并检查重入次数是否达到了0，达到0说明已经解锁，这时会通知其他等待线程重新获取。所以AQS的acquire和release会通过组合应用到不同的同步器实现中实现不同的语义，如</p>
+<ul>
+<li>Reentrant.lock</li>
+<li>ReentrantReadWriteLock</li>
+<li>Semaphore.acquire,</li>
+<li>CountDownLatch.await</li>
+<li>SynchronousQueue</li>
+<li>FutureTask.get(1.5以后不再使用AQS)</li>
+</ul>
+<p>另外AQS还提供其他功能，如非阻塞的获取tryAcquire, 带有超时时间的获取，可以中断的获取等。<br>AQS可以根据具体的场景提供exclusive模式和shared模式，在exclusive模式下，同一时刻最多只能有一个线程能够处于成功获取的状态，排他锁是一个exclusive模式的例子，shared模式则可以多个线程一起获取成功，如多个许可的Semaphore。<br>另外在java.util.concurrent包中还定义了Condition接口，用来提供监视器风格的等待通知操作，可以替换Object中基于synchronized、监视器锁的wait和notify机制。</p>
+<p>实现具体的同步器时，需要将实现类作为具体同步器的内部类，然后调用实现类的acquire、acquireShared、release等方法。</p>
+<h2 id="更具体的设计"><a href="#更具体的设计" class="headerlink" title="更具体的设计"></a>更具体的设计</h2><h3 id="同步状态synchronization管理-state字段"><a href="#同步状态synchronization管理-state字段" class="headerlink" title="同步状态synchronization管理(state字段)"></a>同步状态synchronization管理(state字段)</h3><p>state字段可以通过volatile修饰，这样get和set方法具有了voaltile的相关语义，通过可以通过AtomicInteger或Unsafe类来实现原子CAS更新操作，基于减少indirection的考虑，JDK中一般都是使用Unsafe类。</p>
+<h3 id="阻塞、唤醒线程"><a href="#阻塞、唤醒线程" class="headerlink" title="阻塞、唤醒线程"></a>阻塞、唤醒线程</h3><p>除了基于内置的监视器的synchronizer机制外，唯一可用的似乎是已经Deprecated的Thread.stop、Thread.suspend、Thread.resume, 而这几个个方法有严重的安全问题比如可能造成死锁。JDK1.5增加了一个LockSupport类来解决这个问题, LockSupport给每个线程绑定一个类似Semaphore的permit许可数量，不过permit最大为1，初始时permit为0。park()操作阻塞一直到permit为1并且将permit减1。unpark则进行加1，不过unpark并不会累加permit。<br>而且如果先调用unpark()的话，之后调用park()会立即返回。<br>park()返回的几个情况是</p>
+<p>之前有其他线程调用剩余的unpark()或在park()之后其他调用了unpark()<br>其他线程中断了目标线程<br>调用虚假返回（类似Object.wait()的伪通知, 所以调用返回时需要检查是否等待条件已经达成<br>hotspot的LockSupport最终还是使用了Unsafe的功能</p>
+<h3 id="线程等待队列"><a href="#线程等待队列" class="headerlink" title="线程等待队列"></a>线程等待队列</h3><p>AQS的核心是一个线程等待队列，采用的是一个先进先出FIFO队列。用来实现一个非阻塞的同步器队列有主要有两个选择Mellor-Crummey and Scott (MCS) locks和Craig, Landin, and Hagersten (CLH) locks的变种。CLH锁更适合处理取消和超时，所以AQS基于CLH进行修改作为线程等待队列。<br>CLH队列使用pred引用前节点形成一个队列，入队enqueue和出队dequeue操作都可以通过原子操作完成。</p>
+<p>CLH队列有很多优点，包括入队和出队非常快、无锁、非阻塞，并且是否有线程等待只需要判断head和tail是否相等。<br>CLH中并没有只有向后的指针引用后继节点，每个节点只需要修改自己的状态就能通知后继节点。但是在AQS这样的阻塞同步器中，需要主动唤醒(unpark)后继节点。所以在AQS中增加了next引用引用后继节点，但是并没有合适的方法使用CAS进行无锁插入双向链表的方法，所以节点的插入并不是原子完成的，需要在CAS替换tail完成后调用pred.next=node。</p>
+<h3 id="ConditionObject"><a href="#ConditionObject" class="headerlink" title="ConditionObject"></a>ConditionObject</h3><p>AQS还提供了一个ConditionObject类来表示监视器风格的等待通知操作，主要用在Lock中，和传统的监视器的区别在于一个Lock可以创建多个Condition。ConditionObject使用相同的内部队列节点，但是维护在一个单独的条件队列中，当收到signal操作的时候将条件队列的节点转移到等待队列。</p>
+<h1 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h1><h2 id="节点"><a href="#节点" class="headerlink" title="节点"></a>节点</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">static final class Node &#123;</span><br><span class="line"></span><br><span class="line">	// 省略部分代码...</span><br><span class="line"></span><br><span class="line">	volatile Node prev; // 前节点</span><br><span class="line"></span><br><span class="line">	volatile Node next; // 后节点</span><br><span class="line"></span><br><span class="line">	volatile int waitStatus;// 等待状态</span><br><span class="line"></span><br><span class="line">	volatile Thread thread; // 节点线程</span><br><span class="line"></span><br><span class="line">	Node nextWaiter; // 节点模式</span><br><span class="line"></span><br><span class="line">	Node() &#123; &#125;</span><br><span class="line"></span><br><span class="line">	Node(Thread thread, Node mode) &#123;</span><br><span class="line">		this.nextWaiter = mode;</span><br><span class="line">		this.thread = thread;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	Node(Thread thread, int waitStatus) &#123;</span><br><span class="line">		this.waitStatus = waitStatus;</span><br><span class="line">		this.thread = thread;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="节点状态"><a href="#节点状态" class="headerlink" title="节点状态"></a>节点状态</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">// 表示当前节点的后续节点中的线程通过 park 被阻塞了，需要通过unpark解除它的阻塞</span><br><span class="line">static final int SIGNAL = -1;</span><br><span class="line"></span><br><span class="line">// 表示当前节点在 condition 队列中</span><br><span class="line">static final int CONDITION = -2;</span><br><span class="line"></span><br><span class="line">// 共享模式的头结点可能处于此状态，表示无条件往下传播</span><br><span class="line">// 引入此状态是为了优化锁竞争，使队列中线程有序地一个一个唤醒</span><br><span class="line">static final int PROPAGATE = -3;</span><br><span class="line"></span><br><span class="line">//表示当前节点的线程因为超时或中断被取消了</span><br><span class="line">static final int CANCELLED = 1;</span><br><span class="line"></span><br><span class="line">// 关键 -&gt; 0 表示初始化状态</span><br></pre></td></tr></table></figure>
+<p>Node 的等待状态，因为大于 0 的只有 CANCELLED 一种状态。因此在很多地方也用 waitStatus &gt; 0 表示该状态</p>
+<h2 id="CLH-队列-基本可以保持公平"><a href="#CLH-队列-基本可以保持公平" class="headerlink" title="CLH 队列(基本可以保持公平)"></a>CLH 队列(基本可以保持公平)</h2><ul>
+<li>在 JUC 框架中，若有线程尝试获取锁时失败时，该线程会被包装成节点添加进此队列，也称入队。</li>
+<li>在 JUC 框架中，若有线程释放锁时，等待队列的头节点会从队列中移除，表示不用再等待，也称出队。</li>
+</ul>
+<h3 id="入队"><a href="#入队" class="headerlink" title="入队"></a>入队</h3><p>在 AQS 中通过 addWaiter 方法将节点加入等待队列：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">// 头节点</span><br><span class="line">private transient volatile Node head;</span><br><span class="line"></span><br><span class="line">// 尾节点</span><br><span class="line">private transient volatile Node tail;</span><br><span class="line"></span><br><span class="line">private Node addWaiter(Node mode) &#123;</span><br><span class="line"></span><br><span class="line">	Node node = new Node(Thread.currentThread(), mode);</span><br><span class="line"></span><br><span class="line">	Node pred = tail;</span><br><span class="line"></span><br><span class="line">	// 为空表示等待队列为空</span><br><span class="line">	if (pred != null) &#123;</span><br><span class="line">		node.prev = pred;</span><br><span class="line">		// 通过 CAS 操作设置 tail 为 node</span><br><span class="line">		// 关键 -&gt;失败表示在这期间有其他线程的节点被设置为新的尾节点</span><br><span class="line">		if (compareAndSetTail(pred, node)) &#123;</span><br><span class="line">			pred.next = node;</span><br><span class="line">			return node;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	// 关键 -&gt; 当[等待队列]为空，或者新节点入队失败时（说明存在并发），代码才会执行到这</span><br><span class="line">	enq(node);</span><br><span class="line"></span><br><span class="line">	return node;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 往等待队列中（尾部）插入一个节点</span><br><span class="line">private Node enq(final Node node) &#123;</span><br><span class="line">	// 关键 -&gt; 自旋直至成功</span><br><span class="line">	for (;;) &#123;</span><br><span class="line">		Node t = tail;</span><br><span class="line"></span><br><span class="line">		// t 为空表示等待队列为空</span><br><span class="line">		if (t == null) &#123;</span><br><span class="line">			// 构建等待队列的头节点，实质是创建一个空的循环双链表</span><br><span class="line">			if (compareAndSetHead(new Node()))&#123;</span><br><span class="line">				tail = head;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125; else &#123;</span><br><span class="line">			// 设置该节点为新的尾节点</span><br><span class="line">			node.prev = t;</span><br><span class="line">			if (compareAndSetTail(t, node)) &#123;</span><br><span class="line">				t.next = node;</span><br><span class="line">				return t;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>入队操作只与队列的尾节点有关，通过原子操作将新节点设置成新的尾节点。若操作失败则通过不断自旋直至成功。</p>
+<h3 id="出队"><a href="#出队" class="headerlink" title="出队"></a>出队</h3><p>出队操作跟头节点有关，将要执行出队的节点设置为新的头节点，并置空旧的头节点从等待队列移除即可。</p>
+<ul>
+<li>设置新的 head</li>
+<li>清除节点上的线程</li>
+<li>将旧的头节点从等待队列移除（ 断开前指针和后指针）</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">if (p == head &amp;&amp; tryAcquire(arg)) &#123;</span><br><span class="line">	// 设置新的头节点</span><br><span class="line">    setHead(node);</span><br><span class="line"></span><br><span class="line">	// 将旧头节点后指针置空，表示从等待队列移除</span><br><span class="line">    p.next = null;</span><br><span class="line">    failed = false;</span><br><span class="line">    return interrupted;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">private void setHead(Node node) &#123;</span><br><span class="line">	head = node;</span><br><span class="line">	node.thread = null;</span><br><span class="line">	node.prev = null;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="共享模式"><a href="#共享模式" class="headerlink" title="共享模式"></a>共享模式</h2><p>共享式的操作与独占式的主要区别在于，每次acquire竞争失败后，独占式将立即阻塞当前线程，而共享式需要在多次acquire失败后才会阻塞当前线程。简单来说，共享式是有一定限额的独占式。限额的满足方式，根据不同的子类不同的实现方式。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><h2 id="AbstractQueuedSynchronizer方法概述"><a href="#AbstractQueuedSynchronizer方法概述" class="headerlink" title="AbstractQueuedSynchronizer方法概述"></a>AbstractQueuedSynchronizer方法概述</h2><p>Lock的接口方法是针对用户的使用而定义的，我们在实现Lock的时候，就需要做如下事情，重点关注下这些事情的共性和异性</p>
+<ul>
+<li><p>指明什么情况下才叫获取到锁：如独占锁，一旦有人占据了，就不能获取到锁。如共享锁，有人占据，但是没超过限制也能获取锁。这一部分应该是锁的实现的业务代码，每种锁都有自己的业务逻辑。这一部分其实就是AbstractQueuedSynchronizer对子类留出的tryAcquire方法</p>
+</li>
+<li><p>获取不到锁的时候该如何处理呢：我们当然希望它们能够继续等待，有一个队列就最好不过了，一旦获取锁失败就加入到等待队列中排队，队列中的等待者依次再去竞争获取锁。这一部分代码其实就和哪种锁没太大关系了，所以应该是锁的共性部分，这一部分其实就是AbstractQueuedSynchronizer实现的共性部分acquireQueued</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">if (!tryAcquire(arg) &amp;&amp;</span><br><span class="line">        acquireQueued(addWaiter(Node.EXCLUSIVE), arg))</span><br></pre></td></tr></table></figure>
+<p>代表着先试着获取一下锁，如果获取不成功，就把之后的处理逻辑交给AbstractQueuedSynchronizer来处理。反正你只管告诉AbstractQueuedSynchronizer它怎样才叫获取到锁，其他的等待处理逻辑你就可以不用再关心了。</p>
+<p>以上也仅仅是部分内容，下面来全面看下AbstractQueuedSynchronizer对外留出的接口和已实现的共性部分</p>
+<h3 id="对外留出的接口："><a href="#对外留出的接口：" class="headerlink" title="对外留出的接口："></a>对外留出的接口：</h3><p>tryAcquire：该方法向AQS解释了怎么才叫获取一把独占锁</p>
+<p>tryRelease：该方法向AQS解释了怎么才叫释放一把独占锁</p>
+<p>tryAcquireShared：该方法向AQS解释了怎么才叫获取一把共享锁</p>
+<p>tryReleaseShared：该方法向AQS解释了怎么才叫释放一把共享锁</p>
+<p>这些内容就是各种锁本身的业务逻辑，属于异性部分。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">public class AbstractQueuedSynchronizerChild  extends AbstractQueuedSynchronizer &#123;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected boolean tryAcquire(int arg) &#123;</span><br><span class="line">        return super.tryAcquire(arg);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected boolean tryRelease(int arg) &#123;</span><br><span class="line">        return super.tryRelease(arg);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected int tryAcquireShared(int arg) &#123;</span><br><span class="line">        return super.tryAcquireShared(arg);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected boolean tryReleaseShared(int arg) &#123;</span><br><span class="line">        return super.tryReleaseShared(arg);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="来看看锁的共性部分相关方法："><a href="#来看看锁的共性部分相关方法：" class="headerlink" title="来看看锁的共性部分相关方法："></a>来看看锁的共性部分相关方法：</h3><p>来看看锁的共性部分相关方法：</p>
+<ul>
+<li><p>acquire：获取一把独占锁的过程</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public final void acquire(int arg) &#123;</span><br><span class="line">    if (!tryAcquire(arg) &amp;&amp;</span><br><span class="line">        acquireQueued(addWaiter(Node.EXCLUSIVE), arg))</span><br><span class="line">        selfInterrupt();</span><br><span class="line">&#125;</span><br><span class="line">就是先拿锁实现的tryAcquire方法去尝试获取独占锁，一旦获取锁失败就进入队列，交给AQS来处理，一旦成功就表示获取到了一把锁。</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>release：释放一把独占锁的过程</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public final boolean release(int arg) &#123;</span><br><span class="line">    if (tryRelease(arg)) &#123;</span><br><span class="line">        Node h = head;</span><br><span class="line">        if (h != null &amp;&amp; h.waitStatus != 0)</span><br><span class="line">            unparkSuccessor(h);</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line">    return false;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>就是先拿锁实现的tryRelease方法尝试释放独占锁，一旦释放成功，就通知队列，有人释放锁了，队列前面的可以再次去竞争锁了（这一部分下面详细说明）</p>
+<ul>
+<li>acquireShared：获取一把共享锁的过程<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">public final void acquireShared(int arg) &#123;</span><br><span class="line">    if (tryAcquireShared(arg) &lt; 0)</span><br><span class="line">        doAcquireShared(arg);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>就是先拿锁实现的tryAcquireShared方法尝试获取共享锁，一旦获取失败，就进入队列，交给AQS来处理</p>
+<ul>
+<li>releaseShared：释放一把共享锁的过程<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public final boolean releaseShared(int arg) &#123;</span><br><span class="line">    if (tryReleaseShared(arg)) &#123;</span><br><span class="line">        doReleaseShared();</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line">    return false;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>就是先拿锁实现的tryReleaseShared方法尝试释放共享锁，一旦释放成功，就通知队列，有人释放锁了</p>
+<h2 id="AbstractQueuedSynchronizer的状态属性state"><a href="#AbstractQueuedSynchronizer的状态属性state" class="headerlink" title="AbstractQueuedSynchronizer的状态属性state"></a>AbstractQueuedSynchronizer的状态属性state</h2><p>从上面我们就看到老是方法中会有各种的int参数，其实这是AbstractQueuedSynchronizer将获取锁的过程量化对数字的操作，而state变量就是用于记录当前数字值的。以独占锁为例:</p>
+<ul>
+<li><p>state=0 表示该锁未被其他线程获取</p>
+</li>
+<li><p>一旦有线程想获取锁，就可以对state进行CAS增量操作，这个增量可以是任意值，不过大多数都默认取1。也就是说一旦一个线程对state CAS操作成功就代表该线程获取到了锁，则state就变成1了。其他操作对state CAS操作失败的就代表没获取到锁，就自动进入AQS管理流程</p>
+</li>
+<li><p>其他线程发现当前state值不等于0表示锁已被其他线程获取，就自动进入AQS管理流程</p>
+</li>
+<li><p>一旦获取锁的线程想释放锁，就可以对state进行自减，即减到0，其他线程又可以去获取锁了</p>
+</li>
+</ul>
+<p>从上面的例子中可以看到对state的几种线程安全和非安全操作：</p>
+<ul>
+<li><p>compareAndSetState(int expect, int update)：线程安全的设置状态，因为可能多个线程并发调用该方法，所以需要CAS来保证线程安全</p>
+</li>
+<li><p>setState(int newState)：非线程安全的设置状态，这种一般是针对只有一个线程获取锁的时候来释放锁，此时没有并发的可能性，所以就不需要上述的compareAndSetState操作</p>
+</li>
+<li><p>getState()：获取状态值</p>
+</li>
+</ul>
+<p>AQS提供了上述线程安全和非安全的设置状态state的方法，供我们在实现锁的tryAcquire、tryRelease等方法的时候合理的时候它们。</p>
+<h2 id="AbstractQueuedSynchronizer的FIFO队列"><a href="#AbstractQueuedSynchronizer的FIFO队列" class="headerlink" title="AbstractQueuedSynchronizer的FIFO队列"></a>AbstractQueuedSynchronizer的FIFO队列</h2><p>前面简单提到了，就是先拿锁实现的tryAcquire方法去尝试获取独占锁，一旦获取锁失败就进入队列，交给AQS来处理。AQS的处理简单描述下就是将当前线程包装成Node节点然后放到队列中进程排队，等待前面的Node节点都出队了，被唤醒轮到自己再次去竞争锁。</p>
+<p>我们先来认识下Node节点,大致如下结构：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">static final class Node &#123;</span><br><span class="line"></span><br><span class="line">    volatile Node prev;</span><br><span class="line">    volatile Node next;</span><br><span class="line"></span><br><span class="line">    volatile Thread thread;</span><br><span class="line"></span><br><span class="line">    Node nextWaiter;</span><br><span class="line"></span><br><span class="line">	volatile int waitStatus;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">private transient volatile Node head;</span><br><span class="line"></span><br><span class="line">private transient volatile Node tail;</span><br></pre></td></tr></table></figure></p>
+<p>首先就是prev、next节点可以构成一个双向队列。AQS中含有上述的head和tail两个属性一起来构成FIFO队列。</p>
+<p>Thread thread则代表的是构成此节点的线程。</p>
+<p>Node nextWaiter：是用于condition queue，用于构成一个单向的FIFO队列，详见下面。</p>
+<p>volatile int waitStatus：则表示该节点当前的状态，目前有如下状态：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">/** waitStatus value to indicate thread has cancelled */</span><br><span class="line">static final int CANCELLED =  1;</span><br><span class="line">/** waitStatus value to indicate successor&apos;s thread needs unparking */</span><br><span class="line">static final int SIGNAL    = -1;</span><br><span class="line">/** waitStatus value to indicate thread is waiting on condition */</span><br><span class="line">static final int CONDITION = -2;</span><br><span class="line">/**</span><br><span class="line"> * waitStatus value to indicate the next acquireShared should</span><br><span class="line"> * unconditionally propagate</span><br><span class="line"> */</span><br><span class="line">static final int PROPAGATE = -3;</span><br></pre></td></tr></table></figure></p>
+<p>CANCELLED：表示该节点所对应的线程因为获取锁的过程中超时或者被中断而被设置成此状态</p>
+<p>SIGNAL：表示该节点所对应的线程被阻塞，不再被调度执行，需要等待其他线程释放锁之后来唤醒它，才能再次加入锁的竞争</p>
+<p>CONDITION：表示该节点所对应的线程被阻塞，不再被调度执行，在等待某一个condition的signal、signalAll方法的唤醒</p>
+<p>PROPAGATE：只用于共享状态的HEAD节点，目前还没弄清楚，欢迎一起来探讨</p>
+<p>节点创建后默认状态值是0。</p>
+<h2 id="AbstractQueuedSynchronizer的condition-queue"><a href="#AbstractQueuedSynchronizer的condition-queue" class="headerlink" title="AbstractQueuedSynchronizer的condition queue"></a>AbstractQueuedSynchronizer的condition queue</h2><h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://my.oschina.net/pingpangkuangmo/blog/679636" target="_blank" rel="noopener">https://my.oschina.net/pingpangkuangmo/blog/679636</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/02/java/java_thread/JUC-CountDownLatch/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/02/java/java_thread/JUC-CountDownLatch/" itemprop="url">CountDownLatch学习</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-02T11:02:32+08:00">
+                2018-04-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/02/java/java_thread/JUC-CountDownLatch/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/04/02/java/java_thread/JUC-CountDownLatch/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/04/02/java/java_thread/JUC-CountDownLatch/" class="leancloud_visitors" data-flag-title="CountDownLatch学习">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>CountDownLatch是通过一个计数器来实现的，计数器的初始值为线程的数量。每当一个线程完成了自己的任务后，计数器的值就会减1。当计数器值到达0时，它表示所有的线程已经完成了任务，然后在闭锁上等待的线程就可以恢复执行任务。</p>
+<p><img src="/images/pasted-115.png" alt="upload successful"></p>
+<h1 id="一个countdownlatch的使用案例"><a href="#一个countdownlatch的使用案例" class="headerlink" title="一个countdownlatch的使用案例"></a>一个countdownlatch的使用案例</h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><p>n个赛车，让他们都在起跑线上就绪后，同时出发,并监控结束比赛的结束</p>
+<h2 id="答案"><a href="#答案" class="headerlink" title="答案"></a>答案</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">public class CountDownTest &#123;</span><br><span class="line">    private static class ProcessJob implements Runnable &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        private CountDownLatch startLatch;</span><br><span class="line">        private CountDownLatch stopLatch;</span><br><span class="line"></span><br><span class="line">        public ProcessJob(CountDownLatch startLatch, CountDownLatch stopLatch) &#123;</span><br><span class="line">            this.startLatch = startLatch;</span><br><span class="line">            this.stopLatch = stopLatch;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        public void run() &#123;</span><br><span class="line">            try &#123;</span><br><span class="line">                startLatch.await();</span><br><span class="line">                TimeUnit.SECONDS.sleep(2);</span><br><span class="line">            &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">            System.out.println(&quot;Some Job&quot;);</span><br><span class="line">            stopLatch.countDown();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) throws InterruptedException &#123;</span><br><span class="line">        ExecutorService executorService = Executors.newCachedThreadPool();</span><br><span class="line">        int jobSize = 20;</span><br><span class="line">        CountDownLatch startLatch = new CountDownLatch(1);</span><br><span class="line">        CountDownLatch stopLatch = new CountDownLatch(jobSize);</span><br><span class="line">        for (int i = 0; i &lt; jobSize; i++) &#123;</span><br><span class="line">            executorService.submit(new ProcessJob(startLatch, stopLatch));</span><br><span class="line">        &#125;</span><br><span class="line">        long start = System.currentTimeMillis();</span><br><span class="line">        startLatch.countDown();</span><br><span class="line">        // 等待所有线程执行完任务</span><br><span class="line">        stopLatch.await();</span><br><span class="line">        long end = System.currentTimeMillis();</span><br><span class="line">        System.out.println(&quot;Total cost time: &quot; + (end - start));</span><br><span class="line">        executorService.shutdown();</span><br><span class="line">        executorService.awaitTermination(1, TimeUnit.MINUTES);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="核心代码"><a href="#核心代码" class="headerlink" title="核心代码"></a>核心代码</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">private static final class Sync extends AbstractQueuedSynchronizer &#123;</span><br><span class="line">    private static final long serialVersionUID = 4982264981922014374L;</span><br><span class="line"></span><br><span class="line">    Sync(int count) &#123;</span><br><span class="line">        setState(count);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    int getCount() &#123;</span><br><span class="line">        return getState();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    protected int tryAcquireShared(int acquires) &#123;</span><br><span class="line">   		 // 只有当当前state为0即count为0的时候能够返回</span><br><span class="line">        return (getState() == 0) ? 1 : -1;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    protected boolean tryReleaseShared(int releases) &#123;</span><br><span class="line">        // Decrement count; signal when transition to zero</span><br><span class="line">        for (;;) &#123;</span><br><span class="line">            int c = getState();</span><br><span class="line">            if (c == 0)</span><br><span class="line">                return false;</span><br><span class="line">            int nextc = c-1;</span><br><span class="line">            if (compareAndSetState(c, nextc))</span><br><span class="line">            // 成功CAS将count变为0的线程负责唤醒等待线程</span><br><span class="line">                return nextc == 0;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="重写的aqs接口"><a href="#重写的aqs接口" class="headerlink" title="重写的aqs接口"></a>重写的aqs接口</h1><h2 id="tryAcquireShared"><a href="#tryAcquireShared" class="headerlink" title="tryAcquireShared"></a>tryAcquireShared</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">protected int tryAcquireShared(int arg)</span><br><span class="line">试图在共享模式下获取对象状态。此方法应该查询是否允许它在共享模式下获取对象状态，如果允许，则获取它。</span><br><span class="line">此方法总是由执行 acquire 线程来调用。如果此方法报告失败，则 acquire 方法可以将线程加入队列（如果还没有将它加入队列），直到获得其他某个线程释放了该线程的信号。</span><br><span class="line"></span><br><span class="line">默认实现将抛出 UnsupportedOperationException。</span><br><span class="line"></span><br><span class="line">参数：</span><br><span class="line">arg - acquire 参数。该值总是传递给 acquire 方法的那个值，或者是因某个条件等待而保存在条目上的值。该值是不间断的，并且可以表示任何内容。</span><br><span class="line">返回：</span><br><span class="line">在失败时返回负值；如果共享模式下的获取成功但其后续共享模式下的获取不能成功，则返回 0；如果共享模式下的获取成功并且其后续共享模式下的获取可能够成功，则返回正值，在这种情况下，后续等待线程必须检查可用性。（对三种返回值的支持使得此方法可以在只是有时候以独占方式获取对象的上下文中使用。）在成功的时候，此对象已被获取。</span><br><span class="line">抛出：</span><br><span class="line">IllegalMonitorStateException - 如果正在进行的获取操作将在非法状态下放置此同步器。必须以一致的方式抛出此异常，以便同步正确运行。</span><br><span class="line">UnsupportedOperationException - 如果不支持共享模式</span><br></pre></td></tr></table></figure>
+<h2 id="tryReleaseShared"><a href="#tryReleaseShared" class="headerlink" title="tryReleaseShared"></a>tryReleaseShared</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">protected boolean tryReleaseShared(int arg)</span><br><span class="line">试图设置状态来反映共享模式下的一个释放。</span><br><span class="line">此方法总是由正在执行释放的线程调用。</span><br><span class="line"></span><br><span class="line">默认实现将抛出 UnsupportedOperationException。</span><br><span class="line"></span><br><span class="line">参数：</span><br><span class="line">arg - release 参数。该值总是传递给 release 方法的那个值，或者是因某个条件等待而保存在条目上的当前状态值。该值是不间断的，并且可以表示任何内容。</span><br><span class="line">返回：</span><br><span class="line">如果此对象现在处于完全释放状态，从而使正在等待的线程都可以试图获得此对象，则返回 true；否则返回 false</span><br><span class="line">抛出：</span><br><span class="line">IllegalMonitorStateException - 如果正在进行的释放操作将在非法状态下放置此同步器。必须以一致的方式抛出此异常，以便同步正确运行</span><br><span class="line">UnsupportedOperationException - 如果不支持共享模式</span><br></pre></td></tr></table></figure>
+<h2 id="外部调用"><a href="#外部调用" class="headerlink" title="外部调用"></a>外部调用</h2><p>await()调用acquireShared的不可中断的方法acquireSharedInterruptibly，acquireSharedInterruptibly又会调用到上面Sync实现的tryAcquire方法判断是否能够返回还是继续等待。</p>
+<p>countDown调用sync的releaseShared方法，releaseShared方法又会调用上面Sync实现的tryReleaseShared方法根据返回结果判定是否唤醒线程</p>
+<h1 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h1><p><a href="https://liuzhengyang.github.io/2017/05/22/countdownlatch/" target="_blank" rel="noopener">https://liuzhengyang.github.io/2017/05/22/countdownlatch/</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/30/java/java_thread/JUC-1-overview/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/30/java/java_thread/JUC-1-overview/" itemprop="url">juc概览</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-30T10:14:33+08:00">
+                2018-03-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/30/java/java_thread/JUC-1-overview/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/03/30/java/java_thread/JUC-1-overview/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/03/30/java/java_thread/JUC-1-overview/" class="leancloud_visitors" data-flag-title="juc概览">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://www.cnblogs.com/chenpi/p/5614290.html" target="_blank" rel="noopener">http://www.cnblogs.com/chenpi/p/5614290.html</a><br><a href="http://ifeve.com/doug-lea/" target="_blank" rel="noopener">http://ifeve.com/doug-lea/</a></p>
+<h1 id="J-U-C："><a href="#J-U-C：" class="headerlink" title="J.U.C："></a>J.U.C：</h1><h2 id="什么是JSR-Java-Specification-Requests-："><a href="#什么是JSR-Java-Specification-Requests-：" class="headerlink" title="什么是JSR(Java Specification Requests)："></a>什么是JSR(Java Specification Requests)：</h2><p>JSR，全称 Java Specification Requests， 即Java规范提案， 主要是用于向JCP(Java Community Process)提出新增标准化技术规范的正式请求。每次JAVA版本更新都会有对应的JSR更新，比如在Java 8版本中，其新特性Lambda表达式对应的是JSR 335，新的日期和时间API对应的是JSR 310。</p>
+<h2 id="什么是JSR-166："><a href="#什么是JSR-166：" class="headerlink" title="什么是JSR 166："></a>什么是JSR 166：</h2><p>当然，本文的关注点仅仅是JSR 166，它是一个关于Java并发编程的规范提案，在JDK中，该规范由java.util.concurrent包实现，是在JDK 5.0的时候被引入的；</p>
+<ul>
+<li>JDK6引入Deques、Navigable collections，对应的是JSR 166x，</li>
+<li>JDK7引入fork-join框架，用于并行执行任务，对应的是JSR 166y。</li>
+</ul>
+<h2 id="什么是J-U-C："><a href="#什么是J-U-C：" class="headerlink" title="什么是J.U.C："></a>什么是J.U.C：</h2><p>即java.util.concurrent的缩写，该包参考自EDU.oswego.cs.dl.util.concurrent，是JSR 166标准规范的一个实现；</p>
+<ul>
+<li>同步器(Synchronizers)<ul>
+<li>闭锁 CountDownLatch</li>
+<li>栅栏 CyclicBarrier</li>
+<li>信号量 Semaphore</li>
+<li>交换器 Exchanger<ul>
+<li>Phaser</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>显示锁<ul>
+<li>ReentrantLock</li>
+<li>ReentrantReadWriteLock</li>
+<li>StampedLock</li>
+</ul>
+</li>
+<li>原子变量类(Atomic Variables)</li>
+<li>并发集合(Concurrent Collections)</li>
+<li>Executor框架（线程池、 Callable 、Future）</li>
+<li>Fork/Join并行计算框架</li>
+<li>BlockingQueue（阻塞队列）</li>
+<li>TimeUnit枚举</li>
+</ul>
+<p><img src="/images/pasted-113.png" alt="upload successful"></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/29/redis/study-gossip/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/29/redis/study-gossip/" itemprop="url">study-gossip</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-29T09:40:49+08:00">
+                2018-03-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/29/redis/study-gossip/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/03/29/redis/study-gossip/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/03/29/redis/study-gossip/" class="leancloud_visitors" data-flag-title="study-gossip">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><a href="https://github.com/aCoder2013/blog/issues/2" target="_blank" rel="noopener">https://github.com/aCoder2013/blog/issues/2</a></p>
+<p>Cassandra<br>redis</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/29/mysql/mysql-master-slave/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/29/mysql/mysql-master-slave/" itemprop="url">mysql-master-slave</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-29T07:37:34+08:00">
+                2018-03-29
               </time>
             
 
@@ -682,9 +1431,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/03/24/mysql/optimizie-sql-order-by/#comments" itemprop="discussionUrl">
+                <a href="/2018/03/29/mysql/mysql-master-slave/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/24/mysql/optimizie-sql-order-by/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/03/29/mysql/mysql-master-slave/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -692,7 +1441,7 @@
 
           
           
-             <span id="/2018/03/24/mysql/optimizie-sql-order-by/" class="leancloud_visitors" data-flag-title="优化mysql排序">
+             <span id="/2018/03/29/mysql/mysql-master-slave/" class="leancloud_visitors" data-flag-title="mysql-master-slave">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -725,1471 +1474,624 @@
       
         
           
-            <h1 id="mysql排序方式"><a href="#mysql排序方式" class="headerlink" title="mysql排序方式:"></a>mysql排序方式:</h1><h2 id="常规排序"><a href="#常规排序" class="headerlink" title="常规排序"></a>常规排序</h2><ul>
-<li>a 从表t1中获取满足WHERE条件的记录</li>
-<li>b 对于每条记录，将记录的主键+排序键(id,col2)取出放入sort buffer</li>
-<li>c 如果sort buffer可以存放所有满足条件的(id,col2)对，则进行排序；否则sort buffer满后，进行排序并固化到临时文件中。(排序算法采用的是快速排序算法)</li>
-<li>d 若排序中产生了临时文件，需要利用归并排序算法，保证临时文件中记录是有序的</li>
-<li>e 循环执行上述过程，直到所有满足条件的记录全部参与排序</li>
-<li>f 扫描排好序的(id,col2)对，并利用id去捞取SELECT需要返回的列(col1,col2,col3)</li>
-<li>g 将获取的结果集返回给用户。</li>
+            <h1 id="什么是Mysql主从复制"><a href="#什么是Mysql主从复制" class="headerlink" title="什么是Mysql主从复制"></a>什么是Mysql主从复制</h1><p>MySQL主从复制是其最重要的功能之一。主从复制是指一台服务器充当主数据库服务器，另一台或多台服务器充当从数据库服务器，主服务器中的数据自动复制到从服务器之中。对于多级复制，数据库服务器即可充当主机，也可充当从机。MySQL主从复制的基础是主服务器对数据库修改记录二进制日志，从服务器通过主服务器的二进制日志自动执行更新。</p>
+<h1 id="Mysq主从复制的类型"><a href="#Mysq主从复制的类型" class="headerlink" title="Mysq主从复制的类型"></a>Mysq主从复制的类型</h1><h2 id="基于语句的复制-Statement-："><a href="#基于语句的复制-Statement-：" class="headerlink" title="基于语句的复制(Statement)："></a>基于语句的复制(Statement)：</h2><p>主服务器上面执行的语句在从服务器上面再执行一遍，在MySQL-3.23版本以后支持。</p>
+<p>存在的问题：时间上可能不完全同步造成偏差，执行语句的用户也可能是不同一个用户。</p>
+<p>优点：不需要记录每一行的变化，减少了binlog日志量，节约了IO，提高性能。(相比row能节约多少性能与日志量，这个取决于应用的SQL情况，正常同一条记录修改或者插入row格式所产生的日志量还小于Statement产生的日志量，但是考虑到如果带条件的update操作，以及整表删除，alter表等操作，ROW格式会产生大量日志，因此在考虑是否使用ROW格式日志时应该跟据应用的实际情况，其所产生的日志量会增加多少，以及带来的IO性能问题。)</p>
+<p>缺点：由于记录的只是执行语句，为了这些语句能在slave上正确运行，因此还必须记录每条语句在执行的时候的一些相关信息，以保证所有语句能在slave得到和在master端执行时候相同 的结果。另外mysql 的复制,像一些特定函数功能，slave可与master上要保持一致会有很多相关问题(如sleep()函数， last_insert_id()，以及user-defined functions(udf)会出现问题).</p>
+<p>使用以下函数的语句也无法被复制：</p>
+<ul>
+<li><p>LOAD_FILE()</p>
+</li>
+<li><p>UUID()</p>
+</li>
+<li><p>USER()</p>
+</li>
+<li><p>FOUND_ROWS()</p>
+</li>
+<li><p>SYSDATE() (除非启动时启用了 –sysdate-is-now 选项)</p>
+</li>
 </ul>
-<p>从上述流程来看，是否使用文件排序主要看sort buffer是否能容下需要排序的(id,col2)对，这个buffer的大小由sort_buffer_size参数控制。此外一次排序需要两次IO，一次是捞(id,col2),第二次是捞(col1,col2,col3)，<strong>由于返回的结果集是按col2排序，因此id是乱序的，通过乱序的id去捞(col1,col2,col3)时会产生大量的随机IO</strong>。对于第二次MySQL本身一个优化，即在捞之前首先将id排序，并放入缓冲区，这个缓存区大小由参数read_rnd_buffer_size控制，然后有序去捞记录，将随机IO转为顺序IO。</p>
-<h2 id="优化排序"><a href="#优化排序" class="headerlink" title="优化排序"></a>优化排序</h2><pre><code>常规排序方式除了排序本身，还需要额外两次IO。优化的排序方式相对于常规排序，减少了第二次IO。主要区别在于，放入sort buffer不是(id,col2),而是(col1,col2,col3)。由于sort buffer中包含了查询需要的所有字段，因此排序完成后可以直接返回，无需二次捞数据。这种方式的代价在于，同样大小的sort buffer，能存放的(col1,col2,col3)数目要小于(id,col2)，如果sort buffer不够大，可能导致需要写临时文件，造成额外的IO。当然MySQL提供了参数max_length_for_sort_data，只有当排序元组小于max_length_for_sort_data时，才能利用优化排序方式，否则只能用常规排序方式。
-</code></pre><h2 id="优先队列排序"><a href="#优先队列排序" class="headerlink" title="优先队列排序"></a>优先队列排序</h2><pre><code>为了得到最终的排序结果，无论怎样，我们都需要将所有满足条件的记录进行排序才能返回。那么相对于优化排序方式，是否还有优化空间呢？5.6版本针对Order by limit M，N语句，在空间层面做了优化，加入了一种新的排序方式:优先队列，这种方式采用堆排序实现。堆排序算法特征正好可以解limit M，N 这类排序的问题，虽然仍然需要所有元素参与排序，但是只需要M+N个元组的sort buffer空间即可，对于M，N很小的场景，基本不会因为sort buffer不够而导致需要临时文件进行归并排序的问题。对于升序，采用大顶堆，最终堆中的元素组成了最小的N个元素，对于降序，采用小顶堆，最终堆中的元素组成了最大的N的元素。
-</code></pre><h1 id="对比页数比较大的情况"><a href="#对比页数比较大的情况" class="headerlink" title="对比页数比较大的情况"></a>对比页数比较大的情况</h1><p>低效率:</p>
-<p><img src="/images/pasted-086.png" alt="upload successful"></p>
-<p>高效率:</p>
-<p><img src="/images/pasted-087.png" alt="upload successful"></p>
-<h1 id="针对limit-优化有很多种方式"><a href="#针对limit-优化有很多种方式" class="headerlink" title="针对limit 优化有很多种方式"></a>针对limit 优化有很多种方式</h1><p>1 前端加缓存、搜索，减少落到库的查询操作。比如海量商品可以放到搜索里面，使用瀑布流的方式展现数据，很多电商网站采用了这种方式。<br>2 优化SQL 访问数据的方式，直接快速定位到要访问的数据行。<br>3 使用<strong>书签方式</strong> ，记录上次查询最新/大的id值，向后追溯 M行记录。</p>
+<p>同时在INSERT …SELECT 会产生比 RBR 更多的行级锁</p>
+<h2 id="基于行的复制-Row-："><a href="#基于行的复制-Row-：" class="headerlink" title="基于行的复制(Row)："></a>基于行的复制(Row)：</h2><p>把主服务器上面改编后的内容直接复制过去，而不关心到底改变该内容是由哪条语句引发的，在MySQL-5.0版本以后引入。</p>
+<p>存在的问题：比如一个工资表中有一万个用户，我们把每个用户的工资+1000，那么基于行的复制则要复制一万行的内容，由此造成的开销比较大，而基于语句的复制仅仅一条语句就可以了。</p>
+<p>优点： binlog中可以不记录执行的sql语句的上下文相关的信息，仅需要记录那一条记录被修改成什么了。所以rowlevel的日志内容会非常清楚的记录下每一行数据修改的细节。而且不会出现某些特定情况下的存储过程，或function，以及trigger的调用和触发无法被正确复制的问题</p>
+<p>缺点:所有的执行的语句当记录到日志中的时候，都将以每行记录的修改来记录，这样可能会产生大量的日志内容,比如一条update语句，修改多条记录，则binlog中每一条修改都会有记录，这样造成binlog日志量会很大，特别是当执行alter table之类的语句的时候，由于表结构修改，每条记录都发生改变，那么该表每一条记录都会记录到日志中。</p>
+<h2 id="混合类型的复制："><a href="#混合类型的复制：" class="headerlink" title="混合类型的复制："></a>混合类型的复制：</h2><p>是以上两种level的混合使用，一般的语句修改使用statment格式保存binlog，如一些函数，statement无法完成主从复制的操作，则采用row格式保存binlog,MySQL会根据执行的每一条具体的sql语句来区分对待记录的日志形式，也就是在Statement和Row之间选择一种.新版本的MySQL中队row level模式也被做了优化，并不是所有的修改都会以row level来记录，像遇到表结构变更的时候就会以statement模式来记录。至于update或者delete等修改数据的语句，还是会记录所有行的变更。</p>
+<h1 id="Binlog基本配制与格式设定"><a href="#Binlog基本配制与格式设定" class="headerlink" title="Binlog基本配制与格式设定"></a>Binlog基本配制与格式设定</h1><h2 id="1-基本配制"><a href="#1-基本配制" class="headerlink" title="1.基本配制"></a>1.基本配制</h2><p>Mysql BInlog日志格式可以通过mysql的my.cnf文件的属性binlog_format指定。如以下：</p>
+<p>binlog_format = MIXED //binlog日志格式</p>
+<p>log_bin =目录/mysql-bin.log //binlog日志名</p>
+<p>expire_logs_days = 7 //binlog过期清理时间</p>
+<p>max_binlog_size 100m //binlog每个日志文件大小</p>
+<h2 id="2-Binlog日志格式选择"><a href="#2-Binlog日志格式选择" class="headerlink" title="2.Binlog日志格式选择"></a>2.Binlog日志格式选择</h2><p>Mysql默认是使用Statement日志格式，推荐使用MIXED.</p>
+<p>由于一些特殊使用，可以考虑使用ROWED，如自己通过binlog日志来同步数据的修改，这样会节省很多相关操作。对于binlog数据处理会变得非常轻松,相对mixed，解析也会很轻松(当然前提是增加的日志量所带来的IO开销在容忍的范围内即可)。</p>
+<h2 id="3-mysqlbinlog格式选择"><a href="#3-mysqlbinlog格式选择" class="headerlink" title="3.mysqlbinlog格式选择"></a>3.mysqlbinlog格式选择</h2><p>mysql对于日志格式的选定原则:如果是采用 INSERT，UPDATE，DELETE 等直接操作表的情况，则日志格式根据 binlog_format 的设定而记录,如果是采用 GRANT，REVOKE，SET PASSWORD 等管理语句来做的话，那么无论如何 都采用 SBR 模式记录。</p>
+<h1 id="Mysql主从复制的过程"><a href="#Mysql主从复制的过程" class="headerlink" title="Mysql主从复制的过程"></a>Mysql主从复制的过程</h1><p>MySQL主从复制的两种情况：同步复制和异步复制，实际复制架构中大部分为异步复制。</p>
+<p>复制的基本过程如下：</p>
+<ul>
+<li><p>Slave上面的IO进程连接上Master，并请求从指定日志文件的指定位置（或者从最开始的日志）之后的日志内容。</p>
+</li>
+<li><p>Master接收到来自Slave的IO进程的请求后，负责复制的IO进程会根据请求信息读取日志指定位置之后的日志信息，返回给Slave的IO进程。返回信息中除了日志所包含的信息之外，还包括本次返回的信息已经到Master端的bin-log文件的名称以及bin-log的位置。</p>
+</li>
+<li><p>Slave的IO进程接收到信息后，将接收到的日志内容依次添加到Slave端的relay-log文件的最末端，并将读取到的Master端的 bin-log的文件名和位置记录到master-info文件中，以便在下一次读取的时候能够清楚的告诉Master“我需要从某个bin-log的哪个位置开始往后的日志内容，请发给我”。</p>
+</li>
+<li><p>Slave的Sql进程检测到relay-log中新增加了内容后，会马上解析relay-log的内容成为在Master端真实执行时候的那些可执行的内容，并在自身执行。</p>
+</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/28/redis/redis-cluster/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/28/redis/redis-cluster/" itemprop="url">redis集群</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-28T22:33:59+08:00">
+                2018-03-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/28/redis/redis-cluster/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/03/28/redis/redis-cluster/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/03/28/redis/redis-cluster/" class="leancloud_visitors" data-flag-title="redis集群">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><a href="https://blog.csdn.net/u011204847/article/details/51307044" target="_blank" rel="noopener">https://blog.csdn.net/u011204847/article/details/51307044</a><br><a href="http://www.redis.cn/topics/cluster-tutorial.html" target="_blank" rel="noopener">http://www.redis.cn/topics/cluster-tutorial.html</a><br><a href="https://www.jianshu.com/p/04dd90ea08f5" target="_blank" rel="noopener">https://www.jianshu.com/p/04dd90ea08f5</a></p>
+<h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>Redis Cluster是Redis官方在Redis 3.0版本正式推出的高可用以及分布式的解决方案。</p>
+<p>Redis Cluster由多个Redis实例组成的整体，数据按照槽(slot)存储分布在多个Redis实例上，通过Gossip协议来进行节点之间通信。</p>
+<p>Redis Cluster实现的功能：</p>
+<p>• 将数据分片到多个实例(按照slot存储)；</p>
+<p>• 集群节点宕掉会自动failover；</p>
+<p>• 提供相对平滑扩容(缩容)节点。</p>
+<p>Redis Cluster暂未有的：</p>
+<p>• 实时同步</p>
+<p>• 强一致性</p>
 <hr>
-<h2 id="快速定位"><a href="#快速定位" class="headerlink" title="快速定位"></a>快速定位</h2><p>对于第二种方式 我们推荐使用”延迟关联”的方法来优化排序操作，何谓”延迟关联” ：通过使用覆盖索引查询返回需要的主键,再根据主键关联原表获得需要的数据。<br>3.1 延迟关联<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">root@xxx 12:33:48&gt;explain SELECT id, cu_id, name, info, biz_type, gmt_create, gmt_modified,start_time, end_time, market_type, back_leaf_category,item_status,picuture_url FROM relation where biz_type =&apos;0&apos; AND end_time &gt;=&apos;2014-05-29&apos; ORDER BY id asc LIMIT 149420 ,20;</span><br><span class="line"></span><br><span class="line">explain SELECT a.* FROM relation a, (select id from relation where biz_type =&apos;0&apos; AND end_time &gt;=&apos;2014-05-29&apos; ORDER BY id asc LIMIT 149420 ,20 ) b where a.id=b.id;</span><br></pre></td></tr></table></figure></p>
-<h2 id="书签方式"><a href="#书签方式" class="headerlink" title="书签方式"></a>书签方式</h2><p>首先要获取复合条件的记录的最大 id和最小id(默认id是主键)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select max(id) as maxid ,min(id) as minid from t where kid=2333 and type=1;</span><br></pre></td></tr></table></figure></p>
-<p>其次 根据id 大于最小值或者小于最大值 进行遍历。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">select xx,xx from t where      kid=2333 and type=1 and id &gt;=min_id order by id asc  limit 100;</span><br><span class="line"></span><br><span class="line">select xx,xx from t where      kid=2333 and type=1 and id &lt;=max_id order by id  desc limit 100;</span><br></pre></td></tr></table></figure>
-<p>使用延迟关联查询数据510ms ，使用基于书签模式的解决方法减少到10ms以内 绝对是一个质的飞跃。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/24/mysql/sql-killer/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/24/mysql/sql-killer/" itemprop="url">sql-killer</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-24T15:31:28+08:00">
-                2018-03-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/mysql/" itemprop="url" rel="index">
-                    <span itemprop="name">mysql</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/03/24/mysql/sql-killer/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/24/mysql/sql-killer/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/03/24/mysql/sql-killer/" class="leancloud_visitors" data-flag-title="sql-killer">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>每个oltp数据库实例上设置一个sql-killer进程用于kill掉执行时间超过一定阈值测sql,并发邮件报警</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/24/egenie_bugfix/loft-delete-unquie-key/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/24/egenie_bugfix/loft-delete-unquie-key/" itemprop="url">软删除唯一索引解决</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-24T09:30:51+08:00">
-                2018-03-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/03/24/egenie_bugfix/loft-delete-unquie-key/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/24/egenie_bugfix/loft-delete-unquie-key/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/03/24/egenie_bugfix/loft-delete-unquie-key/" class="leancloud_visitors" data-flag-title="软删除唯一索引解决">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>软件中使用软删除is_usable=1改为0来代表删除，但是遇到唯一索引时，<br>例如：username+is_usable的唯一索引<br>第二次删除则会失败，解决办法，将is_usable 改为其他不重复的数字及可</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/23/分布式/study-cap/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/23/分布式/study-cap/" itemprop="url">study-cap</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-23T23:09:04+08:00">
-                2018-03-23
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/03/23/分布式/study-cap/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/23/分布式/study-cap/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/03/23/分布式/study-cap/" class="leancloud_visitors" data-flag-title="study-cap">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>CAP（Consistency一致性、Availability可用性、Partition-tolerance分区可容忍性）理论普遍被看成是大数据技术的理论基础。同时，凭据该理论，业界有一种极度流行、极度“专业”的认识，那就是：关系型数据库设计选择了C（一致性）与A（可用性），NoSQL数据库设计则差别。其中，HBase选择了C（一致性）与P（分区可容忍性），Cassandra选择了A（可用性）与P（分区可容忍性）。</p>
-<ul>
-<li>Consistency一致性：你的客户再次来电时总能查到他们刚来电更新的信息，不论相隔多短</li>
-<li>Availability可用性：不论你和你妻子谁来工作，记忆公司总能接听来电，处理客户请求</li>
-<li>Partition-tolerance分区可容忍性：即便你和你妻子失联，记忆公司依然能正常运转</li>
-</ul>
-<p>● 一致性(C): 在分布式系统中的所有数据备份，在同一时刻是否同样的值。(等同于所有节点访问同一份最新的数据副本)</p>
-<p>● 可用性(A): 在集群中一部分节点故障后，集群整体是否还能响应客户端 的读写请求。(对数据更新具备高可用性)</p>
-<p>● 分区容忍性(P): 以实际效果而言，分区相当于对通信的时限要求。系统如果不能在时限内达成数据一致性，就意味着发生了分区的情况，必须就当前 操作在 C 和 A 之间做出选择。(分区状态可以理解为部分机器不连通了，比如机器挂了，繁忙失去响应，单机房故障等)</p>
-<p>Partition 字面意思是网络分区，即因网络因素将系统分隔为多个单独的部 分，有人可能会说，网络分区的情况发生概率非常小啊，是不是不用考虑 P， 保证 CA 就好。要理解 P，我们看回 CAP 证明中 P 的定义:</p>
-<p>In order to model partition tolerance, the network will be allowed to lose arbitrarily many messages sent from one node to another。</p>
-<p>网络分区的情况符合该定义，网络丢包的情况也符合以上定义，另外节点宕 机，其他节点发往宕机节点的包也将丢失，这种情况同样符合定义。现实情况 下我们面对的是一个不可靠的网络、有一定概率宕机的设备，这两个因素都会 导致 Partition，因而分布式系统实现中 P 是一个必须项，而不是可选项。</p>
-<h2 id="解读"><a href="#解读" class="headerlink" title="解读"></a>解读</h2><p>CP without A:如果不要求 A(可用)，相当于每个请求都需要在 Server 之间 强一致，而 P(分区)会导致同步时间无限延长，如此 CP 也是可以保证的。很 多传统的数据库分布式事务都属于这种模式。</p>
-<p>AP wihtout C:要高可用并允许分区，则需放弃一致性。一旦分区发生，节点 之间可能会失去联系，为了高可用，每个节点只能用本地数据提供服务，而这样会导致全局数据的不一致性。现在众多的 NoSQL 都属于此类。</p>
-<h2 id="伪命题"><a href="#伪命题" class="headerlink" title="伪命题"></a>伪命题</h2><p>“三选二”是一个伪命题</p>
-<p>不是为了 P(分区容忍性)，要在 A 和 C 之间选择一个。分区很少出现，CAP 在大多数时候允许完美的 C 和 A。但当分区存在或可感知其影响的情况下，就要预备一种策略去探知分区并显式处理其影响。</p>
-<h1 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h1><table>
-<thead>
-<tr>
-<th style="text-align:left">Feature</th>
-<th style="text-align:left">Consul</th>
-<th style="text-align:left">zookeeper</th>
-<th style="text-align:left">etcd</th>
-<th style="text-align:left">euerka</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">服务健康检查</td>
-<td style="text-align:left">服务状态，内存，硬盘等</td>
-<td style="text-align:left">(弱)长连接，keepalive</td>
-<td style="text-align:left">连接心跳</td>
-<td style="text-align:left">可配支持</td>
-</tr>
-<tr>
-<td style="text-align:left">多数据中心</td>
-<td style="text-align:left">支持</td>
-<td style="text-align:left">—</td>
-<td style="text-align:left">—</td>
-<td style="text-align:left">—</td>
-</tr>
-<tr>
-<td style="text-align:left">kv存储服务</td>
-<td style="text-align:left">支持</td>
-<td style="text-align:left">支持</td>
-<td style="text-align:left">支持</td>
-<td style="text-align:left">—</td>
-</tr>
-<tr>
-<td style="text-align:left">一致性</td>
-<td style="text-align:left">raft</td>
-<td style="text-align:left">paxos</td>
-<td style="text-align:left">raft</td>
-<td style="text-align:left">—</td>
-</tr>
-<tr>
-<td style="text-align:left">cap</td>
-<td style="text-align:left">ca</td>
-<td style="text-align:left">cp</td>
-<td style="text-align:left">cp</td>
-<td style="text-align:left">ap</td>
-</tr>
-<tr>
-<td style="text-align:left">使用接口(多语言能力)</td>
-<td style="text-align:left">支持http和dns</td>
-<td style="text-align:left">客户端</td>
-<td style="text-align:left">http/grpc</td>
-<td style="text-align:left">http（sidecar）</td>
-</tr>
-<tr>
-<td style="text-align:left">watch支持</td>
-<td style="text-align:left">全量/支持long polling</td>
-<td style="text-align:left">支持</td>
-<td style="text-align:left">支持 long polling</td>
-<td style="text-align:left">支持 long polling/大部分增量</td>
-</tr>
-<tr>
-<td style="text-align:left">自身监控</td>
-<td style="text-align:left">metrics</td>
-<td style="text-align:left">—</td>
-<td style="text-align:left">metrics</td>
-<td style="text-align:left">metrics</td>
-</tr>
-<tr>
-<td style="text-align:left">安全</td>
-<td style="text-align:left">acl /https</td>
-<td style="text-align:left">acl</td>
-<td style="text-align:left">https支持（弱）</td>
-<td style="text-align:left">—</td>
-</tr>
-<tr>
-<td style="text-align:left">spring cloud集成</td>
-<td style="text-align:left">已支持</td>
-<td style="text-align:left">已支持</td>
-<td style="text-align:left">已支持</td>
-<td style="text-align:left">已支持</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">特性</th>
-<th style="text-align:left">HBase</th>
-<th style="text-align:left">Cassandra</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">语言</td>
-<td style="text-align:left">Java</td>
-<td style="text-align:left">Java</td>
-</tr>
-<tr>
-<td style="text-align:left">出发点</td>
-<td style="text-align:left">BigTable</td>
-<td style="text-align:left">BigTable and Dynamo</td>
-</tr>
-<tr>
-<td style="text-align:left">License</td>
-<td style="text-align:left">Apache</td>
-<td style="text-align:left">Apache</td>
-</tr>
-<tr>
-<td style="text-align:left">Protocol</td>
-<td style="text-align:left">HTTP/REST (also Thrift)</td>
-<td style="text-align:left">Custom, binary (Thrift)</td>
-</tr>
-<tr>
-<td style="text-align:left">数据分布</td>
-<td style="text-align:left">表划分为多个region存在不同region server上</td>
-<td style="text-align:left">改进的一致性哈希（虚拟节点）</td>
-</tr>
-<tr>
-<td style="text-align:left">存储目标</td>
-<td style="text-align:left">大文件</td>
-<td style="text-align:left">小文件</td>
-</tr>
-<tr>
-<td style="text-align:left">一致性</td>
-<td style="text-align:left">强一致性</td>
-<td style="text-align:left">最终一致性，Quorum NRW策略</td>
-</tr>
-<tr>
-<td style="text-align:left">架构</td>
-<td style="text-align:left">master/slave</td>
-<td style="text-align:left">p2p</td>
-</tr>
-<tr>
-<td style="text-align:left">高可用性</td>
-<td style="text-align:left">NameNode是HDFS的单点故障点</td>
-<td style="text-align:left">P2P和去中心化设计，不会出现单点故障</td>
-</tr>
-<tr>
-<td style="text-align:left">伸缩性</td>
-<td style="text-align:left">Region Server扩容，通过将自身发布到Master，Master均匀分布Region</td>
-<td style="text-align:left">扩容需在Hash Ring上多个节点间调整数据分布</td>
-</tr>
-<tr>
-<td style="text-align:left">读写性能</td>
-<td style="text-align:left">数据读写定位可能要通过最多6次的网络RPC，性能较低。</td>
-<td style="text-align:left">数据读写定位非常快</td>
-</tr>
-<tr>
-<td style="text-align:left">数据冲突处理</td>
-<td style="text-align:left">乐观并发控制（optimistic concurrency control）</td>
-<td style="text-align:left">向量时钟</td>
-</tr>
-<tr>
-<td style="text-align:left">临时故障处理</td>
-<td style="text-align:left">Region Server宕机，重做HLog</td>
-<td style="text-align:left">数据回传机制：某节点宕机，hash到该节点的新数据自动路由到下一节点做 hinted handoff，源节点恢复后，推送回源节点。</td>
-</tr>
-<tr>
-<td style="text-align:left">永久故障恢复</td>
-<td style="text-align:left">Region Server恢复，master重新给其分配region</td>
-<td style="text-align:left">Merkle 哈希树，通过Gossip协议同步Merkle Tree，维护集群节点间的数据一致性</td>
-</tr>
-<tr>
-<td style="text-align:left">成员通信及错误检测</td>
-<td style="text-align:left">Zookeeper</td>
-<td style="text-align:left">基于Gossip</td>
-</tr>
-<tr>
-<td style="text-align:left">CAP</td>
-<td style="text-align:left">1，强一致性，0数据丢失。2，可用性低。3，扩容方便。</td>
-<td style="text-align:left">1，弱一致性，数据可能丢失。2，可用性高。3，扩容方便。</td>
-</tr>
-</tbody>
-</table>
-<ul>
-<li>cap</li>
-</ul>
-<p>有这样两种情况：一种情况是要求节点A、B、C的三份数据完全一致后返回。也就是说，这时从任何一个网络节点读取的数据都是一样的，这就是所谓的强一致性读。很明显，这时数据读取的Latency要高一些（由于要等数据在网络中的复制），同时A、B、C三个节点中任何一个宕机，都会导致数据不行用。也就是说，要保证强一致性，网络中的副本越多，数据的可用性就越差；</p>
-<p>另一种情况是，允许读操作立刻返回，容忍B节点的读取与A节点的读取不一致的情况发生。这样一来，可用性显然获得了提高，网络中的副本也可以多一些，唯一得不到保证的是数据一致性。当然，对写操作同样也有多个节点一致性的情况，在此不再赘述。</p>
-<ul>
-<li>cap</li>
-</ul>
-<p>分布式系统分区容忍肯定是要保证的，因为总会有网络延迟，网络波动导致每个节点互相有短暂或长时间的通讯不通。所以我们在这个基础上，如果我们解决了一致性问题，也就是我们在网络波动和延迟的时候也让每个节点的数据是一样的，保证同时从任意节点取到的数据是一样的。</p>
-<p>那么我们就得舍弃可用性，也就是说我们在网络波动或者延迟的时候让整个分布式系统不可用，等到数据都同步完了，每个节点的数据都一样了，这时候我们在让分布式系统可用。这就是舍弃了可用性。</p>
-<p>那什么是舍弃一致性呢？就是在有网络延迟的时候，我整个的分布式系统还对外提供服务，这时就有可能短暂的出现获取的数据不是一致的。这就是舍弃了一致性。所以一般来说我们都是保证可用性，虽然有短暂的数据不一致，但我们只要最终保证了一致性在有些时候也是可以满足需要的。</p>
-<h1 id="解读-1"><a href="#解读-1" class="headerlink" title="解读"></a>解读</h1><p><a href="http://kongchen.github.io/how-cap-defines-avaiability/" target="_blank" rel="noopener">http://kongchen.github.io/how-cap-defines-avaiability/</a><br>C容易理解，所有节点上的数据都一样。<br>P是说一旦集群因为内部通信故障发生分裂，集群还能正常运转。</p>
-<p>关键是这个A。</p>
-<p>说白了就是，CAP里的A指的是，只要是活着的节点能返回响应，那么就认为它是availability的。</p>
-<p>用汽车来做个比喻：<br>汽车一切良好，故障灯一个都不亮，能开能刹，这是我们理解的传统的Available。只要是出了任何问题，例如车胎爆了，发动机坏了，或者是没油开不动了，这都已经是不可用了。</p>
-<p>CAP理论里，车不能开不要紧，只要是这车车门还能打开，那就是Available的：车胎破了能从胎压监测里看到，发动机坏了打火打不着，没油了油表灯会亮……这都是车返回的response，只要是有response，那么就是”可用的“。</p>
-<p>理解了A的真正含义以后再来看CAP。</p>
-<h2 id="只满足CA的系统"><a href="#只满足CA的系统" class="headerlink" title="只满足CA的系统"></a>只满足CA的系统</h2><p>根据P的定义： 一旦集群因为内部通信故障发生分裂，集群还能正常运转。 舍弃P意味着一旦集群发生分裂，整个集群都将无法运转。这是符合A的，因为这是的节点是fail的，不需要给任何响应。<br>单机服务器显然是CA的，只要结点活着，那自然是C+A。而结点一旦挂了，整个集群也就没了，符合舍弃P的选择。</p>
-<h2 id="只满足CP的系统"><a href="#只满足CP的系统" class="headerlink" title="只满足CP的系统"></a>只满足CP的系统</h2><p>一旦集群内部因为内部通信故障发生分裂（假设分裂成两部分），为了满足P，集群需要提供服务。而为了满足C，只能保留其中一部分提供服务，让另一部分整体退役。</p>
-<h2 id="只满足AP的系统"><a href="#只满足AP的系统" class="headerlink" title="只满足AP的系统"></a>只满足AP的系统</h2><p>整个最容易理解，一旦集群内部因为内部通信故障发生分裂（假设分裂成两部分），为了满足P，而又不需要满足C，那么可以让分裂出来的两部分都提供服务，因为暂时数据不一致没关系。</p>
-<h1 id="CAP-的意义"><a href="#CAP-的意义" class="headerlink" title="CAP 的意义"></a>CAP 的意义</h1><p>在系统架构时，应该根据具体的业务场景，来权衡 CAP。比如，对于大多数互联网应用来说（如门户网站），因为机器数量庞大，部署节点分散，网络故障是常态，可用性是必须需要保证的，所以只有舍弃一致性来保证服务的 AP。而对于银行等，需要确保一致性的场景，通常会权衡 CA 和 CP 模型，CA 模型网络故障时完全不可用，CP 模型具备部分可用性。</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://yq.aliyun.com/articles/552548?spm=a2c4e.11153959.teamhomeleft.38.63cb356fpQ5C54" target="_blank" rel="noopener">https://yq.aliyun.com/articles/552548?spm=a2c4e.11153959.teamhomeleft.38.63cb356fpQ5C54</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/21/data_warehouse/data-warehouse-build/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/21/data_warehouse/data-warehouse-build/" itemprop="url">data-warehouse-build</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-21T19:55:08+08:00">
-                2018-03-21
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/03/21/data_warehouse/data-warehouse-build/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/21/data_warehouse/data-warehouse-build/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/03/21/data_warehouse/data-warehouse-build/" class="leancloud_visitors" data-flag-title="data-warehouse-build">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p><a href="https://tech.meituan.com/tag/%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93" target="_blank" rel="noopener">https://tech.meituan.com/tag/%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93</a></p>
-<p><a href="https://tech.meituan.com/mtdp_travel_yydp_present.html" target="_blank" rel="noopener">https://tech.meituan.com/mtdp_travel_yydp_present.html</a></p>
-<h1 id="架构图"><a href="#架构图" class="headerlink" title="架构图"></a>架构图</h1><p><img src="/images/pasted-98.png" alt="upload successful"></p>
-<h1 id="领域内常见的建模方法"><a href="#领域内常见的建模方法" class="headerlink" title="领域内常见的建模方法"></a>领域内常见的建模方法</h1><p>① 3NF模型</p>
-<p>3NF模型（又叫“范式模型”）是数据仓库之父Inmon提出的，它用实体加关系的数据模型描述业务架构，在范式理论上符合3NF，是站在全局角度面向主题的抽象。它更多的是面向数据的一致性治理。</p>
-<p>3NF模型最基本的要素是实体、属性和关系：</p>
-<p>实体：相同特征和性质的属性抽象，用抽象的实体名和属性名集合共同刻画的逻辑实体；<br>关系：实体之间的关系；<br>属性：实体的某种特性，一般实体具有多个属性。<br>② 维度模型</p>
-<p>维度模型是Kimball提出的。维度模型多为分析和决策提供服务，因此它重点解决快速完成分析，同时提供大规模复杂查询的响应性能（预聚合），更直接地面向业务。例如熟知的星形模型，以及特殊场景的雪花模型。</p>
-<p>维度建模最基本的要素是事实和维度：</p>
-<p>事实表：一般由两部分组成，纬度和指标，通常理解为“某人在某时间某地点通过某手段做了什么事情”的事实记录，它体现了业务流程的核心内容；<br>维度表：看待事实的角度，用以描述和还原事实发生的场景，比如通过地址、时间等维度还原业务场景。<br>③ DV模型（DataVault）</p>
-<p>DataVault是Dan Linstedt发起的，是一种介于3NF和维度建模之间的建模方法。它的设计主要是满足灵活性、可扩展性、一致性和对需求的适应性。它强调建立一个可审计的基础数据层，主要包括Hub（核心实体）、Link（关系）、Satellite（实体属性）三个要素。</p>
-<p>④ Anchor模型</p>
-<p>Anchor模型由Lars. Rönnbäck提出，是DataVault模型的进一步范式化处理，核心思想是只添加、不修改的可扩展模型，Anchor模型构建的表极窄，类似于K-V结构化模型。它主要包括Anchors（实体且只有主键），Atributes（属性），Ties（关系），Knots（公用枚举属性)）。Anchor是应用中比较少的建模方法，只有传统企业和少数几家互联网公司有应用，例如：蚂蜂窝等。</p>
-<h1 id="运营专题数据如何构建"><a href="#运营专题数据如何构建" class="headerlink" title="运营专题数据如何构建"></a>运营专题数据如何构建</h1><p>随着促销系统不断发展，平台趋于稳定，再结合各活动类型，及对需求的整理和进一步产品化，选择了3NF+维度建模为基础的模型方法论，对数据进行合理划分和整合，构建了运营专题数据体系。</p>
-<p>① 数据规范制定</p>
-<p>数据规范的制定也是指标字典和服务层规则引擎抽象的基础。首先同业务达成共识，制定数据一致性标准，统一口径。同时将核心指标和个性化指标进行抽象，抽取统一规范定义，例如：月初到月末的整体交易类GMV和补贴类GMV，其原子指标是GMV，其它要素都属于指标的修饰。</p>
-<p><img src="/images/pasted-99.png" alt="upload successful"></p>
-<p>② 数仓模型架构</p>
-<p>将数据分为ODS层、BAS层、FACT层、TOPIC层。</p>
-<p>ODS层主要功能</p>
-<p>从分布式消息队列中消费Binlog和Click-log，并对埋点数据进行清洗和业务库数据还原，并根据需要增量或全量同步到Hive，同时积累历史数据并保存。</p>
-<p>BAS层主要功能</p>
-<p>采用3NF建模方法，对整体业务进行概念抽象及适当冗余，在保证数据一致的同时将同属性实体归纳整合到同一逻辑域。BAS层主要是为了减少数据的不一致，减少存储空间，响应业务系统的变化，避免更新异常。</p>
-<p>FACT层主要功能</p>
-<p>采用维度建模方法，根据活动特点及事实场景，对代金券、现金券、促销等的事件进一步整合。经过对维度的预处理，在使用信息的时候，不但减少时间成本、提高数据的提取效率，又为用户在Ad-Hoc平台查询提供很好的支撑，同时它成为了上层数据应用的关键出口。</p>
-<p>TOPIC层主要功能</p>
-<p>该层建设不是必须的，是针对业务中个性化诉求，根据需要建设专题数据。服务小范围业务群体和用户，用来支撑核心业务指标外的某一块个性化指标和应用。</p>
-<p><img src="/images/pasted-100.png" alt="upload successful"></p>
-<p>如图所示，数仓模型整体架构图。通过构建运营专题的底层数据，针对数据一致性等问题，在数仓层面上得到了很好的解决，同时在数据提取效率上有很大的提升。数仓建设为接下来的业务支撑打好了充分的基础。</p>
-<h1 id="多维预计算层"><a href="#多维预计算层" class="headerlink" title="多维预计算层"></a>多维预计算层</h1><p>预计算层是连接数据和应用之间的管道，是应用层垂直模块的专项支持。它是在Fact层数据之上的预聚合，强依赖于数仓模型中事实和维度的构建以及预关联。预计算采用Kylin引擎构建Cube聚合组，来解决取数门槛和数据处理耗时等问题，同是提供多维分析的能力，不但提供了新的Ad-Hoc(Query Engine)平台，在提高查询响应的同时，又能为产品带来更流畅的交互，增强用户体验。例如：创建一个交易数据cube，它包含日期（datakey）、用户（userid）、付款方式（paytype）、购买城市（city）。为满足不同消费方式在不同城市的应用情况和查看用户在不同城市的消费行为，建立以下两个聚合组，包含的维度和方式如图所示：</p>
-<p><img src="/images/pasted-101.png" alt="upload successful"></p>
-<h1 id="中台服务层"><a href="#中台服务层" class="headerlink" title="中台服务层"></a>中台服务层</h1><p>数据预计算之后，需要分别对PC和移动端提供计算和装载，并且要针对不同端的特定模块做特定的开发，为了应对多变的业务逻辑，以及未来的可扩展能力，需要提供可插拔的、统一的服务层，该层主要可以解决如下问题：</p>
-<ul>
-<li>服务与预计算数据同步，数据模型的修改只影响到预计算层，同时服务层还可以完全感知预计算数据的变化，不需要对服务做开发调整，实现数据变更的同步响应；</li>
-<li>服务与端解耦，针对不同端产品提供统一数据服务，避免重复开发，同时产品的迭代升级与服务层隔离，应对多变的业务发展和增长；</li>
-<li>服务扩展能力增强，支持服务的横向扩展，不影响正常业务的同时提高服务能力，同时在该层实现可抽象通用操作以及规范管理。</li>
-</ul>
-<h1 id="总体"><a href="#总体" class="headerlink" title="总体"></a>总体</h1><p><img src="/images/pasted-102.png" alt="upload successful"></p>
-<p>整个服务由独立的Web应用端发起请求，通过权限验证后对中台发起调用，然后读取配置中心的配置，由计算引擎对数据进行并行计算，同时规则引擎按业务线和指标修饰词等生产衍生指标，然后将引擎完成的数据按周期进行快照，存入备忘录，同时关联指标字典将数据与文案返回前台，最后按功能再对数据做可视化处理。下面分别对服务中交互的几个模块做简单的介绍。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/21/data_warehouse/data-warehouse-layering/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/21/data_warehouse/data-warehouse-layering/" itemprop="url">data-warehouse-layering</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-21T17:05:26+08:00">
-                2018-03-21
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/03/21/data_warehouse/data-warehouse-layering/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/21/data_warehouse/data-warehouse-layering/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/03/21/data_warehouse/data-warehouse-layering/" class="leancloud_visitors" data-flag-title="data-warehouse-layering">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="传统分层"><a href="#传统分层" class="headerlink" title="传统分层"></a>传统分层</h1><p><img src="/images/pasted-91.png" alt="upload successful"></p>
-<h1 id="阿里数据分层"><a href="#阿里数据分层" class="headerlink" title="阿里数据分层"></a>阿里数据分层</h1><p><a href="https://oss-cn-hangzhou.aliyuncs.com/yqfiles/ceea30ef3e4db4ec980c5a3fb8dee73d.pdf?spm=a2c4e.11153959.blogcont69316.176.367f2caePvjO9h&amp;file=ceea30ef3e4db4ec980c5a3fb8dee73d.pdf" target="_blank" rel="noopener">https://oss-cn-hangzhou.aliyuncs.com/yqfiles/ceea30ef3e4db4ec980c5a3fb8dee73d.pdf?spm=a2c4e.11153959.blogcont69316.176.367f2caePvjO9h&amp;file=ceea30ef3e4db4ec980c5a3fb8dee73d.pdf</a></p>
-<p><img src="/images/pasted-97.png" alt="upload successful"></p>
-<p><img src="/images/pasted-92.png" alt="upload successful"></p>
-<p>基础层</p>
-<p><img src="/images/pasted-93.png" alt="upload successful"></p>
-<p>数据中间层</p>
-<p><img src="/images/pasted-94.png" alt="upload successful"></p>
-<p>数据集市层<br><img src="/images/pasted-95.png" alt="upload successful"></p>
-<p>流式数据集<br><img src="/images/pasted-96.png" alt="upload successful"></p>
-<h1 id="美团分层"><a href="#美团分层" class="headerlink" title="美团分层"></a>美团分层</h1><p><a href="https://tech.meituan.com/traffic_data_product.html" target="_blank" rel="noopener">https://tech.meituan.com/traffic_data_product.html</a></p>
-<p><img src="/images/pasted-103.png" alt="upload successful"><br>A层（也称ODS层），包含美团App的大搜日志、页面流量日志、模块事件日志以及描述埋点内容的信息日志。<br>公共维度，其中重要的流量入口维度、页面维度都是从具有统一规则的埋点标记日志中，抽象形成的维度。<br>B3层（酒旅基础明细层），通过对A层的抽取转换，初步形成只含酒旅业务所需的基础流量日志。<br>B2层（酒旅多维模型层），对已有的基础层数据和公共维度的轻加工，扩展出业务常用的维度信息，例如页面类型、商家门店、产品、城市，以及平台等。<br>B1层（主题宽表层），主题宽表层主要是对多维模型层的聚合计算，包括多个复杂业务口径的输出、少数维度的深加工，以及来源入口的增加，保证数据的一致性。<br>App层，该层是针对各自的流量应用（流量罗盘）设计的，满足该产品应用所需且具有一定扩展容量的聚合模型结构。<br>视图层，作为App层与Kylin cube的缓冲层，依靠其本身视图的特性，能够很好地解决顶层扩展、查询延时、资源分配，以及表意理解等多个问题。<br>cube层，每个Kylin cube是由单个视图与多个维度的雪花组合，输出计算数据给罗盘后台服务。<br>后台服务层，包含查询引擎和配置模块两部分的内容。处理前端的查询请求。<br>权限层，对各个业务线分平台和终端控制权限。<br>前端展示层，与用户交互并提交用户的查询请求。</p>
-<h1 id="数据仓库分层的原因"><a href="#数据仓库分层的原因" class="headerlink" title="数据仓库分层的原因"></a>数据仓库分层的原因</h1><p>1通过数据预处理提高效率，因为预处理，所以会存在冗余数据</p>
-<p>2如果不分层而业务系统的业务规则发生变化，就会影响整个数据清洗过程，工作量巨大</p>
-<p>3通过分层管理来实现分步完成工作，这样每一层的处理逻辑就简单了</p>
-<h1 id="标准的数据仓库分层："><a href="#标准的数据仓库分层：" class="headerlink" title="标准的数据仓库分层："></a>标准的数据仓库分层：</h1><p><img src="/images/pasted-90.png" alt="upload successful"></p>
-<ul>
-<li>ods（临时存储层）</li>
-<li>pdw（数据仓库层）</li>
-<li>mid（数据集市层） 轻度汇总(宽表几百个字段)</li>
-<li>app（应用层）OLAP/OLAM/app</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">中间层是数据仓库最重要的一层。直接决定了数据仓库的性能。</span><br><span class="line"></span><br><span class="line">一般的做法是：</span><br><span class="line"></span><br><span class="line">1）数据汇总。将底层数据按维度进行小颗粒度汇总</span><br><span class="line"></span><br><span class="line">2）信息聚合。将多张表的信息聚合在一个表中。这样的好处，是避免使用表关联，提高查询性能。</span><br></pre></td></tr></table></figure>
-<p>ods：历史存储层，它和源系统数据是同构的，而且这一层数据粒度是最细的，这层的表分为两种，一种是存储当前需要加载的数据，一种是用于存储处理完后的数据。</p>
-<p>pdw：数据仓库层，它的数据是干净的数据，是一致的准确的，也就是清洗后的数据，它的数据一般都遵循数据库第三范式，数据粒度和ods的粒度相同，它会保存bi系统中所有历史数据</p>
-<p>mid：数据集市层，它是<strong>面向主题</strong>组织数据的，通常是星状和雪花状数据，从数据粒度将，它是轻度汇总级别的数据，<strong>已经不存在明细的数据</strong>了，从广度来说，它包含了所有业务数量。从分析角度讲，大概就是近几年</p>
-<p>app：应用层，数据粒度高度汇总，倒不一定涵盖所有业务数据，只是mid层数据的一个子集。</p>
-<p>数据仓库的目的是构建面向分析的集成化数据环境，为企业提供决策支持。数据仓库的context也可以理解为：数据源，数据仓库，数据应用</p>
-<p>数据仓库可以理解为中间集成化数据管理的一个平台</p>
-<p>etl（抽取extra，转化transfer，装载load）是数据仓库的流水线，也可以认为是数据仓库的血液。</p>
-<p>数据仓库的存储并不需要存储所有原始数据，因为比如你存储冗长的文本数据完全没必要，但需要存储细节数据，因为需求是多变的，而且数据仓库是导入数据必须经过整理和转换使它面向主题，因为前台数据库的数据是基于oltp操作组织优化的，这些可能不适合做分析，面向主题的组织形式才有利于分析。</p>
-<p>多维数据模型就是说可以多维度交叉查询和细分，应用一般都是基于联机分析处理<strong>（online analytical process OLAP）</strong>，面向特定需求群体的数据集市会基于多位数据模型构建</p>
-<p>而报表展示就是将聚合数据和多维分析数据展示到报表，提供简单和直观的数据。</p>
-<p>元数据，也叫解释性数据，或者数据字典，会记录数据仓库中模型的定义，各层级之间的映射关系，监控数据仓库的数据状态和etl的任务运行状态。一般通过元数据资料库来统一存储和管理元数据。</p>
-<h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><h2 id="数据来源层"><a href="#数据来源层" class="headerlink" title="数据来源层"></a>数据来源层</h2><p>日志或者关系型数据库，并通过Flume、Sqoop、Kettle等etl工具导入到HDFS，并映射到HIVE的数据仓库表中。</p>
-<h2 id="事实表"><a href="#事实表" class="headerlink" title="事实表"></a>事实表</h2><p>是数据仓库结构中的中央表，它包含联系事实与维度表的数字度量值和键。事实数据表包含描述业务（例如产品销售）内特定事件的数据。</p>
-<h2 id="维度表"><a href="#维度表" class="headerlink" title="维度表"></a>维度表</h2><p>是维度属性的集合。是分析问题的一个窗口。是人们观察数据的特定角度，是考虑问题时的一类属性，属性的集合构成一个维。数据库结构中的星型结构，该结构在位于结构中心的单个事实数据表中维护数据，其它维度数据存储在维度表中。每个维度表与事实数据表直接相关，且通常通过一个键联接到事实数据表中。星型架构是数据仓库比较流向的一种架构</p>
-<h2 id="主题表：主题（Subject）"><a href="#主题表：主题（Subject）" class="headerlink" title="主题表：主题（Subject）"></a>主题表：主题（Subject）</h2><p>是在较高层次上将企业信息系统中的数据进行综合、归类和分析利用的一个抽象概念，每一个主题基本对应一个宏观的分析领域。在逻辑意义上，它是对应企业中某一宏观分析领域所涉及的分析对象。例如“销售分析”就是一个分析领域，因此这个数据仓库应用的主题就是“销售分析”。</p>
-<p>面向主题的数据组织方式，就是在较高层次上对分析对象数据的一个完整并且一致的描述，能刻画各个分析对象所涉及的企业各项数据，以及数据之间的联系。所谓较高层次是相对面向应用的数据组织方式而言的，是指按照主题进行数据组织的方式具有更高的数据抽象级别。与传统数据库面向应用进行数据组织的特点相对应，数据仓库中的数据是面向主题进行组织的。例如，一个生产企业的数据仓库所组织的主题可能有产品订货分析和货物发运分析等。而按应用来组织则可能为财务子系统、销售子系统、供应子系统、人力资源子系统和生产调度子系统。</p>
-<h2 id="汇总数据层-周报、月报、季报、年报"><a href="#汇总数据层-周报、月报、季报、年报" class="headerlink" title="汇总数据层(周报、月报、季报、年报)"></a>汇总数据层(周报、月报、季报、年报)</h2><p>聚合原子粒度事实表及维度表，为满足固定分析需求，以提高查询性能为目的，形成的高粒度表，如周报、月报、季报、年报等。</p>
-<h2 id="应用层："><a href="#应用层：" class="headerlink" title="应用层："></a>应用层：</h2><p>为应用层，这层数据是完全为了满足具体的分析需求而构建的数据，也是星形结构的数据。应用层为前端应用的展现提现数据，可以为关系型数据库组成。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/21/egenie_bugfix/bugfix-exception-try-catch/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/21/egenie_bugfix/bugfix-exception-try-catch/" itemprop="url">catch异常但是仍然回滚</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-21T16:28:49+08:00">
-                2018-03-21
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/03/21/egenie_bugfix/bugfix-exception-try-catch/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/21/egenie_bugfix/bugfix-exception-try-catch/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/03/21/egenie_bugfix/bugfix-exception-try-catch/" class="leancloud_visitors" data-flag-title="catch异常但是仍然回滚">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="上代码"><a href="#上代码" class="headerlink" title="上代码"></a>上代码</h1><h2 id="方式1"><a href="#方式1" class="headerlink" title="方式1:"></a>方式1:</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">public void insert() &#123;</span><br><span class="line">    long insuranceId = IdGenerator.generateId(&quot;insurance&quot;);</span><br><span class="line">    String sql = String.format(&quot;insert into a (id) values(%s)&quot;, insuranceId);</span><br><span class="line">    int update = jdbcTemplate.update(sql);</span><br><span class="line">  try &#123;</span><br><span class="line">      hrow new RuntimeException();</span><br><span class="line">    &#125; catch (RuntimeException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="方式2"><a href="#方式2" class="headerlink" title="方式2:"></a>方式2:</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">@Service</span><br><span class="line">@Transactional(readOnly = false)</span><br><span class="line">public class ExService2 &#123;</span><br><span class="line"></span><br><span class="line">    @Autowired</span><br><span class="line">    JdbcTemplate jdbcTemplate;</span><br><span class="line"></span><br><span class="line">    public void ex() &#123;</span><br><span class="line">        throw new RuntimeException();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">public void insert() &#123;</span><br><span class="line">    long insuranceId = IdGenerator.generateId(&quot;insurance&quot;);</span><br><span class="line">    String sql = String.format(&quot;insert into a (id) values(%s)&quot;, insuranceId);</span><br><span class="line">    int update = jdbcTemplate.update(sql);</span><br><span class="line">try &#123;</span><br><span class="line">        exService2.ex();</span><br><span class="line">//            throw new RuntimeException();</span><br><span class="line">    &#125; catch (RuntimeException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h1 id="测试结果"><a href="#测试结果" class="headerlink" title="测试结果"></a>测试结果</h1><p>看似同样的逻辑,但是对于事务的回滚影响却截然不同</p>
-<p>方式1:未回滚+一个异常日志<br>方式2:回滚:两个异常日志+<code>Transaction rolled back because it has been marked as rollback-only</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">20861 [http-nio-9991-exec-1] ERROR o.a.c.c.C.[.[.[.[dispatcherServlet] - Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed; nested exception is org.springframework.transaction.UnexpectedRollbackException: Transaction rolled back because it has been marked as rollback-only] with root cause</span><br><span class="line">org.springframework.transaction.UnexpectedRollbackException: Transaction rolled back because it has been marked as rollback-only</span><br><span class="line">	at org.springframework.transaction.support.AbstractPlatformTransactionManager.commit(AbstractPlatformTransactionManager.java:724)</span><br><span class="line">	at org.springframework.transaction.interceptor.TransactionAspectSupport.commitTransactionAfterReturning(TransactionAspectSupport.java:485)</span><br><span class="line">	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:291)</span><br><span class="line">	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:96)</span><br><span class="line">	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)</span><br><span class="line">	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:655)</span><br><span class="line">	at cn.egenie.admin.domain.controller.ExService$$EnhancerBySpringCGLIB$$c69282d3.insert(&lt;generated&gt;)</span><br><span class="line">	at cn.egenie.admin.domain.controller.ExceptionController.info(ExceptionController.java:25)</span><br><span class="line">	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)</span><br><span class="line">	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)</span><br><span class="line">	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)</span><br><span class="line">	at java.lang.reflect.Method.invoke(Method.java:498)</span><br><span class="line">	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:221)</span><br><span class="line">	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:136)</span><br><span class="line">	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:110)</span><br><span class="line">	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:832)</span><br><span class="line">	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:743)</span><br><span class="line">	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:85)</span><br><span class="line">	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:961)</span><br><span class="line">	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:895)</span><br><span class="line">	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:967)</span><br><span class="line">	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:858)</span><br><span class="line">	at javax.servlet.http.HttpServlet.service(HttpServlet.java:622)</span><br><span class="line">	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:843)</span><br><span class="line">	at javax.servlet.http.HttpServlet.service(HttpServlet.java:729)</span><br><span class="line">	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:292)</span><br><span class="line">	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:207)</span><br><span class="line">	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:52)</span><br><span class="line">	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:240)</span><br><span class="line">	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:207)</span><br><span class="line">	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:121)</span><br><span class="line">	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)</span><br><span class="line">	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:240)</span><br><span class="line">	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:207)</span><br><span class="line">	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:212)</span><br><span class="line">	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:106)</span><br><span class="line">	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:502)</span><br><span class="line">	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:141)</span><br><span class="line">	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:79)</span><br><span class="line">	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:88)</span><br><span class="line">	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:522)</span><br><span class="line">	at org.apache.coyote.http11.AbstractHttp11Processor.process(AbstractHttp11Processor.java:1095)</span><br><span class="line">	at org.apache.coyote.AbstractProtocol$AbstractConnectionHandler.process(AbstractProtocol.java:672)</span><br><span class="line">	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1502)</span><br><span class="line">	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.run(NioEndpoint.java:1458)</span><br><span class="line">	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)</span><br><span class="line">	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)</span><br><span class="line">	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)</span><br><span class="line">	at java.lang.Thread.run(Thread.java:748)</span><br></pre></td></tr></table></figure>
-<h1 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h1><p> spring 具备多种事务传播机制，最常用的是REQUIRED，即如果不存在事务，则新建一个事务；如果存在事务，则加入现存的事务中。<br>` public void A() {<br>    querySomething(…)；<br>    try {<br>      B()<br>    } catch () {<br>    }<br>    saveSomethinf()；<br>}</p>
-<p>public void B() {<br>    throw Exception()<br>}`<br>此时B会和A存在一个事务中。如果B抛出异常没有捕获，即使在A中捕获并处理，仍会发生异常：Transaction rolled back because it has been marked as rollback-only 因为spring会在A捕获异常之前提前捕获到异常，并将当前事务设置为rollback-only，而A觉得对异常进行了捕获，它仍然继续commit，当TransactionManager发现状态为设置为rollback-only时， 则会抛出UnexpectedRollbackException 相关代码在AbstractPlatformTransactonManager.java中：</p>
-<p>`public final void commit(TransactionStatus status) throws TransactionException {<br>        if (status.isCompleted()) {<br>            throw new IllegalTransactionStateException(<br>                    “Transaction is already completed - do not call commit or rollback more than once per transaction”);<br>        }</p>
-<pre><code>    DefaultTransactionStatus defStatus = (DefaultTransactionStatus) status;
-    if (defStatus.isLocalRollbackOnly()) {
-        if (defStatus.isDebug()) {
-            logger.debug(&quot;Transactional code has requested rollback&quot;);
-        }
-        processRollback(defStatus);
-        return;
-    }
-    if (!shouldCommitOnGlobalRollbackOnly() &amp;&amp; defStatus.isGlobalRollbackOnly()) {
-        if (defStatus.isDebug()) {
-            logger.debug(&quot;Global transaction is marked as rollback-only but transactional code requested commit&quot;);
-        }
-        processRollback(defStatus);
-        // Throw UnexpectedRollbackException only at outermost transaction boundary
-        // or if explicitly asked to.
-        if (status.isNewTransaction() || isFailEarlyOnGlobalRollbackOnly()) {
-            throw new UnexpectedRollbackException(
-                    &quot;Transaction rolled back because it has been marked as rollback-only&quot;);
-        }
-        return;
-    }
-
-    processCommit(defStatus);
-}`
-</code></pre>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/21/mysql/study-sharding-mysql/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/21/mysql/study-sharding-mysql/" itemprop="url">mysql分库分表</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-21T13:53:45+08:00">
-                2018-03-21
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/mysql/" itemprop="url" rel="index">
-                    <span itemprop="name">mysql</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/03/21/mysql/study-sharding-mysql/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/21/mysql/study-sharding-mysql/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/03/21/mysql/study-sharding-mysql/" class="leancloud_visitors" data-flag-title="mysql分库分表">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://tech.meituan.com/dianping_order_db_sharding.html" target="_blank" rel="noopener">https://tech.meituan.com/dianping_order_db_sharding.html</a><br><a href="https://help.aliyun.com/knowledge_list/52171.html?spm=a2c4g.11186623.6.702.CJt75C" target="_blank" rel="noopener">https://help.aliyun.com/knowledge_list/52171.html?spm=a2c4g.11186623.6.702.CJt75C</a><br><a href="http://shardingjdbc.io/docs_cn/02-guide/sharding/" target="_blank" rel="noopener">http://shardingjdbc.io/docs_cn/02-guide/sharding/</a><br><a href="https://github.com/MyCATApache/Mycat-doc/blob/master/%E5%85%A5%E9%97%A8%E6%8C%87%E5%8D%97/mycat%E5%88%86%E7%89%87%E8%A7%84%E5%88%99%20.docx" target="_blank" rel="noopener">https://github.com/MyCATApache/Mycat-doc/blob/master/%E5%85%A5%E9%97%A8%E6%8C%87%E5%8D%97/mycat%E5%88%86%E7%89%87%E8%A7%84%E5%88%99%20.docx</a></p>
-<h1 id="水平切分"><a href="#水平切分" class="headerlink" title="水平切分"></a>水平切分</h1><h2 id="切分策略"><a href="#切分策略" class="headerlink" title="切分策略"></a>切分策略</h2><h3 id="查询切分"><a href="#查询切分" class="headerlink" title="查询切分"></a>查询切分</h3><p>将ID和库的Mapping关系记录在一个单独的库中。<br>优点：ID和库的Mapping算法可以随意更改。<br>缺点：引入额外的单点。</p>
-<h3 id="范围切分"><a href="#范围切分" class="headerlink" title="范围切分"></a>范围切分</h3><p>比如按照时间区间或ID区间来切分。<br>优点：单表大小可控，天然水平扩展。<br>缺点：无法解决集中写入瓶颈的问题。</p>
-<h3 id="3-Hash切分"><a href="#3-Hash切分" class="headerlink" title="3. Hash切分"></a>3. Hash切分</h3><ul>
-<li>按照订单号来做hash分散订单数据<ul>
-<li>均匀分散</li>
-<li>如果要查询某用户的所有订单呢？由于是根据订单号来分散数据的。他的订单分散在了多个库、多个表中。总不能去所有的库，所有的表扫描吧。这样效率很低。</li>
-</ul>
+<p>redis集群是一个无中心的分布式Redis存储架构，可以在多个节点之间进行数据共享，解决了Redis高可用、可扩展等问题。redis集群提供了以下两个好处</p>
+<p>1、将数据自动切分(split)到多个节点<br>2、当集群中的某一个节点故障时，redis还可以继续处理客户端的请求。</p>
+<p>一个 Redis 集群包含 16384 个哈希槽（hash slot），数据库中的每个数据都属于这16384个哈希槽中的一个。集群使用公式 CRC16(key) % 16384 来计算键 key 属于哪个槽。集群中的每一个节点负责处理一部分哈希槽。</p>
+<h2 id="Redis-集群的数据分片"><a href="#Redis-集群的数据分片" class="headerlink" title="Redis 集群的数据分片"></a>Redis 集群的数据分片</h2><p>Redis 集群没有使用一致性hash, 而是引入了 哈希槽的概念.</p>
+<p>Redis 集群有16384个哈希槽,每个key通过CRC16校验后对16384取模来决定放置哪个槽.集群的每个节点负责一部分hash槽,举个例子,比如当前集群有3个节点,那么:</p>
+<p>节点 A 包含 0 到 5500号哈希槽.<br>节点 B 包含5501 到 11000 号哈希槽.<br>节点 C 包含11001 到 16384号哈希槽.<br>这种结构很容易添加或者删除节点. 比如如果我想新添加个节点D, 我需要从节点 A, B, C中得部分槽到D上. 如果我想移除节点A,需要将A中的槽移到B和C节点上,然后将没有任何槽的A节点从集群中移除即可. 由于从一个节点将哈希槽移动到另一个节点并不会停止服务,所以无论添加删除或者改变某个节点的哈希槽的数量都不会造成集群不可用的状态.</p>
+<p>何处维护hash槽的绑定关系</p>
+<h2 id="cap理论"><a href="#cap理论" class="headerlink" title="cap理论"></a>cap理论</h2><p>Redis Cluster集群功能推出已经有一段时间了。在单机版的Redis中，每个Master之间是没有任何通信的，所以我们一般在Jedis客户端或者Codis这样的代理中做Pre-sharding。按照CAP理论来说，单机版的Redis属于保证CP(Consistency &amp; Partition-Tolerancy)而牺牲A(Availability)，也就说Redis能够保证所有用户看到相同的数据（一致性，因为Redis不自动冗余数据）和网络通信出问题时，暂时隔离开的子系统能继续运行（分区容忍性，因为Master之间没有直接关系，不需要通信），但是不保证某些结点故障时，所有请求都能被响应（可用性，某个Master结点挂了的话，那么它上面分片的数据就无法访问了）。</p>
+<p>有了Cluster功能后，Redis从一个单纯的NoSQL内存数据库变成了分布式NoSQL数据库，CAP模型也从CP变成了AP。也就是说，通过自动分片和冗余数据，Redis具有了真正的分布式能力，某个结点挂了的话，因为数据在其他结点上有备份，所以其他结点顶上来就可以继续提供服务，保证了Availability。然而，也正因为这一点，Redis无法保证曾经的强一致性了。这也是CAP理论要求的，三者只能取其二。</p>
+<h1 id="集群中的主从复制"><a href="#集群中的主从复制" class="headerlink" title="集群中的主从复制"></a>集群中的主从复制</h1><p>集群中的每个节点都有1个至N个复制品，其中一个为主节点，其余的为从节点，如果主节点下线了，集群就会把这个主节点的一个从节点设置为新的主节点，继续工作。这样集群就不会因为一个主节点的下线而无法正常工作。</p>
+<p>注意：</p>
+<p>1、如果某一个主节点和他所有的从节点都下线的话，redis集群就会停止工作了。redis集群不保证数据的强一致性，在特定的情况下，redis集群会丢失已经被执行过的写命令</p>
+<p>2、使用异步复制（asynchronous replication）是 Redis 集群可能会丢失写命令的其中一个原因，有时候由于网络原因，如果网络断开时间太长，redis集群就会启用新的主节点，之前发给主节点的数据就会丢失。</p>
+<h1 id="Redis-Cluster分片实现"><a href="#Redis-Cluster分片实现" class="headerlink" title="Redis Cluster分片实现"></a>Redis Cluster分片实现</h1><p>一般分片（Sharding）实现的方式有list、range和hash(或者基于上述的组合方式)等方式。而Redis的实现方式是基于hash的分片方式，具体是虚拟槽分区。</p>
+<p>虚拟槽分区</p>
+<p>槽(slot):使用分散度良好的hash函数把所有数据映射到一个固定范围的整数集合中，这个整数集合就是槽。</p>
+<p>Redis Cluster槽: Redis Cluster槽的范围是0 ~ 16383。槽是集群内数据管理和迁移的基本单位。</p>
+<p><img src="/images/pasted-108.png" alt="upload successful"></p>
+<h2 id="Hash标签"><a href="#Hash标签" class="headerlink" title="Hash标签"></a>Hash标签</h2><p>哈希标签(hash tags)，在Redis集群分片中，可以通过哈希标签来实现指定两个及以上的Key在同一个slot中。只要Key包含“{…}”这种模式，Redis就会根据第一次出现的’{’和第一次出现的’}’之间的字符串进行哈希计算以获取相对应的slot数。如上Redis源码实现。</p>
+<p>所以如果要指定某些Key存储到同一个slot中，只需要在命令Key的之后指定相同的“{…}”命名模式即可。</p>
+<h2 id="集群节点和槽"><a href="#集群节点和槽" class="headerlink" title="集群节点和槽"></a>集群节点和槽</h2><p>当Redis Cluster中的16384个槽都有节点在处理时，集群处于上线状态(ok)；</p>
+<p>如果Redis Cluster中有任何一个槽没有得到处理(或者某一分片的最后一个节点挂了)，那么集群处于下线状态(fail)。（info cluster中的：cluster_state状态）。那整个集群就不能对外提供服务。</p>
+<p>Redis-3.0.0.rc1加入cluster-require-full-coverage参数，默认关闭，打开集群容忍部分失败。</p>
+<p>但是如果集群超过半数以上master挂掉，无论是否有slave集群进入fail状态。</p>
+<h2 id="节点ID"><a href="#节点ID" class="headerlink" title="节点ID"></a>节点ID</h2><p>Redis Cluster每个节点在集群中都有唯一的ID，该ID是由40位的16进制字符组成，具体是节点第一次启动由linux的/dev/urandom生成。具体信息会保存在node.cnf配置文件中(该文件有Redis Cluster自动维护，可以通过参数cluster-config-file来指定路径和名称)，如果该文件被删除，节点ID将会重新生成。（删除以后所有的cluster和replication信息都没有了）或者通过Cluster Reset强制请求硬重置。</p>
+<p>节点ID用于标识集群中的每个节点，包括指定Replication Master。只要节点ID不改变，哪怕节点的IP和端口发生了改变，Redis Cluster可以自动识别出IP和端口的变化，并将变更的信息通过Gossip协议广播给其他节点。</p>
+<h2 id="ClusterNode"><a href="#ClusterNode" class="headerlink" title="ClusterNode"></a>ClusterNode</h2><p><img src="/images/pasted-109.png" alt="upload successful"></p>
+<p>Master 节点维护这一个16384/8字节的位序列，Master节点用bit来标识对于某个槽自己是否拥有。(判断索引是不是为1即可)</p>
+<p>slots属性是一个二进制位数组(bit arry)，这个数组的长度为16384/8 = 2048个字节，共包含16384个二进制。</p>
+<p>Redis Cluster对slots数组中的16384个二进制位进行编号：从0为起始索引，16383为终止索引。</p>
+<p>根据索引i上的二进制位的值来判断节点是否负责处理槽i：</p>
+<p>•slots数组在索引i上的二进制位的值为1，即表示该节点负责处理槽i；</p>
+<p>•slots数组在索引i上的二进制位的值为0，即表示该节点不负责处理槽i；</p>
+<p>示例1：（如下节点负责处理slot0-slot7）</p>
+<p><img src="/images/pasted-110.png" alt="upload successful"><br>即在Redis Cluster中Master节点使用bit(0)和bit(1)来标识对某个槽是否拥有，而Master只要判断序列第二位的值是不是1即可，时间复杂度为O(1)。</p>
+<p>numslots属性记录节点负责处理的槽的数量，也就是slots数组中值为1的二进制位的数量。上图中节点处理的槽数量为8个。</p>
+<h2 id="ClusterState"><a href="#ClusterState" class="headerlink" title="ClusterState"></a>ClusterState</h2><p>集群中所有槽的分配信息都保存在ClusterState数据结构的slots数组中，程序要检查槽i是否已经被分配或者找出处理槽i的节点，只需要访问clusterState.slots[i]的值即可，时间复杂度为O(1)。</p>
+<p>slots数组包含16384个项，每个数组项都是一个指向clusterNode结构的指针：</p>
+<p>•如果slots[i]指针指向null，那么表示槽i尚未指派给任何节点；</p>
+<p>•如果slots[i]指针指向一个clusterNode结构，那么表示槽i已经指派给了clusterNode结构所代表的节点。</p>
+<p><img src="/images/pasted-111.png" alt="upload successful"><br>示例2：</p>
+<ol>
+<li><p>slots[0]至slots[4999]的指针都指向端口为6381的节点，即槽0到4999都由节点6381负责处理；</p>
 </li>
-<li>取模切分(较多)<ul>
-<li>要扩容的时候，为了减少迁移的数据量，一般扩容是以倍数的形式增加。比如原来是8个库，扩容的时候，就要增加到16个库，再次扩容，就增加到32个库。这样迁移的数据量，就小很多了。这个问题不算很大问题，毕竟一次扩容，可以保证比较长的时间，而且使用倍数增加的方式，已经减少了数据迁移量。</li>
-</ul>
+<li><p>slots[5000]至slots[9999]的指针都指向端口为6382的节点，即槽5000到9999都由节点6382负责处理；</p>
+</li>
+<li><p>slots[10000]至slots[16383]的指针都指向端口为6383的节点，即槽10000到16384都由节点6383负责处理。</p>
+</li>
+</ol>
+<p><img src="/images/pasted-112.png" alt="upload successful"></p>
+<h2 id="数组-clusterNode-slots和clusterState-slots："><a href="#数组-clusterNode-slots和clusterState-slots：" class="headerlink" title="数组 clusterNode.slots和clusterState.slots："></a>数组 clusterNode.slots和clusterState.slots：</h2><p>• clusterNode.slots数组记录了clusterNode结构所代表的节点的槽指派信息（每个节点负责哪些槽）。</p>
+<p>• clusterState.slots数组记录了集群中所有槽的指派信息。</p>
+<p>• 如果需要查看某个节点的槽指派信息，只需要将相应节点的clusterNode.slots数组整个发送出去即可。</p>
+<p>• 但是如果需要查看槽i是否被分配或者分配给了哪个节点，就需要遍历clusterState.nodes字典中所有clusterNode结构，检查这些结构的slots数组，直到遍历到负责处理槽i的节点为止，这个过程的时间复杂度为O(N)，N是clusterState.nodes字典保存的clusterNode结构的数量。</p>
+<p>• 引入clusterState.slots ,将所有槽的指派信息保存在clusterState.slots数组里面，程序要检查槽i是否已经被指派，或者查看负责处理槽i的节点，只需要访问clusterState.slots[i]的值即可，这个操作的时间复杂度为O(1)。</p>
+<p>• 如果只使用clusterState.slots数组(不引入clusterNode.slots)，如果要将节点A的槽指派信息传播给其他节点时，必须先遍历整个clusterState.slots数组，记录节点A负责处理哪些槽，然后再发送给其他节点。比直接发送clusterNode.slots数组要低效的多。</p>
+<h2 id="Redis-Cluster节点通信"><a href="#Redis-Cluster节点通信" class="headerlink" title="Redis Cluster节点通信"></a>Redis Cluster节点通信</h2><p>Redis Cluster节点通信<br><strong>Redis Cluster采用P2P的Gossip协议，Gossip协议的原理就是每个节点与其他节点间不断通信交换信息，一段时间后节点信息一致，每个节点都知道集群的完整信息</strong>。</p>
+<p>Redis Cluster通信过程：</p>
+<p>(1)集群中的每个节点都会单独开辟一个TCP通道，用于节点之间彼此通信，通信端口号在基础端口上加10000；</p>
+<p>(2)每个节点在固定周期内通过特定规则选择几个节点发送ping消息；</p>
+<p>(3)接收到ping消息的节点用pong消息作为响应。</p>
+<p>集群中每个节点通过一定规则挑选要通信的节点，每个节点可能知道全部节点，也可能仅知道部分节点，</p>
+<p>只要这些节点彼此可以正常通信，最终它们会达到一致的状态。当节点出故障、新节点加入、主从角色变化、槽信息变更等事件发生时，通过不断的ping/pong消息通信，经过一段时间后所有的节点都会知道整个集群全部节点的最新状态，从而达到集群状态同步的目的。</p>
+<h2 id="Gossip消息"><a href="#Gossip消息" class="headerlink" title="Gossip消息"></a>Gossip消息</h2><p>Gossip协议的主要职责就是信息交换，信息交换的载体就是节点彼此发送的Gossip消息，常用的Gossip消息可分为：</p>
+<p>• meet消息：用于通知新节点加入。消息发送者通知接收者加入到当前集群，meet消息通信正常完成后，接收节点会加入到集群中并进行周期性的ping、pong消息交换；</p>
+<p>• ping消息：集群内交换最频繁的消息，集群内每个节点每秒向多个其他节点发送ping消息，用于检测节点是否在线和交换彼此状态信息。ping消息发送封装了自身节点和部分其他节点的状态数据。</p>
+<p>• pong消息：当接收到ping、meet消息时，作为响应消息回复给发送方确认消息正常通信。pong消息内部封装了自身状态数据。节点也可以向集群内广播自身的pong消息来通知整个集群对自身状态进行更新。</p>
+<p>• fail消息：当节点判定集群内另一个节点下线时，会向集群内广播一个fail消息，其他节点接收到fail消息之后把对应节点更新为下线状态。</p>
+<p>消息格式：</p>
+<p>所有的消息格式划分为：消息头和消息体。</p>
+<p>消息头包含发送节点自身状态数据，接收节点根据消息头就可以获取到发送节点的相关数据。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/28/redis/redis-master-slave/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/28/redis/redis-master-slave/" itemprop="url">redis主从复制</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-28T22:20:50+08:00">
+                2018-03-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/28/redis/redis-master-slave/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/03/28/redis/redis-master-slave/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/03/28/redis/redis-master-slave/" class="leancloud_visitors" data-flag-title="redis主从复制">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>1、redis的复制功能是支持多个数据库之间的数据同步。一类是主数据库（master）一类是从数据库（slave），主数据库可以进行读写操作，当发生写操作的时候自动将数据同步到从数据库，而从数据库一般是只读的，并接收主数据库同步过来的数据，一个主数据库可以有多个从数据库，而一个从数据库只能有一个主数据库。</p>
+<p>2、通过redis的复制功能可以很好的实现数据库的读写分离，提高服务器的负载能力。主数据库主要进行写操作，而从数据库负责读操作。</p>
+<p><img src="/images/pasted-107.png" alt="upload successful"></p>
+<h2 id="重要方面："><a href="#重要方面：" class="headerlink" title="重要方面："></a>重要方面：</h2><p>Redis 使用异步复制。 从 Redis 2.8 开始， 从服务器会以每秒一次的频率向主服务器报告复制流（replication stream）的处理进度。</p>
+<ul>
+<li><p>一个主服务器可以有多个从服务器。</p>
+</li>
+<li><p>不仅主服务器可以有从服务器， 从服务器也可以有自己的从服务器， 多个从服务器之间可以构成一个图状结构。</p>
+</li>
+<li><p>复制功能不会阻塞主服务器： 即使有一个或多个从服务器正在进行初次同步， 主服务器也可以继续处理命令请求。</p>
+</li>
+<li><p>复制功能也不会阻塞从服务器： 只要在 redis.conf 文件中进行了相应的设置， 即使从服务器正在进行初次同步， 服务器也可以使用旧版本的数据集来处理命令查询。不过， 在从服务器删除旧版本数据集并载入新版本数据集的那段时间内， 连接请求会被阻塞。你还可以配置从服务器， 让它在与主服务器之间的连接断开时， 向客户端发送一个错误。</p>
+</li>
+<li><p>复制功能可以单纯地用于数据冗余（data redundancy）， 也可以通过让多个从服务器处理只读命令请求来提升扩展性（scalability）： 比如说， 繁重的 SORT 命令可以交给附属节点去运行。</p>
+</li>
+<li><p>可以通过复制功能来让主服务器免于执行持久化操作： 只要关闭主服务器的持久化功能， 然后由从服务器去执行持久化操作即可。</p>
 </li>
 </ul>
-<p>为了保持性能，每张表的数据量要控制。单表可以维持在一千万-5千万行的数据。1024*一千万。哇，可以表示很多数据了。</p>
-<p>一般采用Mod来切分，下面着重讲一下Mod的策略。</p>
-<p><img src="/images/pasted-86.png" alt="upload successful"></p>
-<p>数据水平切分后我们希望是一劳永逸或者是易于水平扩展的，所以推荐采用mod 2^n这种一致性Hash。</p>
-<p>以统一订单库为例，我们分库分表的方案是32*32的，即通过UserId后四位mod 32分到32个库中，同时再将UserId后四位整除32后 Mod 32将每个库分为32个表，共计分为1024张表。线上部署情况为8个集群(主从)，每个集群4个库。</p>
-<p>为什么说这种方式是易于水平扩展的呢？我们分析如下两个场景。</p>
-<p>场景一：数据库性能达到瓶颈<br>方法一<br>按照现有规则不变，可以直接扩展到32个数据库集群。</p>
-<p><img src="/images/pasted-87.png" alt="upload successful"></p>
-<p>方法二<br>如果32个集群也无法满足需求，那么将分库分表规则调整为(32<em>2^n)</em>(32/2^n)，可以达到最多1024个集群。</p>
-<h1 id="查询需求的考虑"><a href="#查询需求的考虑" class="headerlink" title="查询需求的考虑"></a>查询需求的考虑</h1><p>   思路：既然是根据订单号分散订单数据，如果需要知道某个用户所有的订单。只要我能知道了a用户的所有的订单号，那么就可以根据订单号定位到表名称了。</p>
-<p>  思路：既然是根据用户id来分散订单数据的。那么只要知道了这个订单号是谁的(得到了用户id)，就能知道去哪个库、哪个表查询数据了。<br>      那怎么知道是谁的呢？建立一个索引关系表，暂且叫做订单用户关系索引表order_user_idx。咱们命名为了保持维护性，还是一看能够知道是干嘛用的。<br>   存储的数据包括两项：订单号、用户编号。<br>   这样输入订单号，可以去查询索引关系表，获取到用户编号。<br>   得到了用户编号，问题解决了。订单信息是根据用户编号分库分表的，可以直接定位到x库x表了。<br>  当创建订单的时候，就要把关系插入到表里面去了。保存关系记录时，为了减低用户等待时间，不需要实时，做成异步。加入到消息队列中去操作。</p>
-<h1 id="唯一ID方案"><a href="#唯一ID方案" class="headerlink" title="唯一ID方案"></a>唯一ID方案</h1><h1 id="其他方案"><a href="#其他方案" class="headerlink" title="其他方案"></a>其他方案</h1><ul>
-<li>事务支持：我们是将整个订单领域聚合体切分，维度一致，所以对聚合体的事务是支持的。</li>
-<li>复杂查询：垂直切分后，就跟join说拜拜了；水平切分后，查询的条件一定要在切分的维度内，比如查询具体某个用户下的各位订单等；禁止不带切分的维度的查询，即使中间件可以支持这种查询，可以在内存中组装，但是这种需求往往不应该在在线库查询，或者可以通过其他方法转换到切分的维度来实现。</li>
-</ul>
-<p><img src="/images/pasted-88.png" alt="upload successful"></p>
-<p>场景二：单表容量达到瓶颈（或者1024已经无法满足你）</p>
-<p>方法：</p>
-<p><img src="/images/pasted-89.png" alt="upload successful"></p>
-<p>假如单表都已突破200G，200<em>1024=200T（按照现有的订单模型算了算，大概一万千亿订单，相信这一天，嗯，指日可待！），没关系，32</em>(32*2^n)，这时分库规则不变，单库里的表再进行裂变，当然，在目前订单这种规则下（用userId后四位 mod）还是有极限的，因为只有四位，所以最多拆8192个表，至于为什么只取后四位，后面会有篇幅讲到。</p>
-<p>另外一个维度是通过ShopID进行切分，规则8*8和UserID比较类似，就不再赘述，需要注意的是Shop库我们仅存储了订单主表，用来满足Shop维度的查询。</p>
-<h1 id="数据迁移（从单表–切换到分表的过程）"><a href="#数据迁移（从单表–切换到分表的过程）" class="headerlink" title="数据迁移（从单表–切换到分表的过程）"></a>数据迁移（从单表–切换到分表的过程）</h1><p>数据库拆分一般是业务发展到一定规模后的优化和重构，为了支持业务快速上线，很难一开始就分库分表，垂直拆分还好办，改改数据源就搞定了，一旦开始水平拆分，数据清洗就是个大问题，为此，我们经历了以下几个阶段。</p>
-<h2 id="第一阶段"><a href="#第一阶段" class="headerlink" title="第一阶段"></a>第一阶段</h2><p>数据库双写（事务成功以老模型为准），查询走老模型。<br>每日job数据对账（通过DW），并将差异补平。<br>通过job导历史数据。</p>
-<h2 id="第二阶段"><a href="#第二阶段" class="headerlink" title="第二阶段"></a>第二阶段</h2><p>历史数据导入完毕并且数据对账无误。<br>依然是数据库双写，但是事务成功与否以新模型为准，在线查询切新模型。<br>每日job数据对账，将差异补平。</p>
-<h2 id="第三阶段"><a href="#第三阶段" class="headerlink" title="第三阶段"></a>第三阶段</h2><h1 id="其他场景"><a href="#其他场景" class="headerlink" title="其他场景"></a>其他场景</h1><h2 id="思考一、b2b平台的订单分卖家和买家的时候，选择什么字段来分库分表呢？"><a href="#思考一、b2b平台的订单分卖家和买家的时候，选择什么字段来分库分表呢？" class="headerlink" title="思考一、b2b平台的订单分卖家和买家的时候，选择什么字段来分库分表呢？"></a>思考一、b2b平台的订单分卖家和买家的时候，选择什么字段来分库分表呢？</h2><p>上面讨论的情况是，b2c平台。订单的卖家就一个，就是平台自己。<br>b2b平台，上面支持开店，买家和卖家都要能够登陆看到自己的订单。<br>先来看看，分表使用买家id分库分表和根据卖家id分库分表，两种办法出现的问题<br>如果按买家id来分库分表。有卖家的商品，会有n个用户购买，他所有的订单，会分散到多个库多个表中去了，卖家查询自己的所有订单，跨库、跨表扫描，性能低下。</p>
-<p>如果按卖家id分库分表。买家会在n个店铺下单。订单就会分散在多个库、多个表中。买家查询自己所有订单，同样要去所有的库、所有的表搜索，性能低下。</p>
-<p>所以，无论是按照买家id切分订单表，还是按照卖家id切分订单表。两边都不讨好。</p>
-<p>淘宝的做法是拆分买家库和卖家库，也就是两个库：买家库、卖家库。</p>
-<p>买家库，按照用户的id来分库分表。卖家库，按照卖家的id来分库分表。</p>
-<p>实际上是通过数据冗余解决的：一个订单，在买家库里面有，在卖家库里面也存储了一份。下订单的时候，要写两份数据。先把订单写入买家库里面去，然后通过消息中间件来同步订单数据到卖家库里面去。</p>
-<p>买家库的订单a修改了后，要发异步消息，通知到卖家库去，更改状态。</p>
-<h2 id="思考二：那可以按订单号来分库分表吗"><a href="#思考二：那可以按订单号来分库分表吗" class="headerlink" title="思考二：那可以按订单号来分库分表吗?"></a>思考二：那可以按订单号来分库分表吗?</h2><p>这样分库分表的话，用户有10个订单，订单不见得都在一个库、一个表里面。查询a用户的所有订单，就会变得麻烦了。尤其是要进行分页展示，分散在不同的表，甚至不同的数据库服务器，也比较耗费性能。</p>
-<p>那么订单号里面，最好是要有分库分表信息。淘宝的是在订单号里面添加了卖家id末2位、买家id末2位。这样的好处是干嘛呢？直接定位到具体的库、具体的表去了？</p>
-<p>怎么根据这个呢。因为分库、分表的规则，买家库是按照卖家id末尾2位数分，卖家库是按照卖家id末尾两位分。</p>
-<p>所以，只要从订单号里面拿到了这些数字信息，就知道在哪个库，哪个表了。</p>
-<p>这种办法，与微信的红包订单号是类似的，末尾三位数包含了库信息、表信息。</p>
-<p>按照这样，其实就没必要使用订单号来计算了？</p>
-<p>如果是按照用户id的后4位数取模分散订单数据。那么订单号的生成，可以在后面加上用户id的后4位数。</p>
-<p>那么，虽然是按照用户id来对订单表分库分表的。其实可以直接根据订单号，知道这个订单在哪个库哪个表了。</p>
-<p>如果是b2b系统，涉及到卖家和买家。那么可以把卖家和买家的id后面4位都加进去。不过是不是订单号太长了？</p>
-<h2 id="思考三、按照订单的时间来分表如何"><a href="#思考三、按照订单的时间来分表如何" class="headerlink" title="思考三、按照订单的时间来分表如何?"></a>思考三、按照订单的时间来分表如何?</h2><p>一月一张表。一年一张表。用户的所有订单，会分散在不同的库、不同的表中。</p>
-<p>按照时间分，在切分订单数据的时候，业界用得比较少。</p>
-<p>出现如下两个问题：</p>
-<p>1、如果需要分页查询某个用户的所有订单数据，就会出现跨库、跨表查询。效率低。</p>
-<p>   可以做折中：限制只能查一个范围内的订单，比如一次只能查询，一年以内或者一个月以内的订单。</p>
-<p>2、某个时间集中写入数据，出现瓶颈。如一个月一张表。这个月的订单量暴涨呢。那么写入新的订单数据都会操作这张表。造成性能低下。影响整个业务系统交易。</p>
-<p>真正好的分表方案，尽量将写数据分散到多个表去，达到分流效果，系统的并发能力就提高了。</p>
-<h1 id="分库分表需要解决的问题"><a href="#分库分表需要解决的问题" class="headerlink" title="分库分表需要解决的问题"></a>分库分表需要解决的问题</h1><h2 id="事务问题"><a href="#事务问题" class="headerlink" title="事务问题"></a>事务问题</h2><p>方案一：使用分布式事务<br>优点：交由数据库管理，简单有效<br>缺点：性能代价高，特别是shard越来越多时<br>方案二：由应用程序和数据库共同控制<br>原理：将一个跨多个数据库的分布式事务分拆成多个仅处 于单个数据库上面的小事务，并通过应用程序来总控 各个小事务。<br>优点：性能上有优势<br>缺点：需要应用程序在事务控制上做灵活设计。如果使用 了spring的事务管理，改动起来会面临一定的困难。</p>
-<h2 id="跨节点Join的问题"><a href="#跨节点Join的问题" class="headerlink" title="跨节点Join的问题"></a>跨节点Join的问题</h2><p>只要是进行切分，跨节点Join的问题是不可避免的。但是良好的设计和切分却可以减少此类情况的发生。解决这一问题的普遍做法是分两次查询实现。在第一次查询的结果集中找出关联数据的id,根据这些id发起第二次请求得到关联数据。</p>
-<h2 id="跨节点的count-order-by-group-by以及聚合函数问题"><a href="#跨节点的count-order-by-group-by以及聚合函数问题" class="headerlink" title="跨节点的count,order by,group by以及聚合函数问题"></a>跨节点的count,order by,group by以及聚合函数问题</h2><p>这些是一类问题，因为它们都需要基于全部数据集合进行计算。多数的代理都不会自动处理合并工作。解决方案：与解决跨节点join问题的类似，分别在各个节点上得到结果后在应用程序端进行合并。和join不同的是每个结点的查询可以并行执行，因此很多时候它的速度要比单一大表快很多。但如果结果集很大，对应用程序内存的消耗是一个问题。</p>
-<h2 id="数据迁移，容量规划，扩容等问题"><a href="#数据迁移，容量规划，扩容等问题" class="headerlink" title="数据迁移，容量规划，扩容等问题"></a>数据迁移，容量规划，扩容等问题</h2><p>来自淘宝综合业务平台团队，它利用对2的倍数取余具有向前兼容的特性（如对4取余得1的数对2取余也是1）来分配数据，避免了行级别的数据迁移，但是依然需要进行表级别的迁移，同时对扩容规模和分表数量都有限制。总得来说，这些方案都不是十分的理想，多多少少都存在一些缺点，这也从一个侧面反映出了Sharding扩容的难度。</p>
-<h2 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h2><h2 id="ID问题"><a href="#ID问题" class="headerlink" title="ID问题"></a>ID问题</h2><h2 id="跨分片的排序分页"><a href="#跨分片的排序分页" class="headerlink" title="跨分片的排序分页"></a>跨分片的排序分页</h2><h2 id="分库策略"><a href="#分库策略" class="headerlink" title="分库策略"></a>分库策略</h2><h2 id="分库数量"><a href="#分库数量" class="headerlink" title="分库数量"></a>分库数量</h2><h2 id="路由透明"><a href="#路由透明" class="headerlink" title="路由透明"></a>路由透明</h2><h2 id="使用框架还是自主研发"><a href="#使用框架还是自主研发" class="headerlink" title="使用框架还是自主研发"></a>使用框架还是自主研发</h2><h1 id="如何选择分片数"><a href="#如何选择分片数" class="headerlink" title="如何选择分片数"></a>如何选择分片数</h1><p>DRDS 中的水平拆分有两个层次：分库和分表。每个 RDS 实例上默认会创建8个物理分库，每个物理分库上可以创建一个或多个物理分表。分表数通常也被称为分片数。</p>
-<p>一般情况下，建议单个物理分表的容量不超过500万行数据。通常可以预估1到2年的数据增长量，用估算出的总数据量除以总的物理分库数，再除以建议的最大数据量500万，即可得出每个物理分库上需要创建的物理分表数：</p>
-<p><code>物理分库上的物理分表数 = 向上取整(估算的总数据量 / (RDS 实例数 * 8) / 5,000,000)</code></p>
-<h1 id="如何选择拆分键"><a href="#如何选择拆分键" class="headerlink" title="如何选择拆分键"></a>如何选择拆分键</h1><p>拆分键即分库/分表字段，是在水平拆分过程中用于生成拆分规则的数据表字段。DRDS 根据拆分键的值将数据表水平拆分到每个 RDS 实例上的物理分库中。</p>
-<p>数据表拆分的首要原则，就是要尽可能找到数据表中的数据在业务逻辑上的主体，并确定大部分（或核心的）数据库操作都是围绕这个主体的数据进行，然后可使用该主体对应的字段作为拆分键，进行分库分表。</p>
-<p>业务逻辑上的主体，通常与业务的应用场景相关，下面的一些典型应用场景都有明确的业务逻辑主体，可用于拆分键：</p>
+<h1 id="过程："><a href="#过程：" class="headerlink" title="过程："></a>过程：</h1><p>1：当一个从数据库启动时，会向主数据库发送sync命令，</p>
+<p>2：主数据库接收到sync命令后会开始在后台保存快照（执行rdb操作），并将保存期间接收到的命令缓存起来</p>
+<p>3：当快照完成后，redis会将快照文件和所有缓存的命令发送给从数据库。</p>
+<p>4：从数据库收到后，会载入快照文件并执行收到的缓存的命令。</p>
+<h1 id="方式"><a href="#方式" class="headerlink" title="方式"></a>方式</h1><p>配置方式<br>手动方式</p>
+<h1 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h1><p>如果你使用主从复制，那么要确保你的master激活了持久化，或者确保它不会在当掉后自动重启。原因：</p>
+<p>slave是master的完整备份，因此如果master通过一个空数据集重启，slave也会被清掉。</p>
+<p>在配置redis复制功能的时候如果主数据库设置了密码，需要在从数据的配置文件中通过masterauth参数设置主数据库的密码，这样从数据库在连接主数据库时就会自动使用auth命令认证了。相当于做了一个免密码登录。</p>
+<h1 id="复制功能的运作原理"><a href="#复制功能的运作原理" class="headerlink" title="复制功能的运作原理"></a>复制功能的运作原理</h1><h2 id="完整重同步"><a href="#完整重同步" class="headerlink" title="完整重同步"></a>完整重同步</h2><p>无论是初次连接还是重新连接， 当建立一个从服务器时， 从服务器都将向主服务器发送一个 SYNC 命令。</p>
+<p>接到 SYNC 命令的主服务器将开始执行 BGSAVE ， 并在保存操作执行期间， 将所有新执行的写入命令都保存到一个缓冲区里面。</p>
+<p>当 BGSAVE 执行完毕后， 主服务器将执行保存操作所得的 .rdb 文件发送给从服务器， 从服务器接收这个 .rdb 文件， 并将文件中的数据载入到内存中。</p>
+<p>之后主服务器会以 Redis 命令协议的格式， 将写命令缓冲区中积累的所有内容都发送给从服务器。</p>
+<p>你可以通过 telnet 命令来亲自验证这个同步过程： 首先连上一个正在处理命令请求的 Redis 服务器， 然后向它发送 SYNC 命令， 过一阵子， 你将看到 telnet 会话（session）接收到服务器发来的大段数据（.rdb 文件）， 之后还会看到， 所有在服务器执行过的写命令， 都会重新发送到 telnet 会话来。</p>
+<p>即使有多个从服务器同时向主服务器发送 SYNC ， 主服务器也只需执行一次 BGSAVE 命令， 就可以处理所有这些从服务器的同步请求。</p>
+<p>从服务器可以在主从服务器之间的连接断开时进行自动重连， 在 Redis 2.8 版本之前， 断线之后重连的从服务器总要执行一次完整重同步（full resynchronization）操作， 但是从 Redis 2.8 版本开始， 从服务器可以根据主服务器的情况来选择执行完整重同步还是部分重同步（partial resynchronization）。</p>
+<h2 id="部分重同步"><a href="#部分重同步" class="headerlink" title="部分重同步"></a>部分重同步</h2><p>从 Redis 2.8 开始， 在网络连接短暂性失效之后， 主从服务器可以尝试继续执行原有的复制进程（process）， 而不一定要执行完整重同步操作。</p>
+<p>这个特性需要主服务器为被发送的复制流创建一个内存缓冲区（in-memory backlog）， 并且主服务器和所有从服务器之间都记录一个复制偏移量（replication offset）和一个主服务器 ID （master run id）， 当出现网络连接断开时， 从服务器会重新连接， 并且向主服务器请求继续执行原来的复制进程：</p>
+<p>如果从服务器记录的主服务器 ID 和当前要连接的主服务器的 ID 相同， 并且从服务器记录的偏移量所指定的数据仍然保存在主服务器的复制流缓冲区里面， 那么主服务器会向从服务器发送断线时缺失的那部分数据， 然后复制工作可以继续执行。<br>否则的话， 从服务器就要执行完整重同步操作。<br>Redis 2.8 的这个部分重同步特性会用到一个新增的 PSYNC 内部命令， 而 Redis 2.8 以前的旧版本只有 SYNC 命令， 不过， 只要从服务器是 Redis 2.8 或以上的版本， 它就会根据主服务器的版本来决定到底是使用 PSYNC 还是 SYNC ：</p>
+<p>如果主服务器是 Redis 2.8 或以上版本，那么从服务器使用 PSYNC 命令来进行同步。<br>如果主服务器是 Redis 2.8 之前的版本，那么从服务器使用 SYNC 命令来进行同步。</p>
+<h1 id="redis的Sentinel"><a href="#redis的Sentinel" class="headerlink" title="redis的Sentinel"></a>redis的Sentinel</h1><p>redis的sentinel系统用于管理多个redis服务器，该系统主要执行三个任务：监控、提醒、自动故障转移。</p>
+<p>1、监控（Monitoring）： Redis Sentinel实时监控主服务器和从服务器运行状态，并且实现自动切换。</p>
+<p>2、提醒（Notification）：当被监控的某个 Redis 服务器出现问题时， Redis Sentinel 可以向系统管理员发送通知， 也可以通过 API 向其他程序发送通知。</p>
+<p>3、自动故障转移（Automatic failover）： 当一个主服务器不能正常工作时，Redis Sentinel 可以将一个从服务器升级为主服务器， 并对其他从服务器进行配置，让它们使用新的主服务器。当应用程序连接Redis 服务器时， Redis Sentinel会告之新的主服务器地址和端口。</p>
+<p>注意：在使用sentinel监控主从节点的时候，从节点需要是使用动态方式配置的，如果直接修改配置文件，后期sentinel实现故障转移的时候会出问题。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/28/java/java_thread/java-deprecated-thread-stop/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/28/java/java_thread/java-deprecated-thread-stop/" itemprop="url">为什么废弃thread类的stop方法及java中的中断概念</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-28T14:27:14+08:00">
+                2018-03-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/28/java/java_thread/java-deprecated-thread-stop/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/03/28/java/java_thread/java-deprecated-thread-stop/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/03/28/java/java_thread/java-deprecated-thread-stop/" class="leancloud_visitors" data-flag-title="为什么废弃thread类的stop方法及java中的中断概念">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="对比测试"><a href="#对比测试" class="headerlink" title="对比测试"></a>对比测试</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">package com.example.demo.thread;</span><br><span class="line"></span><br><span class="line">public class ThreadStopTest &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line"></span><br><span class="line">        try &#123;</span><br><span class="line">            System.out.println(&quot;try&quot;);</span><br><span class="line">            Thread thread = new MyThread();</span><br><span class="line">            thread.start();</span><br><span class="line">            Thread.sleep(700L);</span><br><span class="line">            thread.stop();</span><br><span class="line">//             thread.interrupt();</span><br><span class="line">        &#125; catch (Exception e) &#123;</span><br><span class="line">            System.out.println(&quot;exception&quot;);</span><br><span class="line">        &#125; finally &#123;</span><br><span class="line">            System.out.println(&quot;finally&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class MyThread extends Thread &#123;</span><br><span class="line"></span><br><span class="line">    public void run() &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            System.out.println(&quot;run&quot;);</span><br><span class="line">            Thread.sleep(1000L);</span><br><span class="line">            throw new Exception();</span><br><span class="line">        &#125; catch (Exception e) &#123;</span><br><span class="line">            System.out.println(&quot;exception &quot;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>console输出的结果是：<br>try<br>run<br>finally</p>
+<p>可以看到，stop终结一个线程，并且释放监控线程的所有资源。对于主线程来说，并不能再跟踪线程的运行状况，当线程出现异常也不能被捕获。而其他线程并不知道被stop的线程出现了异常。这样导致状态不一致的情况产生。</p>
+<p>注释掉stop 一行，换用interrupt,进行测试。输出结果是：<br>try<br>finally<br>run<br>exception</p>
+<p>catch部分无法处理ThreadDeath异常</p>
+<h1 id="探究"><a href="#探究" class="headerlink" title="探究"></a>探究</h1><p>##stop方法内部实现:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">stop0(new ThreadDeath());</span><br><span class="line"></span><br><span class="line">public class ThreadDeath extends Error &#123;</span><br><span class="line">    private static final long serialVersionUID = -4417128565033088268L;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> ThreadDeath 悄无声息的杀死及其他线程。因此，用户得不到程序可能会崩溃的警告。崩溃会在真正破坏发生后的任意时刻显现，甚至在数小时或数天之后。</p>
+<h2 id="为何不正确"><a href="#为何不正确" class="headerlink" title="为何不正确"></a>为何不正确</h2><p>首先应该明确一点：一个线程不应该由其他线程来强制中断或停止，而是应该由线程自己自行停止。所以Thread.stop(),（同样的原因还有Thread.suspend(), Thread.resume()）都已经被废弃了。</p>
+<h3 id="一、资源回收问题"><a href="#一、资源回收问题" class="headerlink" title="一、资源回收问题"></a>一、资源回收问题</h3><p>线程A调用线程B的stop方法去停止线程B，调用这个方法的时候线程A其实并不知道线程B执行的具体情况，这种突然地停止会导致线程B的一些清理工作无法完成。</p>
+<p>比如说假如线程B正在执行数据库操作，线程A突然就把线程B给stop掉了，那么线程B中的数据库链接该怎么关闭呢？线程B中方法才执行到一半，那些局部变量要怎么释放呢？</p>
+<h3 id="二、数据不同步问题"><a href="#二、数据不同步问题" class="headerlink" title="二、数据不同步问题"></a>二、数据不同步问题</h3><p>执行stop方法后线程B会马上释放锁，这有可能会引发数据不同步问题。</p>
+<h4 id="数据不一致"><a href="#数据不一致" class="headerlink" title="数据不一致"></a>数据不一致</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">假如一个线程正在执行：synchronized void &#123; x = 3; y = 4;&#125;　由于方法是同步的，多个线程访问时总能保证x,y被同时赋值，而如果一个线程正在执行到x = 3;时，被调用了 stop()方法，即使在同步块中，它也干脆地stop了，这样就产生了不完整的残废数据。而多线程编程中最最基础的条件要保证数据的完整性，所以请忘记线程的stop方法，以后我们再也不要说“停止线程”了。而且如果对象处于一种不连贯状态，那么其他线程能在那种状态下检查和修改它们。结果 很难检查出真正的问题所在。</span><br></pre></td></tr></table></figure>
+<h4 id="锁"><a href="#锁" class="headerlink" title="锁"></a>锁</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">package test;</span><br><span class="line"></span><br><span class="line">public class testLock &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line"></span><br><span class="line">		final Object lock = new Object();</span><br><span class="line"></span><br><span class="line">		Thread thread1 = new Thread() &#123;</span><br><span class="line"></span><br><span class="line">			public void run() &#123;</span><br><span class="line"></span><br><span class="line">				try &#123;</span><br><span class="line"></span><br><span class="line">					synchronized (lock) &#123;</span><br><span class="line"></span><br><span class="line">						System.out.println(&quot;thread1 acquire lock&quot;);</span><br><span class="line"></span><br><span class="line">						System.out.println(&quot;thread1 release lock&quot;);</span><br><span class="line">					&#125;</span><br><span class="line"></span><br><span class="line">				&#125; catch (ThreadDeath e) &#123;</span><br><span class="line">					// TODO: handle exception</span><br><span class="line">					e.printStackTrace();</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;;</span><br><span class="line"></span><br><span class="line">		Thread thread2 = new Thread() &#123;</span><br><span class="line"></span><br><span class="line">			public void run() &#123;</span><br><span class="line"></span><br><span class="line">				synchronized (lock) &#123;</span><br><span class="line"></span><br><span class="line">					System.out.println(&quot;thread2 acquire lock&quot;);</span><br><span class="line"></span><br><span class="line">					System.out.println(&quot;thread2 release lock&quot;);</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;;</span><br><span class="line"></span><br><span class="line">		thread1.start();</span><br><span class="line"></span><br><span class="line">		thread1.stop();</span><br><span class="line"></span><br><span class="line">		thread2.start();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果不使用stop方法，结果为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">thread1 acquire lock</span><br><span class="line">thread1 release lock</span><br><span class="line">thread2 acquire lock</span><br><span class="line">thread2 release lock</span><br></pre></td></tr></table></figure></p>
+<p>这说明thread1和thread2都在正确地征用同一个锁对象。先是thread1获得了lock，然后释放lock。然后thread2获得了lock，然后释放lock。但是如果使用了stop方法，那么结果为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">thread2 acquire lock</span><br><span class="line">thread2 release lock</span><br><span class="line">java.lang.ThreadDeath</span><br><span class="line">	at java.lang.Thread.stop(Thread.java:850)</span><br><span class="line">	at test.testLock.main(testLock.java:44)</span><br></pre></td></tr></table></figure>
+<p>可以看到thread1抛出了java.lang.ThreadDeath错误。同时thread的lock被破坏掉了，只有thread2获得了lock。因为锁被破坏，所以当前线程可能不安全。</p>
+<h1 id="线程中断"><a href="#线程中断" class="headerlink" title="线程中断"></a>线程中断</h1><p>在Java中没有办法立即停止一条线程，然而停止线程却显得尤为重要，如取消一个耗时操作。因此，Java提供了一种用于停止线程的机制——中断。</p>
 <ul>
-<li>面向用户的互联网应用，都是围绕用户维度来做各种操作，那么业务逻辑主体就是用户，可使用用户对应的字段作为拆分键；</li>
-<li>侧重于卖家的电商应用，都是围绕卖家维度来进行各种操作，那么业务逻辑主体就是卖家，可使用卖家对应的字段作为拆分键；</li>
-<li>游戏类的应用，是围绕玩家维度来做各种操作，那么业务逻辑主体就是玩家，可使用玩家对应的字段作为拆分键；</li>
-<li>车联网方面的应用，则是基于车辆信息进行操作，那么业务逻辑主体就是车辆，可使用车辆对应的字段作为拆分键；</li>
-<li>税务类的应用，主要是基于纳税人的信息来开展前台业务，那么业务逻辑主体就是纳税人，可使用纳税人对应的字段作为拆分键。<br>以此类推，其它类型的应用场景，大多也能找到合适的业务逻辑主体作为拆分键的选择。</li>
+<li>中断只是一种协作机制，Java没有给中断增加任何语法，中断的过程完全需要程序员自己实现。若要中断一个线程，你需要手动调用该线程的interrupted方法，该方法也仅仅是将线程对象的中断标识设成true；接着你需要自己写代码不断地检测当前线程的标识位；如果为true，表示别的线程要求这条线程中断，此时究竟该做什么需要你自己写代码实现。</li>
+<li>每个线程对象中都有一个标识，用于表示线程是否被中断；该标识位为true表示中断，为false表示未中断；</li>
+<li>通过调用线程对象的interrupt方法将该线程的标识位设为true；可以在别的线程中调用，也可以在自己的线程中调用。</li>
 </ul>
-<p>如果确实找不到合适的业务逻辑主体作为拆分键，那么可以考虑下面的方法来选择拆分键：</p>
-<ul>
-<li>根据数据分布和访问的均衡度来考虑拆分键，尽量将数据表中的数据相对均匀地分布在不同的物理分库/分表中，适用于大量分析型查询的应用场景（查询并发度大部分能维持为1）；</li>
-<li>按照数字（字符串）类型与时间类型字段相结合作为拆分键，进行分库和分表，适用于日志检索类的应用场景。</li>
-</ul>
-<p><a href="http://docs-aliyun.cn-hangzhou.oss.aliyun-inc.com/assets/pic/29659/cn_zh/1497859380824/DRDS_overview.png" target="_blank" rel="noopener">http://docs-aliyun.cn-hangzhou.oss.aliyun-inc.com/assets/pic/29659/cn_zh/1497859380824/DRDS_overview.png</a></p>
+<h2 id="相关方法"><a href="#相关方法" class="headerlink" title="相关方法"></a>相关方法</h2><p>中断的相关方法public void interrupt() 将调用者线程的中断状态设为true。public boolean isInterrupted() 判断调用者线程的中断状态。public static boolean interrupted 只能通过Thread.interrupted()调用。 它会做两步操作：返回当前线程的中断状态；将当前线程的中断状态设为false；</p>
+<h2 id="正确用法"><a href="#正确用法" class="headerlink" title="正确用法"></a>正确用法</h2><p>1.设置中断监听<br>2.触发中断</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p> <a href="http://ibruce.info/2013/12/19/how-to-stop-a-java-thread/" target="_blank" rel="noopener">http://ibruce.info/2013/12/19/how-to-stop-a-java-thread/</a><br> <a href="https://blog.csdn.net/wei_ya_wen/article/details/8626880" target="_blank" rel="noopener">https://blog.csdn.net/wei_ya_wen/article/details/8626880</a><br> <a href="http://www.xie4ever.com/2017/03/03/java-%E7%A6%81%E6%AD%A2%E4%BD%BF%E7%94%A8thread-stop%E6%96%B9%E6%B3%95/" target="_blank" rel="noopener">http://www.xie4ever.com/2017/03/03/java-%E7%A6%81%E6%AD%A2%E4%BD%BF%E7%94%A8thread-stop%E6%96%B9%E6%B3%95/</a></p>
 
           
         
@@ -2229,7 +2131,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/6/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/page/8/">8</a><span class="space">&hellip;</span><a class="page-number" href="/page/16/">16</a><a class="extend next" rel="next" href="/page/8/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/6/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/page/8/">8</a><span class="space">&hellip;</span><a class="page-number" href="/page/18/">18</a><a class="extend next" rel="next" href="/page/8/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2275,7 +2177,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-count">179</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

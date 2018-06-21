@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="官网api123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949596979899100101">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ScheduledExecutorService">
+<meta property="og:url" content="http://yoursite.com/2018/06/05/java/ScheduledExecutorService/index.html">
+<meta property="og:site_name" content="Victor的博客">
+<meta property="og:description" content="官网api123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949596979899100101">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-06-05T11:59:21.040Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ScheduledExecutorService">
+<meta name="twitter:description" content="官网api123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949596979899100101">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/06/05/java/ScheduledExecutorService/"/>
+
+
+
+
+
+  <title>ScheduledExecutorService | Victor的博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e6ec2c9b3e1b5d7f223d40c9c7a9efe1";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Victor的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br />
+            
+            日程表
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/sitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />
+            
+            站点地图
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/05/java/ScheduledExecutorService/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ScheduledExecutorService</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-05T19:59:03+08:00">
+                2018-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/06/05/java/ScheduledExecutorService/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/06/05/java/ScheduledExecutorService/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/06/05/java/ScheduledExecutorService/" class="leancloud_visitors" data-flag-title="ScheduledExecutorService">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="官网api"><a href="#官网api" class="headerlink" title="官网api"></a>官网api</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line"> * ORACLE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.</span><br><span class="line"> *</span><br><span class="line"> * Written by Doug Lea with assistance from members of JCP JSR-166</span><br><span class="line"> * Expert Group and released to the public domain, as explained at</span><br><span class="line"> * http://creativecommons.org/publicdomain/zero/1.0/</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">package java.util.concurrent;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * An &#123;@link ExecutorService&#125; that can schedule commands to run after a given</span><br><span class="line"> * delay, or to execute periodically.</span><br><span class="line"> *</span><br><span class="line"> * &lt;p&gt;The &#123;@code schedule&#125; methods create tasks with various delays</span><br><span class="line"> * and return a task object that can be used to cancel or check</span><br><span class="line"> * execution. The &#123;@code scheduleAtFixedRate&#125; and</span><br><span class="line"> * &#123;@code scheduleWithFixedDelay&#125; methods create and execute tasks</span><br><span class="line"> * that run periodically until cancelled.</span><br><span class="line"> *</span><br><span class="line"> * &lt;p&gt;Commands submitted using the &#123;@link Executor#execute(Runnable)&#125;</span><br><span class="line"> * and &#123;@link ExecutorService&#125; &#123;@code submit&#125; methods are scheduled</span><br><span class="line"> * with a requested delay of zero. Zero and negative delays (but not</span><br><span class="line"> * periods) are also allowed in &#123;@code schedule&#125; methods, and are</span><br><span class="line"> * treated as requests for immediate execution.</span><br><span class="line"> *</span><br><span class="line"> * &lt;p&gt;All &#123;@code schedule&#125; methods accept &lt;em&gt;relative&lt;/em&gt; delays and</span><br><span class="line"> * periods as arguments, not absolute times or dates. It is a simple</span><br><span class="line"> * matter to transform an absolute time represented as a &#123;@link</span><br><span class="line"> * java.util.Date&#125; to the required form. For example, to schedule at</span><br><span class="line"> * a certain future &#123;@code date&#125;, you can use: &#123;@code schedule(task,</span><br><span class="line"> * date.getTime() - System.currentTimeMillis(),</span><br><span class="line"> * TimeUnit.MILLISECONDS)&#125;. Beware however that expiration of a</span><br><span class="line"> * relative delay need not coincide with the current &#123;@code Date&#125; at</span><br><span class="line"> * which the task is enabled due to network time synchronization</span><br><span class="line"> * protocols, clock drift, or other factors.</span><br><span class="line"> *</span><br><span class="line"> * &lt;p&gt;The &#123;@link Executors&#125; class provides convenient factory methods for</span><br><span class="line"> * the ScheduledExecutorService implementations provided in this package.</span><br><span class="line"> *</span><br><span class="line"> * &lt;h3&gt;Usage Example&lt;/h3&gt;</span><br><span class="line"> *</span><br><span class="line"> * Here is a class with a method that sets up a ScheduledExecutorService</span><br><span class="line"> * to beep every ten seconds for an hour:</span><br><span class="line"> *</span><br><span class="line"> *  &lt;pre&gt; &#123;@code</span><br><span class="line"> * import static java.util.concurrent.TimeUnit.*;</span><br><span class="line"> * class BeeperControl &#123;</span><br><span class="line"> *   private final ScheduledExecutorService scheduler =</span><br><span class="line"> *     Executors.newScheduledThreadPool(1);</span><br><span class="line"> *</span><br><span class="line"> *   public void beepForAnHour() &#123;</span><br><span class="line"> *     final Runnable beeper = new Runnable() &#123;</span><br><span class="line"> *       public void run() &#123; System.out.println(&quot;beep&quot;); &#125;</span><br><span class="line"> *     &#125;;</span><br><span class="line"> *     final ScheduledFuture&lt;?&gt; beeperHandle =</span><br><span class="line"> *       scheduler.scheduleAtFixedRate(beeper, 10, 10, SECONDS);</span><br><span class="line"> *     scheduler.schedule(new Runnable() &#123;</span><br><span class="line"> *       public void run() &#123; beeperHandle.cancel(true); &#125;</span><br><span class="line"> *     &#125;, 60 * 60, SECONDS);</span><br><span class="line"> *   &#125;</span><br><span class="line"> * &#125;&#125;&lt;/pre&gt;</span><br><span class="line"> *</span><br><span class="line"> * @since 1.5</span><br><span class="line"> * @author Doug Lea</span><br><span class="line"> */</span><br><span class="line">public interface ScheduledExecutorService extends ExecutorService &#123;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Creates and executes a one-shot action that becomes enabled</span><br><span class="line">     * after the given delay.</span><br><span class="line">     *</span><br><span class="line">     * @param command the task to execute</span><br><span class="line">     * @param delay the time from now to delay execution</span><br><span class="line">     * @param unit the time unit of the delay parameter</span><br><span class="line">     * @return a ScheduledFuture representing pending completion of</span><br><span class="line">     *         the task and whose &#123;@code get()&#125; method will return</span><br><span class="line">     *         &#123;@code null&#125; upon completion</span><br><span class="line">     * @throws RejectedExecutionException if the task cannot be</span><br><span class="line">     *         scheduled for execution</span><br><span class="line">     * @throws NullPointerException if command is null</span><br><span class="line">     */</span><br><span class="line">    public ScheduledFuture&lt;?&gt; schedule(Runnable command,</span><br><span class="line">                                       long delay, TimeUnit unit);</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Creates and executes a ScheduledFuture that becomes enabled after the</span><br><span class="line">     * given delay.</span><br><span class="line">     *</span><br><span class="line">     * @param callable the function to execute</span><br><span class="line">     * @param delay the time from now to delay execution</span><br><span class="line">     * @param unit the time unit of the delay parameter</span><br><span class="line">     * @param &lt;V&gt; the type of the callable&apos;s result</span><br><span class="line">     * @return a ScheduledFuture that can be used to extract result or cancel</span><br><span class="line">     * @throws RejectedExecutionException if the task cannot be</span><br><span class="line">     *         scheduled for execution</span><br><span class="line">     * @throws NullPointerException if callable is null</span><br><span class="line">     */</span><br><span class="line">    public &lt;V&gt; ScheduledFuture&lt;V&gt; schedule(Callable&lt;V&gt; callable,</span><br><span class="line">                                           long delay, TimeUnit unit);</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Creates and executes a periodic action that becomes enabled first</span><br><span class="line">     * after the given initial delay, and subsequently with the given</span><br><span class="line">     * period; that is executions will commence after</span><br><span class="line">     * &#123;@code initialDelay&#125; then &#123;@code initialDelay+period&#125;, then</span><br><span class="line">     * &#123;@code initialDelay + 2 * period&#125;, and so on.</span><br><span class="line">     * If any execution of the task</span><br><span class="line">     * encounters an exception, subsequent executions are suppressed.</span><br><span class="line">     * Otherwise, the task will only terminate via cancellation or</span><br><span class="line">     * termination of the executor.  If any execution of this task</span><br><span class="line">     * takes longer than its period, then subsequent executions</span><br><span class="line">     * may start late, but will not concurrently execute.</span><br><span class="line">     *</span><br><span class="line">     * @param command the task to execute</span><br><span class="line">     * @param initialDelay the time to delay first execution</span><br><span class="line">     * @param period the period between successive executions</span><br><span class="line">     * @param unit the time unit of the initialDelay and period parameters</span><br><span class="line">     * @return a ScheduledFuture representing pending completion of</span><br><span class="line">     *         the task, and whose &#123;@code get()&#125; method will throw an</span><br><span class="line">     *         exception upon cancellation</span><br><span class="line">     * @throws RejectedExecutionException if the task cannot be</span><br><span class="line">     *         scheduled for execution</span><br><span class="line">     * @throws NullPointerException if command is null</span><br><span class="line">     * @throws IllegalArgumentException if period less than or equal to zero</span><br><span class="line">     */</span><br><span class="line">    public ScheduledFuture&lt;?&gt; scheduleAtFixedRate(Runnable command,</span><br><span class="line">                                                  long initialDelay,</span><br><span class="line">                                                  long period,</span><br><span class="line">                                                  TimeUnit unit);</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Creates and executes a periodic action that becomes enabled first</span><br><span class="line">     * after the given initial delay, and subsequently with the</span><br><span class="line">     * given delay between the termination of one execution and the</span><br><span class="line">     * commencement of the next.  If any execution of the task</span><br><span class="line">     * encounters an exception, subsequent executions are suppressed.</span><br><span class="line">     * Otherwise, the task will only terminate via cancellation or</span><br><span class="line">     * termination of the executor.</span><br><span class="line">     *</span><br><span class="line">     * @param command the task to execute</span><br><span class="line">     * @param initialDelay the time to delay first execution</span><br><span class="line">     * @param delay the delay between the termination of one</span><br><span class="line">     * execution and the commencement of the next</span><br><span class="line">     * @param unit the time unit of the initialDelay and delay parameters</span><br><span class="line">     * @return a ScheduledFuture representing pending completion of</span><br><span class="line">     *         the task, and whose &#123;@code get()&#125; method will throw an</span><br><span class="line">     *         exception upon cancellation</span><br><span class="line">     * @throws RejectedExecutionException if the task cannot be</span><br><span class="line">     *         scheduled for execution</span><br><span class="line">     * @throws NullPointerException if command is null</span><br><span class="line">     * @throws IllegalArgumentException if delay less than or equal to zero</span><br><span class="line">     */</span><br><span class="line">    public ScheduledFuture&lt;?&gt; scheduleWithFixedDelay(Runnable command,</span><br><span class="line">                                                     long initialDelay,</span><br><span class="line">                                                     long delay,</span><br><span class="line">                                                     TimeUnit unit);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="核心方法"><a href="#核心方法" class="headerlink" title="核心方法"></a>核心方法</h1><table>
+<thead>
+<tr>
+<th style="text-align:left">Method</th>
+<th style="text-align:left">Desc</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">schedule(Callable&lt;V&gt; callable, long delay, TimeUnit unit)</td>
+<td style="text-align:left">创建并执行在给定延迟后启用的 ScheduledFuture。</td>
+</tr>
+<tr>
+<td style="text-align:left">schedule(Runnable command, long delay, TimeUnit unit)</td>
+<td style="text-align:left">创建并执行在给定延迟后启用的一次性操作。</td>
+</tr>
+<tr>
+<td style="text-align:left">scheduleAtFixedRate(Runnable command, long initialDelay,long period, TimeUnitunit)</td>
+<td style="text-align:left">创建并执行一个在给定初始延迟后首次启用的定期操作，后续操作具有给定的周期；也就是将在 initialDelay 后开始执行，然后在initialDelay+period 后执行，接着在 initialDelay + 2 * period 后执行，依此类推。</td>
+</tr>
+<tr>
+<td style="text-align:left">scheduleWithFixedDelay(Runnable command, long initialDelay, long delay,TimeUnit unit)</td>
+<td style="text-align:left">创建并执行一个在给定初始延迟后首次启用的定期操作，随后，在每一次执行终止和下一次执行开始之间都存在给定的延迟。</td>
+</tr>
+</tbody>
+</table>
+<h1 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h1><h2 id="执行多个不同任务"><a href="#执行多个不同任务" class="headerlink" title="执行多个不同任务"></a>执行多个不同任务</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">public class ScheduledException &#123;</span><br><span class="line"></span><br><span class="line">    static class TaskA implements Runnable &#123;</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        public void run() &#123;</span><br><span class="line">            System.out.println(&quot;task A&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    static class TaskB implements Runnable &#123;</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        public void run() &#123;</span><br><span class="line">            System.out.println(&quot;task B&quot;);</span><br><span class="line">            throw new RuntimeException();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) throws InterruptedException &#123;</span><br><span class="line">        ScheduledExecutorService timer = Executors</span><br><span class="line">                .newSingleThreadScheduledExecutor();</span><br><span class="line">        timer.scheduleWithFixedDelay(new TaskA(), 0, 1, TimeUnit.SECONDS);</span><br><span class="line">        timer.scheduleWithFixedDelay(new TaskB(), 2, 1, TimeUnit.SECONDS);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="第二个任务就不会被第一个任务延迟了"><a href="#第二个任务就不会被第一个任务延迟了" class="headerlink" title="第二个任务就不会被第一个任务延迟了"></a>第二个任务就不会被第一个任务延迟了</h2><h2 id="任务取消"><a href="#任务取消" class="headerlink" title="任务取消"></a>任务取消</h2><p>单个定时任务的异常不会再导致整个定时任务被取消了，即使背后只有一个线程执行任务</p>
+<h2 id="coreSzie的作用"><a href="#coreSzie的作用" class="headerlink" title="coreSzie的作用??"></a>coreSzie的作用??</h2><h1 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h1><p><a href="https://blog.csdn.net/top_code/article/details/52180239" target="_blank" rel="noopener">https://blog.csdn.net/top_code/article/details/52180239</a></p>
+<p><a href="https://www.zybuluo.com/mikumikulch/note/713546" target="_blank" rel="noopener">https://www.zybuluo.com/mikumikulch/note/713546</a></p>
+<p><a href="https://www.zybuluo.com/mikumikulch/note/712598" target="_blank" rel="noopener">https://www.zybuluo.com/mikumikulch/note/712598</a></p>
+<p><a href="http://www.cnblogs.com/swiftma/p/6724894.html" target="_blank" rel="noopener">http://www.cnblogs.com/swiftma/p/6724894.html</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Victor
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://yoursite.com/2018/06/05/java/ScheduledExecutorService/" title="ScheduledExecutorService">http://yoursite.com/2018/06/05/java/ScheduledExecutorService/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/05/运维-测试/study-wrk/" rel="next" title="study-wrk">
+                <i class="fa fa-chevron-left"></i> study-wrk
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/05/分布式/loadbalance/" rel="prev" title="负载均衡算法">
+                负载均衡算法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Victor</p>
+              <p class="site-description motion-element" itemprop="description">victor的个人博客,作为一枚后端开发工程师,写本博客目的,旨在记录自己在工作生活中的点点滴滴,形成自己的知识体系</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">179</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">27</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">77</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#官网api"><span class="nav-number">1.</span> <span class="nav-text">官网api</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#核心方法"><span class="nav-number">2.</span> <span class="nav-text">核心方法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#特点"><span class="nav-number">3.</span> <span class="nav-text">特点</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#执行多个不同任务"><span class="nav-number">3.1.</span> <span class="nav-text">执行多个不同任务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第二个任务就不会被第一个任务延迟了"><span class="nav-number">3.2.</span> <span class="nav-text">第二个任务就不会被第一个任务延迟了</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#任务取消"><span class="nav-number">3.3.</span> <span class="nav-text">任务取消</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#coreSzie的作用"><span class="nav-number">3.4.</span> <span class="nav-text">coreSzie的作用??</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考文章"><span class="nav-number">4.</span> <span class="nav-text">参考文章</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Victor</span>
+  
+  <!--以下3行为一条竖线和Coding Page-->
+  <div class="powered-by">
+  </div>
+  <span>Hosted by <a href="https://pages.coding.me" style="font-weight: bold">Coding Pages</a></span>
+  
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://victor123-cn.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://yoursite.com/2018/06/05/java/ScheduledExecutorService/';
+          this.page.identifier = '2018/06/05/java/ScheduledExecutorService/';
+          this.page.title = 'ScheduledExecutorService';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://victor123-cn.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("QdvsGi5rrGt05B6T1cP9buCX-gzGzoHsz", "IPzdnLkdvxDPxh2zyHn82bWk");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
