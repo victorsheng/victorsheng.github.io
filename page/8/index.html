@@ -326,6 +326,1255 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/02/java/java_thread/JUC-CountDownLatch/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/02/java/java_thread/JUC-CountDownLatch/" itemprop="url">CountDownLatch学习</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-02T11:02:32+08:00">
+                2018-04-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/02/java/java_thread/JUC-CountDownLatch/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/04/02/java/java_thread/JUC-CountDownLatch/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/04/02/java/java_thread/JUC-CountDownLatch/" class="leancloud_visitors" data-flag-title="CountDownLatch学习">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>CountDownLatch是通过一个计数器来实现的，计数器的初始值为线程的数量。每当一个线程完成了自己的任务后，计数器的值就会减1。当计数器值到达0时，它表示所有的线程已经完成了任务，然后在闭锁上等待的线程就可以恢复执行任务。</p>
+<p><img src="/images/pasted-115.png" alt="upload successful"></p>
+<h1 id="一个countdownlatch的使用案例"><a href="#一个countdownlatch的使用案例" class="headerlink" title="一个countdownlatch的使用案例"></a>一个countdownlatch的使用案例</h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><p>n个赛车，让他们都在起跑线上就绪后，同时出发,并监控结束比赛的结束</p>
+<h2 id="答案"><a href="#答案" class="headerlink" title="答案"></a>答案</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">public class CountDownTest &#123;</span><br><span class="line">    private static class ProcessJob implements Runnable &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        private CountDownLatch startLatch;</span><br><span class="line">        private CountDownLatch stopLatch;</span><br><span class="line"></span><br><span class="line">        public ProcessJob(CountDownLatch startLatch, CountDownLatch stopLatch) &#123;</span><br><span class="line">            this.startLatch = startLatch;</span><br><span class="line">            this.stopLatch = stopLatch;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        public void run() &#123;</span><br><span class="line">            try &#123;</span><br><span class="line">                startLatch.await();</span><br><span class="line">                TimeUnit.SECONDS.sleep(2);</span><br><span class="line">            &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">            System.out.println(&quot;Some Job&quot;);</span><br><span class="line">            stopLatch.countDown();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) throws InterruptedException &#123;</span><br><span class="line">        ExecutorService executorService = Executors.newCachedThreadPool();</span><br><span class="line">        int jobSize = 20;</span><br><span class="line">        CountDownLatch startLatch = new CountDownLatch(1);</span><br><span class="line">        CountDownLatch stopLatch = new CountDownLatch(jobSize);</span><br><span class="line">        for (int i = 0; i &lt; jobSize; i++) &#123;</span><br><span class="line">            executorService.submit(new ProcessJob(startLatch, stopLatch));</span><br><span class="line">        &#125;</span><br><span class="line">        long start = System.currentTimeMillis();</span><br><span class="line">        startLatch.countDown();</span><br><span class="line">        // 等待所有线程执行完任务</span><br><span class="line">        stopLatch.await();</span><br><span class="line">        long end = System.currentTimeMillis();</span><br><span class="line">        System.out.println(&quot;Total cost time: &quot; + (end - start));</span><br><span class="line">        executorService.shutdown();</span><br><span class="line">        executorService.awaitTermination(1, TimeUnit.MINUTES);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="核心代码"><a href="#核心代码" class="headerlink" title="核心代码"></a>核心代码</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">private static final class Sync extends AbstractQueuedSynchronizer &#123;</span><br><span class="line">    private static final long serialVersionUID = 4982264981922014374L;</span><br><span class="line"></span><br><span class="line">    Sync(int count) &#123;</span><br><span class="line">        setState(count);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    int getCount() &#123;</span><br><span class="line">        return getState();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    protected int tryAcquireShared(int acquires) &#123;</span><br><span class="line">   		 // 只有当当前state为0即count为0的时候能够返回</span><br><span class="line">        return (getState() == 0) ? 1 : -1;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    protected boolean tryReleaseShared(int releases) &#123;</span><br><span class="line">        // Decrement count; signal when transition to zero</span><br><span class="line">        for (;;) &#123;</span><br><span class="line">            int c = getState();</span><br><span class="line">            if (c == 0)</span><br><span class="line">                return false;</span><br><span class="line">            int nextc = c-1;</span><br><span class="line">            if (compareAndSetState(c, nextc))</span><br><span class="line">            // 成功CAS将count变为0的线程负责唤醒等待线程</span><br><span class="line">                return nextc == 0;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="重写的aqs接口"><a href="#重写的aqs接口" class="headerlink" title="重写的aqs接口"></a>重写的aqs接口</h1><h2 id="tryAcquireShared"><a href="#tryAcquireShared" class="headerlink" title="tryAcquireShared"></a>tryAcquireShared</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">protected int tryAcquireShared(int arg)</span><br><span class="line">试图在共享模式下获取对象状态。此方法应该查询是否允许它在共享模式下获取对象状态，如果允许，则获取它。</span><br><span class="line">此方法总是由执行 acquire 线程来调用。如果此方法报告失败，则 acquire 方法可以将线程加入队列（如果还没有将它加入队列），直到获得其他某个线程释放了该线程的信号。</span><br><span class="line"></span><br><span class="line">默认实现将抛出 UnsupportedOperationException。</span><br><span class="line"></span><br><span class="line">参数：</span><br><span class="line">arg - acquire 参数。该值总是传递给 acquire 方法的那个值，或者是因某个条件等待而保存在条目上的值。该值是不间断的，并且可以表示任何内容。</span><br><span class="line">返回：</span><br><span class="line">在失败时返回负值；如果共享模式下的获取成功但其后续共享模式下的获取不能成功，则返回 0；如果共享模式下的获取成功并且其后续共享模式下的获取可能够成功，则返回正值，在这种情况下，后续等待线程必须检查可用性。（对三种返回值的支持使得此方法可以在只是有时候以独占方式获取对象的上下文中使用。）在成功的时候，此对象已被获取。</span><br><span class="line">抛出：</span><br><span class="line">IllegalMonitorStateException - 如果正在进行的获取操作将在非法状态下放置此同步器。必须以一致的方式抛出此异常，以便同步正确运行。</span><br><span class="line">UnsupportedOperationException - 如果不支持共享模式</span><br></pre></td></tr></table></figure>
+<h2 id="tryReleaseShared"><a href="#tryReleaseShared" class="headerlink" title="tryReleaseShared"></a>tryReleaseShared</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">protected boolean tryReleaseShared(int arg)</span><br><span class="line">试图设置状态来反映共享模式下的一个释放。</span><br><span class="line">此方法总是由正在执行释放的线程调用。</span><br><span class="line"></span><br><span class="line">默认实现将抛出 UnsupportedOperationException。</span><br><span class="line"></span><br><span class="line">参数：</span><br><span class="line">arg - release 参数。该值总是传递给 release 方法的那个值，或者是因某个条件等待而保存在条目上的当前状态值。该值是不间断的，并且可以表示任何内容。</span><br><span class="line">返回：</span><br><span class="line">如果此对象现在处于完全释放状态，从而使正在等待的线程都可以试图获得此对象，则返回 true；否则返回 false</span><br><span class="line">抛出：</span><br><span class="line">IllegalMonitorStateException - 如果正在进行的释放操作将在非法状态下放置此同步器。必须以一致的方式抛出此异常，以便同步正确运行</span><br><span class="line">UnsupportedOperationException - 如果不支持共享模式</span><br></pre></td></tr></table></figure>
+<h2 id="外部调用"><a href="#外部调用" class="headerlink" title="外部调用"></a>外部调用</h2><p>await()调用acquireShared的不可中断的方法acquireSharedInterruptibly，acquireSharedInterruptibly又会调用到上面Sync实现的tryAcquire方法判断是否能够返回还是继续等待。</p>
+<p>countDown调用sync的releaseShared方法，releaseShared方法又会调用上面Sync实现的tryReleaseShared方法根据返回结果判定是否唤醒线程</p>
+<h1 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h1><p><a href="https://liuzhengyang.github.io/2017/05/22/countdownlatch/" target="_blank" rel="noopener">https://liuzhengyang.github.io/2017/05/22/countdownlatch/</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/30/java/java_thread/JUC-1-overview/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/30/java/java_thread/JUC-1-overview/" itemprop="url">juc概览</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-30T10:14:33+08:00">
+                2018-03-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/30/java/java_thread/JUC-1-overview/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/03/30/java/java_thread/JUC-1-overview/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/03/30/java/java_thread/JUC-1-overview/" class="leancloud_visitors" data-flag-title="juc概览">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://www.cnblogs.com/chenpi/p/5614290.html" target="_blank" rel="noopener">http://www.cnblogs.com/chenpi/p/5614290.html</a><br><a href="http://ifeve.com/doug-lea/" target="_blank" rel="noopener">http://ifeve.com/doug-lea/</a></p>
+<h1 id="J-U-C："><a href="#J-U-C：" class="headerlink" title="J.U.C："></a>J.U.C：</h1><h2 id="什么是JSR-Java-Specification-Requests-："><a href="#什么是JSR-Java-Specification-Requests-：" class="headerlink" title="什么是JSR(Java Specification Requests)："></a>什么是JSR(Java Specification Requests)：</h2><p>JSR，全称 Java Specification Requests， 即Java规范提案， 主要是用于向JCP(Java Community Process)提出新增标准化技术规范的正式请求。每次JAVA版本更新都会有对应的JSR更新，比如在Java 8版本中，其新特性Lambda表达式对应的是JSR 335，新的日期和时间API对应的是JSR 310。</p>
+<h2 id="什么是JSR-166："><a href="#什么是JSR-166：" class="headerlink" title="什么是JSR 166："></a>什么是JSR 166：</h2><p>当然，本文的关注点仅仅是JSR 166，它是一个关于Java并发编程的规范提案，在JDK中，该规范由java.util.concurrent包实现，是在JDK 5.0的时候被引入的；</p>
+<ul>
+<li>JDK6引入Deques、Navigable collections，对应的是JSR 166x，</li>
+<li>JDK7引入fork-join框架，用于并行执行任务，对应的是JSR 166y。</li>
+</ul>
+<h2 id="什么是J-U-C："><a href="#什么是J-U-C：" class="headerlink" title="什么是J.U.C："></a>什么是J.U.C：</h2><p>即java.util.concurrent的缩写，该包参考自EDU.oswego.cs.dl.util.concurrent，是JSR 166标准规范的一个实现；</p>
+<ul>
+<li>同步器(Synchronizers)<ul>
+<li>闭锁 CountDownLatch</li>
+<li>栅栏 CyclicBarrier</li>
+<li>信号量 Semaphore</li>
+<li>交换器 Exchanger<ul>
+<li>Phaser</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>显示锁<ul>
+<li>ReentrantLock</li>
+<li>ReentrantReadWriteLock</li>
+<li>StampedLock</li>
+</ul>
+</li>
+<li>原子变量类(Atomic Variables)</li>
+<li>并发集合(Concurrent Collections)</li>
+<li>Executor框架（线程池、 Callable 、Future）</li>
+<li>Fork/Join并行计算框架</li>
+<li>BlockingQueue（阻塞队列）</li>
+<li>TimeUnit枚举</li>
+</ul>
+<p><img src="/images/pasted-113.png" alt="upload successful"></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/29/redis/study-gossip/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/29/redis/study-gossip/" itemprop="url">study-gossip</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-29T09:40:49+08:00">
+                2018-03-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/29/redis/study-gossip/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/03/29/redis/study-gossip/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/03/29/redis/study-gossip/" class="leancloud_visitors" data-flag-title="study-gossip">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><a href="https://github.com/aCoder2013/blog/issues/2" target="_blank" rel="noopener">https://github.com/aCoder2013/blog/issues/2</a></p>
+<p>Cassandra<br>redis</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/29/mysql/mysql-master-slave/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/29/mysql/mysql-master-slave/" itemprop="url">mysql-master-slave</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-29T07:37:34+08:00">
+                2018-03-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mysql/" itemprop="url" rel="index">
+                    <span itemprop="name">mysql</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/29/mysql/mysql-master-slave/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/03/29/mysql/mysql-master-slave/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/03/29/mysql/mysql-master-slave/" class="leancloud_visitors" data-flag-title="mysql-master-slave">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="什么是Mysql主从复制"><a href="#什么是Mysql主从复制" class="headerlink" title="什么是Mysql主从复制"></a>什么是Mysql主从复制</h1><p>MySQL主从复制是其最重要的功能之一。主从复制是指一台服务器充当主数据库服务器，另一台或多台服务器充当从数据库服务器，主服务器中的数据自动复制到从服务器之中。对于多级复制，数据库服务器即可充当主机，也可充当从机。MySQL主从复制的基础是主服务器对数据库修改记录二进制日志，从服务器通过主服务器的二进制日志自动执行更新。</p>
+<h1 id="Mysq主从复制的类型"><a href="#Mysq主从复制的类型" class="headerlink" title="Mysq主从复制的类型"></a>Mysq主从复制的类型</h1><h2 id="基于语句的复制-Statement-："><a href="#基于语句的复制-Statement-：" class="headerlink" title="基于语句的复制(Statement)："></a>基于语句的复制(Statement)：</h2><p>主服务器上面执行的语句在从服务器上面再执行一遍，在MySQL-3.23版本以后支持。</p>
+<p>存在的问题：时间上可能不完全同步造成偏差，执行语句的用户也可能是不同一个用户。</p>
+<p>优点：不需要记录每一行的变化，减少了binlog日志量，节约了IO，提高性能。(相比row能节约多少性能与日志量，这个取决于应用的SQL情况，正常同一条记录修改或者插入row格式所产生的日志量还小于Statement产生的日志量，但是考虑到如果带条件的update操作，以及整表删除，alter表等操作，ROW格式会产生大量日志，因此在考虑是否使用ROW格式日志时应该跟据应用的实际情况，其所产生的日志量会增加多少，以及带来的IO性能问题。)</p>
+<p>缺点：由于记录的只是执行语句，为了这些语句能在slave上正确运行，因此还必须记录每条语句在执行的时候的一些相关信息，以保证所有语句能在slave得到和在master端执行时候相同 的结果。另外mysql 的复制,像一些特定函数功能，slave可与master上要保持一致会有很多相关问题(如sleep()函数， last_insert_id()，以及user-defined functions(udf)会出现问题).</p>
+<p>使用以下函数的语句也无法被复制：</p>
+<ul>
+<li><p>LOAD_FILE()</p>
+</li>
+<li><p>UUID()</p>
+</li>
+<li><p>USER()</p>
+</li>
+<li><p>FOUND_ROWS()</p>
+</li>
+<li><p>SYSDATE() (除非启动时启用了 –sysdate-is-now 选项)</p>
+</li>
+</ul>
+<p>同时在INSERT …SELECT 会产生比 RBR 更多的行级锁</p>
+<h2 id="基于行的复制-Row-："><a href="#基于行的复制-Row-：" class="headerlink" title="基于行的复制(Row)："></a>基于行的复制(Row)：</h2><p>把主服务器上面改编后的内容直接复制过去，而不关心到底改变该内容是由哪条语句引发的，在MySQL-5.0版本以后引入。</p>
+<p>存在的问题：比如一个工资表中有一万个用户，我们把每个用户的工资+1000，那么基于行的复制则要复制一万行的内容，由此造成的开销比较大，而基于语句的复制仅仅一条语句就可以了。</p>
+<p>优点： binlog中可以不记录执行的sql语句的上下文相关的信息，仅需要记录那一条记录被修改成什么了。所以rowlevel的日志内容会非常清楚的记录下每一行数据修改的细节。而且不会出现某些特定情况下的存储过程，或function，以及trigger的调用和触发无法被正确复制的问题</p>
+<p>缺点:所有的执行的语句当记录到日志中的时候，都将以每行记录的修改来记录，这样可能会产生大量的日志内容,比如一条update语句，修改多条记录，则binlog中每一条修改都会有记录，这样造成binlog日志量会很大，特别是当执行alter table之类的语句的时候，由于表结构修改，每条记录都发生改变，那么该表每一条记录都会记录到日志中。</p>
+<h2 id="混合类型的复制："><a href="#混合类型的复制：" class="headerlink" title="混合类型的复制："></a>混合类型的复制：</h2><p>是以上两种level的混合使用，一般的语句修改使用statment格式保存binlog，如一些函数，statement无法完成主从复制的操作，则采用row格式保存binlog,MySQL会根据执行的每一条具体的sql语句来区分对待记录的日志形式，也就是在Statement和Row之间选择一种.新版本的MySQL中队row level模式也被做了优化，并不是所有的修改都会以row level来记录，像遇到表结构变更的时候就会以statement模式来记录。至于update或者delete等修改数据的语句，还是会记录所有行的变更。</p>
+<h1 id="Binlog基本配制与格式设定"><a href="#Binlog基本配制与格式设定" class="headerlink" title="Binlog基本配制与格式设定"></a>Binlog基本配制与格式设定</h1><h2 id="1-基本配制"><a href="#1-基本配制" class="headerlink" title="1.基本配制"></a>1.基本配制</h2><p>Mysql BInlog日志格式可以通过mysql的my.cnf文件的属性binlog_format指定。如以下：</p>
+<p>binlog_format = MIXED //binlog日志格式</p>
+<p>log_bin =目录/mysql-bin.log //binlog日志名</p>
+<p>expire_logs_days = 7 //binlog过期清理时间</p>
+<p>max_binlog_size 100m //binlog每个日志文件大小</p>
+<h2 id="2-Binlog日志格式选择"><a href="#2-Binlog日志格式选择" class="headerlink" title="2.Binlog日志格式选择"></a>2.Binlog日志格式选择</h2><p>Mysql默认是使用Statement日志格式，推荐使用MIXED.</p>
+<p>由于一些特殊使用，可以考虑使用ROWED，如自己通过binlog日志来同步数据的修改，这样会节省很多相关操作。对于binlog数据处理会变得非常轻松,相对mixed，解析也会很轻松(当然前提是增加的日志量所带来的IO开销在容忍的范围内即可)。</p>
+<h2 id="3-mysqlbinlog格式选择"><a href="#3-mysqlbinlog格式选择" class="headerlink" title="3.mysqlbinlog格式选择"></a>3.mysqlbinlog格式选择</h2><p>mysql对于日志格式的选定原则:如果是采用 INSERT，UPDATE，DELETE 等直接操作表的情况，则日志格式根据 binlog_format 的设定而记录,如果是采用 GRANT，REVOKE，SET PASSWORD 等管理语句来做的话，那么无论如何 都采用 SBR 模式记录。</p>
+<h1 id="Mysql主从复制的过程"><a href="#Mysql主从复制的过程" class="headerlink" title="Mysql主从复制的过程"></a>Mysql主从复制的过程</h1><p>MySQL主从复制的两种情况：同步复制和异步复制，实际复制架构中大部分为异步复制。</p>
+<p>复制的基本过程如下：</p>
+<ul>
+<li><p>Slave上面的IO进程连接上Master，并请求从指定日志文件的指定位置（或者从最开始的日志）之后的日志内容。</p>
+</li>
+<li><p>Master接收到来自Slave的IO进程的请求后，负责复制的IO进程会根据请求信息读取日志指定位置之后的日志信息，返回给Slave的IO进程。返回信息中除了日志所包含的信息之外，还包括本次返回的信息已经到Master端的bin-log文件的名称以及bin-log的位置。</p>
+</li>
+<li><p>Slave的IO进程接收到信息后，将接收到的日志内容依次添加到Slave端的relay-log文件的最末端，并将读取到的Master端的 bin-log的文件名和位置记录到master-info文件中，以便在下一次读取的时候能够清楚的告诉Master“我需要从某个bin-log的哪个位置开始往后的日志内容，请发给我”。</p>
+</li>
+<li><p>Slave的Sql进程检测到relay-log中新增加了内容后，会马上解析relay-log的内容成为在Master端真实执行时候的那些可执行的内容，并在自身执行。</p>
+</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/28/redis/redis-cluster/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/28/redis/redis-cluster/" itemprop="url">redis集群</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-28T22:33:59+08:00">
+                2018-03-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/28/redis/redis-cluster/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/03/28/redis/redis-cluster/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/03/28/redis/redis-cluster/" class="leancloud_visitors" data-flag-title="redis集群">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><a href="https://blog.csdn.net/u011204847/article/details/51307044" target="_blank" rel="noopener">https://blog.csdn.net/u011204847/article/details/51307044</a><br><a href="http://www.redis.cn/topics/cluster-tutorial.html" target="_blank" rel="noopener">http://www.redis.cn/topics/cluster-tutorial.html</a><br><a href="https://www.jianshu.com/p/04dd90ea08f5" target="_blank" rel="noopener">https://www.jianshu.com/p/04dd90ea08f5</a></p>
+<h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>Redis Cluster是Redis官方在Redis 3.0版本正式推出的高可用以及分布式的解决方案。</p>
+<p>Redis Cluster由多个Redis实例组成的整体，数据按照槽(slot)存储分布在多个Redis实例上，通过Gossip协议来进行节点之间通信。</p>
+<p>Redis Cluster实现的功能：</p>
+<p>• 将数据分片到多个实例(按照slot存储)；</p>
+<p>• 集群节点宕掉会自动failover；</p>
+<p>• 提供相对平滑扩容(缩容)节点。</p>
+<p>Redis Cluster暂未有的：</p>
+<p>• 实时同步</p>
+<p>• 强一致性</p>
+<hr>
+<p>redis集群是一个无中心的分布式Redis存储架构，可以在多个节点之间进行数据共享，解决了Redis高可用、可扩展等问题。redis集群提供了以下两个好处</p>
+<p>1、将数据自动切分(split)到多个节点<br>2、当集群中的某一个节点故障时，redis还可以继续处理客户端的请求。</p>
+<p>一个 Redis 集群包含 16384 个哈希槽（hash slot），数据库中的每个数据都属于这16384个哈希槽中的一个。集群使用公式 CRC16(key) % 16384 来计算键 key 属于哪个槽。集群中的每一个节点负责处理一部分哈希槽。</p>
+<h2 id="Redis-集群的数据分片"><a href="#Redis-集群的数据分片" class="headerlink" title="Redis 集群的数据分片"></a>Redis 集群的数据分片</h2><p>Redis 集群没有使用一致性hash, 而是引入了 哈希槽的概念.</p>
+<p>Redis 集群有16384个哈希槽,每个key通过CRC16校验后对16384取模来决定放置哪个槽.集群的每个节点负责一部分hash槽,举个例子,比如当前集群有3个节点,那么:</p>
+<p>节点 A 包含 0 到 5500号哈希槽.<br>节点 B 包含5501 到 11000 号哈希槽.<br>节点 C 包含11001 到 16384号哈希槽.<br>这种结构很容易添加或者删除节点. 比如如果我想新添加个节点D, 我需要从节点 A, B, C中得部分槽到D上. 如果我想移除节点A,需要将A中的槽移到B和C节点上,然后将没有任何槽的A节点从集群中移除即可. 由于从一个节点将哈希槽移动到另一个节点并不会停止服务,所以无论添加删除或者改变某个节点的哈希槽的数量都不会造成集群不可用的状态.</p>
+<p>何处维护hash槽的绑定关系</p>
+<h2 id="cap理论"><a href="#cap理论" class="headerlink" title="cap理论"></a>cap理论</h2><p>Redis Cluster集群功能推出已经有一段时间了。在单机版的Redis中，每个Master之间是没有任何通信的，所以我们一般在Jedis客户端或者Codis这样的代理中做Pre-sharding。按照CAP理论来说，单机版的Redis属于保证CP(Consistency &amp; Partition-Tolerancy)而牺牲A(Availability)，也就说Redis能够保证所有用户看到相同的数据（一致性，因为Redis不自动冗余数据）和网络通信出问题时，暂时隔离开的子系统能继续运行（分区容忍性，因为Master之间没有直接关系，不需要通信），但是不保证某些结点故障时，所有请求都能被响应（可用性，某个Master结点挂了的话，那么它上面分片的数据就无法访问了）。</p>
+<p>有了Cluster功能后，Redis从一个单纯的NoSQL内存数据库变成了分布式NoSQL数据库，CAP模型也从CP变成了AP。也就是说，通过自动分片和冗余数据，Redis具有了真正的分布式能力，某个结点挂了的话，因为数据在其他结点上有备份，所以其他结点顶上来就可以继续提供服务，保证了Availability。然而，也正因为这一点，Redis无法保证曾经的强一致性了。这也是CAP理论要求的，三者只能取其二。</p>
+<h1 id="集群中的主从复制"><a href="#集群中的主从复制" class="headerlink" title="集群中的主从复制"></a>集群中的主从复制</h1><p>集群中的每个节点都有1个至N个复制品，其中一个为主节点，其余的为从节点，如果主节点下线了，集群就会把这个主节点的一个从节点设置为新的主节点，继续工作。这样集群就不会因为一个主节点的下线而无法正常工作。</p>
+<p>注意：</p>
+<p>1、如果某一个主节点和他所有的从节点都下线的话，redis集群就会停止工作了。redis集群不保证数据的强一致性，在特定的情况下，redis集群会丢失已经被执行过的写命令</p>
+<p>2、使用异步复制（asynchronous replication）是 Redis 集群可能会丢失写命令的其中一个原因，有时候由于网络原因，如果网络断开时间太长，redis集群就会启用新的主节点，之前发给主节点的数据就会丢失。</p>
+<h1 id="Redis-Cluster分片实现"><a href="#Redis-Cluster分片实现" class="headerlink" title="Redis Cluster分片实现"></a>Redis Cluster分片实现</h1><p>一般分片（Sharding）实现的方式有list、range和hash(或者基于上述的组合方式)等方式。而Redis的实现方式是基于hash的分片方式，具体是虚拟槽分区。</p>
+<p>虚拟槽分区</p>
+<p>槽(slot):使用分散度良好的hash函数把所有数据映射到一个固定范围的整数集合中，这个整数集合就是槽。</p>
+<p>Redis Cluster槽: Redis Cluster槽的范围是0 ~ 16383。槽是集群内数据管理和迁移的基本单位。</p>
+<p><img src="/images/pasted-108.png" alt="upload successful"></p>
+<h2 id="Hash标签"><a href="#Hash标签" class="headerlink" title="Hash标签"></a>Hash标签</h2><p>哈希标签(hash tags)，在Redis集群分片中，可以通过哈希标签来实现指定两个及以上的Key在同一个slot中。只要Key包含“{…}”这种模式，Redis就会根据第一次出现的’{’和第一次出现的’}’之间的字符串进行哈希计算以获取相对应的slot数。如上Redis源码实现。</p>
+<p>所以如果要指定某些Key存储到同一个slot中，只需要在命令Key的之后指定相同的“{…}”命名模式即可。</p>
+<h2 id="集群节点和槽"><a href="#集群节点和槽" class="headerlink" title="集群节点和槽"></a>集群节点和槽</h2><p>当Redis Cluster中的16384个槽都有节点在处理时，集群处于上线状态(ok)；</p>
+<p>如果Redis Cluster中有任何一个槽没有得到处理(或者某一分片的最后一个节点挂了)，那么集群处于下线状态(fail)。（info cluster中的：cluster_state状态）。那整个集群就不能对外提供服务。</p>
+<p>Redis-3.0.0.rc1加入cluster-require-full-coverage参数，默认关闭，打开集群容忍部分失败。</p>
+<p>但是如果集群超过半数以上master挂掉，无论是否有slave集群进入fail状态。</p>
+<h2 id="节点ID"><a href="#节点ID" class="headerlink" title="节点ID"></a>节点ID</h2><p>Redis Cluster每个节点在集群中都有唯一的ID，该ID是由40位的16进制字符组成，具体是节点第一次启动由linux的/dev/urandom生成。具体信息会保存在node.cnf配置文件中(该文件有Redis Cluster自动维护，可以通过参数cluster-config-file来指定路径和名称)，如果该文件被删除，节点ID将会重新生成。（删除以后所有的cluster和replication信息都没有了）或者通过Cluster Reset强制请求硬重置。</p>
+<p>节点ID用于标识集群中的每个节点，包括指定Replication Master。只要节点ID不改变，哪怕节点的IP和端口发生了改变，Redis Cluster可以自动识别出IP和端口的变化，并将变更的信息通过Gossip协议广播给其他节点。</p>
+<h2 id="ClusterNode"><a href="#ClusterNode" class="headerlink" title="ClusterNode"></a>ClusterNode</h2><p><img src="/images/pasted-109.png" alt="upload successful"></p>
+<p>Master 节点维护这一个16384/8字节的位序列，Master节点用bit来标识对于某个槽自己是否拥有。(判断索引是不是为1即可)</p>
+<p>slots属性是一个二进制位数组(bit arry)，这个数组的长度为16384/8 = 2048个字节，共包含16384个二进制。</p>
+<p>Redis Cluster对slots数组中的16384个二进制位进行编号：从0为起始索引，16383为终止索引。</p>
+<p>根据索引i上的二进制位的值来判断节点是否负责处理槽i：</p>
+<p>•slots数组在索引i上的二进制位的值为1，即表示该节点负责处理槽i；</p>
+<p>•slots数组在索引i上的二进制位的值为0，即表示该节点不负责处理槽i；</p>
+<p>示例1：（如下节点负责处理slot0-slot7）</p>
+<p><img src="/images/pasted-110.png" alt="upload successful"><br>即在Redis Cluster中Master节点使用bit(0)和bit(1)来标识对某个槽是否拥有，而Master只要判断序列第二位的值是不是1即可，时间复杂度为O(1)。</p>
+<p>numslots属性记录节点负责处理的槽的数量，也就是slots数组中值为1的二进制位的数量。上图中节点处理的槽数量为8个。</p>
+<h2 id="ClusterState"><a href="#ClusterState" class="headerlink" title="ClusterState"></a>ClusterState</h2><p>集群中所有槽的分配信息都保存在ClusterState数据结构的slots数组中，程序要检查槽i是否已经被分配或者找出处理槽i的节点，只需要访问clusterState.slots[i]的值即可，时间复杂度为O(1)。</p>
+<p>slots数组包含16384个项，每个数组项都是一个指向clusterNode结构的指针：</p>
+<p>•如果slots[i]指针指向null，那么表示槽i尚未指派给任何节点；</p>
+<p>•如果slots[i]指针指向一个clusterNode结构，那么表示槽i已经指派给了clusterNode结构所代表的节点。</p>
+<p><img src="/images/pasted-111.png" alt="upload successful"><br>示例2：</p>
+<ol>
+<li><p>slots[0]至slots[4999]的指针都指向端口为6381的节点，即槽0到4999都由节点6381负责处理；</p>
+</li>
+<li><p>slots[5000]至slots[9999]的指针都指向端口为6382的节点，即槽5000到9999都由节点6382负责处理；</p>
+</li>
+<li><p>slots[10000]至slots[16383]的指针都指向端口为6383的节点，即槽10000到16384都由节点6383负责处理。</p>
+</li>
+</ol>
+<p><img src="/images/pasted-112.png" alt="upload successful"></p>
+<h2 id="数组-clusterNode-slots和clusterState-slots："><a href="#数组-clusterNode-slots和clusterState-slots：" class="headerlink" title="数组 clusterNode.slots和clusterState.slots："></a>数组 clusterNode.slots和clusterState.slots：</h2><p>• clusterNode.slots数组记录了clusterNode结构所代表的节点的槽指派信息（每个节点负责哪些槽）。</p>
+<p>• clusterState.slots数组记录了集群中所有槽的指派信息。</p>
+<p>• 如果需要查看某个节点的槽指派信息，只需要将相应节点的clusterNode.slots数组整个发送出去即可。</p>
+<p>• 但是如果需要查看槽i是否被分配或者分配给了哪个节点，就需要遍历clusterState.nodes字典中所有clusterNode结构，检查这些结构的slots数组，直到遍历到负责处理槽i的节点为止，这个过程的时间复杂度为O(N)，N是clusterState.nodes字典保存的clusterNode结构的数量。</p>
+<p>• 引入clusterState.slots ,将所有槽的指派信息保存在clusterState.slots数组里面，程序要检查槽i是否已经被指派，或者查看负责处理槽i的节点，只需要访问clusterState.slots[i]的值即可，这个操作的时间复杂度为O(1)。</p>
+<p>• 如果只使用clusterState.slots数组(不引入clusterNode.slots)，如果要将节点A的槽指派信息传播给其他节点时，必须先遍历整个clusterState.slots数组，记录节点A负责处理哪些槽，然后再发送给其他节点。比直接发送clusterNode.slots数组要低效的多。</p>
+<h2 id="Redis-Cluster节点通信"><a href="#Redis-Cluster节点通信" class="headerlink" title="Redis Cluster节点通信"></a>Redis Cluster节点通信</h2><p>Redis Cluster节点通信<br><strong>Redis Cluster采用P2P的Gossip协议，Gossip协议的原理就是每个节点与其他节点间不断通信交换信息，一段时间后节点信息一致，每个节点都知道集群的完整信息</strong>。</p>
+<p>Redis Cluster通信过程：</p>
+<p>(1)集群中的每个节点都会单独开辟一个TCP通道，用于节点之间彼此通信，通信端口号在基础端口上加10000；</p>
+<p>(2)每个节点在固定周期内通过特定规则选择几个节点发送ping消息；</p>
+<p>(3)接收到ping消息的节点用pong消息作为响应。</p>
+<p>集群中每个节点通过一定规则挑选要通信的节点，每个节点可能知道全部节点，也可能仅知道部分节点，</p>
+<p>只要这些节点彼此可以正常通信，最终它们会达到一致的状态。当节点出故障、新节点加入、主从角色变化、槽信息变更等事件发生时，通过不断的ping/pong消息通信，经过一段时间后所有的节点都会知道整个集群全部节点的最新状态，从而达到集群状态同步的目的。</p>
+<h2 id="Gossip消息"><a href="#Gossip消息" class="headerlink" title="Gossip消息"></a>Gossip消息</h2><p>Gossip协议的主要职责就是信息交换，信息交换的载体就是节点彼此发送的Gossip消息，常用的Gossip消息可分为：</p>
+<p>• meet消息：用于通知新节点加入。消息发送者通知接收者加入到当前集群，meet消息通信正常完成后，接收节点会加入到集群中并进行周期性的ping、pong消息交换；</p>
+<p>• ping消息：集群内交换最频繁的消息，集群内每个节点每秒向多个其他节点发送ping消息，用于检测节点是否在线和交换彼此状态信息。ping消息发送封装了自身节点和部分其他节点的状态数据。</p>
+<p>• pong消息：当接收到ping、meet消息时，作为响应消息回复给发送方确认消息正常通信。pong消息内部封装了自身状态数据。节点也可以向集群内广播自身的pong消息来通知整个集群对自身状态进行更新。</p>
+<p>• fail消息：当节点判定集群内另一个节点下线时，会向集群内广播一个fail消息，其他节点接收到fail消息之后把对应节点更新为下线状态。</p>
+<p>消息格式：</p>
+<p>所有的消息格式划分为：消息头和消息体。</p>
+<p>消息头包含发送节点自身状态数据，接收节点根据消息头就可以获取到发送节点的相关数据。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/28/redis/redis-master-slave/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/28/redis/redis-master-slave/" itemprop="url">redis主从复制</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-28T22:20:50+08:00">
+                2018-03-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/28/redis/redis-master-slave/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/03/28/redis/redis-master-slave/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/03/28/redis/redis-master-slave/" class="leancloud_visitors" data-flag-title="redis主从复制">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>1、redis的复制功能是支持多个数据库之间的数据同步。一类是主数据库（master）一类是从数据库（slave），主数据库可以进行读写操作，当发生写操作的时候自动将数据同步到从数据库，而从数据库一般是只读的，并接收主数据库同步过来的数据，一个主数据库可以有多个从数据库，而一个从数据库只能有一个主数据库。</p>
+<p>2、通过redis的复制功能可以很好的实现数据库的读写分离，提高服务器的负载能力。主数据库主要进行写操作，而从数据库负责读操作。</p>
+<p><img src="/images/pasted-107.png" alt="upload successful"></p>
+<h2 id="重要方面："><a href="#重要方面：" class="headerlink" title="重要方面："></a>重要方面：</h2><p>Redis 使用异步复制。 从 Redis 2.8 开始， 从服务器会以每秒一次的频率向主服务器报告复制流（replication stream）的处理进度。</p>
+<ul>
+<li><p>一个主服务器可以有多个从服务器。</p>
+</li>
+<li><p>不仅主服务器可以有从服务器， 从服务器也可以有自己的从服务器， 多个从服务器之间可以构成一个图状结构。</p>
+</li>
+<li><p>复制功能不会阻塞主服务器： 即使有一个或多个从服务器正在进行初次同步， 主服务器也可以继续处理命令请求。</p>
+</li>
+<li><p>复制功能也不会阻塞从服务器： 只要在 redis.conf 文件中进行了相应的设置， 即使从服务器正在进行初次同步， 服务器也可以使用旧版本的数据集来处理命令查询。不过， 在从服务器删除旧版本数据集并载入新版本数据集的那段时间内， 连接请求会被阻塞。你还可以配置从服务器， 让它在与主服务器之间的连接断开时， 向客户端发送一个错误。</p>
+</li>
+<li><p>复制功能可以单纯地用于数据冗余（data redundancy）， 也可以通过让多个从服务器处理只读命令请求来提升扩展性（scalability）： 比如说， 繁重的 SORT 命令可以交给附属节点去运行。</p>
+</li>
+<li><p>可以通过复制功能来让主服务器免于执行持久化操作： 只要关闭主服务器的持久化功能， 然后由从服务器去执行持久化操作即可。</p>
+</li>
+</ul>
+<h1 id="过程："><a href="#过程：" class="headerlink" title="过程："></a>过程：</h1><p>1：当一个从数据库启动时，会向主数据库发送sync命令，</p>
+<p>2：主数据库接收到sync命令后会开始在后台保存快照（执行rdb操作），并将保存期间接收到的命令缓存起来</p>
+<p>3：当快照完成后，redis会将快照文件和所有缓存的命令发送给从数据库。</p>
+<p>4：从数据库收到后，会载入快照文件并执行收到的缓存的命令。</p>
+<h1 id="方式"><a href="#方式" class="headerlink" title="方式"></a>方式</h1><p>配置方式<br>手动方式</p>
+<h1 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h1><p>如果你使用主从复制，那么要确保你的master激活了持久化，或者确保它不会在当掉后自动重启。原因：</p>
+<p>slave是master的完整备份，因此如果master通过一个空数据集重启，slave也会被清掉。</p>
+<p>在配置redis复制功能的时候如果主数据库设置了密码，需要在从数据的配置文件中通过masterauth参数设置主数据库的密码，这样从数据库在连接主数据库时就会自动使用auth命令认证了。相当于做了一个免密码登录。</p>
+<h1 id="复制功能的运作原理"><a href="#复制功能的运作原理" class="headerlink" title="复制功能的运作原理"></a>复制功能的运作原理</h1><h2 id="完整重同步"><a href="#完整重同步" class="headerlink" title="完整重同步"></a>完整重同步</h2><p>无论是初次连接还是重新连接， 当建立一个从服务器时， 从服务器都将向主服务器发送一个 SYNC 命令。</p>
+<p>接到 SYNC 命令的主服务器将开始执行 BGSAVE ， 并在保存操作执行期间， 将所有新执行的写入命令都保存到一个缓冲区里面。</p>
+<p>当 BGSAVE 执行完毕后， 主服务器将执行保存操作所得的 .rdb 文件发送给从服务器， 从服务器接收这个 .rdb 文件， 并将文件中的数据载入到内存中。</p>
+<p>之后主服务器会以 Redis 命令协议的格式， 将写命令缓冲区中积累的所有内容都发送给从服务器。</p>
+<p>你可以通过 telnet 命令来亲自验证这个同步过程： 首先连上一个正在处理命令请求的 Redis 服务器， 然后向它发送 SYNC 命令， 过一阵子， 你将看到 telnet 会话（session）接收到服务器发来的大段数据（.rdb 文件）， 之后还会看到， 所有在服务器执行过的写命令， 都会重新发送到 telnet 会话来。</p>
+<p>即使有多个从服务器同时向主服务器发送 SYNC ， 主服务器也只需执行一次 BGSAVE 命令， 就可以处理所有这些从服务器的同步请求。</p>
+<p>从服务器可以在主从服务器之间的连接断开时进行自动重连， 在 Redis 2.8 版本之前， 断线之后重连的从服务器总要执行一次完整重同步（full resynchronization）操作， 但是从 Redis 2.8 版本开始， 从服务器可以根据主服务器的情况来选择执行完整重同步还是部分重同步（partial resynchronization）。</p>
+<h2 id="部分重同步"><a href="#部分重同步" class="headerlink" title="部分重同步"></a>部分重同步</h2><p>从 Redis 2.8 开始， 在网络连接短暂性失效之后， 主从服务器可以尝试继续执行原有的复制进程（process）， 而不一定要执行完整重同步操作。</p>
+<p>这个特性需要主服务器为被发送的复制流创建一个内存缓冲区（in-memory backlog）， 并且主服务器和所有从服务器之间都记录一个复制偏移量（replication offset）和一个主服务器 ID （master run id）， 当出现网络连接断开时， 从服务器会重新连接， 并且向主服务器请求继续执行原来的复制进程：</p>
+<p>如果从服务器记录的主服务器 ID 和当前要连接的主服务器的 ID 相同， 并且从服务器记录的偏移量所指定的数据仍然保存在主服务器的复制流缓冲区里面， 那么主服务器会向从服务器发送断线时缺失的那部分数据， 然后复制工作可以继续执行。<br>否则的话， 从服务器就要执行完整重同步操作。<br>Redis 2.8 的这个部分重同步特性会用到一个新增的 PSYNC 内部命令， 而 Redis 2.8 以前的旧版本只有 SYNC 命令， 不过， 只要从服务器是 Redis 2.8 或以上的版本， 它就会根据主服务器的版本来决定到底是使用 PSYNC 还是 SYNC ：</p>
+<p>如果主服务器是 Redis 2.8 或以上版本，那么从服务器使用 PSYNC 命令来进行同步。<br>如果主服务器是 Redis 2.8 之前的版本，那么从服务器使用 SYNC 命令来进行同步。</p>
+<h1 id="redis的Sentinel"><a href="#redis的Sentinel" class="headerlink" title="redis的Sentinel"></a>redis的Sentinel</h1><p>redis的sentinel系统用于管理多个redis服务器，该系统主要执行三个任务：监控、提醒、自动故障转移。</p>
+<p>1、监控（Monitoring）： Redis Sentinel实时监控主服务器和从服务器运行状态，并且实现自动切换。</p>
+<p>2、提醒（Notification）：当被监控的某个 Redis 服务器出现问题时， Redis Sentinel 可以向系统管理员发送通知， 也可以通过 API 向其他程序发送通知。</p>
+<p>3、自动故障转移（Automatic failover）： 当一个主服务器不能正常工作时，Redis Sentinel 可以将一个从服务器升级为主服务器， 并对其他从服务器进行配置，让它们使用新的主服务器。当应用程序连接Redis 服务器时， Redis Sentinel会告之新的主服务器地址和端口。</p>
+<p>注意：在使用sentinel监控主从节点的时候，从节点需要是使用动态方式配置的，如果直接修改配置文件，后期sentinel实现故障转移的时候会出问题。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/28/java/java_thread/java-deprecated-thread-stop/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/28/java/java_thread/java-deprecated-thread-stop/" itemprop="url">为什么废弃thread类的stop方法及java中的中断概念</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-28T14:27:14+08:00">
+                2018-03-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/28/java/java_thread/java-deprecated-thread-stop/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/03/28/java/java_thread/java-deprecated-thread-stop/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/03/28/java/java_thread/java-deprecated-thread-stop/" class="leancloud_visitors" data-flag-title="为什么废弃thread类的stop方法及java中的中断概念">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="对比测试"><a href="#对比测试" class="headerlink" title="对比测试"></a>对比测试</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">package com.example.demo.thread;</span><br><span class="line"></span><br><span class="line">public class ThreadStopTest &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line"></span><br><span class="line">        try &#123;</span><br><span class="line">            System.out.println(&quot;try&quot;);</span><br><span class="line">            Thread thread = new MyThread();</span><br><span class="line">            thread.start();</span><br><span class="line">            Thread.sleep(700L);</span><br><span class="line">            thread.stop();</span><br><span class="line">//             thread.interrupt();</span><br><span class="line">        &#125; catch (Exception e) &#123;</span><br><span class="line">            System.out.println(&quot;exception&quot;);</span><br><span class="line">        &#125; finally &#123;</span><br><span class="line">            System.out.println(&quot;finally&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class MyThread extends Thread &#123;</span><br><span class="line"></span><br><span class="line">    public void run() &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            System.out.println(&quot;run&quot;);</span><br><span class="line">            Thread.sleep(1000L);</span><br><span class="line">            throw new Exception();</span><br><span class="line">        &#125; catch (Exception e) &#123;</span><br><span class="line">            System.out.println(&quot;exception &quot;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>console输出的结果是：<br>try<br>run<br>finally</p>
+<p>可以看到，stop终结一个线程，并且释放监控线程的所有资源。对于主线程来说，并不能再跟踪线程的运行状况，当线程出现异常也不能被捕获。而其他线程并不知道被stop的线程出现了异常。这样导致状态不一致的情况产生。</p>
+<p>注释掉stop 一行，换用interrupt,进行测试。输出结果是：<br>try<br>finally<br>run<br>exception</p>
+<p>catch部分无法处理ThreadDeath异常</p>
+<h1 id="探究"><a href="#探究" class="headerlink" title="探究"></a>探究</h1><p>##stop方法内部实现:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">stop0(new ThreadDeath());</span><br><span class="line"></span><br><span class="line">public class ThreadDeath extends Error &#123;</span><br><span class="line">    private static final long serialVersionUID = -4417128565033088268L;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> ThreadDeath 悄无声息的杀死及其他线程。因此，用户得不到程序可能会崩溃的警告。崩溃会在真正破坏发生后的任意时刻显现，甚至在数小时或数天之后。</p>
+<h2 id="为何不正确"><a href="#为何不正确" class="headerlink" title="为何不正确"></a>为何不正确</h2><p>首先应该明确一点：一个线程不应该由其他线程来强制中断或停止，而是应该由线程自己自行停止。所以Thread.stop(),（同样的原因还有Thread.suspend(), Thread.resume()）都已经被废弃了。</p>
+<h3 id="一、资源回收问题"><a href="#一、资源回收问题" class="headerlink" title="一、资源回收问题"></a>一、资源回收问题</h3><p>线程A调用线程B的stop方法去停止线程B，调用这个方法的时候线程A其实并不知道线程B执行的具体情况，这种突然地停止会导致线程B的一些清理工作无法完成。</p>
+<p>比如说假如线程B正在执行数据库操作，线程A突然就把线程B给stop掉了，那么线程B中的数据库链接该怎么关闭呢？线程B中方法才执行到一半，那些局部变量要怎么释放呢？</p>
+<h3 id="二、数据不同步问题"><a href="#二、数据不同步问题" class="headerlink" title="二、数据不同步问题"></a>二、数据不同步问题</h3><p>执行stop方法后线程B会马上释放锁，这有可能会引发数据不同步问题。</p>
+<h4 id="数据不一致"><a href="#数据不一致" class="headerlink" title="数据不一致"></a>数据不一致</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">假如一个线程正在执行：synchronized void &#123; x = 3; y = 4;&#125;　由于方法是同步的，多个线程访问时总能保证x,y被同时赋值，而如果一个线程正在执行到x = 3;时，被调用了 stop()方法，即使在同步块中，它也干脆地stop了，这样就产生了不完整的残废数据。而多线程编程中最最基础的条件要保证数据的完整性，所以请忘记线程的stop方法，以后我们再也不要说“停止线程”了。而且如果对象处于一种不连贯状态，那么其他线程能在那种状态下检查和修改它们。结果 很难检查出真正的问题所在。</span><br></pre></td></tr></table></figure>
+<h4 id="锁"><a href="#锁" class="headerlink" title="锁"></a>锁</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">package test;</span><br><span class="line"></span><br><span class="line">public class testLock &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line"></span><br><span class="line">		final Object lock = new Object();</span><br><span class="line"></span><br><span class="line">		Thread thread1 = new Thread() &#123;</span><br><span class="line"></span><br><span class="line">			public void run() &#123;</span><br><span class="line"></span><br><span class="line">				try &#123;</span><br><span class="line"></span><br><span class="line">					synchronized (lock) &#123;</span><br><span class="line"></span><br><span class="line">						System.out.println(&quot;thread1 acquire lock&quot;);</span><br><span class="line"></span><br><span class="line">						System.out.println(&quot;thread1 release lock&quot;);</span><br><span class="line">					&#125;</span><br><span class="line"></span><br><span class="line">				&#125; catch (ThreadDeath e) &#123;</span><br><span class="line">					// TODO: handle exception</span><br><span class="line">					e.printStackTrace();</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;;</span><br><span class="line"></span><br><span class="line">		Thread thread2 = new Thread() &#123;</span><br><span class="line"></span><br><span class="line">			public void run() &#123;</span><br><span class="line"></span><br><span class="line">				synchronized (lock) &#123;</span><br><span class="line"></span><br><span class="line">					System.out.println(&quot;thread2 acquire lock&quot;);</span><br><span class="line"></span><br><span class="line">					System.out.println(&quot;thread2 release lock&quot;);</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;;</span><br><span class="line"></span><br><span class="line">		thread1.start();</span><br><span class="line"></span><br><span class="line">		thread1.stop();</span><br><span class="line"></span><br><span class="line">		thread2.start();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果不使用stop方法，结果为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">thread1 acquire lock</span><br><span class="line">thread1 release lock</span><br><span class="line">thread2 acquire lock</span><br><span class="line">thread2 release lock</span><br></pre></td></tr></table></figure></p>
+<p>这说明thread1和thread2都在正确地征用同一个锁对象。先是thread1获得了lock，然后释放lock。然后thread2获得了lock，然后释放lock。但是如果使用了stop方法，那么结果为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">thread2 acquire lock</span><br><span class="line">thread2 release lock</span><br><span class="line">java.lang.ThreadDeath</span><br><span class="line">	at java.lang.Thread.stop(Thread.java:850)</span><br><span class="line">	at test.testLock.main(testLock.java:44)</span><br></pre></td></tr></table></figure>
+<p>可以看到thread1抛出了java.lang.ThreadDeath错误。同时thread的lock被破坏掉了，只有thread2获得了lock。因为锁被破坏，所以当前线程可能不安全。</p>
+<h1 id="线程中断"><a href="#线程中断" class="headerlink" title="线程中断"></a>线程中断</h1><p>在Java中没有办法立即停止一条线程，然而停止线程却显得尤为重要，如取消一个耗时操作。因此，Java提供了一种用于停止线程的机制——中断。</p>
+<ul>
+<li>中断只是一种协作机制，Java没有给中断增加任何语法，中断的过程完全需要程序员自己实现。若要中断一个线程，你需要手动调用该线程的interrupted方法，该方法也仅仅是将线程对象的中断标识设成true；接着你需要自己写代码不断地检测当前线程的标识位；如果为true，表示别的线程要求这条线程中断，此时究竟该做什么需要你自己写代码实现。</li>
+<li>每个线程对象中都有一个标识，用于表示线程是否被中断；该标识位为true表示中断，为false表示未中断；</li>
+<li>通过调用线程对象的interrupt方法将该线程的标识位设为true；可以在别的线程中调用，也可以在自己的线程中调用。</li>
+</ul>
+<h2 id="相关方法"><a href="#相关方法" class="headerlink" title="相关方法"></a>相关方法</h2><p>中断的相关方法public void interrupt() 将调用者线程的中断状态设为true。public boolean isInterrupted() 判断调用者线程的中断状态。public static boolean interrupted 只能通过Thread.interrupted()调用。 它会做两步操作：返回当前线程的中断状态；将当前线程的中断状态设为false；</p>
+<h2 id="正确用法"><a href="#正确用法" class="headerlink" title="正确用法"></a>正确用法</h2><p>1.设置中断监听<br>2.触发中断</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p> <a href="http://ibruce.info/2013/12/19/how-to-stop-a-java-thread/" target="_blank" rel="noopener">http://ibruce.info/2013/12/19/how-to-stop-a-java-thread/</a><br> <a href="https://blog.csdn.net/wei_ya_wen/article/details/8626880" target="_blank" rel="noopener">https://blog.csdn.net/wei_ya_wen/article/details/8626880</a><br> <a href="http://www.xie4ever.com/2017/03/03/java-%E7%A6%81%E6%AD%A2%E4%BD%BF%E7%94%A8thread-stop%E6%96%B9%E6%B3%95/" target="_blank" rel="noopener">http://www.xie4ever.com/2017/03/03/java-%E7%A6%81%E6%AD%A2%E4%BD%BF%E7%94%A8thread-stop%E6%96%B9%E6%B3%95/</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/28/其他/gauze-mask-comparison/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1052,1350 +2301,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/27/redis/redis-key-persist/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/27/redis/redis-key-persist/" itemprop="url">redis移除过期时间的命令</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-27T13:05:30+08:00">
-                2018-03-27
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/redis/" itemprop="url" rel="index">
-                    <span itemprop="name">redis</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/03/27/redis/redis-key-persist/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/27/redis/redis-key-persist/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/03/27/redis/redis-key-persist/" class="leancloud_visitors" data-flag-title="redis移除过期时间的命令">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="PERSIST-mykey"><a href="#PERSIST-mykey" class="headerlink" title="PERSIST mykey"></a>PERSIST mykey</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">起始版本：2.2.0</span><br><span class="line"></span><br><span class="line">时间复杂度：O(1)</span><br></pre></td></tr></table></figure>
-<p>移除给定key的生存时间，将这个 key 从『易失的』(带生存时间 key )转换成『持久的』(一个不带生存时间、永不过期的 key )。</p>
-<p>##返回值</p>
-<p>integer-reply, 只有以下两种值:</p>
-<p>当生存时间移除成功时，返回 1 .<br>如果 key 不存在或 key 没有设置生存时间，返回 0 .</p>
-<p>##例子</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; SET mykey &quot;Hello&quot;</span><br><span class="line">OK</span><br><span class="line">redis&gt; EXPIRE mykey 10</span><br><span class="line">(integer) 1</span><br><span class="line">redis&gt; TTL mykey</span><br><span class="line">(integer) 10</span><br><span class="line">redis&gt; PERSIST mykey</span><br><span class="line">(integer) 1</span><br><span class="line">redis&gt; TTL mykey</span><br><span class="line">(integer) -1</span><br><span class="line">redis&gt;</span><br></pre></td></tr></table></figure>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/27/http/study-https/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/27/http/study-https/" itemprop="url">study-https</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-27T09:46:57+08:00">
-                2018-03-27
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/03/27/http/study-https/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/27/http/study-https/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/03/27/http/study-https/" class="leancloud_visitors" data-flag-title="study-https">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="一、HTTP和HTTPS的基本概念"><a href="#一、HTTP和HTTPS的基本概念" class="headerlink" title="一、HTTP和HTTPS的基本概念"></a>一、HTTP和HTTPS的基本概念</h1><p>HTTP：是互联网上应用最为广泛的一种网络协议，是一个客户端和服务器端请求和应答的标准（TCP），用于从WWW服务器传输超文本到本地浏览器的传输协议，它可以使浏览器更加高效，使网络传输减少。</p>
-<p>HTTPS：是以安全为目标的HTTP通道，简单讲是HTTP的安全版，即HTTP下加入SSL层，HTTPS的安全基础是SSL，因此加密的详细内容就需要SSL。</p>
-<p>HTTPS协议的主要作用可以分为两种：</p>
-<ul>
-<li>一种是建立一个信息安全通道，来保证数据传输的安全；</li>
-<li>另一种就是确认网站的真实性。</li>
-</ul>
-<h1 id="二、HTTP与HTTPS有什么区别？"><a href="#二、HTTP与HTTPS有什么区别？" class="headerlink" title="二、HTTP与HTTPS有什么区别？"></a>二、HTTP与HTTPS有什么区别？</h1><p>HTTP协议传输的数据都是未加密的，也就是明文的，因此使用HTTP协议传输隐私信息非常不安全，为了保证这些隐私数据能加密传输，于是网景公司设计了SSL（Secure Sockets Layer）协议用于对HTTP协议传输的数据进行加密，从而就诞生了HTTPS。</p>
-<p>简单来说，HTTPS协议是由SSL+HTTP协议构建的可进行加密传输、身份认证的网络协议，要比http协议安全。</p>
-<p>HTTPS和HTTP的区别主要如下：</p>
-<p>1、https协议需要到ca申请证书，一般免费证书较少，因而需要一定费用。</p>
-<p>2、http是超文本传输协议，信息是明文传输，https则是具有安全性的ssl加密传输协议。</p>
-<p>3、http和https使用的是完全不同的连接方式，用的端口也不一样，前者是80，后者是443。</p>
-<p>4、http的连接很简单，是无状态的；HTTPS协议是由SSL+HTTP协议构建的可进行加密传输、身份认证的网络协议，比http协议安全。</p>
-<h1 id="HTTPS的工作原理"><a href="#HTTPS的工作原理" class="headerlink" title="HTTPS的工作原理"></a>HTTPS的工作原理</h1><p>1、客户端发起HTTPS请求</p>
-<p>这个没什么好说的，就是用户在浏览器里输入一个https网址，然后连接到server的443端口。</p>
-<p>2、服务端的配置</p>
-<p>采用HTTPS协议的服务器必须要有一套数字证书，可以自己制作，也可以向组织申请，区别就是自己颁发的证书需要客户端验证通过，才可以继续访问，而使用受信任的公司申请的证书则不会弹出提示页面(startssl就是个不错的选择，有1年的免费服务)。</p>
-<p>这套证书其实就是一对公钥和私钥，如果对公钥和私钥不太理解，可以想象成一把钥匙和一个锁头，只是全世界只有你一个人有这把钥匙，你可以把锁头给别人，别人可以用这个锁把重要的东西锁起来，然后发给你，因为只有你一个人有这把钥匙，所以只有你才能看到被这把锁锁起来的东西。</p>
-<p>3、传送证书</p>
-<p>这个证书其实就是公钥，只是包含了很多信息，如证书的颁发机构，过期时间等等。</p>
-<p>4、客户端解析证书(验证公钥)</p>
-<p>这部分工作是有客户端的TLS来完成的，首先会验证公钥是否有效，比如颁发机构，过期时间等等，如果发现异常，则会弹出一个警告框，提示证书存在问题。</p>
-<p>如果证书没有问题，那么就生成一个随机值，然后用证书对该随机值进行加密，就好像上面说的，把随机值用锁头锁起来，这样除非有钥匙，不然看不到被锁住的内容。</p>
-<p>5、传送加密信息</p>
-<p>这部分传送的是用证书加密后的随机值，目的就是让服务端得到这个随机值，以后客户端和服务端的通信就可以通过这个随机值来进行加密解密了。</p>
-<p>6、服务段解密信息</p>
-<p>服务端用私钥解密后，得到了客户端传过来的随机值(私钥)，然后把内容通过该值进行<strong>对称加密</strong>，所谓对称加密就是，将信息和私钥通过某种算法混合在一起，这样除非知道私钥，不然无法获取内容，而正好客户端和服务端都知道这个私钥，所以只要加密算法够彪悍，私钥够复杂，数据就够安全。</p>
-<p>7、传输加密后的信息</p>
-<p>这部分信息是服务段用私钥加密后的信息，可以在客户端被还原。</p>
-<p>8、客户端解密信息</p>
-<p>客户端用之前生成的私钥解密服务段传过来的信息，于是获取了解密后的内容，整个过程第三方即使监听到了数据，也束手无策。x</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/27/design/study-idempotence/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/27/design/study-idempotence/" itemprop="url">常见用来保证幂等的手段</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-27T09:28:00+08:00">
-                2018-03-27
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/03/27/design/study-idempotence/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/27/design/study-idempotence/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/03/27/design/study-idempotence/" class="leancloud_visitors" data-flag-title="常见用来保证幂等的手段">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="幂等性定义"><a href="#幂等性定义" class="headerlink" title="幂等性定义"></a>幂等性定义</h1><h2 id="数学定义"><a href="#数学定义" class="headerlink" title="数学定义"></a>数学定义</h2><p>在数学里，幂等有两种主要的定义：</p>
-<p>在某二元运算下，幂等元素是指被自己重复运算(或对于函数是为复合)的结果等于它自己的元素。例如，乘法下唯一两个幂等实数为0和1。 即 s *s = s<br>某一元运算为幂等的时，其作用在任一元素两次后会和其作用一次的结果相同。例如，高斯符号便是幂等的，即f(f(x)) = f(x)。</p>
-<h2 id="HTTP规范的定义"><a href="#HTTP规范的定义" class="headerlink" title="HTTP规范的定义"></a>HTTP规范的定义</h2><p>HTTP的幂等性指的是一次和多次请求某一个资源应该具有相同的副作用。如通过PUT接口将数据的Status置为1，无论是第一次执行还是多次执行，获取到的结果应该是相同的，即执行完成之后Status =1。</p>
-<h1 id="何种接口提供幂等性"><a href="#何种接口提供幂等性" class="headerlink" title="何种接口提供幂等性"></a>何种接口提供幂等性</h1><p>在HTTP规范中定义GET,PUT和DELETE方法应该具有幂等性。</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">重要</th>
-<th style="text-align:left">安全？</th>
-<th style="text-align:left">幂等？</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">GET</td>
-<td style="text-align:left">是</td>
-<td style="text-align:left">是</td>
-</tr>
-<tr>
-<td style="text-align:left">DELETE</td>
-<td style="text-align:left">否</td>
-<td style="text-align:left">是</td>
-</tr>
-<tr>
-<td style="text-align:left">PUT</td>
-<td style="text-align:left">否</td>
-<td style="text-align:left">是</td>
-</tr>
-<tr>
-<td style="text-align:left">POST</td>
-<td style="text-align:left">否</td>
-<td style="text-align:left">否</td>
-</tr>
-</tbody>
-</table>
-<h1 id="常见用来保证幂等的手段"><a href="#常见用来保证幂等的手段" class="headerlink" title="常见用来保证幂等的手段:"></a>常见用来保证幂等的手段:</h1><h2 id="1-查询性质-天然支持"><a href="#1-查询性质-天然支持" class="headerlink" title="1.查询性质(天然支持)"></a>1.查询性质(天然支持)</h2><p>  查询的API，可以说是天然的幂等性，因为你查询一次和查询两次，对于系统来讲，没有任何数据的变更，所以，查询一次和查询多次一样的；</p>
-<h2 id="2-MVCC方案"><a href="#2-MVCC方案" class="headerlink" title="2.MVCC方案"></a>2.MVCC方案</h2><p>   多版本并发控制，update with condition更新带条件，这也是在系统设计的时候，合理的选择乐观锁，通过version或者其他条件，来做乐观锁，这样保证更新及时在并发的情况下，也不会有太大的问题。</p>
-<p>   例如update table_xxx set name=#name#,version=version+1 where version=#version# ,或者是 update table_xxx set quality=quality-#subQuality# where quality-#subQuality# &gt;= 0</p>
-<h2 id="3-插入数据的唯一索引-单库单表可行"><a href="#3-插入数据的唯一索引-单库单表可行" class="headerlink" title="3.插入数据的唯一索引(单库单表可行)"></a>3.插入数据的唯一索引(单库单表可行)</h2><p>   插入数据的唯一性，可以通过业务主键来进行约束，例如一个特定的业务场景，三个字段肯定确定唯一性，那么，可以在数据库表添加唯一索引来进行标示。</p>
-<h2 id="3-1-select-insert-并发不高的情况下-分库分表支持"><a href="#3-1-select-insert-并发不高的情况下-分库分表支持" class="headerlink" title="3.1 select + insert (并发不高的情况下,分库分表支持)"></a>3.1 select + insert (并发不高的情况下,分库分表支持)</h2><p>　　并发不高的后台系统，或者一些任务JOB，为了支持幂等，支持重复执行，简单的处理方法是，先查询下一些关键数据，判断是否已经执行过，在进行业务处理，就可以了。注意：核心高并发流程不要用这种方法</p>
-<h2 id="3-2-select-insert-锁-并发高的情况下-分库分表支持"><a href="#3-2-select-insert-锁-并发高的情况下-分库分表支持" class="headerlink" title="3.2 select + insert + 锁 (并发高的情况下,分库分表支持)"></a>3.2 select + insert + 锁 (并发高的情况下,分库分表支持)</h2><p>　　并发不高的后台系统，或者一些任务JOB，为了支持幂等，支持重复执行，简单的处理方法是，先查询下一些关键数据，判断是否已经执行过，在进行业务处理，就可以了。注意：核心高并发流程不要用这种方法</p>
-<h2 id="4-分布式锁"><a href="#4-分布式锁" class="headerlink" title="4.分布式锁"></a>4.分布式锁</h2><p>   还是拿插入数据的例子，如果是分布是系统，构建唯一索引比较困难，例如唯一性的字段没法确定，这时候可以引入分布式锁，通过第三方的系统，在业务系统插入数据或者更新数据，获取分布式锁，然后做操作，之后释放锁，这样其实是把多线程并发的锁的思路，引入多个系统，也就是分布式系统中得解决思路；</p>
-<h2 id="5-状态机幂等"><a href="#5-状态机幂等" class="headerlink" title="5.状态机幂等"></a>5.状态机幂等</h2><p>   在设计单据相关的业务，或者是任务相关的业务，肯定会涉及到状态机，就是业务单据上面有个状态，状态在不同的情况下会发生变更，一般情况下存在有限状态机，这时候，如果状态机已经处于下一个状态，这时候来了一个上一个状态的变更，理论上是不能够变更的，这样的话，保证了有限状态机的幂等</p>
-<h2 id="6-token机制，防止页面重复提交"><a href="#6-token机制，防止页面重复提交" class="headerlink" title="6.token机制，防止页面重复提交"></a>6.token机制，防止页面重复提交</h2><p>　　业务要求：页面的数据只能被点击提交一次<br>　　发生原因：由于重复点击或者网络重发，或者nginx重发等情况会导致数据被重复提交 </p>
-<h1 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h1><p>通常，客户端只需要在500（InternalErrorInternalError）或503（ServiceUnavailable）错误、或者无法得到响应结果的情况下进行重试操作。返回结果是200时，重试可以得到上次相同的结果，但不会对服务端状态带来任何影响。而对4xx的返回错误，除非提示信息里明确出现“try it later”，通常重试也是不能成功的。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/26/redis/redis-key-timeout/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/26/redis/redis-key-timeout/" itemprop="url">Redis过期淘汰机制</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-26T18:21:00+08:00">
-                2018-03-26
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/redis/" itemprop="url" rel="index">
-                    <span itemprop="name">redis</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/03/26/redis/redis-key-timeout/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/26/redis/redis-key-timeout/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/03/26/redis/redis-key-timeout/" class="leancloud_visitors" data-flag-title="Redis过期淘汰机制">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p> <a href="https://yq.aliyun.com/articles/257459" target="_blank" rel="noopener">https://yq.aliyun.com/articles/257459</a></p>
-<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>Redis作为一个高性能的内存NoSQL数据库，其容量受到最大内存限制的限制。</p>
-<p>用户在使用阿里云Redis时，除了对性能，稳定性有很高的要求外，对内存占用也比较敏感。在使用过程中，有些用户会觉得自己的线上实例内存占用比自己预想的要大。</p>
-<p>事实上，实例中的内存除了保存原始的键值对所需的开销外，还有一些运行时产生的额外内存，包括：</p>
-<ol>
-<li>垃圾数据和过期Key所占空间</li>
-<li>字典渐进式Rehash导致未及时删除的空间</li>
-<li>Redis管理数据，包括底层数据结构开销，客户端信息，读写缓冲区等</li>
-<li>主从复制，bgsave时的额外开销</li>
-<li>其它</li>
-</ol>
-<p>本系列文章主要分析这些在Redis中产生的原因，带来的影响和规避的方式。</p>
-<p>本文主要分析第一项Redis过期策略对内存的影响。</p>
-<h2 id="Redis过期数据清理策略"><a href="#Redis过期数据清理策略" class="headerlink" title="Redis过期数据清理策略"></a>Redis过期数据清理策略</h2><h3 id="过期数据清理时机"><a href="#过期数据清理时机" class="headerlink" title="过期数据清理时机"></a>过期数据清理时机</h3><p>为了防止一次性清理大量过期Key导致Redis服务受影响，Redis只在空闲时清理过期Key。</p>
-<p>具体Redis逐出过期Key的时机为:</p>
-<ul>
-<li><p>访问Key时，会判断Key是否过期，逐出过期Key;</p>
-</li>
-<li><p>CPU空闲时在定期serverCron任务中，逐出部分过期Key;</p>
-</li>
-<li><p>每次事件循环执行的时候，逐出部分过期Key;</p>
-</li>
-</ul>
-<h3 id="过期数据清理算法"><a href="#过期数据清理算法" class="headerlink" title="过期数据清理算法"></a>过期数据清理算法</h3><p>Redis过期Key清理的机制对清理的频率和最大时间都有限制，在尽量不影响正常服务的情况下，进行过期Key的清理，以达到长时间服务的性能最优.</p>
-<p>Redis会周期性的随机测试一批设置了过期时间的key并进行处理。测试到的已过期的key将被删除。具体的算法如下:</p>
-<ol>
-<li>Redis配置项hz定义了serverCron任务的执行周期，默认为10，即CPU空闲时每秒执行10次;</li>
-<li>每次过期key清理的时间不超过CPU时间的25%，即若hz=1，则一次清理时间最大为250ms，若hz=10，则一次清理时间最大为25ms;</li>
-<li>清理时依次遍历所有的db;</li>
-<li>从db中随机取20个key，判断是否过期，若过期，则逐出;</li>
-<li>若有5个以上key过期，则重复步骤4，否则遍历下一个db;</li>
-<li>在清理过程中，若达到了25%CPU时间，退出清理过程;</li>
-</ol>
-<p>这是一个基于概率的简单算法，基本的假设是抽出的样本能够代表整个key空间，redis持续清理过期的数据直至将要过期的key的百分比降到了25%以下。这也意味着在长期来看任何给定的时刻已经过期但仍占据着内存空间的key的量最多为每秒的写操作量除以4.</p>
-<ul>
-<li>由于算法采用的随机取key判断是否过期的方式，故几乎不可能清理完所有的过期Key;</li>
-<li>调高hz参数可以提升清理的频率，过期key可以更及时的被删除，但hz太高会增加CPU时间的消耗;<br><a href="https://groups.google.com/forum/#!topic/redis-db/6kILekxQXBM" target="_blank" rel="noopener">Redis作者关于hz参数的一些讨论</a></li>
-</ul>
-<p>代码分析如下:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br></pre></td><td class="code"><pre><span class="line">void</span><br><span class="line">activeExpireCycle</span><br><span class="line">(</span><br><span class="line">int</span><br><span class="line">type)</span><br><span class="line">&#123;</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">/* We can use at max ACTIVE_EXPIRE_CYCLE_SLOW_TIME_PERC percentage of CPU time</span><br><span class="line">* per iteration. Since this function gets called with a frequency of</span><br><span class="line">* server.hz times per second, the following is the max amount of</span><br><span class="line">* microseconds we can spend in this function. */</span><br><span class="line">// 最多允许25%的CPU时间用于过期Key清理</span><br><span class="line">// 若hz=1，则一次activeExpireCycle最多只能执行250ms</span><br><span class="line">// 若hz=10，则一次activeExpireCycle最多只能执行25ms</span><br><span class="line"></span><br><span class="line">timelimit =</span><br><span class="line">1000000</span><br><span class="line">*ACTIVE_EXPIRE_CYCLE_SLOW_TIME_PERC/server.hz/</span><br><span class="line">100</span><br><span class="line">;</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">// 遍历所有db</span><br><span class="line">for</span><br><span class="line">(j =</span><br><span class="line">0</span><br><span class="line">; j</span><br><span class="line">&lt;</span><br><span class="line">dbs_per_call; j++) &#123;</span><br><span class="line"></span><br><span class="line">int</span><br><span class="line">expired;</span><br><span class="line">redisDb *db = server.db+(current_db % server.dbnum);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">/* Increment the DB now so we are sure if we run out of time</span><br><span class="line">* in the current DB we&apos;ll restart from the next. This allows to</span><br><span class="line">* distribute the time evenly across DBs. */</span><br><span class="line"></span><br><span class="line">current_db++;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">/* Continue to expire if at the end of the cycle more than 25%</span><br><span class="line">* of the keys were expired. */</span><br><span class="line">do</span><br><span class="line">&#123;</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">// 一次取20个Key，判断是否过期</span><br><span class="line">if</span><br><span class="line">(num</span><br><span class="line">&gt;</span><br><span class="line">ACTIVE_EXPIRE_CYCLE_LOOKUPS_PER_LOOP)</span><br><span class="line">num = ACTIVE_EXPIRE_CYCLE_LOOKUPS_PER_LOOP;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">while</span><br><span class="line">(num--) &#123;</span><br><span class="line">dictEntry *de;</span><br><span class="line"></span><br><span class="line">long</span><br><span class="line">long</span><br><span class="line">ttl;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if</span><br><span class="line">((de = dictGetRandomKey(db-</span><br><span class="line">&gt;</span><br><span class="line">expires)) ==</span><br><span class="line">NULL</span><br><span class="line">)</span><br><span class="line">break</span><br><span class="line">;</span><br><span class="line">ttl = dictGetSignedIntegerVal(de)-now;</span><br><span class="line"></span><br><span class="line">if</span><br><span class="line">(activeExpireCycleTryExpire(db,de,now)) expired++;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if</span><br><span class="line">((iteration</span><br><span class="line">&amp;</span><br><span class="line">0xf</span><br><span class="line">) ==</span><br><span class="line">0</span><br><span class="line">) &#123;</span><br><span class="line">/* check once every 16 iterations. */</span><br><span class="line">long</span><br><span class="line">long</span><br><span class="line">elapsed = ustime()-start;</span><br><span class="line">latencyAddSampleIfNeeded(</span><br><span class="line">&quot;expire-cycle&quot;</span><br><span class="line">,elapsed/</span><br><span class="line">1000</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">if</span><br><span class="line">(elapsed</span><br><span class="line">&gt;</span><br><span class="line">timelimit) timelimit_exit =</span><br><span class="line">1</span><br><span class="line">;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">if</span><br><span class="line">(timelimit_exit)</span><br><span class="line">return</span><br><span class="line">;</span><br><span class="line"></span><br><span class="line">/* We don&apos;t repeat the cycle if there are less than 25% of keys</span><br><span class="line">* found expired in the current DB. */</span><br><span class="line">// 若有5个以上过期Key，则继续直至时间超过25%的CPU时间</span><br><span class="line">// 若没有5个过期Key，则跳过。</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line">while</span><br><span class="line">(expired</span><br><span class="line">&gt;</span><br><span class="line">ACTIVE_EXPIRE_CYCLE_LOOKUPS_PER_LOOP/</span><br><span class="line">4</span><br><span class="line">);</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="Redis数据逐出策略"><a href="#Redis数据逐出策略" class="headerlink" title="Redis数据逐出策略"></a>Redis数据逐出策略</h2><h3 id="数据逐出时机"><a href="#数据逐出时机" class="headerlink" title="数据逐出时机"></a>数据逐出时机</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">// 执行命令</span><br><span class="line">int</span><br><span class="line">processCommand</span><br><span class="line">(redisClient *c)</span><br><span class="line">&#123;</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">/* Handle the maxmemory directive.</span><br><span class="line">**</span><br><span class="line">First we try to free some memory if possible (if there are volatile</span><br><span class="line">* keys in the dataset). If there are not the only thing we can do</span><br><span class="line">* is returning an error. */</span><br><span class="line">if</span><br><span class="line">(server.maxmemory) &#123;</span><br><span class="line"></span><br><span class="line">int</span><br><span class="line">retval = freeMemoryIfNeeded();</span><br><span class="line">...</span><br><span class="line">&#125;</span><br><span class="line">...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="数据逐出算法"><a href="#数据逐出算法" class="headerlink" title="数据逐出算法"></a>数据逐出算法</h3><p>在逐出算法中，根据用户设置的逐出策略，选出待逐出的key，直到当前内存小于最大内存值为主.</p>
-<p>默认的策略为noeviction策略</p>
-<p>可选逐出策略如下：</p>
-<ul>
-<li>volatile-lru：从已设置过期时间的数据集（server.db[i].expires）中挑选最近最少使用 的数据淘汰</li>
-<li>volatile-ttl：从已设置过期时间的数据集（server.db[i].expires）中挑选将要过期的数 据淘汰</li>
-<li>volatile-random：从已设置过期时间的数据集（server.db[i].expires）中任意选择数据 淘汰</li>
-<li>allkeys-lru：从数据集（server.db[i].dict）中挑选最近最少使用的数据淘汰</li>
-<li>allkeys-random：从数据集（server.db[i].dict）中任意选择数据淘汰</li>
-<li>no-enviction（驱逐）：禁止驱逐数据</li>
-</ul>
-<p>具体代码如下</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br></pre></td><td class="code"><pre><span class="line">int</span><br><span class="line">freeMemoryIfNeeded</span><br><span class="line">()</span><br><span class="line">&#123;</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">// 计算mem_used</span><br><span class="line"></span><br><span class="line">mem_used = zmalloc_used_memory();</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">/* Check if we are over the memory limit. */</span><br><span class="line">if</span><br><span class="line">(mem_used</span><br><span class="line">&lt;</span><br><span class="line">= server.maxmemory)</span><br><span class="line">return</span><br><span class="line">REDIS_OK;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 如果禁止逐出，返回错误</span><br><span class="line">if</span><br><span class="line">(server.maxmemory_policy == REDIS_MAXMEMORY_NO_EVICTION)</span><br><span class="line"></span><br><span class="line">return</span><br><span class="line">REDIS_ERR;</span><br><span class="line">/* We need to free memory, but policy forbids. */</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">mem_freed =</span><br><span class="line">0</span><br><span class="line">;</span><br><span class="line">mem_tofree = mem_used - server.maxmemory;</span><br><span class="line"></span><br><span class="line">long</span><br><span class="line">long</span><br><span class="line">start = ustime();</span><br><span class="line">latencyStartMonitor(latency);</span><br><span class="line"></span><br><span class="line">while</span><br><span class="line">(mem_freed</span><br><span class="line">&lt;</span><br><span class="line">mem_tofree) &#123;</span><br><span class="line"></span><br><span class="line">int</span><br><span class="line">j, k, keys_freed =</span><br><span class="line">0</span><br><span class="line">;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">for</span><br><span class="line">(j =</span><br><span class="line">0</span><br><span class="line">; j</span><br><span class="line">&lt;</span><br><span class="line">server.dbnum; j++) &#123;</span><br><span class="line"></span><br><span class="line">// 根据逐出策略的不同，选出待逐出的数据</span><br><span class="line">long</span><br><span class="line">bestval =</span><br><span class="line">0</span><br><span class="line">;</span><br><span class="line">/* just to prevent warning */</span><br><span class="line"></span><br><span class="line">sds bestkey =</span><br><span class="line">NULL</span><br><span class="line">;</span><br><span class="line"></span><br><span class="line">struct</span><br><span class="line">dictEntry *de;</span><br><span class="line">redisDb *db = server.db+j;</span><br><span class="line">dict *dict;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if</span><br><span class="line">(server.maxmemory_policy == REDIS_MAXMEMORY_ALLKEYS_LRU ||</span><br><span class="line">server.maxmemory_policy == REDIS_MAXMEMORY_ALLKEYS_RANDOM)</span><br><span class="line">&#123;</span><br><span class="line">dict = server.db[j].dict;</span><br><span class="line">&#125;</span><br><span class="line">else</span><br><span class="line">&#123;</span><br><span class="line">dict = server.db[j].expires;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">if</span><br><span class="line">(dictSize(dict) ==</span><br><span class="line">0</span><br><span class="line">)</span><br><span class="line">continue</span><br><span class="line">;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">/* volatile-random and allkeys-random policy */</span><br><span class="line">if</span><br><span class="line">(server.maxmemory_policy == REDIS_MAXMEMORY_ALLKEYS_RANDOM ||</span><br><span class="line">server.maxmemory_policy == REDIS_MAXMEMORY_VOLATILE_RANDOM)</span><br><span class="line">&#123;</span><br><span class="line">de = dictGetRandomKey(dict);</span><br><span class="line">bestkey = dictGetKey(de);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">/* volatile-lru and allkeys-lru policy */</span><br><span class="line">else</span><br><span class="line">if</span><br><span class="line">(server.maxmemory_policy == REDIS_MAXMEMORY_ALLKEYS_LRU ||</span><br><span class="line">server.maxmemory_policy == REDIS_MAXMEMORY_VOLATILE_LRU)</span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">for</span><br><span class="line">(k =</span><br><span class="line">0</span><br><span class="line">; k</span><br><span class="line">&lt;</span><br><span class="line">server.maxmemory_samples; k++) &#123;</span><br><span class="line">sds thiskey;</span><br><span class="line"></span><br><span class="line">long</span><br><span class="line">thisval;</span><br><span class="line">robj *o;</span><br><span class="line"></span><br><span class="line">de = dictGetRandomKey(dict);</span><br><span class="line">thiskey = dictGetKey(de);</span><br><span class="line"></span><br><span class="line">/* When policy is volatile-lru we need an additional lookup</span><br><span class="line">* to locate the real key, as dict is set to db-</span><br><span class="line">&gt;</span><br><span class="line">expires. **/</span><br><span class="line">if</span><br><span class="line">(server.maxmemory_policy == REDIS_MAXMEMORY_VOLATILE_LRU)</span><br><span class="line">de = dictFind(db-</span><br><span class="line">&gt;</span><br><span class="line">dict, thiskey);</span><br><span class="line">o = dictGetVal(de);</span><br><span class="line">thisval = estimateObjectIdleTime(o);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">/* Higher idle time is better candidate for deletion */</span><br><span class="line">if</span><br><span class="line">(bestkey ==</span><br><span class="line">NULL</span><br><span class="line">|| thisval</span><br><span class="line">&gt;</span><br><span class="line">bestval) &#123;</span><br><span class="line">bestkey = thiskey;</span><br><span class="line">bestval = thisval;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">/* volatile-ttl */</span><br><span class="line">else</span><br><span class="line">if</span><br><span class="line">(server.maxmemory_policy == REDIS_MAXMEMORY_VOLATILE_TTL) &#123;</span><br><span class="line"></span><br><span class="line">for</span><br><span class="line">(k =</span><br><span class="line">0</span><br><span class="line">; k</span><br><span class="line">&lt;</span><br><span class="line">server.maxmemory_samples; k++) &#123;</span><br><span class="line">sds thiskey;</span><br><span class="line"></span><br><span class="line">long</span><br><span class="line">thisval;</span><br><span class="line"></span><br><span class="line">de = dictGetRandomKey(dict);</span><br><span class="line">thiskey = dictGetKey(de);</span><br><span class="line">thisval = (</span><br><span class="line">long</span><br><span class="line">) dictGetVal(de);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">/* Expire sooner (minor expire unix timestamp) is better</span><br><span class="line">* candidate for deletion **/</span><br><span class="line">if</span><br><span class="line">(bestkey ==</span><br><span class="line">NULL</span><br><span class="line">|| thisval</span><br><span class="line">&lt;</span><br><span class="line">bestval) &#123;</span><br><span class="line">bestkey = thiskey;</span><br><span class="line">bestval = thisval;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">/* Finally remove the selected key. **/</span><br><span class="line">// 逐出挑选出的数据</span><br><span class="line">if</span><br><span class="line">(bestkey ) &#123;</span><br><span class="line">...</span><br><span class="line">delta = (</span><br><span class="line">long</span><br><span class="line">long</span><br><span class="line">) zmalloc_used_memory();</span><br><span class="line">dbDelete(db,keyobj);</span><br><span class="line">delta -= (</span><br><span class="line">long</span><br><span class="line">long</span><br><span class="line">) zmalloc_used_memory();</span><br><span class="line">mem_freed += delta;</span><br><span class="line">...</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">...</span><br><span class="line">&#125;</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">return</span><br><span class="line">REDIS_OK;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="相关最佳实践"><a href="#相关最佳实践" class="headerlink" title="相关最佳实践"></a>相关最佳实践</h2><ul>
-<li>不要放垃圾数据，及时清理无用数据</li>
-</ul>
-<p>实验性的数据和下线的业务数据及时删除;</p>
-<ul>
-<li>key尽量都设置过期时间</li>
-</ul>
-<p>对具有时效性的key设置过期时间，通过redis自身的过期key清理策略来降低过期key对于内存的占用，同时也能够减少业务的麻烦，不需要定期手动清理了.</p>
-<ul>
-<li>单Key不要过大</li>
-</ul>
-<p>给用户排查问题时遇到过单个string的value有43M的，也有一个list 100多万个大成员占了1G多内存的。这种key在get的时候网络传输延迟会比较大，需要分配的输出缓冲区也比较大，在定期清理的时候也容易造成比较高的延迟. 最好能通过业务拆分，数据压缩等方式避免这种过大的key的产生。</p>
-<ul>
-<li>不同业务如果公用一个业务的话，最好使用不同的逻辑db分开</li>
-</ul>
-<p>从上面的分析可以看出，Redis的过期Key清理策略和强制淘汰策略都会遍历各个db。将key分布在不同的db有助于过期Key的及时清理。另外不同业务使用不同db也有助于问题排查和无用数据的及时下线.</p>
-<h1 id="如何选择淘汰策略"><a href="#如何选择淘汰策略" class="headerlink" title="如何选择淘汰策略"></a>如何选择淘汰策略</h1><p>但是这个值填什么呢？为解决这个问题，我们需要了解我们的应用请求对于Redis中存储的数据集的访问方式以及我们的诉求是什么。同时Redis也支持Runtime修改淘汰策略，这使得我们不需要重启Redis实例而实时的调整内存淘汰策略。</p>
-<p>下面看看几种策略的适用场景：</p>
-<ul>
-<li>allkeys-lru：如果我们的应用对缓存的访问符合幂律分布（也就是存在相对热点数据），或者我们不太清楚我们应用的缓存访问分布状况，我们可以选择allkeys-lru策略。</li>
-<li>allkeys-random：如果我们的应用对于缓存key的访问概率相等，则可以使用这个策略。</li>
-<li>volatile-ttl：这种策略使得我们可以向Redis提示哪些key更适合被eviction。</li>
-</ul>
-<p>另外，volatile-lru策略和volatile-random策略适合我们将一个Redis实例既应用于缓存和又应用于持久化存储的时候，然而我们也可以通过使用两个Redis实例来达到相同的效果，值得一提的是将key设置过期时间实际上会消耗更多的内存，因此我们建议使用allkeys-lru策略从而更有效率的使用内存。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/26/redis/redis-persist/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/26/redis/redis-persist/" itemprop="url">Redis持久化方式</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-26T18:21:00+08:00">
-                2018-03-26
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/redis/" itemprop="url" rel="index">
-                    <span itemprop="name">redis</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/03/26/redis/redis-persist/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/26/redis/redis-persist/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/03/26/redis/redis-persist/" class="leancloud_visitors" data-flag-title="Redis持久化方式">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>为防止数据丢失，需要将 Redis 中的数据从内存中 dump 到磁盘，这就是持久化。Redis 提供两种持久化方式：RDB 和 AOF。Redis 允许两者结合，也允许两者同时关闭。</p>
-<p>RDB 可以定时备份内存中的数据集。服务器启动的时候，可以从 RDB 文件中恢复数据集。</p>
-<p>AOF(append only file) 可以记录服务器的所有写操作。在服务器重新启动的时候，会把所有的写操作重新执行一遍，从而实现数据备份。当写操作集过大（比原有的数据集还大），Redis 会重写写操作集。</p>
-<p>为什么称为 append only file 呢？AOF 持久化是类似于生成一个关于 Redis 写操作的文件，写操作（增删）总是以追加的方式追加到文件中。</p>
-<p>因此，在 RDB 持久化的时候可以将 RDB 保存到磁盘中，也可以保存到内存中，当然保存到内存中就不是持久化了。</p>
-<h1 id="RDB-持久化的运作机制-快照模式"><a href="#RDB-持久化的运作机制-快照模式" class="headerlink" title="RDB 持久化的运作机制(快照模式)"></a>RDB 持久化的运作机制(快照模式)</h1><p><img src="http://wiki.jikexueyuan.com/project/redis/images/redis16.png" alt="image.png"></p>
-<p>Redis 支持两种方式进行 RDB 持久化：当前进程执行和后台执行（BGSAVE）。RDB BGSAVE 策略是 fork 出一个子进程，把内存中的数据集整个 dump 到硬盘上。两个场景举例：</p>
-<ol>
-<li>Redis 服务器初始化过程中，设定了定时事件，每隔一段时间就会触发持久化操作； 进入定时事件处理程序中，就会 fork 产生子进程执行持久化操作。</li>
-<li>Redis 服务器预设了 save 指令，客户端可要求服务器进程中断服务，执行持久化操作。</li>
-</ol>
-<p>这里主要展开的内容是 RDB 持久化操作的写文件过程，读过程和写过程相反。子进程的产生发生在 rdbSaveBackground() 中，真正的 RDB 持久化操作是在 rdbSave()，想要直接进行 RDB 持久化，调用 rdbSave() 即可。</p>
-<h2 id="RDB-的优点"><a href="#RDB-的优点" class="headerlink" title="RDB 的优点"></a>RDB 的优点</h2><ul>
-<li>RDB 是一个非常紧凑（compact）的文件，它保存了 Redis 在某个时间点上的数据集。 这种文件非常适合用于进行备份： 比如说，你可以在最近的 24 小时内，每小时备份一次 RDB 文件，并且在每个月的每一天，也备份一个 RDB 文件。 这样的话，即使遇上问题，也可以随时将数据集还原到不同的版本。</li>
-<li>RDB 非常适用于灾难恢复（disaster recovery）：它只有一个文件，并且内容都非常紧凑，可以（在加密后）将它传送到别的数据中心，或者亚马逊 S3 中。</li>
-<li>RDB 可以最大化 Redis 的性能：父进程在保存 RDB 文件时唯一要做的就是 fork 出一个子进程，然后这个子进程就会处理接下来的所有保存工作，父进程无须执行任何磁盘 I/O 操作。<br>RDB 在恢复大数据集时的速度比 AOF 的恢复速度要快。<h2 id="RDB-的缺点"><a href="#RDB-的缺点" class="headerlink" title="RDB 的缺点"></a>RDB 的缺点</h2></li>
-<li>如果你需要尽量避免在服务器故障时丢失数据，那么 RDB 不适合你。 虽然 Redis 允许你设置不同的保存点（save point）来控制保存 RDB 文件的频率， 但是， 因为RDB 文件需要保存整个数据集的状态， 所以它并不是一个轻松的操作。 因此你可能会至少 5 分钟才保存一次 RDB 文件。 在这种情况下， 一旦发生故障停机， 你就可能会丢失好几分钟的数据。</li>
-<li>每次保存 RDB 的时候，Redis 都要 fork() 出一个子进程，并由子进程来进行实际的持久化工作。 在数据集比较庞大时， fork() 可能会非常耗时，<strong>造成服务器在某某毫秒内停止处理客户端</strong>； 如果数据集非常巨大，并且 CPU 时间非常紧张的话，那么这种停止时间甚至可能会长达整整一秒。 虽然 AOF 重写也需要进行 fork() ，但无论 AOF 重写的执行间隔有多长，数据的耐久性都不会有任何损失。</li>
-</ul>
-<h2 id="RDB-快照"><a href="#RDB-快照" class="headerlink" title="RDB 快照"></a>RDB 快照</h2><p>在默认情况下， Redis 将数据库快照保存在名字为 dump.rdb 的二进制文件中。</p>
-<p>你可以对 Redis 进行设置， 让它在“ N 秒内数据集至少有 M 个改动”这一条件被满足时， 自动保存一次数据集。</p>
-<p>你也可以通过调用 SAVE 或者 BGSAVE ， 手动让 Redis 进行数据集保存操作。</p>
-<p>比如说， 以下设置会让 Redis 在满足“ 60 秒内有至少有 1000 个键被改动”这一条件时， 自动保存一次数据集：</p>
-<p><code>save 60 1000</code><br>这种持久化方式被称为快照（snapshot）。</p>
-<h2 id="快照的运作方式"><a href="#快照的运作方式" class="headerlink" title="快照的运作方式"></a>快照的运作方式</h2><p>当 Redis 需要保存 dump.rdb 文件时， 服务器执行以下操作：</p>
-<p>Redis 调用 fork() ，同时拥有父进程和子进程。<br>子进程将数据集写入到一个临时 RDB 文件中。<br>当子进程完成对新 RDB 文件的写入时，Redis 用新 RDB 文件替换原来的 RDB 文件，并删除旧的 RDB 文件。<br>这种工作方式使得 Redis 可以从写时复制（copy-on-write）机制中获益。</p>
-<h1 id="AOF-持久化运作机制-日志模式"><a href="#AOF-持久化运作机制-日志模式" class="headerlink" title="AOF 持久化运作机制(日志模式)"></a>AOF 持久化运作机制(日志模式)</h1><p>和 redis RDB 持久化运作机制不同，redis AOF 有后台执行和边服务边备份两种方式。</p>
-<p><img src="http://wiki.jikexueyuan.com/project/redis/images/redis18.png" alt="image.png"></p>
-<p>1）AOF 后台执行的方式和 RDB 有类似的地方，fork 一个子进程，主进程仍进行服务，子进程执行AOF 持久化，数据被dump 到磁盘上。与 RDB 不同的是，后台子进程持久化过程中，主进程会记录期间的所有数据变更（主进程还在服务），并存储在 server.aof_rewrite_buf_blocks 中；后台子进程结束后，Redis 更新缓存追加到 AOF 文件中，是 RDB 持久化所不具备的。</p>
-<p>来说说更新缓存这个东西。Redis 服务器产生数据变更的时候，譬如 set name Jhon，不仅仅会修改内存数据集，也会记录此更新（修改）操作，记录的方式就是上面所说的数据组织方式。</p>
-<p>更新缓存可以存储在 server.aof_buf 中，你可以把它理解为一个小型临时中转站，所有累积的更新缓存都会先放入这里，它会在特定时机写入文件或者插入到server.aof_-rewrite_buf_blocks 下链表（下面会详述）；server.aof_buf 中的数据在 propagrate() 添加，在涉及数据更新的地方都会调用propagrate() 以累积变更。更新缓存也可以存储在 server.aof_-rewrite_buf_blocks，这是一个元素类型为 struct aofrwblock 的链表，你可以把它理解为一个仓库，当后台有AOF 子进程的时候，会将累积的更新缓存（在 server.aof_buf 中）插入到链表中，而当 AOF 子进程结束，它会被整个写入到文件。两者是有关联的。</p>
-<p>这里的意图即是不用每次出现数据变更的时候都触发一个写操作，可以将写操作先缓存到内存中，待到合适的时机写入到磁盘，如此避免频繁的写操作。当然，完全可以实现让数据变更及时更新到磁盘中。两种做法的好坏就是一种博弈了。</p>
-<p>Redis允许同时开启AOF和RDB，既保证了数据安全又使得进行备份等操作十分容易。此时重新启动Redis后Redis会使用AOF文件来恢复数据，因为AOF方式的持久化可能丢失的数据更少。</p>
-<h2 id="AOF-的优点"><a href="#AOF-的优点" class="headerlink" title="AOF 的优点"></a>AOF 的优点</h2><ul>
-<li>使用 AOF 持久化会让 Redis 变得非常耐久（much more durable）：你可以设置不同的 fsync 策略，比如无 fsync ，每秒钟一次 fsync ，或者每次执行写入命令时 fsync 。 AOF 的默认策略为每秒钟 fsync 一次，在这种配置下，Redis 仍然可以保持良好的性能，并且就算发生故障停机，也最多只会丢失一秒钟的数据（ fsync 会在后台线程执行，所以主线程可以继续努力地处理命令请求）。</li>
-<li>AOF 文件是一个只进行追加操作的日志文件（append only log）， 因此对 AOF 文件的写入不需要进行 seek ， 即使日志因为某些原因而包含了未写入完整的命令（比如写入时磁盘已满，写入中途停机，等等）， redis-check-aof 工具也可以轻易地修复这种问题。</li>
-<li>Redis 可以在 AOF 文件体积变得过大时，自动地在后台对 AOF 进行重写： 重写后的新 AOF 文件包含了恢复当前数据集所需的最小命令集合。 整个重写操作是绝对安全的，因为 Redis 在创建新 AOF 文件的过程中，会继续将命令追加到现有的 AOF 文件里面，即使重写过程中发生停机，现有的 AOF 文件也不会丢失。 而一旦新 AOF 文件创建完毕，Redis 就会从旧 AOF 文件切换到新 AOF 文件，并开始对新 AOF 文件进行追加操作。</li>
-<li>AOF 文件有序地保存了对数据库执行的所有写入操作， 这些写入操作以 Redis 协议的格式保存， 因此 AOF 文件的内容非常容易被人读懂， 对文件进行分析（parse）也很轻松。 导出（export） AOF 文件也非常简单： 举个例子， 如果你不小心执行了 FLUSHALL 命令， 但只要 AOF 文件未被重写， 那么只要停止服务器， 移除 AOF 文件末尾的 FLUSHALL 命令， 并重启 Redis ， 就可以将数据集恢复到 FLUSHALL 执行之前的状态。<h2 id="AOF-的缺点"><a href="#AOF-的缺点" class="headerlink" title="AOF 的缺点"></a>AOF 的缺点</h2></li>
-<li>对于相同的数据集来说，AOF 文件的体积通常要大于 RDB 文件的体积。</li>
-<li>根据所使用的 fsync 策略，AOF 的速度可能会慢于 RDB 。 在一般情况下， 每秒 fsync 的性能依然非常高， 而关闭 fsync 可以让 AOF 的速度和 RDB 一样快， 即使在高负荷之下也是如此。 不过在处理巨大的写入载入时，RDB 可以提供更有保证的最大延迟时间（latency）。</li>
-<li>AOF 在过去曾经发生过这样的 bug ： 因为个别命令的原因，导致 AOF 文件在重新载入时，无法将数据集恢复成保存时的原样。 （举个例子，阻塞命令 BRPOPLPUSH 就曾经引起过这样的 bug 。） 测试套件里为这种情况添加了测试： 它们会自动生成随机的、复杂的数据集， 并通过重新载入这些数据来确保一切正常。 虽然这种 bug 在 AOF 文件中并不常见， 但是对比来说， RDB 几乎是不可能出现这种 bug 的。</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/26/redis/redis-data-type/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/26/redis/redis-data-type/" itemprop="url">redis数据类型</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-26T18:21:00+08:00">
-                2018-03-26
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/redis/" itemprop="url" rel="index">
-                    <span itemprop="name">redis</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/03/26/redis/redis-data-type/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/26/redis/redis-data-type/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/03/26/redis/redis-data-type/" class="leancloud_visitors" data-flag-title="redis数据类型">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p><em>
-</em>在Redis中有五种数据类型**</p>
-<p><strong>String———-</strong>字符串</p>
-<p><strong>Hash————</strong>字典</p>
-<p><strong>List————-</strong>列表</p>
-<p><strong>Set————–</strong>集合</p>
-<p><strong>Sorted Set——</strong>有序集合</p>
-<h1 id="一-数据类型"><a href="#一-数据类型" class="headerlink" title="一 数据类型"></a>一 数据类型</h1><h2 id="String—字符串"><a href="#String—字符串" class="headerlink" title="String—字符串"></a>String—字符串</h2><p>string是redis最基本的类型，你可以理解成与Memcached一模一样的类型，一个key对应一个value。string类型是二进制安全的。意思是redis的string可以包含任何数据。比如jpg图片或者序列化的对象 。string类型是Redis最基本的数据类型，一个键最大能存储512MB。**</p>
-<p>String 数据结构是简单的 key-value 类型，value 不仅可以是 String，也可以是数字（当数字类型用 Long 可以表示的时候encoding 就是整型，其他都存储在 sdshdr 当做字符串）。使用 Strings 类型，可以完全实现目前 Memcached 的功能，并且效率更高。还可以享受 Redis 的定时持久化（可以选择 RDB 模式或者 AOF 模式），操作日志及 Replication 等功能。除了提供与 Memcached 一样的 get、set、incr、decr 等操作外，Redis 还提供了下面一些操作：</p>
-<p>1.LEN：O(1)获取字符串长度<br>2.APPEND ：往字符串 append 内容，而且采用智能分配内存（每次2倍）<br>3.设置和获取字符串的某一段内容<br>4.设置及获取字符串的某一位（bit）<br>5.批量设置一系列字符串的内容<br>6.原子计数器<br>7.GET SET 命令的妙用，请于清空旧值的同时设置一个新值，配合原子计数器使用</p>
-<h2 id="Hash——字典-哈希"><a href="#Hash——字典-哈希" class="headerlink" title="Hash——字典(哈希)"></a>Hash——字典(哈希)</h2><p>Hash是一个健值对集合，是一个String类型的key与value的映射表，特别适合用于存储对象。<br>使用场景：存储、读取、修改用户属性<br>在 Memcached 中，我们经常将一些结构化的信息打包成 hashmap，在客户端序列化后存储为一个字符串的值（一般是 JSON 格式），比如用户的昵称、年龄、性别、积分等。这时候在需要修改其中某一项时，通常需要将字符串（JSON）取出来，然后进行反序列化，修改某一项的值，再序列化成字符串（JSON）存储回去。简单修改一个属性就干这么多事情，消耗必定是很大的，也不适用于一些可能并发操作的场合（比如两个并发的操作都需要修改积分）。而 Redis 的 Hash 结构可以使你像在数据库中 Update 一个属性一样只修改某一项属性值。</p>
-<h2 id="List——列表"><a href="#List——列表" class="headerlink" title="List——列表"></a>List——列表</h2><p>使用场景：微博 TimeLine、消息队列*<em><br>List 说白了就是链表（redis 使用双端链表实现的 List），相信学过数据结构知识的人都应该能理解其结构。使用 List 结构，我们可以轻松地实现最新消息排行等功能（比如新浪微博的 TimeLine ）。List 的另一个应用就是消息队列，可以利用 List 的 \</em>PUSH 操作，将任务存在 List 中，然后工作线程再用 POP 操作将任务取出进行执行。Redis 还提供了操作 List 中某一段元素的 API，你可以直接查询，删除 List 中某一段的元素</p>
-<h2 id="Set——集合"><a href="#Set——集合" class="headerlink" title="Set——集合"></a>Set——集合</h2><p>集合是通过哈希表实现的，所以添加，删除，查找的复杂度都是O(1)<br>使用场景：1.共同好友、二度好友 2.利用唯一性，可以统计访问网站的所有独立 IP 3.好友推荐的时候，根据 tag 求交集，大于某个 threshold 就可以推荐<strong><br>Set 就是一个集合，集合的概念就是一堆不重复值的组合。利用 Redis 提供的 Set 数据结构，可以存储一些集合性的数据。比如在微博应用中，可以将一个用户所有的关注人存在一个集合中，将其所有粉丝存在一个集合。因为 Redis 非常人性化的为集合提供了</strong>求交集、并集、差集等操作**，那么就可以非常方便的实现如共同关注、共同喜好、二度好友等功能，对上面的所有集合操作，你还可以使用不同的命令选择将结果返回给客户端还是存集到一个新的集合中。</p>
-<h2 id="Sorted-Set——有序集合"><a href="#Sorted-Set——有序集合" class="headerlink" title="Sorted Set——有序集合"></a>Sorted Set——有序集合</h2><p>使用场景：1.带有权重的元素，比如一个游戏的用户得分排行榜 2.比较复杂的数据结构，一般用到的场景不算太多**<br>和Sets相比，Sorted Sets是将 Set 中的元素增加了一个权重参数 score，使得集合中的元素能够按 score 进行有序排列，比如一个存储全班同学成绩的 Sorted Sets，其集合 value 可以是同学的学号，而 score 就可以是其考试得分，这样在数据插入集合的时候，就已经进行了天然的排序。另外还可以用 Sorted Sets 来做带权重的队列，比如普通消息的 score 为1，重要消息的 score 为2，然后工作线程可以选择按 score 的倒序来获取工作任务。让重要的任务优先执行。</p>
-<h1 id="二-redis-其他功能使用场景"><a href="#二-redis-其他功能使用场景" class="headerlink" title="二 redis 其他功能使用场景"></a>二 redis 其他功能使用场景</h1><h2 id="订阅-发布系统"><a href="#订阅-发布系统" class="headerlink" title="订阅-发布系统"></a>订阅-发布系统</h2><p>Pub/Sub 从字面上理解就是发布（Publish）与订阅（Subscribe），在 Redis 中，你可以设定对某一个 key 值进行消息发布及消息订阅，当一个 key 值上进行了消息发布后，所有订阅它的客户端都会收到相应的消息。这一功能最明显的用法就是用作实时消息系统，比如普通的即时聊天，群聊等功能。</p>
-<h2 id="事务——Transactions"><a href="#事务——Transactions" class="headerlink" title="事务——Transactions"></a>事务——Transactions</h2><p>谁说 NoSQL 都不支持事务，虽然 Redis 的 Transactions 提供的并不是严格的 ACID 的事务（比如一串用 EXEC 提交执行的命令，在执行中服务器宕机，那么会有一部分命令执行了，剩下的没执行），但是这个 Transactions 还是提供了基本的命令打包执行的功能（在服务器不出问题的情况下，可以保证一连串的命令是顺序在一起执行的，中间不会有其它客户端命令插进来执行）。Redis 还提供了一个 Watch 功能，你可以对一个 key 进行 Watch，然后再执行 Transactions，在这过程中，如果这个 Watched 的值进行了修改，那么这个 Transactions 会发现并拒绝执行。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/26/redis/redis-fast/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/26/redis/redis-fast/" itemprop="url">Redis 快的原因</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-26T18:21:00+08:00">
-                2018-03-26
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/redis/" itemprop="url" rel="index">
-                    <span itemprop="name">redis</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/03/26/redis/redis-fast/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/26/redis/redis-fast/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/03/26/redis/redis-fast/" class="leancloud_visitors" data-flag-title="Redis 快的原因">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>R<br>edis 采用的是基于内存的采用的是单进程单线程模型的 KV 数据库，由 C 语言编写。官方提供的数据是可以达到100000+的 qps。这个数据不比采用单进程多线程的同样基于内存的 KV 数据库 Memcached 差。</p>
-<p>Redis 快的主要原因有：</p>
-<ol>
-<li>完全基于内存；</li>
-<li>数据结构简单，对数据操作也简单；</li>
-<li>使用多路 I/O 复用模型；</li>
-</ol>
-<p>第一、二点不细讲，主要围绕第三点采用多路 I/O 复用技术来展开。</p>
-<p>多路 I/O 复用模型是利用 select、poll、epoll 可以<strong>同时监察多个流的 I/O 事件</strong>的能力，在空闲的时候，会把当前线程阻塞掉，当有一个或多个流有 I/O 事件时，就从阻塞态中唤醒，于是程序就会轮询一遍所有的流（epoll 是只轮询那些真正发出了事件的流），并且只依次顺序的处理就绪的流，这种做法就避免了大量的无用操作。这里“多路”指的是多个网络连接，“复用”指的是复用同一个线程。采用多路 I/O 复用技术可以让单个线程高效的处理多个连接请求（尽量减少网络 IO 的时间消耗），且 Redis 在内存中操作数据的速度非常快（内存内的操作不会成为这里的性能瓶颈），主要以上两点造就了 Redis 具有很高的吞吐量。</p>
-<p><img src="http://www.syyong.com/usr/uploads/2016/07/3587411016.png" alt=""></p>
-<p>和 Memcached 不同，Redis 并没有直接使用 Libevent，而是自己完成了一个非常轻量级的对 select、epoll、evport、kqueue 这些通用的接口的实现。在不同的系统调用选用适合的接口，linux 下默认是 epoll。因为 Libevent 比较重，更通用，代码量也就很庞大，拥有很多 Redis 用不上的功能，Redis 为了追求“轻巧”并且去除依赖，就选择自己去封装了一套。</p>
-<h3 id="单进程单线程好处"><a href="#单进程单线程好处" class="headerlink" title="单进程单线程好处"></a>单进程单线程好处</h3><ol>
-<li>代码更清晰，处理逻辑更简单</li>
-<li>不用去考虑各种锁的问题，不存在加锁释放锁操作，没有因为可能出现死锁而导致的性能消耗</li>
-<li>不存在多进程或者多线程导致的切换而消耗 CPU</li>
-</ol>
-<h3 id="单进程单线程弊端"><a href="#单进程单线程弊端" class="headerlink" title="单进程单线程弊端"></a>单进程单线程弊端</h3><ol>
-<li>无法发挥多核 CPU 性能，不过可以通过在单机开多个 Redis 实例来完善；</li>
-</ol>
-<h3 id="其他一些优秀的开源软件采用的模型"><a href="#其他一些优秀的开源软件采用的模型" class="headerlink" title="其他一些优秀的开源软件采用的模型"></a>其他一些优秀的开源软件采用的模型</h3><ul>
-<li>多进程单线程模型：Nginx</li>
-<li>单进程多线程模型：Memcached</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/7/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/page/9/">9</a><span class="space">&hellip;</span><a class="page-number" href="/page/18/">18</a><a class="extend next" rel="next" href="/page/9/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/7/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/page/9/">9</a><span class="space">&hellip;</span><a class="page-number" href="/page/19/">19</a><a class="extend next" rel="next" href="/page/9/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2441,7 +2351,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">179</span>
+                  <span class="site-state-item-count">186</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

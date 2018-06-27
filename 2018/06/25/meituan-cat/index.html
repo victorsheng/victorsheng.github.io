@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="整体设计监控整体要求就是快速发现故障、快速定位故障以及辅助进行程序性能优化。为了做到这些，我们对监控系统的一些非功能做了如下的要求：  实时处理：信息的价值会随时间锐减，尤其是事故处理过程中。 全量数据：最开始的设计目标就是全量采集，全量的好处有很多。 高可用：所有应用都倒下了，需要监控还站着，并告诉工程师发生了什么，做到故障还原和问题定位。 故障容忍：CAT本身故障不应该影响业务正常运转，CAT">
+<meta property="og:type" content="article">
+<meta property="og:title" content="meituan-cat">
+<meta property="og:url" content="http://yoursite.com/2018/06/25/meituan-cat/index.html">
+<meta property="og:site_name" content="Victor的博客">
+<meta property="og:description" content="整体设计监控整体要求就是快速发现故障、快速定位故障以及辅助进行程序性能优化。为了做到这些，我们对监控系统的一些非功能做了如下的要求：  实时处理：信息的价值会随时间锐减，尤其是事故处理过程中。 全量数据：最开始的设计目标就是全量采集，全量的好处有很多。 高可用：所有应用都倒下了，需要监控还站着，并告诉工程师发生了什么，做到故障还原和问题定位。 故障容忍：CAT本身故障不应该影响业务正常运转，CAT">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/images/pasted-186.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-187.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-188.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-189.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-190.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-192.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-191.png">
+<meta property="og:updated_time" content="2018-06-25T02:02:38.927Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="meituan-cat">
+<meta name="twitter:description" content="整体设计监控整体要求就是快速发现故障、快速定位故障以及辅助进行程序性能优化。为了做到这些，我们对监控系统的一些非功能做了如下的要求：  实时处理：信息的价值会随时间锐减，尤其是事故处理过程中。 全量数据：最开始的设计目标就是全量采集，全量的好处有很多。 高可用：所有应用都倒下了，需要监控还站着，并告诉工程师发生了什么，做到故障还原和问题定位。 故障容忍：CAT本身故障不应该影响业务正常运转，CAT">
+<meta name="twitter:image" content="http://yoursite.com/images/pasted-186.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/06/25/meituan-cat/"/>
+
+
+
+
+
+  <title>meituan-cat | Victor的博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e6ec2c9b3e1b5d7f223d40c9c7a9efe1";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Victor的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br />
+            
+            日程表
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/sitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />
+            
+            站点地图
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/meituan-cat/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">meituan-cat</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-25T09:30:15+08:00">
+                2018-06-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/06/25/meituan-cat/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/06/25/meituan-cat/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/06/25/meituan-cat/" class="leancloud_visitors" data-flag-title="meituan-cat">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="整体设计"><a href="#整体设计" class="headerlink" title="整体设计"></a>整体设计</h1><p>监控整体要求就是快速发现故障、快速定位故障以及辅助进行程序性能优化。为了做到这些，我们对监控系统的一些非功能做了如下的要求：</p>
+<ul>
+<li>实时处理：信息的价值会随时间锐减，尤其是事故处理过程中。</li>
+<li>全量数据：最开始的设计目标就是全量采集，全量的好处有很多。</li>
+<li>高可用：所有应用都倒下了，需要监控还站着，并告诉工程师发生了什么，做到故障还原和问题定位。</li>
+<li>故障容忍：CAT本身故障不应该影响业务正常运转，CAT挂了，应用不该受影响，只是监控能力暂时减弱。</li>
+<li>高吞吐：要想还原真相，需要全方位地监控和度量，必须要有超强的处理吞吐能力。</li>
+<li>可扩展：支持分布式、跨IDC部署，横向扩展的监控系统。</li>
+<li>不保证可靠：允许消息丢失，这是一个很重要的trade-off，目前CAT服务端可以做到4个9的可靠性，可靠系统和不可靠性系统的设计差别非常大。</li>
+</ul>
+<p>CAT从开发至今，一直秉承着简单的架构就是最好的架构原则，主要分为三个模块：CAT-client、CAT-consumer、CAT-home。</p>
+<ul>
+<li>Cat-client 提供给业务以及中间层埋点的底层SDK。</li>
+<li>Cat-consumer 用于实时分析从客户端提供的数据。</li>
+<li>Cat-home 作为用户给用户提供展示的控制端。</li>
+</ul>
+<p>在实际开发和部署中，Cat-consumer和Cat-home是部署在一个JVM内部，每个CAT服务端都可以作为consumer也可以作为home，这样既能减少整个层级结构，也可以增加系统稳定性。</p>
+<p><a href="https://tech.meituan.com/img/cat/overall.png" target="_blank" rel="noopener">https://tech.meituan.com/img/cat/overall.png</a><br><img src="/images/pasted-186.png" alt="upload successful"></p>
+<p>上图是CAT目前多机房的整体结构图，图中可见：</p>
+<ul>
+<li>路由中心是根据应用所在机房信息来决定客户端上报的CAT服务端地址，目前美团有广州、北京、上海三地机房。</li>
+<li>每个机房内部都有独立的原始信息存储集群HDFS。</li>
+<li>CAT-home可以部署在一个机房也可以部署在多个机房，在最后做展示的时候，home会从consumer中进行跨机房的调用，将所有的数据合并展示给用户。</li>
+<li>实际过程中，consumer、home以及路由中心都是部署在一起的，每个服务端节点都可以充当任何一个角色。</li>
+</ul>
+<h1 id="客户端设计"><a href="#客户端设计" class="headerlink" title="客户端设计"></a>客户端设计</h1><p>客户端设计是CAT系统设计中最为核心的一个环节，客户端要求是做到API简单、高可靠性能，无论在任何场景下都不能影响客业务性能，监控只是公司核心业务流程一个旁路环节。CAT核心客户端是Java，也支持Net客户端，近期公司内部也在研发其他多语言客户端。以下客户端设计及细节均以Java客户端为模板。</p>
+<h2 id="设计架构"><a href="#设计架构" class="headerlink" title="设计架构"></a>设计架构</h2><p>CAT客户端在收集端数据方面使用ThreadLocal（线程局部变量），是线程本地变量，也可以称之为线程本地存储。其实ThreadLocal的功用非常简单，就是为每一个使用该变量的线程都提供一个变量值的副本，属于Java中一种较为特殊的线程绑定机制，每一个线程都可以独立地改变自己的副本，不会和其它线程的副本冲突。</p>
+<p>在监控场景下，为用户提供服务都是Web容器，比如tomcat或者Jetty，后端的RPC服务端比如Dubbo或者Pigeon，也都是基于线程池来实现的。业务方在处理业务逻辑时基本都是在一个线程内部调用后端服务、数据库、缓存等，将这些数据拿回来再进行业务逻辑封装，最后将结果展示给用户。所以将所有的监控请求作为一个监控上下文存入线程变量就非常合适。</p>
+<p><a href="https://tech.meituan.com/img/cat/client01.png" target="_blank" rel="noopener">https://tech.meituan.com/img/cat/client01.png</a><br><img src="/images/pasted-187.png" alt="upload successful"></p>
+<p>如上图所示，业务执行业务逻辑的时候，就会把此次请求对应的监控存放于线程上下文中，存于上下文的其实是一个监控树的结构。在最后业务线程执行结束时，将监控对象存入一个异步内存队列中，CAT有个消费线程将队列内的数据异步发送到服务端。</p>
+<h2 id="API设计"><a href="#API设计" class="headerlink" title="API设计"></a>API设计</h2><p>监控API定义往往取决于对监控或者性能分析这个领域的理解，监控和性能分析所针对的场景有如下几种：</p>
+<p>一段代码的执行时间，一段代码可以是URL执行耗时，也可以是SQL的执行耗时。<br>一段代码的执行次数，比如Java抛出异常记录次数，或者一段逻辑的执行次数。<br>定期执行某段代码，比如定期上报一些核心指标：JVM内存、GC等指标。<br>关键的业务监控指标，比如监控订单数、交易额、支付成功率等。<br>在上述领域模型的基础上，CAT设计自己核心的几个监控对象：Transaction、Event、Heartbeat、Metric。</p>
+<p><a href="https://tech.meituan.com/img/cat/client02.png" target="_blank" rel="noopener">https://tech.meituan.com/img/cat/client02.png</a><br><img src="/images/pasted-188.png" alt="upload successful"></p>
+<h2 id="序列化和通信"><a href="#序列化和通信" class="headerlink" title="序列化和通信"></a>序列化和通信</h2><p>序列化和通信是整个客户端包括服务端性能里面很关键的一个环节。</p>
+<p>CAT序列化协议是自定义序列化协议，自定义序列化协议相比通用序列化协议要高效很多，这个在大规模数据实时处理场景下还是非常有必要的。<br>CAT通信是基于Netty来实现的NIO的数据传输，Netty是一个非常好的NIO开发框架，在这边就不详细介绍了。</p>
+<h2 id="客户端埋点"><a href="#客户端埋点" class="headerlink" title="客户端埋点"></a>客户端埋点</h2><p>日志埋点是监控活动的最重要环节之一，日志质量决定着监控质量和效率。当前CAT的埋点目标是以问题为中心，像程序抛出exception就是典型问题。我个人对问题的定义是：不符合预期的就可以算问题，比如请求未完成、响应时间快了慢了、请求TPS多了少了、时间分布不均匀等等。</p>
+<p>在互联网环境中，最突出的问题场景，突出的理解是：跨越边界的行为。包括但不限于：</p>
+<ul>
+<li>HTTP/REST、RPC/SOA、MQ、Job、Cache、DAL;</li>
+<li>搜索/查询引擎、业务应用、外包系统、遗留系统;</li>
+<li>第三方网关/银行, 合作伙伴/供应商之间；</li>
+<li>各类业务指标，如用户登录、订单数、支付状态、销售额。</li>
+</ul>
+<h2 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h2><p>通常Java客户端在业务上使用容易出问题的地方就是内存，另外一个是CPU。内存往往是内存泄露，占用内存较多导致业务方GC压力增大； CPU开销最终就是看代码的性能。</p>
+<p>以前我们遇到过一个极端的例子，我们一个业务请求做餐饮加商铺的销售额，业务一般会通过for循环所有商铺的分店，结果就造成内存OOM了，后来发现这家店是肯德基，有几万分店，每个循环里面都会有数据库连接。在正常场景下，ThreadLocal内部的监控一个对象就存在几万个节点，导致业务Oldgc特别严重。所以说框架的代码是不能想象业务方会怎么用你的代码，需要考虑到任何情况下都有出问题的可能。</p>
+<p>在消耗CPU方面我们也遇到一个case：在某个客户端版本，CAT本地存储当前消息ID自增的大小，客户端使用了MappedByteBuffer这个类，这个类是一个文件内存映射，测试下来这个类的性能非常高，我们仅仅用这个存储了几个字节的对象，正常情况理论上不会有任何问题。在一次线上场景下，很多业务线程都block在这个上面，结果发现当本身这台机器IO存在瓶颈时候，这个也会变得很慢。后来的优化就是把这个IO的操作异步化，所以客户端需要尽可能异步化，异步化序列化、异步化传输、异步化任何可能存在时间延迟的代码操作。</p>
+<h1 id="服务端设计"><a href="#服务端设计" class="headerlink" title="服务端设计"></a>服务端设计</h1><p>服务端主要的问题是大数据的实时处理，目前后端CAT的计算集群大约35台物理机，存储集群大约35台物理机，每天处理了约100TB的数据量。线上单台机器高峰期大约是110MB/s，接近千兆网打满。</p>
+<p>下面我重点讲下CAT服务端一些设计细节。</p>
+<h2 id="架构设计"><a href="#架构设计" class="headerlink" title="架构设计"></a>架构设计</h2><p>在最初的整体介绍中已经画了架构图，这边介绍下单机的consumer中大概的结构如下：</p>
+<p><a href="https://tech.meituan.com/img/cat/server01.png" target="_blank" rel="noopener">https://tech.meituan.com/img/cat/server01.png</a><br><img src="/images/pasted-189.png" alt="upload successful"></p>
+<p>如上图，CAT服务端在整个实时处理中，基本上实现了全异步化处理。</p>
+<ul>
+<li>消息接受是基于Netty的NIO实现。</li>
+<li>消息接受到服务端就存放内存队列，然后程序开启一个线程会消费这个消息做消息分发。</li>
+<li>每个消息都会有一批线程并发消费各自队列的数据，以做到消息处理的隔离。</li>
+<li>消息存储是先存入本地磁盘，然后异步上传到HDFS文件，这也避免了强依赖HDFS。</li>
+</ul>
+<p>当某个报表处理器处理来不及时候，比如Transaction报表处理比较慢，可以通过配置支持开启多个Transaction处理线程，并发消费消息。</p>
+<h2 id="性能分析报表"><a href="#性能分析报表" class="headerlink" title="性能分析报表"></a>性能分析报表</h2><p><a href="https://tech.meituan.com/img/cat/server03.png" target="_blank" rel="noopener">https://tech.meituan.com/img/cat/server03.png</a><br><img src="/images/pasted-190.png" alt="upload successful"></p>
+<h2 id="故障发现报表"><a href="#故障发现报表" class="headerlink" title="故障发现报表"></a>故障发现报表</h2><p>实时业务指标监控 ：核心业务都会定义自己的业务指标，这不需要太多，主要用于24小时值班监控，实时发现业务指标问题，图中一个是当前的实际值，一个是基准值，就是根据历史趋势计算的预测值。如下图就是当时的情景，能直观看到支付业务出问题的故障。<br><a href="https://tech.meituan.com/img/cat/server04.png" target="_blank" rel="noopener">https://tech.meituan.com/img/cat/server04.png</a><br><img src="/images/pasted-192.png" alt="upload successful"></p>
+<ul>
+<li>系统报错大盘。</li>
+<li>实时数据库大盘、服务大盘、缓存大盘等。</li>
+</ul>
+<h2 id="存储设计"><a href="#存储设计" class="headerlink" title="存储设计"></a>存储设计</h2><p>CAT系统的存储主要有两块：</p>
+<ul>
+<li>CAT的报表的存储。</li>
+<li>CAT原始logview的存储。<br>报表是根据logview实时运算出来的给业务分析用的报表，默认报表有小时模式、天模式、周模式以及月模式。CAT实时处理报表都是产生小时级别统计，小时级报表中会带有最低分钟级别粒度的统计。天、周、月等报表都是在小时级别报表合并的结果报表。</li>
+</ul>
+<p>原始logview存储一天大约100TB的数据量，因为数据量比较大所以存储必须要要压缩，本身原始logview需要根据Message-ID读取，所以存储整体要求就是批量压缩以及随机读。在当时场景下，并没有特别合适成熟的系统以支持这样的特性，所以我们开发了一种基于文件的存储以支持CAT的场景，在存储上一直是最难的问题，我们一直在这块持续的改进和优化。</p>
+<h2 id="消息ID的设计"><a href="#消息ID的设计" class="headerlink" title="消息ID的设计"></a>消息ID的设计</h2><p>CAT每个消息都有一个唯一的ID，这个ID在客户端生成，后续都通过这个ID在进行消息内容的查找。典型的RPC消息串起来的问题，比如A调用B的时候，在A这端生成一个Message-ID，在A调用B的过程中，将Message-ID作为调用传递到B端，在B执行过程中，B用context传递的Message-ID作为当前监控消息的Message-ID。</p>
+<p>CAT消息的Message-ID格式ShopWeb-0a010680-375030-2，CAT消息一共分为四段：</p>
+<ul>
+<li>第一段是应用名shop-web。</li>
+<li>第二段是当前这台机器的IP的16进制格式，01010680表示10.1.6.108。</li>
+<li>第三段的375030，是系统当前时间除以小时得到的整点数。</li>
+<li>第四段的2，是表示当前这个客户端在当前小时的顺序递增号。</li>
+</ul>
+<h2 id="存储数据的设计"><a href="#存储数据的设计" class="headerlink" title="存储数据的设计"></a>存储数据的设计</h2><p>消息存储是CAT最有挑战的部分。关键问题是消息数量多且大，目前美团每天处理消息1000亿左右，大小大约100TB，单物理机高峰期每秒要处理100MB左右的流量。CAT服务端基于此流量做实时计算，还需要将这些数据压缩后写入磁盘。<br><a href="https://tech.meituan.com/img/cat/server05.png" target="_blank" rel="noopener">https://tech.meituan.com/img/cat/server05.png</a><br><img src="/images/pasted-191.png" alt="upload successful"></p>
+<p>CAT在写数据一份是Index文件，一份是Data文件.</p>
+<ul>
+<li>Data文件是分段GZIP压缩，每个分段大小小于64K，这样可以用16bits可以表示一个最大分段地址。</li>
+<li>一个Message-ID都用需要48bits的大小来存索引，索引根据Message-ID的第四段来确定索引的位置，比如消息Message-ID为ShopWeb-0a010680-375030-2，这条消息ID对应的索引位置为2*48bits的位置。</li>
+<li>48bits前面32bits存数据文件的块偏移地址，后面16bits存数据文件解压之后的块内地址偏移。</li>
+<li>CAT读取消息的时候，首先根据Message-ID的前面三段确定唯一的索引文件，在根据Message-ID第四段确定此Message-ID索引位置，根据索引文件的48bits读取数据文件的内容，然后将数据文件进行GZIP解压，在根据块内便宜地址读取出真正的消息内容。</li>
+</ul>
+<h2 id="服务端设计总结"><a href="#服务端设计总结" class="headerlink" title="服务端设计总结"></a>服务端设计总结</h2><p>CAT在分布式实时方面，主要归结于以下几点因素：</p>
+<ul>
+<li>去中心化，数据分区处理。</li>
+<li>基于日志只读特性，以一个小时为时间窗口，实时报表基于内存建模和分析，历史报表通过聚合完成。</li>
+<li>基于内存队列，全面异步化、单线程化、无锁设计。</li>
+<li>全局消息ID，数据本地化生产，集中式存储。</li>
+<li>组件化、服务化理念。</li>
+</ul>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://tech.meituan.com/CAT_in_Depth_Java_Application_Monitoring.html" target="_blank" rel="noopener">https://tech.meituan.com/CAT_in_Depth_Java_Application_Monitoring.html</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Victor
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://yoursite.com/2018/06/25/meituan-cat/" title="meituan-cat">http://yoursite.com/2018/06/25/meituan-cat/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/24/redis-bitmap/" rel="next" title="redis-bitmap">
+                <i class="fa fa-chevron-left"></i> redis-bitmap
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/25/design-case-geek-time/" rel="prev" title="design-case-geek-time">
+                design-case-geek-time <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Victor</p>
+              <p class="site-description motion-element" itemprop="description">victor的个人博客,作为一枚后端开发工程师,写本博客目的,旨在记录自己在工作生活中的点点滴滴,形成自己的知识体系</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">186</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">27</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">77</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#整体设计"><span class="nav-number">1.</span> <span class="nav-text">整体设计</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#客户端设计"><span class="nav-number">2.</span> <span class="nav-text">客户端设计</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#设计架构"><span class="nav-number">2.1.</span> <span class="nav-text">设计架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#API设计"><span class="nav-number">2.2.</span> <span class="nav-text">API设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#序列化和通信"><span class="nav-number">2.3.</span> <span class="nav-text">序列化和通信</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#客户端埋点"><span class="nav-number">2.4.</span> <span class="nav-text">客户端埋点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#遇到的问题"><span class="nav-number">2.5.</span> <span class="nav-text">遇到的问题</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#服务端设计"><span class="nav-number">3.</span> <span class="nav-text">服务端设计</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#架构设计"><span class="nav-number">3.1.</span> <span class="nav-text">架构设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#性能分析报表"><span class="nav-number">3.2.</span> <span class="nav-text">性能分析报表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#故障发现报表"><span class="nav-number">3.3.</span> <span class="nav-text">故障发现报表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#存储设计"><span class="nav-number">3.4.</span> <span class="nav-text">存储设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消息ID的设计"><span class="nav-number">3.5.</span> <span class="nav-text">消息ID的设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#存储数据的设计"><span class="nav-number">3.6.</span> <span class="nav-text">存储数据的设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务端设计总结"><span class="nav-number">3.7.</span> <span class="nav-text">服务端设计总结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Victor</span>
+  
+  <!--以下3行为一条竖线和Coding Page-->
+  <div class="powered-by">
+  </div>
+  <span>Hosted by <a href="https://pages.coding.me" style="font-weight: bold">Coding Pages</a></span>
+  
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://victor123-cn.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://yoursite.com/2018/06/25/meituan-cat/';
+          this.page.identifier = '2018/06/25/meituan-cat/';
+          this.page.title = 'meituan-cat';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://victor123-cn.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("QdvsGi5rrGt05B6T1cP9buCX-gzGzoHsz", "IPzdnLkdvxDPxh2zyHn82bWk");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
