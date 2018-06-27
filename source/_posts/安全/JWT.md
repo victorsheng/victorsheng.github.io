@@ -75,8 +75,31 @@ eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9
 
 但是像密码这样的内容就不能被放在JWT中了。如果将用户的密码放在了JWT中，那么怀有恶意的第三方通过Base64解码就能很快地知道你的密码了。
 
+# jwt校验
+## 规范:
+https://tools.ietf.org/html/rfc7523#section-2.1
+
+## mitreid中对jwt格式的id_token的校验逻辑
+https://github.com/mitreid-connect/simple-web-app
+
+- 从seesion中取issuer
+- 访问issuer上的jwk接口
+- 通过公钥校验jwt
+- 校验jwt的issuer字段
+- 校验jwt的issuer字段和从seesion中取issuer字段
+- 校验jwt的issue时间是否为空
+- 校验jwt的issue时间是否在当前时间+窗口时间之后
+- 校验jwt的Audience字段是否为空
+- 校验jwt的Audience字段是否包含clientId
+- 校验jwt的nonce字段是否为空
+- 校验jwt的nonce字段是否与seesion中的nonce相同
+
+
+# jwt校验公钥获取方式
+- 本地获取
+- jwk接口获取
+
 
 # 参考
 
 http://blog.leapoahead.com/2015/09/07/user-authentication-with-jwt/
-
