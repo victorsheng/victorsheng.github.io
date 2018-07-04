@@ -1,0 +1,2315 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Java字符串的内部编码String类内部管理着一个char类型的数组，Java API是这样描述char基本类型的：char 数据类型（和 Character 对象封装的值）基于原始的 Unicode 规范，将字符定义为固定宽度的 16 位实体。(2倍于字节) 字符集对比123456789101112131415161718192021222324252627282930313233343536">
+<meta property="og:type" content="article">
+<meta property="og:title" content="字符与string">
+<meta property="og:url" content="http://yoursite.com/2018/07/03/java/java_common/charset-string/index.html">
+<meta property="og:site_name" content="Victor的博客">
+<meta property="og:description" content="Java字符串的内部编码String类内部管理着一个char类型的数组，Java API是这样描述char基本类型的：char 数据类型（和 Character 对象封装的值）基于原始的 Unicode 规范，将字符定义为固定宽度的 16 位实体。(2倍于字节) 字符集对比123456789101112131415161718192021222324252627282930313233343536">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-07-03T14:43:54.370Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="字符与string">
+<meta name="twitter:description" content="Java字符串的内部编码String类内部管理着一个char类型的数组，Java API是这样描述char基本类型的：char 数据类型（和 Character 对象封装的值）基于原始的 Unicode 规范，将字符定义为固定宽度的 16 位实体。(2倍于字节) 字符集对比123456789101112131415161718192021222324252627282930313233343536">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/07/03/java/java_common/charset-string/"/>
+
+
+
+
+
+  <title>字符与string | Victor的博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e6ec2c9b3e1b5d7f223d40c9c7a9efe1";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Victor的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br />
+            
+            日程表
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/sitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />
+            
+            站点地图
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/03/java/java_common/charset-string/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">字符与string</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-03T07:43:36+08:00">
+                2018-07-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/07/03/java/java_common/charset-string/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/07/03/java/java_common/charset-string/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/07/03/java/java_common/charset-string/" class="leancloud_visitors" data-flag-title="字符与string">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Java字符串的内部编码"><a href="#Java字符串的内部编码" class="headerlink" title="Java字符串的内部编码"></a>Java字符串的内部编码</h1><p>String类内部管理着一个char类型的数组，Java API是这样描述char基本类型的：<br>char 数据类型（和 Character 对象封装的值）基于原始的 Unicode 规范，将字符定义为固定宽度的 16 位实体。(2倍于字节)</p>
+<h1 id="字符集对比"><a href="#字符集对比" class="headerlink" title="字符集对比"></a>字符集对比</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">@Test</span><br><span class="line">  public void chinese() &#123;</span><br><span class="line">    String str = &quot;中国&quot;;</span><br><span class="line">    printBytes(str);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  @Test</span><br><span class="line">  public void email() &#123;</span><br><span class="line">    String str = &quot;aa@qq.com&quot;;</span><br><span class="line">    printBytes(str);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  private void printBytes(String str) &#123;</span><br><span class="line">    printBytes(str + &quot;的UNICODE编码：&quot;, str.getBytes(Charset.forName(&quot;unicode&quot;)));</span><br><span class="line">    printBytes(str + &quot;的8859编码：&quot;, str.getBytes(Charset.forName(&quot;ISO-8859-1&quot;)));</span><br><span class="line">    printBytes(str + &quot;的BIG5编码：&quot;, str.getBytes(Charset.forName(&quot;BIG5&quot;)));</span><br><span class="line">    printBytes(str + &quot;的GBK编码：&quot;, str.getBytes(Charset.forName(&quot;GBK&quot;)));</span><br><span class="line">    printBytes(str + &quot;的UTF-8编码：&quot;, str.getBytes(Charset.forName(&quot;UTF-8&quot;)));</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public void printBytes(String title, byte[] data) &#123;</span><br><span class="line">    System.out.println(title);</span><br><span class="line">    for (byte b : data) &#123;</span><br><span class="line">      System.out.print(&quot;0x&quot; + toHexString(b) + &quot; &quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    System.out.println();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public String toHexString(byte value) &#123;</span><br><span class="line">    String tmp = Integer.toHexString(value &amp; 0xFF);</span><br><span class="line">    if (tmp.length() == 1) &#123;</span><br><span class="line">      tmp = &quot;0&quot; + tmp;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return tmp.toUpperCase();</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="中国"><a href="#中国" class="headerlink" title="中国"></a>中国</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">中国的UNICODE编码：</span><br><span class="line">0xFE 0xFF 0x4E 0x2D 0x56 0xFD </span><br><span class="line">中国的8859编码：</span><br><span class="line">0x3F 0x3F </span><br><span class="line">中国的BIG5编码：</span><br><span class="line">0xA4 0xA4 0x3F </span><br><span class="line">中国的GBK编码：</span><br><span class="line">0xD6 0xD0 0xB9 0xFA </span><br><span class="line">中国的UTF-8编码：</span><br><span class="line">0xE4 0xB8 0xAD 0xE5 0x9B 0xBD</span><br></pre></td></tr></table></figure>
+<h2 id="email"><a href="#email" class="headerlink" title="email"></a>email</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">aa@qq.com的UNICODE编码：</span><br><span class="line">0xFE 0xFF 0x00 0x61 0x00 0x61 0x00 0x40 0x00 0x71 0x00 0x71 0x00 0x2E 0x00 0x63 0x00 0x6F 0x00 0x6D </span><br><span class="line">aa@qq.com的8859编码：</span><br><span class="line">0x61 0x61 0x40 0x71 0x71 0x2E 0x63 0x6F 0x6D </span><br><span class="line">aa@qq.com的BIG5编码：</span><br><span class="line">0x61 0x61 0x40 0x71 0x71 0x2E 0x63 0x6F 0x6D </span><br><span class="line">aa@qq.com的GBK编码：</span><br><span class="line">0x61 0x61 0x40 0x71 0x71 0x2E 0x63 0x6F 0x6D </span><br><span class="line">aa@qq.com的UTF-8编码：</span><br><span class="line">0x61 0x61 0x40 0x71 0x71 0x2E 0x63 0x6F 0x6D</span><br></pre></td></tr></table></figure>
+<h2 id="特殊的字符集（ISO-8859-1）"><a href="#特殊的字符集（ISO-8859-1）" class="headerlink" title="特殊的字符集（ISO-8859-1）"></a>特殊的字符集（ISO-8859-1）</h2><p>ISO-8859-1是单字节字符集，是ASCII字符集的补充。通常情况下使用ISO-8859-1字符集进行字符串对象与字节化字符数据的互换操作与前述完全一致。</p>
+<p>利用ISO-8859-1字符集，我们可以将任何一个字节数组无损保存到字符串对象中。</p>
+<h1 id="0x代表的含义-十六进制表示法"><a href="#0x代表的含义-十六进制表示法" class="headerlink" title="0x代表的含义:十六进制表示法"></a>0x代表的含义:十六进制表示法</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">public class Test &#123;</span><br><span class="line">	</span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		</span><br><span class="line">		int a = 0x2f;//小写十六进制（等价于0x002f）</span><br><span class="line">		System.out.println(Integer.toBinaryString(a));</span><br><span class="line">		</span><br><span class="line">		int b = 0x2F;//大写十六进制</span><br><span class="line">		System.out.println(Integer.toBinaryString(b));</span><br><span class="line">		</span><br><span class="line">		int c = 10;//标准十进制</span><br><span class="line">		System.out.println(Integer.toBinaryString(c));</span><br><span class="line">		</span><br><span class="line">		int d = 010;//以零开头，表示八进制</span><br><span class="line">		System.out.println(Integer.toBinaryString(d));</span><br><span class="line">		</span><br><span class="line">		</span><br><span class="line">		</span><br><span class="line">		char e = 0xff;//char为2个字节，16位</span><br><span class="line">		byte f = 0xf;//byte为8位</span><br><span class="line">		short g = 0xff;//short为2个字节，16位</span><br><span class="line">		System.out.println(Integer.toBinaryString(e));</span><br><span class="line">		System.out.println(Integer.toBinaryString(f));</span><br><span class="line">		System.out.println(Integer.toBinaryString(g));</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">/*</span><br><span class="line">  结果如下：(都是按照int型处理)</span><br><span class="line">101111</span><br><span class="line">101111</span><br><span class="line">1010</span><br><span class="line">1000</span><br><span class="line">11111111</span><br><span class="line">1111</span><br><span class="line">11111111</span><br><span class="line">*/</span><br></pre></td></tr></table></figure>
+<h1 id="ASCII-（American-Standard-Code-for-Information-Interchange，美国信息交换标准代码）"><a href="#ASCII-（American-Standard-Code-for-Information-Interchange，美国信息交换标准代码）" class="headerlink" title="ASCII （American Standard Code for Information Interchange，美国信息交换标准代码）"></a>ASCII （American Standard Code for Information Interchange，美国信息交换标准代码）</h1><p>十进制:0-127</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Bin(二进制)</th>
+<th style="text-align:left">Oct(八进制)</th>
+<th style="text-align:left">Dec(十进制)</th>
+<th style="text-align:left">Hex(十六进制)</th>
+<th style="text-align:left">缩写/字符</th>
+<th style="text-align:left">解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">0000 0000</td>
+<td style="text-align:left">0</td>
+<td style="text-align:left">0</td>
+<td style="text-align:left">00</td>
+<td style="text-align:left">NUL(null)</td>
+<td style="text-align:left">空字符</td>
+</tr>
+<tr>
+<td style="text-align:left">0000 0001</td>
+<td style="text-align:left">1</td>
+<td style="text-align:left">1</td>
+<td style="text-align:left">01</td>
+<td style="text-align:left">SOH(start of headline)</td>
+<td style="text-align:left">标题开始</td>
+</tr>
+<tr>
+<td style="text-align:left">0000 0010</td>
+<td style="text-align:left">2</td>
+<td style="text-align:left">2</td>
+<td style="text-align:left">02</td>
+<td style="text-align:left">STX (start of text)</td>
+<td style="text-align:left">正文开始</td>
+</tr>
+<tr>
+<td style="text-align:left">0000 0011</td>
+<td style="text-align:left">3</td>
+<td style="text-align:left">3</td>
+<td style="text-align:left">03</td>
+<td style="text-align:left">ETX (end of text)</td>
+<td style="text-align:left">正文结束</td>
+</tr>
+<tr>
+<td style="text-align:left">0000 0100</td>
+<td style="text-align:left">4</td>
+<td style="text-align:left">4</td>
+<td style="text-align:left">04</td>
+<td style="text-align:left">EOT (end of transmission)</td>
+<td style="text-align:left">传输结束</td>
+</tr>
+<tr>
+<td style="text-align:left">0000 0101</td>
+<td style="text-align:left">5</td>
+<td style="text-align:left">5</td>
+<td style="text-align:left">05</td>
+<td style="text-align:left">ENQ (enquiry)</td>
+<td style="text-align:left">请求</td>
+</tr>
+<tr>
+<td style="text-align:left">0000 0110</td>
+<td style="text-align:left">6</td>
+<td style="text-align:left">6</td>
+<td style="text-align:left">06</td>
+<td style="text-align:left">ACK (acknowledge)</td>
+<td style="text-align:left">收到通知</td>
+</tr>
+<tr>
+<td style="text-align:left">0000 0111</td>
+<td style="text-align:left">7</td>
+<td style="text-align:left">7</td>
+<td style="text-align:left">07</td>
+<td style="text-align:left">BEL (bell)</td>
+<td style="text-align:left">响铃</td>
+</tr>
+<tr>
+<td style="text-align:left">0000 1000</td>
+<td style="text-align:left">10</td>
+<td style="text-align:left">8</td>
+<td style="text-align:left">08</td>
+<td style="text-align:left">BS (backspace)</td>
+<td style="text-align:left">退格</td>
+</tr>
+<tr>
+<td style="text-align:left">0000 1001</td>
+<td style="text-align:left">11</td>
+<td style="text-align:left">9</td>
+<td style="text-align:left">09</td>
+<td style="text-align:left">HT (horizontal tab)</td>
+<td style="text-align:left">水平制表符</td>
+</tr>
+<tr>
+<td style="text-align:left">0000 1010</td>
+<td style="text-align:left">12</td>
+<td style="text-align:left">10</td>
+<td style="text-align:left">0A</td>
+<td style="text-align:left">LF (NL line feed, new line)</td>
+<td style="text-align:left">换行键</td>
+</tr>
+<tr>
+<td style="text-align:left">0000 1011</td>
+<td style="text-align:left">13</td>
+<td style="text-align:left">11</td>
+<td style="text-align:left">0B</td>
+<td style="text-align:left">VT (vertical tab)</td>
+<td style="text-align:left">垂直制表符</td>
+</tr>
+<tr>
+<td style="text-align:left">0000 1100</td>
+<td style="text-align:left">14</td>
+<td style="text-align:left">12</td>
+<td style="text-align:left">0C</td>
+<td style="text-align:left">FF (NP form feed, new page)</td>
+<td style="text-align:left">换页键</td>
+</tr>
+<tr>
+<td style="text-align:left">0000 1101</td>
+<td style="text-align:left">15</td>
+<td style="text-align:left">13</td>
+<td style="text-align:left">0D</td>
+<td style="text-align:left">CR (carriage return)</td>
+<td style="text-align:left">回车键</td>
+</tr>
+<tr>
+<td style="text-align:left">0000 1110</td>
+<td style="text-align:left">16</td>
+<td style="text-align:left">14</td>
+<td style="text-align:left">0E</td>
+<td style="text-align:left">SO (shift out)</td>
+<td style="text-align:left">不用切换</td>
+</tr>
+<tr>
+<td style="text-align:left">0000 1111</td>
+<td style="text-align:left">17</td>
+<td style="text-align:left">15</td>
+<td style="text-align:left">0F</td>
+<td style="text-align:left">SI (shift in)</td>
+<td style="text-align:left">启用切换</td>
+</tr>
+<tr>
+<td style="text-align:left">0001 0000</td>
+<td style="text-align:left">20</td>
+<td style="text-align:left">16</td>
+<td style="text-align:left">10</td>
+<td style="text-align:left">DLE (data link escape)</td>
+<td style="text-align:left">数据链路转义</td>
+</tr>
+<tr>
+<td style="text-align:left">0001 0001</td>
+<td style="text-align:left">21</td>
+<td style="text-align:left">17</td>
+<td style="text-align:left">11</td>
+<td style="text-align:left">DC1 (device control 1)</td>
+<td style="text-align:left">设备控制1</td>
+</tr>
+<tr>
+<td style="text-align:left">0001 0010</td>
+<td style="text-align:left">22</td>
+<td style="text-align:left">18</td>
+<td style="text-align:left">12</td>
+<td style="text-align:left">DC2 (device control 2)</td>
+<td style="text-align:left">设备控制2</td>
+</tr>
+<tr>
+<td style="text-align:left">0001 0011</td>
+<td style="text-align:left">23</td>
+<td style="text-align:left">19</td>
+<td style="text-align:left">13</td>
+<td style="text-align:left">DC3 (device control 3)</td>
+<td style="text-align:left">设备控制3</td>
+</tr>
+<tr>
+<td style="text-align:left">0001 0100</td>
+<td style="text-align:left">24</td>
+<td style="text-align:left">20</td>
+<td style="text-align:left">14</td>
+<td style="text-align:left">DC4 (device control 4)</td>
+<td style="text-align:left">设备控制4</td>
+</tr>
+<tr>
+<td style="text-align:left">0001 0101</td>
+<td style="text-align:left">25</td>
+<td style="text-align:left">21</td>
+<td style="text-align:left">15</td>
+<td style="text-align:left">NAK (negative acknowledge)</td>
+<td style="text-align:left">拒绝接收</td>
+</tr>
+<tr>
+<td style="text-align:left">0001 0110</td>
+<td style="text-align:left">26</td>
+<td style="text-align:left">22</td>
+<td style="text-align:left">16</td>
+<td style="text-align:left">SYN (synchronous idle)</td>
+<td style="text-align:left">同步空闲</td>
+</tr>
+<tr>
+<td style="text-align:left">0001 0111</td>
+<td style="text-align:left">27</td>
+<td style="text-align:left">23</td>
+<td style="text-align:left">17</td>
+<td style="text-align:left">ETB (end of trans. block)</td>
+<td style="text-align:left">结束传输块</td>
+</tr>
+<tr>
+<td style="text-align:left">0001 1000</td>
+<td style="text-align:left">30</td>
+<td style="text-align:left">24</td>
+<td style="text-align:left">18</td>
+<td style="text-align:left">CAN (cancel)</td>
+<td style="text-align:left">取消</td>
+</tr>
+<tr>
+<td style="text-align:left">0001 1001</td>
+<td style="text-align:left">31</td>
+<td style="text-align:left">25</td>
+<td style="text-align:left">19</td>
+<td style="text-align:left">EM (end of medium)</td>
+<td style="text-align:left">媒介结束</td>
+</tr>
+<tr>
+<td style="text-align:left">0001 1010</td>
+<td style="text-align:left">32</td>
+<td style="text-align:left">26</td>
+<td style="text-align:left">1A</td>
+<td style="text-align:left">SUB (substitute)</td>
+<td style="text-align:left">代替</td>
+</tr>
+<tr>
+<td style="text-align:left">0001 1011</td>
+<td style="text-align:left">33</td>
+<td style="text-align:left">27</td>
+<td style="text-align:left">1B</td>
+<td style="text-align:left">ESC (escape)</td>
+<td style="text-align:left">换码(溢出)</td>
+</tr>
+<tr>
+<td style="text-align:left">0001 1100</td>
+<td style="text-align:left">34</td>
+<td style="text-align:left">28</td>
+<td style="text-align:left">1C</td>
+<td style="text-align:left">FS (file separator)</td>
+<td style="text-align:left">文件分隔符</td>
+</tr>
+<tr>
+<td style="text-align:left">0001 1101</td>
+<td style="text-align:left">35</td>
+<td style="text-align:left">29</td>
+<td style="text-align:left">1D</td>
+<td style="text-align:left">GS (group separator)</td>
+<td style="text-align:left">分组符</td>
+</tr>
+<tr>
+<td style="text-align:left">0001 1110</td>
+<td style="text-align:left">36</td>
+<td style="text-align:left">30</td>
+<td style="text-align:left">1E</td>
+<td style="text-align:left">RS (record separator)</td>
+<td style="text-align:left">记录分隔符</td>
+</tr>
+<tr>
+<td style="text-align:left">0001 1111</td>
+<td style="text-align:left">37</td>
+<td style="text-align:left">31</td>
+<td style="text-align:left">1F</td>
+<td style="text-align:left">US (unit separator)</td>
+<td style="text-align:left">单元分隔符</td>
+</tr>
+<tr>
+<td style="text-align:left">0010 0000</td>
+<td style="text-align:left">40</td>
+<td style="text-align:left">32</td>
+<td style="text-align:left">20</td>
+<td style="text-align:left">(space)</td>
+<td style="text-align:left">空格</td>
+</tr>
+<tr>
+<td style="text-align:left">0010 0001</td>
+<td style="text-align:left">41</td>
+<td style="text-align:left">33</td>
+<td style="text-align:left">21</td>
+<td style="text-align:left">!</td>
+<td style="text-align:left">叹号</td>
+</tr>
+<tr>
+<td style="text-align:left">0010 0010</td>
+<td style="text-align:left">42</td>
+<td style="text-align:left">34</td>
+<td style="text-align:left">22</td>
+<td style="text-align:left">“</td>
+<td style="text-align:left">双引号</td>
+</tr>
+<tr>
+<td style="text-align:left">0010 0011</td>
+<td style="text-align:left">43</td>
+<td style="text-align:left">35</td>
+<td style="text-align:left">23</td>
+<td style="text-align:left">#</td>
+<td style="text-align:left">井号</td>
+</tr>
+<tr>
+<td style="text-align:left">0010 0100</td>
+<td style="text-align:left">44</td>
+<td style="text-align:left">36</td>
+<td style="text-align:left">24</td>
+<td style="text-align:left">$</td>
+<td style="text-align:left">美元符</td>
+</tr>
+<tr>
+<td style="text-align:left">0010 0101</td>
+<td style="text-align:left">45</td>
+<td style="text-align:left">37</td>
+<td style="text-align:left">25</td>
+<td style="text-align:left">%</td>
+<td style="text-align:left">百分号</td>
+</tr>
+<tr>
+<td style="text-align:left">0010 0110</td>
+<td style="text-align:left">46</td>
+<td style="text-align:left">38</td>
+<td style="text-align:left">26</td>
+<td style="text-align:left">&amp;</td>
+<td style="text-align:left">和号</td>
+</tr>
+<tr>
+<td style="text-align:left">0010 0111</td>
+<td style="text-align:left">47</td>
+<td style="text-align:left">39</td>
+<td style="text-align:left">27</td>
+<td style="text-align:left">‘</td>
+<td style="text-align:left">闭单引号</td>
+</tr>
+<tr>
+<td style="text-align:left">0010 1000</td>
+<td style="text-align:left">50</td>
+<td style="text-align:left">40</td>
+<td style="text-align:left">28</td>
+<td style="text-align:left">(</td>
+<td style="text-align:left">开括号</td>
+</tr>
+<tr>
+<td style="text-align:left">0010 1001</td>
+<td style="text-align:left">51</td>
+<td style="text-align:left">41</td>
+<td style="text-align:left">29</td>
+<td style="text-align:left">)</td>
+<td style="text-align:left">闭括号</td>
+</tr>
+<tr>
+<td style="text-align:left">0010 1010</td>
+<td style="text-align:left">52</td>
+<td style="text-align:left">42</td>
+<td style="text-align:left">2A</td>
+<td style="text-align:left">*</td>
+<td style="text-align:left">星号</td>
+</tr>
+<tr>
+<td style="text-align:left">0010 1011</td>
+<td style="text-align:left">53</td>
+<td style="text-align:left">43</td>
+<td style="text-align:left">2B</td>
+<td style="text-align:left">+</td>
+<td style="text-align:left">加号</td>
+</tr>
+<tr>
+<td style="text-align:left">0010 1100</td>
+<td style="text-align:left">54</td>
+<td style="text-align:left">44</td>
+<td style="text-align:left">2C</td>
+<td style="text-align:left">,</td>
+<td style="text-align:left">逗号</td>
+</tr>
+<tr>
+<td style="text-align:left">0010 1101</td>
+<td style="text-align:left">55</td>
+<td style="text-align:left">45</td>
+<td style="text-align:left">2D</td>
+<td style="text-align:left">-</td>
+<td style="text-align:left">减号/破折号</td>
+</tr>
+<tr>
+<td style="text-align:left">0010 1110</td>
+<td style="text-align:left">56</td>
+<td style="text-align:left">46</td>
+<td style="text-align:left">2E</td>
+<td style="text-align:left">.</td>
+<td style="text-align:left">句号</td>
+</tr>
+<tr>
+<td style="text-align:left">00101111</td>
+<td style="text-align:left">57</td>
+<td style="text-align:left">47</td>
+<td style="text-align:left">2F</td>
+<td style="text-align:left">/</td>
+<td style="text-align:left">斜杠</td>
+</tr>
+<tr>
+<td style="text-align:left">00110000</td>
+<td style="text-align:left">60</td>
+<td style="text-align:left">48</td>
+<td style="text-align:left">30</td>
+<td style="text-align:left">0</td>
+<td style="text-align:left">数字0</td>
+</tr>
+<tr>
+<td style="text-align:left">00110001</td>
+<td style="text-align:left">61</td>
+<td style="text-align:left">49</td>
+<td style="text-align:left">31</td>
+<td style="text-align:left">1</td>
+<td style="text-align:left">数字1</td>
+</tr>
+<tr>
+<td style="text-align:left">00110010</td>
+<td style="text-align:left">62</td>
+<td style="text-align:left">50</td>
+<td style="text-align:left">32</td>
+<td style="text-align:left">2</td>
+<td style="text-align:left">数字2</td>
+</tr>
+<tr>
+<td style="text-align:left">00110011</td>
+<td style="text-align:left">63</td>
+<td style="text-align:left">51</td>
+<td style="text-align:left">33</td>
+<td style="text-align:left">3</td>
+<td style="text-align:left">数字3</td>
+</tr>
+<tr>
+<td style="text-align:left">00110100</td>
+<td style="text-align:left">64</td>
+<td style="text-align:left">52</td>
+<td style="text-align:left">34</td>
+<td style="text-align:left">4</td>
+<td style="text-align:left">数字4</td>
+</tr>
+<tr>
+<td style="text-align:left">00110101</td>
+<td style="text-align:left">65</td>
+<td style="text-align:left">53</td>
+<td style="text-align:left">35</td>
+<td style="text-align:left">5</td>
+<td style="text-align:left">数字5</td>
+</tr>
+<tr>
+<td style="text-align:left">00110110</td>
+<td style="text-align:left">66</td>
+<td style="text-align:left">54</td>
+<td style="text-align:left">36</td>
+<td style="text-align:left">6</td>
+<td style="text-align:left">数字6</td>
+</tr>
+<tr>
+<td style="text-align:left">00110111</td>
+<td style="text-align:left">67</td>
+<td style="text-align:left">55</td>
+<td style="text-align:left">37</td>
+<td style="text-align:left">7</td>
+<td style="text-align:left">数字7</td>
+</tr>
+<tr>
+<td style="text-align:left">00111000</td>
+<td style="text-align:left">70</td>
+<td style="text-align:left">56</td>
+<td style="text-align:left">38</td>
+<td style="text-align:left">8</td>
+<td style="text-align:left">数字8</td>
+</tr>
+<tr>
+<td style="text-align:left">00111001</td>
+<td style="text-align:left">71</td>
+<td style="text-align:left">57</td>
+<td style="text-align:left">39</td>
+<td style="text-align:left">9</td>
+<td style="text-align:left">数字9</td>
+</tr>
+<tr>
+<td style="text-align:left">00111010</td>
+<td style="text-align:left">72</td>
+<td style="text-align:left">58</td>
+<td style="text-align:left">3A</td>
+<td style="text-align:left">:</td>
+<td style="text-align:left">冒号</td>
+</tr>
+<tr>
+<td style="text-align:left">00111011</td>
+<td style="text-align:left">73</td>
+<td style="text-align:left">59</td>
+<td style="text-align:left">3B</td>
+<td style="text-align:left">;</td>
+<td style="text-align:left">分号</td>
+</tr>
+<tr>
+<td style="text-align:left">00111100</td>
+<td style="text-align:left">74</td>
+<td style="text-align:left">60</td>
+<td style="text-align:left">3C</td>
+<td style="text-align:left">&lt;</td>
+<td style="text-align:left">小于</td>
+</tr>
+<tr>
+<td style="text-align:left">00111101</td>
+<td style="text-align:left">75</td>
+<td style="text-align:left">61</td>
+<td style="text-align:left">3D</td>
+<td style="text-align:left">=</td>
+<td style="text-align:left">等号</td>
+</tr>
+<tr>
+<td style="text-align:left">00111110</td>
+<td style="text-align:left">76</td>
+<td style="text-align:left">62</td>
+<td style="text-align:left">3E</td>
+<td style="text-align:left">&gt;</td>
+<td style="text-align:left">大于</td>
+</tr>
+<tr>
+<td style="text-align:left">00111111</td>
+<td style="text-align:left">77</td>
+<td style="text-align:left">63</td>
+<td style="text-align:left">3F</td>
+<td style="text-align:left">?</td>
+<td style="text-align:left">问号</td>
+</tr>
+<tr>
+<td style="text-align:left">01000000</td>
+<td style="text-align:left">100</td>
+<td style="text-align:left">64</td>
+<td style="text-align:left">40</td>
+<td style="text-align:left">@</td>
+<td style="text-align:left">电子邮件符号</td>
+</tr>
+<tr>
+<td style="text-align:left">01000001</td>
+<td style="text-align:left">101</td>
+<td style="text-align:left">65</td>
+<td style="text-align:left">41</td>
+<td style="text-align:left">A</td>
+<td style="text-align:left">大写字母A</td>
+</tr>
+<tr>
+<td style="text-align:left">01000010</td>
+<td style="text-align:left">102</td>
+<td style="text-align:left">66</td>
+<td style="text-align:left">42</td>
+<td style="text-align:left">B</td>
+<td style="text-align:left">大写字母B</td>
+</tr>
+<tr>
+<td style="text-align:left">01000011</td>
+<td style="text-align:left">103</td>
+<td style="text-align:left">67</td>
+<td style="text-align:left">43</td>
+<td style="text-align:left">C</td>
+<td style="text-align:left">大写字母C</td>
+</tr>
+<tr>
+<td style="text-align:left">01000100</td>
+<td style="text-align:left">104</td>
+<td style="text-align:left">68</td>
+<td style="text-align:left">44</td>
+<td style="text-align:left">D</td>
+<td style="text-align:left">大写字母D</td>
+</tr>
+<tr>
+<td style="text-align:left">01000101</td>
+<td style="text-align:left">105</td>
+<td style="text-align:left">69</td>
+<td style="text-align:left">45</td>
+<td style="text-align:left">E</td>
+<td style="text-align:left">大写字母E</td>
+</tr>
+<tr>
+<td style="text-align:left">01000110</td>
+<td style="text-align:left">106</td>
+<td style="text-align:left">70</td>
+<td style="text-align:left">46</td>
+<td style="text-align:left">F</td>
+<td style="text-align:left">大写字母F</td>
+</tr>
+<tr>
+<td style="text-align:left">01000111</td>
+<td style="text-align:left">107</td>
+<td style="text-align:left">71</td>
+<td style="text-align:left">47</td>
+<td style="text-align:left">G</td>
+<td style="text-align:left">大写字母G</td>
+</tr>
+<tr>
+<td style="text-align:left">01001000</td>
+<td style="text-align:left">110</td>
+<td style="text-align:left">72</td>
+<td style="text-align:left">48</td>
+<td style="text-align:left">H</td>
+<td style="text-align:left">大写字母H</td>
+</tr>
+<tr>
+<td style="text-align:left">01001001</td>
+<td style="text-align:left">111</td>
+<td style="text-align:left">73</td>
+<td style="text-align:left">49</td>
+<td style="text-align:left">I</td>
+<td style="text-align:left">大写字母I</td>
+</tr>
+<tr>
+<td style="text-align:left">01001010</td>
+<td style="text-align:left">112</td>
+<td style="text-align:left">74</td>
+<td style="text-align:left">4A</td>
+<td style="text-align:left">J</td>
+<td style="text-align:left">大写字母J</td>
+</tr>
+<tr>
+<td style="text-align:left">01001011</td>
+<td style="text-align:left">113</td>
+<td style="text-align:left">75</td>
+<td style="text-align:left">4B</td>
+<td style="text-align:left">K</td>
+<td style="text-align:left">大写字母K</td>
+</tr>
+<tr>
+<td style="text-align:left">01001100</td>
+<td style="text-align:left">114</td>
+<td style="text-align:left">76</td>
+<td style="text-align:left">4C</td>
+<td style="text-align:left">L</td>
+<td style="text-align:left">大写字母L</td>
+</tr>
+<tr>
+<td style="text-align:left">01001101</td>
+<td style="text-align:left">115</td>
+<td style="text-align:left">77</td>
+<td style="text-align:left">4D</td>
+<td style="text-align:left">M</td>
+<td style="text-align:left">大写字母M</td>
+</tr>
+<tr>
+<td style="text-align:left">01001110</td>
+<td style="text-align:left">116</td>
+<td style="text-align:left">78</td>
+<td style="text-align:left">4E</td>
+<td style="text-align:left">N</td>
+<td style="text-align:left">大写字母N</td>
+</tr>
+<tr>
+<td style="text-align:left">01001111</td>
+<td style="text-align:left">117</td>
+<td style="text-align:left">79</td>
+<td style="text-align:left">4F</td>
+<td style="text-align:left">O</td>
+<td style="text-align:left">大写字母O</td>
+</tr>
+<tr>
+<td style="text-align:left">01010000</td>
+<td style="text-align:left">120</td>
+<td style="text-align:left">80</td>
+<td style="text-align:left">50</td>
+<td style="text-align:left">P</td>
+<td style="text-align:left">大写字母P</td>
+</tr>
+<tr>
+<td style="text-align:left">01010001</td>
+<td style="text-align:left">121</td>
+<td style="text-align:left">81</td>
+<td style="text-align:left">51</td>
+<td style="text-align:left">Q</td>
+<td style="text-align:left">大写字母Q</td>
+</tr>
+<tr>
+<td style="text-align:left">01010010</td>
+<td style="text-align:left">122</td>
+<td style="text-align:left">82</td>
+<td style="text-align:left">52</td>
+<td style="text-align:left">R</td>
+<td style="text-align:left">大写字母R</td>
+</tr>
+<tr>
+<td style="text-align:left">01010011</td>
+<td style="text-align:left">123</td>
+<td style="text-align:left">83</td>
+<td style="text-align:left">53</td>
+<td style="text-align:left">S</td>
+<td style="text-align:left">大写字母S</td>
+</tr>
+<tr>
+<td style="text-align:left">01010100</td>
+<td style="text-align:left">124</td>
+<td style="text-align:left">84</td>
+<td style="text-align:left">54</td>
+<td style="text-align:left">T</td>
+<td style="text-align:left">大写字母T</td>
+</tr>
+<tr>
+<td style="text-align:left">01010101</td>
+<td style="text-align:left">125</td>
+<td style="text-align:left">85</td>
+<td style="text-align:left">55</td>
+<td style="text-align:left">U</td>
+<td style="text-align:left">大写字母U</td>
+</tr>
+<tr>
+<td style="text-align:left">01010110</td>
+<td style="text-align:left">126</td>
+<td style="text-align:left">86</td>
+<td style="text-align:left">56</td>
+<td style="text-align:left">V</td>
+<td style="text-align:left">大写字母V</td>
+</tr>
+<tr>
+<td style="text-align:left">01010111</td>
+<td style="text-align:left">127</td>
+<td style="text-align:left">87</td>
+<td style="text-align:left">57</td>
+<td style="text-align:left">W</td>
+<td style="text-align:left">大写字母W</td>
+</tr>
+<tr>
+<td style="text-align:left">01011000</td>
+<td style="text-align:left">130</td>
+<td style="text-align:left">88</td>
+<td style="text-align:left">58</td>
+<td style="text-align:left">X</td>
+<td style="text-align:left">大写字母X</td>
+</tr>
+<tr>
+<td style="text-align:left">01011001</td>
+<td style="text-align:left">131</td>
+<td style="text-align:left">89</td>
+<td style="text-align:left">59</td>
+<td style="text-align:left">Y</td>
+<td style="text-align:left">大写字母Y</td>
+</tr>
+<tr>
+<td style="text-align:left">01011010</td>
+<td style="text-align:left">132</td>
+<td style="text-align:left">90</td>
+<td style="text-align:left">5A</td>
+<td style="text-align:left">Z</td>
+<td style="text-align:left">大写字母Z</td>
+</tr>
+<tr>
+<td style="text-align:left">01011011</td>
+<td style="text-align:left">133</td>
+<td style="text-align:left">91</td>
+<td style="text-align:left">5B</td>
+<td style="text-align:left">[</td>
+<td style="text-align:left">开方括号</td>
+</tr>
+<tr>
+<td style="text-align:left">01011100</td>
+<td style="text-align:left">134</td>
+<td style="text-align:left">92</td>
+<td style="text-align:left">5C</td>
+<td style="text-align:left">\</td>
+<td style="text-align:left">反斜杠</td>
+</tr>
+<tr>
+<td style="text-align:left">01011101</td>
+<td style="text-align:left">135</td>
+<td style="text-align:left">93</td>
+<td style="text-align:left">5D</td>
+<td style="text-align:left">]</td>
+<td style="text-align:left">闭方括号</td>
+</tr>
+<tr>
+<td style="text-align:left">01011110</td>
+<td style="text-align:left">136</td>
+<td style="text-align:left">94</td>
+<td style="text-align:left">5E</td>
+<td style="text-align:left">^</td>
+<td style="text-align:left">脱字符</td>
+</tr>
+<tr>
+<td style="text-align:left">01011111</td>
+<td style="text-align:left">137</td>
+<td style="text-align:left">95</td>
+<td style="text-align:left">5F</td>
+<td style="text-align:left">_</td>
+<td style="text-align:left">下划线</td>
+</tr>
+<tr>
+<td style="text-align:left">01100000</td>
+<td style="text-align:left">140</td>
+<td style="text-align:left">96</td>
+<td style="text-align:left">60</td>
+<td style="text-align:left">`</td>
+<td style="text-align:left">开单引号</td>
+</tr>
+<tr>
+<td style="text-align:left">01100001</td>
+<td style="text-align:left">141</td>
+<td style="text-align:left">97</td>
+<td style="text-align:left">61</td>
+<td style="text-align:left">a</td>
+<td style="text-align:left">小写字母a</td>
+</tr>
+<tr>
+<td style="text-align:left">01100010</td>
+<td style="text-align:left">142</td>
+<td style="text-align:left">98</td>
+<td style="text-align:left">62</td>
+<td style="text-align:left">b</td>
+<td style="text-align:left">小写字母b</td>
+</tr>
+<tr>
+<td style="text-align:left">01100011</td>
+<td style="text-align:left">143</td>
+<td style="text-align:left">99</td>
+<td style="text-align:left">63</td>
+<td style="text-align:left">c</td>
+<td style="text-align:left">小写字母c</td>
+</tr>
+<tr>
+<td style="text-align:left">01100100</td>
+<td style="text-align:left">144</td>
+<td style="text-align:left">100</td>
+<td style="text-align:left">64</td>
+<td style="text-align:left">d</td>
+<td style="text-align:left">小写字母d</td>
+</tr>
+<tr>
+<td style="text-align:left">01100101</td>
+<td style="text-align:left">145</td>
+<td style="text-align:left">101</td>
+<td style="text-align:left">65</td>
+<td style="text-align:left">e</td>
+<td style="text-align:left">小写字母e</td>
+</tr>
+<tr>
+<td style="text-align:left">01100110</td>
+<td style="text-align:left">146</td>
+<td style="text-align:left">102</td>
+<td style="text-align:left">66</td>
+<td style="text-align:left">f</td>
+<td style="text-align:left">小写字母f</td>
+</tr>
+<tr>
+<td style="text-align:left">01100111</td>
+<td style="text-align:left">147</td>
+<td style="text-align:left">103</td>
+<td style="text-align:left">67</td>
+<td style="text-align:left">g</td>
+<td style="text-align:left">小写字母g</td>
+</tr>
+<tr>
+<td style="text-align:left">01101000</td>
+<td style="text-align:left">150</td>
+<td style="text-align:left">104</td>
+<td style="text-align:left">68</td>
+<td style="text-align:left">h</td>
+<td style="text-align:left">小写字母h</td>
+</tr>
+<tr>
+<td style="text-align:left">01101001</td>
+<td style="text-align:left">151</td>
+<td style="text-align:left">105</td>
+<td style="text-align:left">69</td>
+<td style="text-align:left">i</td>
+<td style="text-align:left">小写字母i</td>
+</tr>
+<tr>
+<td style="text-align:left">01101010</td>
+<td style="text-align:left">152</td>
+<td style="text-align:left">106</td>
+<td style="text-align:left">6A</td>
+<td style="text-align:left">j</td>
+<td style="text-align:left">小写字母j</td>
+</tr>
+<tr>
+<td style="text-align:left">01101011</td>
+<td style="text-align:left">153</td>
+<td style="text-align:left">107</td>
+<td style="text-align:left">6B</td>
+<td style="text-align:left">k</td>
+<td style="text-align:left">小写字母k</td>
+</tr>
+<tr>
+<td style="text-align:left">01101100</td>
+<td style="text-align:left">154</td>
+<td style="text-align:left">108</td>
+<td style="text-align:left">6C</td>
+<td style="text-align:left">l</td>
+<td style="text-align:left">小写字母l</td>
+</tr>
+<tr>
+<td style="text-align:left">01101101</td>
+<td style="text-align:left">155</td>
+<td style="text-align:left">109</td>
+<td style="text-align:left">6D</td>
+<td style="text-align:left">m</td>
+<td style="text-align:left">小写字母m</td>
+</tr>
+<tr>
+<td style="text-align:left">01101110</td>
+<td style="text-align:left">156</td>
+<td style="text-align:left">110</td>
+<td style="text-align:left">6E</td>
+<td style="text-align:left">n</td>
+<td style="text-align:left">小写字母n</td>
+</tr>
+<tr>
+<td style="text-align:left">01101111</td>
+<td style="text-align:left">157</td>
+<td style="text-align:left">111</td>
+<td style="text-align:left">6F</td>
+<td style="text-align:left">o</td>
+<td style="text-align:left">小写字母o</td>
+</tr>
+<tr>
+<td style="text-align:left">01110000</td>
+<td style="text-align:left">160</td>
+<td style="text-align:left">112</td>
+<td style="text-align:left">70</td>
+<td style="text-align:left">p</td>
+<td style="text-align:left">小写字母p</td>
+</tr>
+<tr>
+<td style="text-align:left">01110001</td>
+<td style="text-align:left">161</td>
+<td style="text-align:left">113</td>
+<td style="text-align:left">71</td>
+<td style="text-align:left">q</td>
+<td style="text-align:left">小写字母q</td>
+</tr>
+<tr>
+<td style="text-align:left">01110010</td>
+<td style="text-align:left">162</td>
+<td style="text-align:left">114</td>
+<td style="text-align:left">72</td>
+<td style="text-align:left">r</td>
+<td style="text-align:left">小写字母r</td>
+</tr>
+<tr>
+<td style="text-align:left">01110011</td>
+<td style="text-align:left">163</td>
+<td style="text-align:left">115</td>
+<td style="text-align:left">73</td>
+<td style="text-align:left">s</td>
+<td style="text-align:left">小写字母s</td>
+</tr>
+<tr>
+<td style="text-align:left">01110100</td>
+<td style="text-align:left">164</td>
+<td style="text-align:left">116</td>
+<td style="text-align:left">74</td>
+<td style="text-align:left">t</td>
+<td style="text-align:left">小写字母t</td>
+</tr>
+<tr>
+<td style="text-align:left">01110101</td>
+<td style="text-align:left">165</td>
+<td style="text-align:left">117</td>
+<td style="text-align:left">75</td>
+<td style="text-align:left">u</td>
+<td style="text-align:left">小写字母u</td>
+</tr>
+<tr>
+<td style="text-align:left">01110110</td>
+<td style="text-align:left">166</td>
+<td style="text-align:left">118</td>
+<td style="text-align:left">76</td>
+<td style="text-align:left">v</td>
+<td style="text-align:left">小写字母v</td>
+</tr>
+<tr>
+<td style="text-align:left">01110111</td>
+<td style="text-align:left">167</td>
+<td style="text-align:left">119</td>
+<td style="text-align:left">77</td>
+<td style="text-align:left">w</td>
+<td style="text-align:left">小写字母w</td>
+</tr>
+<tr>
+<td style="text-align:left">01111000</td>
+<td style="text-align:left">170</td>
+<td style="text-align:left">120</td>
+<td style="text-align:left">78</td>
+<td style="text-align:left">x</td>
+<td style="text-align:left">小写字母x</td>
+</tr>
+<tr>
+<td style="text-align:left">01111001</td>
+<td style="text-align:left">171</td>
+<td style="text-align:left">121</td>
+<td style="text-align:left">79</td>
+<td style="text-align:left">y</td>
+<td style="text-align:left">小写字母y</td>
+</tr>
+<tr>
+<td style="text-align:left">01111010</td>
+<td style="text-align:left">172</td>
+<td style="text-align:left">122</td>
+<td style="text-align:left">7A</td>
+<td style="text-align:left">z</td>
+<td style="text-align:left">小写字母z</td>
+</tr>
+<tr>
+<td style="text-align:left">01111011</td>
+<td style="text-align:left">173</td>
+<td style="text-align:left">123</td>
+<td style="text-align:left">7B</td>
+<td style="text-align:left">{</td>
+<td style="text-align:left">开花括号</td>
+</tr>
+<tr>
+<td style="text-align:left">01111100</td>
+<td style="text-align:left">174</td>
+<td style="text-align:left">124</td>
+<td style="text-align:left">7C</td>
+<td style="text-align:left">\</td>
+<td style="text-align:left"></td>
+<td>垂线</td>
+</tr>
+<tr>
+<td style="text-align:left">01111101</td>
+<td style="text-align:left">175</td>
+<td style="text-align:left">125</td>
+<td style="text-align:left">7D</td>
+<td style="text-align:left">}</td>
+<td style="text-align:left">闭花括号</td>
+</tr>
+<tr>
+<td style="text-align:left">01111110</td>
+<td style="text-align:left">176</td>
+<td style="text-align:left">126</td>
+<td style="text-align:left">7E</td>
+<td style="text-align:left">~</td>
+<td style="text-align:left">波浪号</td>
+</tr>
+<tr>
+<td style="text-align:left">01111111</td>
+<td style="text-align:left">177</td>
+<td style="text-align:left">127</td>
+<td style="text-align:left">7F</td>
+<td style="text-align:left">DEL (delete)</td>
+<td style="text-align:left">删除</td>
+</tr>
+</tbody>
+</table>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://blog.csdn.net/darxin/article/details/5079242" target="_blank" rel="noopener">https://blog.csdn.net/darxin/article/details/5079242</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Victor
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://yoursite.com/2018/07/03/java/java_common/charset-string/" title="字符与string">http://yoursite.com/2018/07/03/java/java_common/charset-string/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/03/java/java_common/java-basic-type/" rel="next" title="java基本数据类型">
+                <i class="fa fa-chevron-left"></i> java基本数据类型
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/07/03/java/java_web/springmvc-interceptor/" rel="prev" title="springmvc-interceptor">
+                springmvc-interceptor <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Victor</p>
+              <p class="site-description motion-element" itemprop="description">victor的个人博客,作为一枚后端开发工程师,写本博客目的,旨在记录自己在工作生活中的点点滴滴,形成自己的知识体系</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">196</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">27</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">77</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Java字符串的内部编码"><span class="nav-number">1.</span> <span class="nav-text">Java字符串的内部编码</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#字符集对比"><span class="nav-number">2.</span> <span class="nav-text">字符集对比</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#中国"><span class="nav-number">2.1.</span> <span class="nav-text">中国</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#email"><span class="nav-number">2.2.</span> <span class="nav-text">email</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#特殊的字符集（ISO-8859-1）"><span class="nav-number">2.3.</span> <span class="nav-text">特殊的字符集（ISO-8859-1）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x代表的含义-十六进制表示法"><span class="nav-number">3.</span> <span class="nav-text">0x代表的含义:十六进制表示法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ASCII-（American-Standard-Code-for-Information-Interchange，美国信息交换标准代码）"><span class="nav-number">4.</span> <span class="nav-text">ASCII （American Standard Code for Information Interchange，美国信息交换标准代码）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Victor</span>
+  
+  <!--以下3行为一条竖线和Coding Page-->
+  <div class="powered-by">
+  </div>
+  <span>Hosted by <a href="https://pages.coding.me" style="font-weight: bold">Coding Pages</a></span>
+  
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://victor123-cn.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://yoursite.com/2018/07/03/java/java_common/charset-string/';
+          this.page.identifier = '2018/07/03/java/java_common/charset-string/';
+          this.page.title = '字符与string';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://victor123-cn.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("QdvsGi5rrGt05B6T1cP9buCX-gzGzoHsz", "IPzdnLkdvxDPxh2zyHn82bWk");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

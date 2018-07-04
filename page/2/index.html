@@ -326,7 +326,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/21/sutdy-tdd/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/java/java_web/okhttpclient-close/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
@@ -345,7 +345,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/06/21/sutdy-tdd/" itemprop="url">java测试驱动开发-读书笔记</a></h1>
+                <a class="post-title-link" href="/2018/06/25/java/java_web/okhttpclient-close/" itemprop="url">okhttpclient-close</a></h1>
         
 
         <div class="post-meta">
@@ -357,7 +357,1173 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-21T09:58:16+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-25T10:03:40+08:00">
+                2018-06-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/06/25/java/java_web/okhttpclient-close/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/06/25/java/java_web/okhttpclient-close/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/06/25/java/java_web/okhttpclient-close/" class="leancloud_visitors" data-flag-title="okhttpclient-close">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="原文"><a href="#原文" class="headerlink" title="原文"></a>原文</h1><p><a href="https://github.com/square/okhttp/issues/3372" target="_blank" rel="noopener">https://github.com/square/okhttp/issues/3372</a><br><a href="https://github.com/square/okhttp/issues/3160" target="_blank" rel="noopener">https://github.com/square/okhttp/issues/3160</a></p>
+<p>作者的主张:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">我们希望鼓励用户在客户端之间共享连接池和调度程序。但如果你这样做，你不能把所有东西都关闭。</span><br><span class="line"></span><br><span class="line">创建一个新的OkHttpClient是相对昂贵的，我不愿意轻易地创建和销毁客户端，因为它可能会鼓励低效的用例。 您可以自由地为每个测试创建和销毁客户端，但是我希望您编写代码以进行设置和拆卸，以便您可以承担该性能成本的责任。</span><br><span class="line"></span><br><span class="line">性能成本基本上是为连接池创建ExecutorService的成本，另一个是为Dispatcher创建的成本。我在自己的服务器应用程序中发现，创建和销毁线程池的成本在运行测试的总体成本中相当可观。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">对于大多数效率来说，您的流程中将有一个ConnectionPool和一个Dispatcher。 这些可以被许多OkHttpClient实例共享。</span><br><span class="line">如果关闭分派器，那么使用它的OkHttpClient实例都不会起作用。 类似的关闭ConnectionPool。</span><br><span class="line">一个比喻：想象一下，当你使用Firefox时，拔掉你的住宅调制解调器和WiFi路由器。 当你需要它们时很容易将它们插回去。 如果你不打算再次使用Firefox，那么知道该关闭什么是方便的。</span><br><span class="line">但我仍然认为，Firefox在退出时会关闭这些设备，或者甚至提供一个选项来关闭这些设备。</span><br></pre></td></tr></table></figure></p>
+<h1 id="自动关闭的方式"><a href="#自动关闭的方式" class="headerlink" title="自动关闭的方式"></a>自动关闭的方式</h1><h2 id="连接级别-java-net-Socket-的资源关闭"><a href="#连接级别-java-net-Socket-的资源关闭" class="headerlink" title="连接级别(java.net.Socket)的资源关闭"></a>连接级别(java.net.Socket)的资源关闭</h2><p>如果保持空闲状态，保持的线程和连接将自动释放</p>
+<p>最多可容纳5个闲置连接，闲置5分钟后将被驱逐。<br>默认设置:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">public ConnectionPool() &#123;</span><br><span class="line">  this(5, 5, TimeUnit.MINUTES);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public ConnectionPool(int maxIdleConnections, long keepAliveDuration, TimeUnit timeUnit) &#123;</span><br><span class="line">  this.maxIdleConnections = maxIdleConnections;</span><br><span class="line">  this.keepAliveDurationNs = timeUnit.toNanos(keepAliveDuration);</span><br><span class="line"></span><br><span class="line">  // Put a floor on the keep alive duration, otherwise cleanup will spin loop.</span><br><span class="line">  if (keepAliveDuration &lt;= 0) &#123;</span><br><span class="line">    throw new IllegalArgumentException(&quot;keepAliveDuration &lt;= 0: &quot; + keepAliveDuration);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>ConnectionPool内部维护了一个清理线程<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">private final Runnable cleanupRunnable = new Runnable() &#123;</span><br><span class="line">  @Override public void run() &#123;</span><br><span class="line">    while (true) &#123;</span><br><span class="line">      long waitNanos = cleanup(System.nanoTime());</span><br><span class="line">      if (waitNanos == -1) return;</span><br><span class="line">      if (waitNanos &gt; 0) &#123;</span><br><span class="line">        long waitMillis = waitNanos / 1000000L;</span><br><span class="line">        waitNanos -= (waitMillis * 1000000L);</span><br><span class="line">        synchronized (ConnectionPool.this) &#123;</span><br><span class="line">          try &#123;</span><br><span class="line">            ConnectionPool.this.wait(waitMillis, (int) waitNanos);</span><br><span class="line">          &#125; catch (InterruptedException ignored) &#123;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>实际清理:</p>
+<ul>
+<li>如果空闲醉酒的socket它超出了保持活动时间限制或空闲连接数限制，则驱逐空闲时间最长的连接,并返回0,再次检查</li>
+<li>如果有空闲状态的,返回下次检查的时间:keepAliveDurationNs - longestIdleDurationNs;</li>
+<li>如果没有空闲状态的,返回下次检查的时间:keepAliveDurationNs<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">long cleanup(long now) &#123;</span><br><span class="line">    int inUseConnectionCount = 0;</span><br><span class="line">    int idleConnectionCount = 0;</span><br><span class="line">    RealConnection longestIdleConnection = null;</span><br><span class="line">    long longestIdleDurationNs = Long.MIN_VALUE;</span><br><span class="line"></span><br><span class="line">    // Find either a connection to evict, or the time that the next eviction is due.</span><br><span class="line">    synchronized (this) &#123;</span><br><span class="line">      for (Iterator&lt;RealConnection&gt; i = connections.iterator(); i.hasNext(); ) &#123;</span><br><span class="line">        RealConnection connection = i.next();</span><br><span class="line"></span><br><span class="line">        // If the connection is in use, keep searching.</span><br><span class="line">        if (pruneAndGetAllocationCount(connection, now) &gt; 0) &#123;</span><br><span class="line">          inUseConnectionCount++;</span><br><span class="line">          continue;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        idleConnectionCount++;</span><br><span class="line"></span><br><span class="line">        // If the connection is ready to be evicted, we&apos;re done.</span><br><span class="line">        long idleDurationNs = now - connection.idleAtNanos;</span><br><span class="line">        if (idleDurationNs &gt; longestIdleDurationNs) &#123;</span><br><span class="line">          longestIdleDurationNs = idleDurationNs;</span><br><span class="line">          longestIdleConnection = connection;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      if (longestIdleDurationNs &gt;= this.keepAliveDurationNs</span><br><span class="line">          || idleConnectionCount &gt; this.maxIdleConnections) &#123;</span><br><span class="line">        // We&apos;ve found a connection to evict. Remove it from the list, then close it below (outside</span><br><span class="line">        // of the synchronized block).</span><br><span class="line">        connections.remove(longestIdleConnection);</span><br><span class="line">      &#125; else if (idleConnectionCount &gt; 0) &#123;</span><br><span class="line">        // A connection will be ready to evict soon.</span><br><span class="line">        return keepAliveDurationNs - longestIdleDurationNs;</span><br><span class="line">      &#125; else if (inUseConnectionCount &gt; 0) &#123;</span><br><span class="line">        // All connections are in use. It&apos;ll be at least the keep alive duration &apos;til we run again.</span><br><span class="line">        return keepAliveDurationNs;</span><br><span class="line">      &#125; else &#123;</span><br><span class="line">        // No connections, idle or in use.</span><br><span class="line">        cleanupRunning = false;</span><br><span class="line">        return -1;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    closeQuietly(longestIdleConnection.socket());</span><br><span class="line"></span><br><span class="line">    // Cleanup again immediately.</span><br><span class="line">    return 0;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="输入-输出流级别的资源关闭"><a href="#输入-输出流级别的资源关闭" class="headerlink" title="输入/输出流级别的资源关闭"></a>输入/输出流级别的资源关闭</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">response.close();</span><br><span class="line">response.body().close();</span><br></pre></td></tr></table></figure>
+<p>然而不需要,因为已经自动调用了</p>
+<p>当我们第一次调用 response.body().string() 时，OkHttp 将响应体的缓冲资源返回的同时，调用 closeQuietly() 方法默默释放了资源。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">public final String string() throws IOException &#123;</span><br><span class="line">  return new String(bytes(), charset().name());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public final byte[] bytes() throws IOException &#123;</span><br><span class="line">  //...</span><br><span class="line">  BufferedSource source = source();</span><br><span class="line">  byte[] bytes;</span><br><span class="line">  try &#123;</span><br><span class="line">    bytes = source.readByteArray();</span><br><span class="line">  &#125; finally &#123;</span><br><span class="line">    Util.closeQuietly(source);</span><br><span class="line">  &#125;</span><br><span class="line">  //...</span><br><span class="line">  return bytes;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public static void closeQuietly(Closeable closeable) &#123;</span><br><span class="line">  if (closeable != null) &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">      closeable.close();</span><br><span class="line">    &#125; catch (RuntimeException rethrown) &#123;</span><br><span class="line">      throw rethrown;</span><br><span class="line">    &#125; catch (Exception ignored) &#123;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//持有的 Source 对象</span><br><span class="line">public final Source source;</span><br><span class="line"></span><br><span class="line">@Override</span><br><span class="line">public void close() throws IOException &#123;</span><br><span class="line">  if (closed) return;</span><br><span class="line">  closed = true;</span><br><span class="line">  source.close();</span><br><span class="line">  buffer.clear();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="会触发的方法"><a href="#会触发的方法" class="headerlink" title="会触发的方法"></a>会触发的方法</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Response.close()</span><br><span class="line">Response.body().close()</span><br><span class="line">Response.body().source().close()</span><br><span class="line">Response.body().charStream().close()</span><br><span class="line">Response.body().byteString().close()</span><br><span class="line">Response.body().bytes()</span><br><span class="line">Response.body().string()</span><br></pre></td></tr></table></figure>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p><a href="https://github.com/square/okhttp/issues/1240#issuecomment-329197762" target="_blank" rel="noopener">https://github.com/square/okhttp/issues/1240#issuecomment-329197762</a></p>
+<p>在实际开发中，响应主体 RessponseBody 持有的资源可能会很大，所以 OkHttp 并不会将其直接保存到内存中，只是持有数据流连接。只有当我们需要时，才会从服务器获取数据并返回。同时，考虑到应用重复读取数据的可能性很小，所以将其设计为一次性流(one-shot)，读取后即 ‘关闭并释放资源’。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://juejin.im/post/5a524eef518825732c536025" target="_blank" rel="noopener">https://juejin.im/post/5a524eef518825732c536025</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/java/java_web/javax-validate/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/25/java/java_web/javax-validate/" itemprop="url">javax-validate</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-25T10:03:29+08:00">
+                2018-06-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/06/25/java/java_web/javax-validate/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/06/25/java/java_web/javax-validate/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/06/25/java/java_web/javax-validate/" class="leancloud_visitors" data-flag-title="javax-validate">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><a href="http://hibernate.org/validator/documentation/getting-started/" target="_blank" rel="noopener">http://hibernate.org/validator/documentation/getting-started/</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/java/java_common/java-close/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/25/java/java_common/java-close/" itemprop="url">java-close</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-25T10:03:18+08:00">
+                2018-06-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/06/25/java/java_common/java-close/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/06/25/java/java_common/java-close/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/06/25/java/java_common/java-close/" class="leancloud_visitors" data-flag-title="java-close">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="避免资源泄漏"><a href="#避免资源泄漏" class="headerlink" title="避免资源泄漏"></a>避免资源泄漏</h1><p>实现接口 java.io.Closeable（自 JDK 1.5）和接口 java.lang.AutoCloseable（自 JDK 1.7）的类被视为代表外部资源，当不再需要这些资源时，应该使用方法 close() 将其关闭。</p>
+<p>Eclipse Java 编译器能够分析代码是否使用此类类型来遵从此策略。即：以下片段代表明显的资源泄漏：</p>
+<pre><code>int len(File f) throws IOException {
+    InputStream stream = new FileInputStream(f);
+    return stream.available();
+}
+</code></pre><p>编译器将使用“资源泄漏：从未关闭‘流’”来对此情况进行标记。</p>
+<h1 id="基本原则-谁生产谁销毁"><a href="#基本原则-谁生产谁销毁" class="headerlink" title="基本原则: 谁生产谁销毁"></a>基本原则: 谁生产谁销毁</h1><p>这个是用来解决责任权的问题，例如你的方法接收一个InputStream作为参数，通常就不应该在方法内去关闭它，而由客户端代码去处理。如果要关闭，通常应该在方法签名上明确说明，具体样例参考commons-io的IOUtils类。</p>
+<p>还有另外一个例子，就是经常使用的Servlet的输入输出流，根据这个原则，也是不应该在代码中进行关闭的，这个工作是由Web容器负责的。</p>
+<h1 id="关闭的是什么"><a href="#关闭的是什么" class="headerlink" title="关闭的是什么?"></a>关闭的是什么?</h1><p>java本身是带GC的，所以对象在消除引用之后，按正常是能够被回收的，那么为什么会有关闭操作?</p>
+<p>这是为了回收系统资源，主要是端口(网络IO),文件句柄(输入输出)等，通常涉及的场景也是操作文件，网络操作、数据库应用等。对于类unix系统，所有东西都是抽象成文件的，所以可以通过lsof来观察。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">lsof -p 25945 |grep /tmp/data | wc -l</span><br><span class="line">88</span><br><span class="line"></span><br><span class="line">ls  /proc/25945/fd | wc -l</span><br><span class="line">93</span><br></pre></td></tr></table></figure>
+<p>如果有关闭操作的话，就会发现打开文件数一直都处于很低的位置。如果持续出现未关闭的情况，积累到一定程度就可能超过系统限制，出现too many open files的错误。</p>
+<h1 id="文件句柄"><a href="#文件句柄" class="headerlink" title="文件句柄"></a>文件句柄</h1><p>在linux中, 一切皆句柄, 比如file, socket都是, 每个进程都有自己的上限, 一旦超过这个上限,系统就会限制并拒绝相应的资源请求.<br>查询命令<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ulimit -a  </span><br><span class="line">ulimit -a -H</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">cd /proc/9082/fd</span><br><span class="line">lsof -p 9082</span><br></pre></td></tr></table></figure></p>
+<h1 id="资源包装程序和可用资源可关闭"><a href="#资源包装程序和可用资源可关闭" class="headerlink" title="资源包装程序和可用资源可关闭"></a>资源包装程序和可用资源可关闭</h1><p>JDK 定义实现可关闭的一些类，而不是直接在操作系统级别代表资源。</p>
+<p>java.io.StringReader 是一个不需要调用 close() 的可关闭示例，因为，不保留需要清理的任何操作系统资源。该分析使用白色列表从归到此类别的 java.io 检测类。没有针对这些类发出任何资源泄漏警告。</p>
+<p>类似 java.io.BufferedInputStream 的类的实例是围绕另一资源的包装程序（在此可在多个级别应用包装程序）。另外，这些对象不直接代表操作系统资源。如果关闭了合并的资源，那么不需要关闭包装程序。相反，如果关闭了包装程序，那么这将包括合并资源的关闭。该分析具有用于检测包装程序资源的第二个白色列表，并将识别底层实际资源是否将通过包装程序直接或间接关闭。任何一个都满足针对资源泄漏的静默警告。白列表包含来自 java.io、java.util.zip、java.security、java.beans 和 java.sound.sampled 的类。</p>
+<p>提示：关闭最外层的包装程序（而不是合并的资源）通常是更可取/最安全的。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/design-case-geek-time/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/25/design-case-geek-time/" itemprop="url">design-case-geek-time</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-25T10:03:09+08:00">
+                2018-06-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/06/25/design-case-geek-time/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/06/25/design-case-geek-time/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/06/25/design-case-geek-time/" class="leancloud_visitors" data-flag-title="design-case-geek-time">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="这个消息队列是否需要高性能"><a href="#这个消息队列是否需要高性能" class="headerlink" title="这个消息队列是否需要高性能"></a>这个消息队列是否需要高性能</h2><p>消息系统:10个子系统进行消费</p>
+<ul>
+<li><p>每天:<br>每天发送 1000 万条微博<br>那么微博子系统一天会产生 1亿条消息(1000微博*10个子系统)</p>
+</li>
+<li><p>tps,qps:<br>1000 万和 1 亿看起来很吓人，但对于架构师来说，关注的不是一天的数据，而是 1 秒的数据，即 TPS 和 QPS。我们将数据按照秒来计算，一天内平均每秒写入消息数为 115 条，每秒读取的消息数是 1150 条</p>
+</li>
+<li><p>峰值:<br>峰值一般取平均值的 3 倍，那么消息队列系统的 TPS 是 345，QPS 是 3450，这个量级的数据意味着并不要求高性能。</p>
+</li>
+<li><p>未来增长的用户:<br>虽然根据当前业务规模计算的性能要求并不高，但业务会增长，因此系统设计需要考虑一定的性能余量。由于现在的基数较低，为了预留一定的系统容量应对后续业务的发展，我们将设计目标设定为峰值的 4 倍，因此最终的性能要求是：TPS 为 1380，QPS 为 13800。TPS 为 1380 并不高，但 QPS 为 13800 已经比较高了，因此高性能读取是复杂度之一。注意，这里的设计目标设定为峰值的 4 倍是根据业务发展速度来预估的，不是固定为 4 倍，不同的业务可以是 2 倍，也可以是 8 倍，但一般不要设定在 10 倍以上，更不要一上来就按照 100 倍预估。</p>
+</li>
+</ul>
+<p>从软件系统未来的TPS、响应时间、服务器资源利用率等客观指标，也可以从用户的主观感受方面去考虑</p>
+<h2 id="这个消息队列是否需要高可用性"><a href="#这个消息队列是否需要高可用性" class="headerlink" title="这个消息队列是否需要高可用性"></a>这个消息队列是否需要高可用性</h2><p>主要从服务不中断等质量属性，符合行业政策、国家法规等方面去考虑。</p>
+<h2 id="这个消息队列是否需要高可扩展性"><a href="#这个消息队列是否需要高可扩展性" class="headerlink" title="这个消息队列是否需要高可扩展性"></a>这个消息队列是否需要高可扩展性</h2><p>功能:则主要从功能需求的未来变更幅度等方面去考虑。<br>系统:横向扩展</p>
+<h2 id="安全性"><a href="#安全性" class="headerlink" title="安全性"></a>安全性</h2><h2 id="低成本"><a href="#低成本" class="headerlink" title="低成本"></a>低成本</h2><h2 id="规模"><a href="#规模" class="headerlink" title="规模"></a>规模</h2><h1 id="常见系统的性能量级"><a href="#常见系统的性能量级" class="headerlink" title="常见系统的性能量级"></a>常见系统的性能量级</h1><p>对于架构师来说，常见系统的性能量级需要烂熟于心，例如nginx负载均衡性能是3万左右，mc的读取性能5万左右，kafka号称百万级，zookeeper写入读取2万以上，http请求访问大概在2万左右。<br>具体的数值和机器配置以及测试案例有关，但大概的量级不会变化很大。</p>
+<p>如果是业务系统，由于业务复杂度差异很大，有的每秒500请求可能就是高性能了，因此需要针对业务进行性能测试，确立性能基线，方便后续架构设计做比较。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/meituan-cat/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/25/meituan-cat/" itemprop="url">meituan-cat</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-25T09:30:15+08:00">
+                2018-06-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/06/25/meituan-cat/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/06/25/meituan-cat/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/06/25/meituan-cat/" class="leancloud_visitors" data-flag-title="meituan-cat">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="整体设计"><a href="#整体设计" class="headerlink" title="整体设计"></a>整体设计</h1><p>监控整体要求就是快速发现故障、快速定位故障以及辅助进行程序性能优化。为了做到这些，我们对监控系统的一些非功能做了如下的要求：</p>
+<ul>
+<li>实时处理：信息的价值会随时间锐减，尤其是事故处理过程中。</li>
+<li>全量数据：最开始的设计目标就是全量采集，全量的好处有很多。</li>
+<li>高可用：所有应用都倒下了，需要监控还站着，并告诉工程师发生了什么，做到故障还原和问题定位。</li>
+<li>故障容忍：CAT本身故障不应该影响业务正常运转，CAT挂了，应用不该受影响，只是监控能力暂时减弱。</li>
+<li>高吞吐：要想还原真相，需要全方位地监控和度量，必须要有超强的处理吞吐能力。</li>
+<li>可扩展：支持分布式、跨IDC部署，横向扩展的监控系统。</li>
+<li>不保证可靠：允许消息丢失，这是一个很重要的trade-off，目前CAT服务端可以做到4个9的可靠性，可靠系统和不可靠性系统的设计差别非常大。</li>
+</ul>
+<p>CAT从开发至今，一直秉承着简单的架构就是最好的架构原则，主要分为三个模块：CAT-client、CAT-consumer、CAT-home。</p>
+<ul>
+<li>Cat-client 提供给业务以及中间层埋点的底层SDK。</li>
+<li>Cat-consumer 用于实时分析从客户端提供的数据。</li>
+<li>Cat-home 作为用户给用户提供展示的控制端。</li>
+</ul>
+<p>在实际开发和部署中，Cat-consumer和Cat-home是部署在一个JVM内部，每个CAT服务端都可以作为consumer也可以作为home，这样既能减少整个层级结构，也可以增加系统稳定性。</p>
+<p><a href="https://tech.meituan.com/img/cat/overall.png" target="_blank" rel="noopener">https://tech.meituan.com/img/cat/overall.png</a><br><img src="/images/pasted-186.png" alt="upload successful"></p>
+<p>上图是CAT目前多机房的整体结构图，图中可见：</p>
+<ul>
+<li>路由中心是根据应用所在机房信息来决定客户端上报的CAT服务端地址，目前美团有广州、北京、上海三地机房。</li>
+<li>每个机房内部都有独立的原始信息存储集群HDFS。</li>
+<li>CAT-home可以部署在一个机房也可以部署在多个机房，在最后做展示的时候，home会从consumer中进行跨机房的调用，将所有的数据合并展示给用户。</li>
+<li>实际过程中，consumer、home以及路由中心都是部署在一起的，每个服务端节点都可以充当任何一个角色。</li>
+</ul>
+<h1 id="客户端设计"><a href="#客户端设计" class="headerlink" title="客户端设计"></a>客户端设计</h1><p>客户端设计是CAT系统设计中最为核心的一个环节，客户端要求是做到API简单、高可靠性能，无论在任何场景下都不能影响客业务性能，监控只是公司核心业务流程一个旁路环节。CAT核心客户端是Java，也支持Net客户端，近期公司内部也在研发其他多语言客户端。以下客户端设计及细节均以Java客户端为模板。</p>
+<h2 id="设计架构"><a href="#设计架构" class="headerlink" title="设计架构"></a>设计架构</h2><p>CAT客户端在收集端数据方面使用ThreadLocal（线程局部变量），是线程本地变量，也可以称之为线程本地存储。其实ThreadLocal的功用非常简单，就是为每一个使用该变量的线程都提供一个变量值的副本，属于Java中一种较为特殊的线程绑定机制，每一个线程都可以独立地改变自己的副本，不会和其它线程的副本冲突。</p>
+<p>在监控场景下，为用户提供服务都是Web容器，比如tomcat或者Jetty，后端的RPC服务端比如Dubbo或者Pigeon，也都是基于线程池来实现的。业务方在处理业务逻辑时基本都是在一个线程内部调用后端服务、数据库、缓存等，将这些数据拿回来再进行业务逻辑封装，最后将结果展示给用户。所以将所有的监控请求作为一个监控上下文存入线程变量就非常合适。</p>
+<p><a href="https://tech.meituan.com/img/cat/client01.png" target="_blank" rel="noopener">https://tech.meituan.com/img/cat/client01.png</a><br><img src="/images/pasted-187.png" alt="upload successful"></p>
+<p>如上图所示，业务执行业务逻辑的时候，就会把此次请求对应的监控存放于线程上下文中，存于上下文的其实是一个监控树的结构。在最后业务线程执行结束时，将监控对象存入一个异步内存队列中，CAT有个消费线程将队列内的数据异步发送到服务端。</p>
+<h2 id="API设计"><a href="#API设计" class="headerlink" title="API设计"></a>API设计</h2><p>监控API定义往往取决于对监控或者性能分析这个领域的理解，监控和性能分析所针对的场景有如下几种：</p>
+<p>一段代码的执行时间，一段代码可以是URL执行耗时，也可以是SQL的执行耗时。<br>一段代码的执行次数，比如Java抛出异常记录次数，或者一段逻辑的执行次数。<br>定期执行某段代码，比如定期上报一些核心指标：JVM内存、GC等指标。<br>关键的业务监控指标，比如监控订单数、交易额、支付成功率等。<br>在上述领域模型的基础上，CAT设计自己核心的几个监控对象：Transaction、Event、Heartbeat、Metric。</p>
+<p><a href="https://tech.meituan.com/img/cat/client02.png" target="_blank" rel="noopener">https://tech.meituan.com/img/cat/client02.png</a><br><img src="/images/pasted-188.png" alt="upload successful"></p>
+<h2 id="序列化和通信"><a href="#序列化和通信" class="headerlink" title="序列化和通信"></a>序列化和通信</h2><p>序列化和通信是整个客户端包括服务端性能里面很关键的一个环节。</p>
+<p>CAT序列化协议是自定义序列化协议，自定义序列化协议相比通用序列化协议要高效很多，这个在大规模数据实时处理场景下还是非常有必要的。<br>CAT通信是基于Netty来实现的NIO的数据传输，Netty是一个非常好的NIO开发框架，在这边就不详细介绍了。</p>
+<h2 id="客户端埋点"><a href="#客户端埋点" class="headerlink" title="客户端埋点"></a>客户端埋点</h2><p>日志埋点是监控活动的最重要环节之一，日志质量决定着监控质量和效率。当前CAT的埋点目标是以问题为中心，像程序抛出exception就是典型问题。我个人对问题的定义是：不符合预期的就可以算问题，比如请求未完成、响应时间快了慢了、请求TPS多了少了、时间分布不均匀等等。</p>
+<p>在互联网环境中，最突出的问题场景，突出的理解是：跨越边界的行为。包括但不限于：</p>
+<ul>
+<li>HTTP/REST、RPC/SOA、MQ、Job、Cache、DAL;</li>
+<li>搜索/查询引擎、业务应用、外包系统、遗留系统;</li>
+<li>第三方网关/银行, 合作伙伴/供应商之间；</li>
+<li>各类业务指标，如用户登录、订单数、支付状态、销售额。</li>
+</ul>
+<h2 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h2><p>通常Java客户端在业务上使用容易出问题的地方就是内存，另外一个是CPU。内存往往是内存泄露，占用内存较多导致业务方GC压力增大； CPU开销最终就是看代码的性能。</p>
+<p>以前我们遇到过一个极端的例子，我们一个业务请求做餐饮加商铺的销售额，业务一般会通过for循环所有商铺的分店，结果就造成内存OOM了，后来发现这家店是肯德基，有几万分店，每个循环里面都会有数据库连接。在正常场景下，ThreadLocal内部的监控一个对象就存在几万个节点，导致业务Oldgc特别严重。所以说框架的代码是不能想象业务方会怎么用你的代码，需要考虑到任何情况下都有出问题的可能。</p>
+<p>在消耗CPU方面我们也遇到一个case：在某个客户端版本，CAT本地存储当前消息ID自增的大小，客户端使用了MappedByteBuffer这个类，这个类是一个文件内存映射，测试下来这个类的性能非常高，我们仅仅用这个存储了几个字节的对象，正常情况理论上不会有任何问题。在一次线上场景下，很多业务线程都block在这个上面，结果发现当本身这台机器IO存在瓶颈时候，这个也会变得很慢。后来的优化就是把这个IO的操作异步化，所以客户端需要尽可能异步化，异步化序列化、异步化传输、异步化任何可能存在时间延迟的代码操作。</p>
+<h1 id="服务端设计"><a href="#服务端设计" class="headerlink" title="服务端设计"></a>服务端设计</h1><p>服务端主要的问题是大数据的实时处理，目前后端CAT的计算集群大约35台物理机，存储集群大约35台物理机，每天处理了约100TB的数据量。线上单台机器高峰期大约是110MB/s，接近千兆网打满。</p>
+<p>下面我重点讲下CAT服务端一些设计细节。</p>
+<h2 id="架构设计"><a href="#架构设计" class="headerlink" title="架构设计"></a>架构设计</h2><p>在最初的整体介绍中已经画了架构图，这边介绍下单机的consumer中大概的结构如下：</p>
+<p><a href="https://tech.meituan.com/img/cat/server01.png" target="_blank" rel="noopener">https://tech.meituan.com/img/cat/server01.png</a><br><img src="/images/pasted-189.png" alt="upload successful"></p>
+<p>如上图，CAT服务端在整个实时处理中，基本上实现了全异步化处理。</p>
+<ul>
+<li>消息接受是基于Netty的NIO实现。</li>
+<li>消息接受到服务端就存放内存队列，然后程序开启一个线程会消费这个消息做消息分发。</li>
+<li>每个消息都会有一批线程并发消费各自队列的数据，以做到消息处理的隔离。</li>
+<li>消息存储是先存入本地磁盘，然后异步上传到HDFS文件，这也避免了强依赖HDFS。</li>
+</ul>
+<p>当某个报表处理器处理来不及时候，比如Transaction报表处理比较慢，可以通过配置支持开启多个Transaction处理线程，并发消费消息。</p>
+<h2 id="性能分析报表"><a href="#性能分析报表" class="headerlink" title="性能分析报表"></a>性能分析报表</h2><p><a href="https://tech.meituan.com/img/cat/server03.png" target="_blank" rel="noopener">https://tech.meituan.com/img/cat/server03.png</a><br><img src="/images/pasted-190.png" alt="upload successful"></p>
+<h2 id="故障发现报表"><a href="#故障发现报表" class="headerlink" title="故障发现报表"></a>故障发现报表</h2><p>实时业务指标监控 ：核心业务都会定义自己的业务指标，这不需要太多，主要用于24小时值班监控，实时发现业务指标问题，图中一个是当前的实际值，一个是基准值，就是根据历史趋势计算的预测值。如下图就是当时的情景，能直观看到支付业务出问题的故障。<br><a href="https://tech.meituan.com/img/cat/server04.png" target="_blank" rel="noopener">https://tech.meituan.com/img/cat/server04.png</a><br><img src="/images/pasted-192.png" alt="upload successful"></p>
+<ul>
+<li>系统报错大盘。</li>
+<li>实时数据库大盘、服务大盘、缓存大盘等。</li>
+</ul>
+<h2 id="存储设计"><a href="#存储设计" class="headerlink" title="存储设计"></a>存储设计</h2><p>CAT系统的存储主要有两块：</p>
+<ul>
+<li>CAT的报表的存储。</li>
+<li>CAT原始logview的存储。<br>报表是根据logview实时运算出来的给业务分析用的报表，默认报表有小时模式、天模式、周模式以及月模式。CAT实时处理报表都是产生小时级别统计，小时级报表中会带有最低分钟级别粒度的统计。天、周、月等报表都是在小时级别报表合并的结果报表。</li>
+</ul>
+<p>原始logview存储一天大约100TB的数据量，因为数据量比较大所以存储必须要要压缩，本身原始logview需要根据Message-ID读取，所以存储整体要求就是批量压缩以及随机读。在当时场景下，并没有特别合适成熟的系统以支持这样的特性，所以我们开发了一种基于文件的存储以支持CAT的场景，在存储上一直是最难的问题，我们一直在这块持续的改进和优化。</p>
+<h2 id="消息ID的设计"><a href="#消息ID的设计" class="headerlink" title="消息ID的设计"></a>消息ID的设计</h2><p>CAT每个消息都有一个唯一的ID，这个ID在客户端生成，后续都通过这个ID在进行消息内容的查找。典型的RPC消息串起来的问题，比如A调用B的时候，在A这端生成一个Message-ID，在A调用B的过程中，将Message-ID作为调用传递到B端，在B执行过程中，B用context传递的Message-ID作为当前监控消息的Message-ID。</p>
+<p>CAT消息的Message-ID格式ShopWeb-0a010680-375030-2，CAT消息一共分为四段：</p>
+<ul>
+<li>第一段是应用名shop-web。</li>
+<li>第二段是当前这台机器的IP的16进制格式，01010680表示10.1.6.108。</li>
+<li>第三段的375030，是系统当前时间除以小时得到的整点数。</li>
+<li>第四段的2，是表示当前这个客户端在当前小时的顺序递增号。</li>
+</ul>
+<h2 id="存储数据的设计"><a href="#存储数据的设计" class="headerlink" title="存储数据的设计"></a>存储数据的设计</h2><p>消息存储是CAT最有挑战的部分。关键问题是消息数量多且大，目前美团每天处理消息1000亿左右，大小大约100TB，单物理机高峰期每秒要处理100MB左右的流量。CAT服务端基于此流量做实时计算，还需要将这些数据压缩后写入磁盘。<br><a href="https://tech.meituan.com/img/cat/server05.png" target="_blank" rel="noopener">https://tech.meituan.com/img/cat/server05.png</a><br><img src="/images/pasted-191.png" alt="upload successful"></p>
+<p>CAT在写数据一份是Index文件，一份是Data文件.</p>
+<ul>
+<li>Data文件是分段GZIP压缩，每个分段大小小于64K，这样可以用16bits可以表示一个最大分段地址。</li>
+<li>一个Message-ID都用需要48bits的大小来存索引，索引根据Message-ID的第四段来确定索引的位置，比如消息Message-ID为ShopWeb-0a010680-375030-2，这条消息ID对应的索引位置为2*48bits的位置。</li>
+<li>48bits前面32bits存数据文件的块偏移地址，后面16bits存数据文件解压之后的块内地址偏移。</li>
+<li>CAT读取消息的时候，首先根据Message-ID的前面三段确定唯一的索引文件，在根据Message-ID第四段确定此Message-ID索引位置，根据索引文件的48bits读取数据文件的内容，然后将数据文件进行GZIP解压，在根据块内便宜地址读取出真正的消息内容。</li>
+</ul>
+<h2 id="服务端设计总结"><a href="#服务端设计总结" class="headerlink" title="服务端设计总结"></a>服务端设计总结</h2><p>CAT在分布式实时方面，主要归结于以下几点因素：</p>
+<ul>
+<li>去中心化，数据分区处理。</li>
+<li>基于日志只读特性，以一个小时为时间窗口，实时报表基于内存建模和分析，历史报表通过聚合完成。</li>
+<li>基于内存队列，全面异步化、单线程化、无锁设计。</li>
+<li>全局消息ID，数据本地化生产，集中式存储。</li>
+<li>组件化、服务化理念。</li>
+</ul>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://tech.meituan.com/CAT_in_Depth_Java_Application_Monitoring.html" target="_blank" rel="noopener">https://tech.meituan.com/CAT_in_Depth_Java_Application_Monitoring.html</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/24/redis-bitmap/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/24/redis-bitmap/" itemprop="url">redis-bitmap</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-24T17:56:10+08:00">
+                2018-06-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/06/24/redis-bitmap/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/06/24/redis-bitmap/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/06/24/redis-bitmap/" class="leancloud_visitors" data-flag-title="redis-bitmap">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="bitMap概念"><a href="#bitMap概念" class="headerlink" title="bitMap概念"></a>bitMap概念</h1><p>位图不是一个真实的数据类型，而是定义在字符串类型上的面向位的操作的集合。由于字符串类型是二进制安全的二进制大对象，并且最大长度是 512MB，适合于设置 2^32个不同的位。<br>位操作分为两组：常量时间单个位的操作，像设置一个位为 1 或者 0，或者获取该位的值。对一组位的操作，例如计算指定范围位的置位数量。<br>位图的最大优势是有时是一种非常显著的节省空间来存储信息的方式。例如，在一个系统中，不同用户由递增的用户 ID 来表示，可以使用 512MB 的内存来表示 400 万用户的单个位信息（例如他们是否需要接收信件）。 </p>
+<p>简而言之，位图操作是用来操作比特位的，其优点是节省内存空间。为什么可以节省内存空间呢？假如我们需要存储100万个用户的登录状态，使用位图的话最少只需要100万个比特位（比特位1表示登录，比特位0表示未登录）就可以存储了，而如果以字符串的形式存储，比如说以userId为key，是否登录（字符串“1”表示登录，字符串“0”表示未登录）为value进行存储的话，就需要存储100万个字符串了，相比之下使用位图存储占用的空间要小得多，这就是位图存储的优势。</p>
+<h1 id="redis命令"><a href="#redis命令" class="headerlink" title="redis命令"></a>redis命令</h1><p>位图的常用操作如下：</p>
+<ul>
+<li>setbit 设置特定key对应的比特位的值。</li>
+<li>getbit获取特定key对应的比特位的值。</li>
+<li>bitcount统计给定key对应的字符串比特位为1的数量。</li>
+<li>bitof 对一个或多个保存二进制位的字符串 key 进行位元操作，并将结果保存到 destkey 上。</li>
+<li>bitfield 命令可以将一个 Redis 字符串看作是一个由二进制位组成的数组， 并对这个数组中储存的长度不同的整数进行访问 （被储存的整数无需进行对齐）。 换句话说， 通过这个命令， 用户可以执行诸如 “对偏移量 1234 上的 5 位长有符号整数进行设置”、 “获取偏移量 4567 上的 31 位长无符号整数”等操作。 此外， BITFIELD 命令还可以对指定的整数执行加法操作和减法操作， 并且这些操作可以通过设置妥善地处理计算时出现的溢出情况。</li>
+</ul>
+<h1 id="使用案例"><a href="#使用案例" class="headerlink" title="使用案例"></a>使用案例</h1><p>位图的常见应用是用来存储状态值，比如存储用户的登录状态。</p>
+<h1 id="官方文档"><a href="#官方文档" class="headerlink" title="官方文档"></a>官方文档</h1><p><a href="http://redisdoc.com/string/getbit.html" target="_blank" rel="noopener">http://redisdoc.com/string/getbit.html</a></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/22/java/java_common/java-finalize/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/22/java/java_common/java-finalize/" itemprop="url">java-finalize</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-22T17:49:39+08:00">
+                2018-06-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/06/22/java/java_common/java-finalize/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/06/22/java/java_common/java-finalize/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/06/22/java/java_common/java-finalize/" class="leancloud_visitors" data-flag-title="java-finalize">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="内部过程"><a href="#内部过程" class="headerlink" title="内部过程"></a>内部过程</h1><p>如果类重写了finalize方法，且方法体不为空，则调用register_finalizer函数，继续看register_finalizer函数的实现<br>其中Universe::finalizer_register_method()缓存的是jdk中java.lang.ref.Finalizer类的register方法<br>在jvm中通过JavaCalls::call触发register方法，将新建的对象O封装成一个Finalizer对象，并通过add方法添加到Finalizer链表头。</p>
+<ul>
+<li>对象O和Finalizer类的静态变量unfinalized有联系，在发生GC时，会被判定为活跃对象，因此不会被回收</li>
+</ul>
+<h2 id="FinalizerThread线程"><a href="#FinalizerThread线程" class="headerlink" title="FinalizerThread线程"></a>FinalizerThread线程</h2><ul>
+<li>在Finalizer类的静态代码块中会创建一个FinalizerThread类型的守护线程，但是这个线程的优先级比较低，意味着在cpu吃紧的时候可能会抢占不到资源执行。</li>
+<li>FinalizerThread线程负责从ReferenceQueue队列中获取Finalizer对象，如果队列中没有元素，则通过wait方法将该线程挂起，等待被唤醒</li>
+<li>如果返回了Finalizer对象，执行对象的runFinalizer()方法，其实可以发现：在runFinalizer()方法中主动捕获了异常，即使在执行finalize方法抛出异常时，也没有关系。</li>
+</ul>
+<h2 id="ReferenceHandler线程"><a href="#ReferenceHandler线程" class="headerlink" title="ReferenceHandler线程"></a>ReferenceHandler线程</h2><p>既然FinalizerThread线程是从ReferenceQueue队列中获取Finalizer对象，那么Finalizer对象是在什么情况下才会被插入到ReferenceQueue队列中？</p>
+<ul>
+<li>Finalizer的祖父类Reference中定义了ReferenceHandler线程</li>
+<li>当pending被设置时，会调用ReferenceQueue的enqueue方法把Finalizer对象插入到ReferenceQueue队列中，接着通过notifyAll方法唤醒FinalizerThread线程执行后续逻辑</li>
+<li>在GC过程的引用处理阶段，通过oopDesc::atomic_exchange_oop方法把发现的引用列表设置在pending字段所在的地址</li>
+</ul>
+<h2 id="重写Finalize方法-可能导致的内存泄漏-不能及时的回收掉-依赖于FinalizerThread线程的处理速度"><a href="#重写Finalize方法-可能导致的内存泄漏-不能及时的回收掉-依赖于FinalizerThread线程的处理速度" class="headerlink" title="重写Finalize方法,可能导致的内存泄漏(不能及时的回收掉,依赖于FinalizerThread线程的处理速度)"></a>重写Finalize方法,可能导致的内存泄漏(不能及时的回收掉,依赖于FinalizerThread线程的处理速度)</h2><p>平常使用的Socket通信，SocksSocketImpl的父类重写了finalize方法<br>这么做主要是为了确保在用户忘记手动关闭socket连接的情况下，在该对象被回收时能够自动关闭socket来释放一些资源，但是在开发过程中，真的忘记手动调用了close方法，那么这些socket对象可能会因为FinalizeThread线程迟迟没有执行到这些对象的finalize方法，而导致一直占用某些资源，造成内存泄露。</p>
+<h2 id="没有执行GC也就是无法执行到finalize方法了。"><a href="#没有执行GC也就是无法执行到finalize方法了。" class="headerlink" title="没有执行GC也就是无法执行到finalize方法了。"></a>没有执行GC也就是无法执行到finalize方法了。</h2><h1 id="对象销毁过程状态图"><a href="#对象销毁过程状态图" class="headerlink" title="对象销毁过程状态图"></a>对象销毁过程状态图</h1><p><img src="/images/pasted-184.png" alt="upload successful"></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://www.jianshu.com/p/9d2788fffd5f" target="_blank" rel="noopener">https://www.jianshu.com/p/9d2788fffd5f</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/21/安全/access-token的生成策略/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/21/安全/access-token的生成策略/" itemprop="url">access-token的生成策略</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-21T17:29:42+08:00">
                 2018-06-21
               </time>
             
@@ -376,9 +1542,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/06/21/sutdy-tdd/#comments" itemprop="discussionUrl">
+                <a href="/2018/06/21/安全/access-token的生成策略/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/06/21/sutdy-tdd/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/06/21/安全/access-token的生成策略/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -386,7 +1552,7 @@
 
           
           
-             <span id="/2018/06/21/sutdy-tdd/" class="leancloud_visitors" data-flag-title="java测试驱动开发-读书笔记">
+             <span id="/2018/06/21/安全/access-token的生成策略/" class="leancloud_visitors" data-flag-title="access-token的生成策略">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -419,53 +1585,22 @@
       
         
           
-            <h1 id="代码地址"><a href="#代码地址" class="headerlink" title="代码地址:"></a>代码地址:</h1><p><a href="https://bitbucket.org/vfarcic/" target="_blank" rel="noopener">https://bitbucket.org/vfarcic/</a></p>
-<h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><p>TDD 有广义和狭义之分，常说的是狭义的 TDD，也就是 UTDD（Unit Test Driven Development）。广义的 TDD 是 ATDD（Acceptance Test Driven Development），包括 BDD（Behavior Driven Development）和 Consumer-Driven Contracts Development 等。<br>本文所说的 TDD 指狭义上的 TDD，也就是「单元测试驱动开发」。</p>
-<h1 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h1><h2 id="传统编码方式"><a href="#传统编码方式" class="headerlink" title="传统编码方式"></a>传统编码方式</h2><ul>
-<li>需求分析，想不清楚细节，管他呢，先开始写</li>
-<li>发现需求细节不明确，去跟业务人员确认</li>
-<li>确认好几次终于写完所有逻辑</li>
-<li>运行起来测试一下，靠，果然不工作，调试</li>
-<li>调试好久终于工作了</li>
-<li>转测试，QA 测出 bug，debug， 打补丁</li>
-<li>终于，代码可以工作了</li>
-<li>一看代码烂的像坨屎，不敢动，动了还得手工测试，还得让 QA 测试，还得加班…</li>
-</ul>
-<h2 id="TDD-编码方式"><a href="#TDD-编码方式" class="headerlink" title="TDD 编码方式"></a>TDD 编码方式</h2><ul>
-<li>先分解任务，分离关注点（后面有演示）</li>
-<li>列 Example，用实例化需求，澄清需求细节</li>
-<li>写测试，只关注需求，程序的输入输出，不关心中间过程</li>
-<li>写实现，不考虑别的需求，用最简单的方式满足当前这个小需求即可</li>
-<li>重构，用手法消除代码里的坏味道</li>
-<li>写完，手动测试一下，基本没什么问题，有问题补个用例，修复</li>
-<li>转测试，小问题，补用例，修复</li>
-<li>代码整洁且用例齐全，信心满满地提交</li>
-</ul>
-<h1 id="基本流程"><a href="#基本流程" class="headerlink" title="基本流程"></a>基本流程</h1><p>TDD 的基本流程是：红，绿，重构。<br>更详细的流程是：</p>
-<ul>
-<li>写一个测试用例</li>
-<li>运行测试</li>
-<li>写刚好能让测试通过的实现</li>
-<li>运行测试</li>
-<li>识别坏味道，用手法修改代码</li>
-<li>运行测试</li>
-</ul>
-<h1 id="为什么很多人做-TDD-都做不起来？"><a href="#为什么很多人做-TDD-都做不起来？" class="headerlink" title="为什么很多人做 TDD 都做不起来？"></a>为什么很多人做 TDD 都做不起来？</h1><h2 id="不会合理拆分任务"><a href="#不会合理拆分任务" class="headerlink" title="不会合理拆分任务"></a>不会合理拆分任务</h2><p>TDD 之前要拆分任务，把一个大需求拆成多个小需求。<br>也可以拆出多个函数来。</p>
-<h2 id="不会写测试"><a href="#不会写测试" class="headerlink" title="不会写测试"></a>不会写测试</h2><p>什么是有效的单元测试，有很多人写测试，连到底在测什么都不清楚，也可能连断言都没有，通过控制台输出，肉眼对比来验证。<br>好的单元测试应该符合几条原则：</p>
-<ul>
-<li>简单，只测试一个需求</li>
-<li>符合 Given-When-Then 格式</li>
-<li>速度快</li>
-<li>包含断言</li>
-<li>可以重复执行</li>
-</ul>
-<h2 id="不会写刚好的实现"><a href="#不会写刚好的实现" class="headerlink" title="不会写刚好的实现"></a>不会写刚好的实现</h2><p>很多人写实现的时候无法专注当前需求，一不小心就把其他需求也实现了，就破坏了节奏感。<br>实现的时候不会小步快走。</p>
-<h2 id="不会重构"><a href="#不会重构" class="headerlink" title="不会重构"></a>不会重构</h2><p>不懂什么是 Clean Code，看不出 Smell，没有及时重构，等想要重构时已经难以下手了。<br>不知道用合适的「手法」消除 Smell。</p>
-<h2 id="基础设施"><a href="#基础设施" class="headerlink" title="基础设施"></a>基础设施</h2><p>对于特定技术栈，没有把单元测试基础设施搭建好，导致写测试时无法专注在测试用例上。</p>
-<h1 id="单元测试-模拟"><a href="#单元测试-模拟" class="headerlink" title="单元测试+模拟"></a>单元测试+模拟</h1><h2 id="第四章-什么事单元测试"><a href="#第四章-什么事单元测试" class="headerlink" title="第四章 什么事单元测试"></a>第四章 什么事单元测试</h2><h2 id="第五章-难以测试-代表设计不佳"><a href="#第五章-难以测试-代表设计不佳" class="headerlink" title="第五章 难以测试,代表设计不佳"></a>第五章 难以测试,代表设计不佳</h2><h2 id="第六章-模拟-消除外部依赖"><a href="#第六章-模拟-消除外部依赖" class="headerlink" title="第六章 模拟 消除外部依赖"></a>第六章 模拟 消除外部依赖</h2><p>测试使用调用了依赖的对象的某个方法</p>
-<h1 id="集成测试-行为驱动测试-vargant"><a href="#集成测试-行为驱动测试-vargant" class="headerlink" title="集成测试(行为驱动测试)+vargant"></a>集成测试(行为驱动测试)+vargant</h1><p>JBhave</p>
-<h1 id="相关讨论"><a href="#相关讨论" class="headerlink" title="相关讨论"></a>相关讨论</h1><p><a href="https://www.zhihu.com/question/27081528" target="_blank" rel="noopener">https://www.zhihu.com/question/27081528</a></p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://www.jianshu.com/p/62f16cd4fef3" target="_blank" rel="noopener">https://www.jianshu.com/p/62f16cd4fef3</a></p>
+            <h1 id="oauth2-0规范中的access-token"><a href="#oauth2-0规范中的access-token" class="headerlink" title="oauth2.0规范中的access token"></a>oauth2.0规范中的access token</h1><p><a href="https://tools.ietf.org/html/rfc6749" target="_blank" rel="noopener">https://tools.ietf.org/html/rfc6749</a></p>
+<p>oauth2.0规范并没有定义如何access-token的格式及含义,对此业界对access_token的处理也截然不同</p>
+<h2 id="策略1-共享db的方式"><a href="#策略1-共享db的方式" class="headerlink" title="策略1:共享db的方式"></a>策略1:共享db的方式</h2><p><a href="https://ruby-china.org/topics/15396" target="_blank" rel="noopener">https://ruby-china.org/topics/15396</a></p>
+<p>问题:</p>
+<p>Authorization Server (AS)这边是如何生成access token (AT) 的， 还有就是 Resource Server (RS) 这边如何去验证 请求里面的AT是正确的？(前提是验证的时候 RS 和 AS 没有交互~~~) 谢谢 ！！！</p>
+<p>答案:</p>
+<p>用 SecureRandom.hex 之类的东西产生就行了，重点是 client 如何取得这个 Token 。另外，验证 token 的时候， Resource Server 和 Authorization Server 之间本来就没有交互，只是存取同一个数据库而已。</p>
+<h2 id="策略2-jwt自包含信息-rs需要通过公钥校验jwt"><a href="#策略2-jwt自包含信息-rs需要通过公钥校验jwt" class="headerlink" title="策略2: jwt自包含信息,rs需要通过公钥校验jwt"></a>策略2: jwt自包含信息,rs需要通过公钥校验jwt</h2><h2 id="策略3-rs通过rest接口访问op的-tokeninspection接口-获取代表的信息"><a href="#策略3-rs通过rest接口访问op的-tokeninspection接口-获取代表的信息" class="headerlink" title="策略3:rs通过rest接口访问op的 tokeninspection接口,获取代表的信息"></a>策略3:rs通过rest接口访问op的 tokeninspection接口,获取代表的信息</h2><p><a href="https://tools.ietf.org/html/rfc7662" target="_blank" rel="noopener">https://tools.ietf.org/html/rfc7662</a></p>
+<h3 id="Google-way"><a href="#Google-way" class="headerlink" title="Google way"></a>Google way</h3><p>Google Oauth2 Token Validation<br><a href="https://developers.google.com/accounts/docs/OAuth2UserAgent#validatetoken" target="_blank" rel="noopener">https://developers.google.com/accounts/docs/OAuth2UserAgent#validatetoken</a></p>
+<p>Request:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=1/fFBGRNJru1FQd44AzqT3Zg</span><br></pre></td></tr></table></figure></p>
+<p>Respond:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;audience&quot;:&quot;8819981768.apps.googleusercontent.com&quot;,</span><br><span class="line">  &quot;user_id&quot;:&quot;123456789&quot;,</span><br><span class="line">  &quot;scope&quot;:&quot;https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email&quot;,</span><br><span class="line">  &quot;expires_in&quot;:436</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="Github-way"><a href="#Github-way" class="headerlink" title="Github way"></a>Github way</h3><p>Respond:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;id&quot;: 1,</span><br><span class="line">  &quot;url&quot;: &quot;https://api.github.com/authorizations/1&quot;,</span><br><span class="line">  &quot;scopes&quot;: [</span><br><span class="line">    &quot;public_repo&quot;</span><br><span class="line">  ],</span><br><span class="line">  &quot;token&quot;: &quot;abc123&quot;,</span><br><span class="line">  &quot;app&quot;: &#123;</span><br><span class="line">    &quot;url&quot;: &quot;http://my-github-app.com&quot;,</span><br><span class="line">    &quot;name&quot;: &quot;my github app&quot;,</span><br><span class="line">    &quot;client_id&quot;: &quot;abcde12345fghij67890&quot;</span><br><span class="line">  &#125;,</span><br><span class="line">  &quot;note&quot;: &quot;optional note&quot;,</span><br><span class="line">  &quot;note_url&quot;: &quot;http://optional/note/url&quot;,</span><br><span class="line">  &quot;updated_at&quot;: &quot;2011-09-06T20:39:23Z&quot;,</span><br><span class="line">  &quot;created_at&quot;: &quot;2011-09-06T17:26:27Z&quot;,</span><br><span class="line">  &quot;user&quot;: &#123;</span><br><span class="line">    &quot;login&quot;: &quot;octocat&quot;,</span><br><span class="line">    &quot;id&quot;: 1,</span><br><span class="line">    &quot;avatar_url&quot;: &quot;https://github.com/images/error/octocat_happy.gif&quot;,</span><br><span class="line">    &quot;gravatar_id&quot;: &quot;somehexcode&quot;,</span><br><span class="line">    &quot;url&quot;: &quot;https://api.github.com/users/octocat&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Amazon-way"><a href="#Amazon-way" class="headerlink" title="Amazon way"></a>Amazon way</h3><p>Request :<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://api.amazon.com/auth/O2/tokeninfo?access_token=Atza|IQEBLjAsAhRmHjNgHpi0U-Dme37rR6CuUpSR...</span><br></pre></td></tr></table></figure></p>
+<p>Response :<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">HTTP/l.l 200 OK</span><br><span class="line">Date: Fri, 3l May 20l3 23:22:l0 GMT </span><br><span class="line">x-amzn-RequestId: eb5be423-ca48-lle2-84ad-5775f45l4b09 </span><br><span class="line">Content-Type: application/json </span><br><span class="line">Content-Length: 247 </span><br><span class="line"></span><br><span class="line">&#123; </span><br><span class="line">  &quot;iss&quot;:&quot;https://www.amazon.com&quot;, </span><br><span class="line">  &quot;user_id&quot;: &quot;amznl.account.K2LI23KL2LK2&quot;, </span><br><span class="line">  &quot;aud&quot;: &quot;amznl.oa2-client.ASFWDFBRN&quot;, </span><br><span class="line">  &quot;app_id&quot;: &quot;amznl.application.436457DFHDH&quot;, </span><br><span class="line">  &quot;exp&quot;: 3597, </span><br><span class="line">  &quot;iat&quot;: l3ll280970</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><a href="https://stackoverflow.com/questions/12296017/how-to-validate-an-oauth-2-0-access-token-for-a-resource-server?utm_medium=organic&amp;utm_source=google_rich_qa&amp;utm_campaign=google_rich_qa" target="_blank" rel="noopener">https://stackoverflow.com/questions/12296017/how-to-validate-an-oauth-2-0-access-token-for-a-resource-server?utm_medium=organic&amp;utm_source=google_rich_qa&amp;utm_campaign=google_rich_qa</a></p>
 
           
         
@@ -514,7 +1649,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/21/mid-attack/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/21/geek-time-reactor-proactor/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
@@ -533,7 +1668,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/06/21/mid-attack/" itemprop="url">https中间人攻击</a></h1>
+                <a class="post-title-link" href="/2018/06/21/geek-time-reactor-proactor/" itemprop="url">极客时间reactor-preactor学习笔记</a></h1>
         
 
         <div class="post-meta">
@@ -545,7 +1680,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-21T09:57:59+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-21T10:29:59+08:00">
                 2018-06-21
               </time>
             
@@ -564,9 +1699,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/06/21/mid-attack/#comments" itemprop="discussionUrl">
+                <a href="/2018/06/21/geek-time-reactor-proactor/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/06/21/mid-attack/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/06/21/geek-time-reactor-proactor/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -574,7 +1709,7 @@
 
           
           
-             <span id="/2018/06/21/mid-attack/" class="leancloud_visitors" data-flag-title="https中间人攻击">
+             <span id="/2018/06/21/geek-time-reactor-proactor/" class="leancloud_visitors" data-flag-title="极客时间reactor-preactor学习笔记">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -607,24 +1742,54 @@
       
         
           
-            <h1 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h1><p>假设爱丽丝（Alice）希望与鲍伯（Bob）通信。同时，马洛里（Mallory）希望拦截窃会话以进行窃听并可能在某些时候传送给鲍伯一个虚假的消息。</p>
-<p>首先，爱丽丝会向鲍勃索取他的公钥。如果Bob将他的公钥发送给Alice，并且此时马洛里能够拦截到这个公钥，就可以实施中间人攻击。马洛里发送给爱丽丝一个伪造的消息，声称自己是鲍伯，并且附上了马洛里自己的公钥（而不是鲍伯的）。</p>
-<p>爱丽丝收到公钥后相信这个公钥是鲍伯的，于是爱丽丝将她的消息用马洛里的公钥（爱丽丝以为是鲍伯的）加密，并将加密后的消息回给鲍伯。马洛里再次截获爱丽丝回给鲍伯的消息，并使用马洛里自己的私钥对消息进行解密，如果马洛里愿意，她也可以对消息进行修改，然后马洛里使用鲍伯原先发给爱丽丝的公钥对消息再次加密。当鲍伯收到新加密后的消息时，他会相信这是从爱丽丝那里发来的消息。</p>
-<p>1.爱丽丝发送给鲍伯一条消息，却被马洛里截获：</p>
-<p>爱丽丝“嗨，鲍勃，我是爱丽丝。给我你的公钥” –&gt; 马洛里 鲍勃</p>
-<p>2.马洛里将这条截获的消息转送给鲍伯；此时鲍伯并无法分辨这条消息是否从真的爱丽丝那里发来的：</p>
-<p>爱丽丝 马洛里“嗨，鲍勃，我是爱丽丝。给我你的公钥” –&gt; 鲍伯</p>
-<p>3.鲍伯回应爱丽丝的消息，并附上了他的公钥：</p>
-<p>爱丽丝 马洛里&lt;– [鲍伯的公钥]– 鲍伯</p>
-<p>4.马洛里用自己的密钥<em>替换</em>了消息中鲍伯的密钥，并将消息转发给爱丽丝，声称这是鲍伯的公钥：</p>
-<p>爱丽丝&lt;– [马洛里的公钥]– 马洛里 鲍勃</p>
-<p>5.爱丽丝用她以为是鲍伯的公钥加密了她的消息，以为只有鲍伯才能读到它：</p>
-<p>爱丽丝“我们在公共汽车站见面！”–[使用马洛里的公钥加密] –&gt; 马洛里 鲍勃</p>
-<p>6.然而，由于这个消息实际上是用马洛里的密钥加密的，所以马洛里可以解密它，阅读它，并在愿意的时候修改它。他使用鲍伯的密钥重新加密，并将重新加密后的消息转发给鲍伯：</p>
-<p>爱丽丝 马洛里“在家等我！”–[使用鲍伯的公钥加密] –&gt; 鲍伯</p>
-<p>7.鲍勃认为，这条消息是经由安全的传输通道从爱丽丝那里传来的。</p>
-<p>这个例子显示了爱丽丝和鲍伯需要某种方法来确定他们是真正拿到了属于对方的公钥，而不是拿到来自攻击者的公钥。否则，这类攻击一般都是可行的，在原理上，可以针对任何使用公钥——密钥技术的通讯消息发起攻击。幸运的是，有各种不同的技术可以帮助抵御MITM攻击。</p>
-<h1 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h1><p>无法替换 ,通过证书签名的方式,使得bob的信息无法被伪造(当然如果CA给Mallory也颁发了证书,那么还是没用的)</p>
+            <h1 id="单服务器高性能架构模式：Reactor-和-Proactor"><a href="#单服务器高性能架构模式：Reactor-和-Proactor" class="headerlink" title="单服务器高性能架构模式：Reactor 和 Proactor"></a>单服务器高性能架构模式：Reactor 和 Proactor</h1><h2 id="Reactor"><a href="#Reactor" class="headerlink" title="Reactor"></a>Reactor</h2><ul>
+<li>当一个连接一个进程时，进程可以采用“read -&gt; 业务处理 -&gt; write”的处理流程，如果当前连接没有数据可以读，则进程就阻塞在 read 操作上。</li>
+<li>如果一个进程处理多个连接，进程阻塞在某个连接的 read 操作上，此时即使其他连接有数据可读，进程也无法去处理，很显然这样是无法做到高性能的。</li>
+<li>解决这个问题的最简单的方式是将 read 操作改为非阻塞，然后进程不断地轮询多个连接。这种方式能够解决阻塞的问题，但解决的方式并不优雅。首先，轮询是要消耗 CPU 的；其次，如果一个进程处理几千上万的连接，则轮询的效率是很低的。</li>
+<li>为了能够更好地解决上述问题，只有当连接上有数据的时候进程才去处理，这就是 I/O 多路复用技术的来源。</li>
+<li>I/O 多路复用技术归纳起来有两个关键实现点：<ul>
+<li>当多条连接共用一个阻塞对象后，进程只需要在一个阻塞对象上等待，而无须再轮询所有连接，常见的实现方式有 select、epoll、kqueue 等。</li>
+<li>当某条连接有新的数据可以处理时，操作系统会通知进程，进程从阻塞状态返回，开始进行业务处理。</li>
+</ul>
+</li>
+</ul>
+<p>Reactor 模式也叫 Dispatcher 模式（在很多开源的系统里面会看到这个名称的类，其实就是实现 Reactor 模式的），更加贴近模式本身的含义，即 I/O 多路复用统一监听事件，收到事件后分配（Dispatch）给某个进程。</p>
+<p>Reactor 模式的核心组成部分包括 Reactor 和处理资源池（进程池或线程池），其中 Reactor 负责监听和分配事件，处理资源池负责处理事件。初看 Reactor 的实现是比较简单的，但实际上结合不同的业务场景，Reactor 模式的具体实现方案灵活多变，主要体现在：</p>
+<ul>
+<li>Reactor 的数量可以变化：可以是一个 Reactor，也可以是多个 Reactor。</li>
+<li>资源池的数量可以变化：以进程为例，可以是单个进程，也可以是多个进程（线程类似）。</li>
+</ul>
+<h3 id="单Reactor单进程"><a href="#单Reactor单进程" class="headerlink" title="单Reactor单进程"></a>单Reactor单进程</h3><p><img src="/images/pasted-182.png" alt="upload successful"></p>
+<p>单 Reactor 单进程的方案在实践中应用场景不多，只适用于业务处理非常快速的场景，目前比较著名的开源软件中使用单 Reactor 单进程的是 Redis。<br>需要注意的是，C 语言编写系统的一般使用单 Reactor 单进程，因为没有必要在进程中再创建线程；而 Java 语言编写的一般使用单 Reactor 单线程，因为 Java 虚拟机是一个进程，虚拟机中有很多线程，业务线程只是其中的一个线程而已。</p>
+<h3 id="单-Reactor-多线程"><a href="#单-Reactor-多线程" class="headerlink" title="单 Reactor 多线程"></a>单 Reactor 多线程</h3><p><img src="/images/pasted-181.png" alt="upload successful"><br>介绍:</p>
+<ul>
+<li>主线程中，Reactor 对象通过 select 监控连接事件，收到事件后通过 dispatch 进行分发。</li>
+<li>如果是连接建立的事件，则由 Acceptor 处理，Acceptor 通过 accept 接受连接，并创建一个 Handler 来处理连接后续的各种事件。</li>
+<li>如果不是连接建立事件，则 Reactor 会调用连接对应的 Handler（第 2 步中创建的 Handler）来进行响应。</li>
+<li>Handler 只负责响应事件，不进行业务处理；Handler 通过 read 读取到数据后，会发给 Processor 进行业务处理。</li>
+<li>Processor 会在独立的子线程中完成真正的业务处理，然后将响应结果发给主进程的 Handler 处理；Handler 收到响应后通过 send 将响应结果返回给 client。</li>
+</ul>
+<p>单 Reator 多线程方案能够充分利用多核多 CPU 的处理能力，但同时也存在下面的问题：</p>
+<ul>
+<li>多线程数据共享和访问比较复杂。例如，子线程完成业务处理后，要把结果传递给主线程的 Reactor 进行发送，这里涉及共享数据的互斥和保护机制。以 Java 的 NIO 为例，Selector 是线程安全的，但是通过 Selector.selectKeys() 返回的键的集合是非线程安全的，对 selected keys 的处理必须单线程处理或者采取同步措施进行保护。</li>
+<li>Reactor 承担所有事件的监听和响应，只在主线程中运行，瞬间高并发时会成为性能瓶颈。</li>
+</ul>
+<h3 id="多-Reactor-多进程-线程"><a href="#多-Reactor-多进程-线程" class="headerlink" title="多 Reactor 多进程 / 线程"></a>多 Reactor 多进程 / 线程</h3><p><img src="/images/pasted-183.png" alt="upload successful"><br>目前著名的开源系统 Nginx 采用的是多 Reactor 多进程，<br>采用多 Reactor 多线程的实现有 Memcache 和 Netty。</p>
+<p>我多说一句，Nginx 采用的是多 Reactor 多进程的模式，但方案与标准的多 Reactor 多进程有差异。具体差异表现为主进程中仅仅创建了监听端口，并没有创建 mainReactor 来“accept”连接，而是由子进程的 Reactor 来“accept”连接，通过锁来控制一次只有一个子进程进行“accept”，子进程“accept”新连接后就放到自己的 Reactor 进行处理，不会再分配给其他子进程，更多细节请查阅相关资料或阅读 Nginx 源码。</p>
+<h1 id="补充-select、epoll、kqueue"><a href="#补充-select、epoll、kqueue" class="headerlink" title="补充:select、epoll、kqueue"></a>补充:select、epoll、kqueue</h1><p>select和iocp分别对应第3种与第5种模型，那么epoll与kqueue呢？其实也于select属于同一种模型，只是更高级一些，可以看作有了第4种模型的某些特性，如callback机制。</p>
+<p>那么，为什么epoll,kqueue比select高级？ </p>
+<p>答案是，他们无轮询。因为他们用callback取代了。想想看，当套接字比较多的时候，每次select()都要通过遍历FD_SETSIZE个Socket来完成调度,不管哪个Socket是活跃的,都遍历一遍。这会浪费很多CPU时间。如果能给套接字注册某个回调函数，当他们活跃时，自动完成相关操作，那就避免了轮询，这正是epoll与kqueue做的。</p>
+<p>（1）select，poll实现需要自己不断轮询所有fd集合，直到设备就绪，期间可能要睡眠和唤醒多次交替。而epoll其实也需要调用epoll_wait不断轮询就绪链表，期间也可能多次睡眠和唤醒交替，但是它是设备就绪时，调用回调函数，把就绪fd放入就绪链表中，并唤醒在epoll_wait中进入睡眠的进程。虽然都要睡眠和交替，但是select和poll在“醒着”的时候要遍历整个fd集合，而epoll在“醒着”的时候只要判断一下就绪链表是否为空就行了，这节省了大量的CPU时间。这就是回调机制带来的性能提升。</p>
+<p>（2）select，poll每次调用都要把fd集合从用户态往内核态拷贝一次，并且要把current往设备等待队列中挂一次，而epoll只要一次拷贝，而且把current往等待队列上挂也只挂一次（在epoll_wait的开始，注意这里的等待队列并不是设备等待队列，只是一个epoll内部定义的等待队列）。这也能节省不少的开销。</p>
+<h1 id="补充-Reactor与Proactor"><a href="#补充-Reactor与Proactor" class="headerlink" title="补充:Reactor与Proactor"></a>补充:Reactor与Proactor</h1><p>Reactor与Proactor能不能这样打个比方：<br>1、假如我们去饭店点餐，饭店人很多，如果我们付了钱后站在收银台等着饭端上来我们才离开，这就成了同步阻塞了。<br>2、如果我们付了钱后给你一个号就可以离开，饭好了老板会叫号，你过来取。这就是Reactor模型。<br>3、如果我们付了钱后给我一个号就可以坐到坐位上该干啥干啥，饭好了老板会把饭端上来送给你。这就是Proactor模型了。</p>
+<h1 id="补充-IO操作分两个阶段"><a href="#补充-IO操作分两个阶段" class="headerlink" title="补充:IO操作分两个阶段"></a>补充:IO操作分两个阶段</h1><p> 1、等待数据准备好(读到内核缓存) 2、将数据从内核读到用户空间(进程空间)<br> 一般来说1花费的时间远远大于2。</p>
+<ul>
+<li>1上阻塞2上也阻塞的是同步阻塞IO </li>
+<li>1上非阻塞2阻塞的是同步非阻塞IO，这讲说的Reactor就是这种模型 </li>
+<li>1上非阻塞2上非阻塞是异步非阻塞IO，这讲说的Proactor模型就是这种模型</li>
+</ul>
+<p><img src="/images/pasted-179.png" alt="upload successful"></p>
+<p><img src="/images/pasted-180.png" alt="upload successful"></p>
 
           
         
@@ -673,7 +1838,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/08/4-1视图模型/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/21/安全/data-privacy/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
@@ -692,7 +1857,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/06/08/4-1视图模型/" itemprop="url">4+1视图模型</a></h1>
+                <a class="post-title-link" href="/2018/06/21/安全/data-privacy/" itemprop="url">拆分隐私</a></h1>
         
 
         <div class="post-meta">
@@ -704,8 +1869,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-08T10:47:46+08:00">
-                2018-06-08
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-21T09:59:05+08:00">
+                2018-06-21
               </time>
             
 
@@ -723,9 +1888,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/06/08/4-1视图模型/#comments" itemprop="discussionUrl">
+                <a href="/2018/06/21/安全/data-privacy/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/06/08/4-1视图模型/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/06/21/安全/data-privacy/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -733,7 +1898,7 @@
 
           
           
-             <span id="/2018/06/08/4-1视图模型/" class="leancloud_visitors" data-flag-title="4+1视图模型">
+             <span id="/2018/06/21/安全/data-privacy/" class="leancloud_visitors" data-flag-title="拆分隐私">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -766,1258 +1931,79 @@
       
         
           
-            <h1 id="架构模型"><a href="#架构模型" class="headerlink" title="架构模型"></a>架构模型</h1><p>软件架构涉及到抽象、分解和组合、风格和美学。我们用由多个视图或视角组成的模型来描述它。为了最终处理大型的、富有挑战性的架构，该模型包含五个主要的视图（请对照图 1）：</p>
+            <h1 id="什么是隐私"><a href="#什么是隐私" class="headerlink" title="什么是隐私"></a>什么是隐私</h1><p>对于隐私这个词，科学研究上普遍接受的定义是“单个用户的某一些属性”，只要符合这一定义都可以被看做是隐私。我们在提“隐私”的时候，更加强调的是“单个用户”。那么，一群用户的某一些属性，可以认为不是隐私。</p>
+<p>隐私是针对单个用户的概念，公开群体用户的信息不算是隐私泄漏，但是如果能从数据中能准确推测出个体的信息，那么就算是隐私泄漏。</p>
+<h1 id="隐私保护的方法"><a href="#隐私保护的方法" class="headerlink" title="隐私保护的方法"></a>隐私保护的方法</h1><p>从信息时代开始，关于隐私保护的研究就开始了。随着数据不断地增长，人们对隐私越来越重视。我们在讨论隐私保护的时候包括两种情况。</p>
 <ul>
-<li>逻辑视图（Logical View），设计的</li>
-<li>对象模型（使用面向对象的设计方法时）。</li>
-<li>过程视图（Process View），捕捉设计的并发和同步特征。</li>
-<li><p>物理视图（Physical View），描述了软件到硬件的映射，反映了分布式特性。</p>
-</li>
-<li><p>场景视图：用例图</p>
-</li>
-<li>逻辑视图：类图、对象图、状态图、组合结构图、交互图（顺序、通信、时序）</li>
-<li>开发视图：包图、组件图</li>
-<li>进程视图：活动图</li>
-<li>部署视图：部署图</li>
+<li>第一种是公司为了学术研究和数据交流开放用户数据，学术机构或者个人可以向数据库发起查询请求，公司返回对应的数据时需要保证用户的隐私。</li>
+<li>第二种情况是公司作为服务提供商，为了提高服务质量，主动收集用户的数据，这些在客户端上收集的数据也需要保证隐私性。学术界提出了多种保护隐私的方法和测量隐私是否泄露的工具，例如k-anonymity（k-匿名化）、l-diversity（l-多样化）、t-closeness、 ε-differentialprivacy（差分隐私）、同态加密（homomorphic encryption）、零知识证明（zero-knowledge proof）等等。今天主要介绍k-anonymity（k-匿名化）,l-diversity（l-多样化）,t-closeness 和 ε-differential privacy（差分隐私）。这些方法先从直观的角度去衡量一个公开数据的隐私性，再到使用密码学、统计学等工具保证数据的隐私性。</li>
 </ul>
-<p><img src="/images/pasted-175.png" alt="upload successful"></p>
-<p><img src="/images/pasted-178.png" alt="upload successful"></p>
-<p><img src="/images/pasted-177.png" alt="upload successful"></p>
-<h1 id="软件架构文档提纲"><a href="#软件架构文档提纲" class="headerlink" title="软件架构文档提纲"></a>软件架构文档提纲</h1><p><img src="/images/pasted-176.png" alt="upload successful"></p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://www.ibm.com/developerworks/cn/rational/r-4p1-view/index.html" target="_blank" rel="noopener">https://www.ibm.com/developerworks/cn/rational/r-4p1-view/index.html</a><br><a href="https://www.ibm.com/developerworks/cn/rational/06/r-wenyu/index.html" target="_blank" rel="noopener">https://www.ibm.com/developerworks/cn/rational/06/r-wenyu/index.html</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/07/study-dhcp/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/07/study-dhcp/" itemprop="url">study-dhcp</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-07T17:31:21+08:00">
-                2018-06-07
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/06/07/study-dhcp/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/06/07/study-dhcp/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/06/07/study-dhcp/" class="leancloud_visitors" data-flag-title="study-dhcp">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>最近总是遇到公司WiFi ip地址冲突的问题,于是百度了下</p>
-<h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><p>DHCP协议全称为“动态主机设置协议”（Dynamic Host Configuration Protocol）。通常来说，普通电脑中都内置有DHCP客户端模块。电脑接上网络后，DHCP客户端发现新连通的网络，会在该网络上找DHCP服务器。DHCP服务器将给电脑提供合理的网络配置，并把设置信息传回本机。所谓的DHCP服务器，其实就是一些运行有DHCP服务器端软件的特殊电脑。他们像等候在网络上的服务员，为新来的顾客排忧解难。本机和DHCP服务器之间的通信，都是通过DHCP协议进行的。</p>
-<p>动态管理100个ip地址,并设置有效期,如果过期没有续租,则收回ip</p>
-<h1 id="通信过程"><a href="#通信过程" class="headerlink" title="通信过程"></a>通信过程</h1><p>DHCP协议的底层是UDP协议。我们知道，网络上的点对点沟通需要有IP地址。但新接入网络的客户机正是想通过DHCP通信来获得IP地址。这简直成了“鸡生蛋、蛋生鸡”的死胡同。幸好，除了点对点通信，UDP协议还允许广播通信。把UDP数据包发送到网络的广播地址，网络上的每个设备都能收到。因此，DHCP通信主要靠这种广播的形式进行。<br>DHCP通信分为四步：</p>
-<ul>
-<li>Discovery：客户机发广播，搜寻DHCP服务器。</li>
-<li>Offer：DHCP服务器发出邀请，提供一个可用的IP地址。</li>
-<li>Request：客户机正式请求使用该IP地址。</li>
-<li>Acknowledge：DHCP服务器确认，并提供其他配置参数。</li>
-</ul>
-<p><img src="/images/pasted-174.png" alt="upload successful"></p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://wizardforcel.gitbooks.io/protocol-forest-vamei/content/content/16.html" target="_blank" rel="noopener">https://wizardforcel.gitbooks.io/protocol-forest-vamei/content/content/16.html</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/06/openid-connect/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/06/openid-connect/" itemprop="url">openid-connect</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-06T16:37:06+08:00">
-                2018-06-06
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/06/06/openid-connect/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/06/06/openid-connect/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/06/06/openid-connect/" class="leancloud_visitors" data-flag-title="openid-connect">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><p>OpenID Connect 1.0 is a simple identity layer on top of the OAuth 2.0 protocol. It enables Clients to verify the identity of the End-User based on the authentication performed by an Authorization Server, as well as to obtain basic profile information about the End-User in an interoperable and REST-like manner.</p>
-<p>This specification defines the core OpenID Connect functionality: authentication built on top of OAuth 2.0 and the use of Claims to communicate information about the End-User. It also describes the security and privacy considerations for using OpenID Connect.</p>
-<h1 id="Id-Token的好处"><a href="#Id-Token的好处" class="headerlink" title="Id Token的好处"></a>Id Token的好处</h1><ul>
-<li>无状态会话  :放入浏览器cookie中，ID令牌可以实现轻量级无状态会话。 这消除了将会话存储在服务器端（存储器或磁盘上）的需要，这可能是管理和扩展的负担。 通过验证ID令牌来检查会话。 当令牌达到超过其发布时间戳（iat）的某个预定义年龄时，应用程序可以简单地通过静默向op发出请求</li>
-<li>将身份传递给第三方  :当需要知道用户身份时，可以将ID令牌传递给其他应用程序组件或后端服务，例如记录审计跟踪。</li>
-<li>令牌交换  :</li>
-</ul>
-<h1 id="标准规范"><a href="#标准规范" class="headerlink" title="标准规范"></a>标准规范</h1><p><a href="http://openid.net/specs/openid-connect-core-1_0.html" target="_blank" rel="noopener">http://openid.net/specs/openid-connect-core-1_0.html</a></p>
-<p>#$ 实际流程:<br><a href="https://connect2id.com/learn/openid-connect" target="_blank" rel="noopener">https://connect2id.com/learn/openid-connect</a></p>
-<h1 id="标准中的接口"><a href="#标准中的接口" class="headerlink" title="标准中的接口"></a>标准中的接口</h1><p><img src="/images/pasted-173.png" alt="upload successful"></p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">Endpoint</th>
-<th style="text-align:left">Purpose</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left"><a href="https://connect2id.com/products/server/docs/api/discovery" target="_blank" rel="noopener">Server discovery</a></td>
-<td style="text-align:left">Discover the OAuth 2.0 / OpenID Connect endpoints, capabilities, supported cryptographic algoritms and features.</td>
-</tr>
-<tr>
-<td style="text-align:left"><a href="https://connect2id.com/products/server/docs/api/jwk-set" target="_blank" rel="noopener">Server JWK set</a></td>
-<td style="text-align:left">Retrieve the public server JSON Web Key (JWK) required to verify the authenticity of issued ID and access tokens.</td>
-</tr>
-<tr>
-<td style="text-align:left"><a href="https://connect2id.com/products/server/docs/api/client-registration" target="_blank" rel="noopener">Client registration</a></td>
-<td style="text-align:left">Create, access, update and delete client registrations with the server.</td>
-</tr>
-<tr>
-<td style="text-align:left"><a href="https://connect2id.com/products/server/docs/api/authorization" target="_blank" rel="noopener">Authorisation</a></td>
-<td style="text-align:left">The client sends the end-user’s browser to this endpoint to request their authentication and consent. This endpoint is used in the code and implicit OAuth 2.0 flows which require end-user interaction.</td>
-</tr>
-<tr>
-<td style="text-align:left"><a href="https://connect2id.com/products/server/docs/api/token" target="_blank" rel="noopener">Token</a></td>
-<td style="text-align:left">Post an OAuth 2.0 grant (code, refresh token, resource owner password credentials, client credentials) to obtain an ID and / or access token.</td>
-</tr>
-<tr>
-<td style="text-align:left"><a href="https://connect2id.com/products/server/docs/api/token-introspection" target="_blank" rel="noopener">Token introspection</a></td>
-<td style="text-align:left">Validate an access token and retrieve its underlying authorisation (for resource servers).</td>
-</tr>
-<tr>
-<td style="text-align:left"><a href="https://connect2id.com/products/server/docs/api/token-revocation" target="_blank" rel="noopener">Token revocation</a></td>
-<td style="text-align:left">Revoke an obtained access or refresh token.</td>
-</tr>
-<tr>
-<td style="text-align:left"><a href="https://connect2id.com/products/server/docs/api/userinfo" target="_blank" rel="noopener">UserInfo</a></td>
-<td style="text-align:left">Retrieve profile information and other attributes for a logged-in end-user.</td>
-</tr>
-<tr>
-<td style="text-align:left"><a href="https://connect2id.com/products/server/docs/api/check-session" target="_blank" rel="noopener">Check session iframe</a></td>
-<td style="text-align:left">Poll the OpenID provider for changes of end-user authentication status.</td>
-</tr>
-<tr>
-<td style="text-align:left"><a href="https://connect2id.com/products/server/docs/api/logout" target="_blank" rel="noopener">Logout (end-session)</a></td>
-<td style="text-align:left">Sign out an end-user.</td>
-</tr>
-</tbody>
-</table>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/06/http-header-httponly/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/06/http-header-httponly/" itemprop="url">http-header-httponly</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-06T15:53:09+08:00">
-                2018-06-06
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/06/06/http-header-httponly/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/06/06/http-header-httponly/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/06/06/http-header-httponly/" class="leancloud_visitors" data-flag-title="http-header-httponly">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="属性说明："><a href="#属性说明：" class="headerlink" title="属性说明："></a>属性说明：</h1><p>1 secure属性<br>当设置为true时，表示创建的 Cookie 会被以安全的形式向服务器传输，也就是只能在 HTTPS 连接中被浏览器传递到服务器端进行会话验证，如果是 HTTP 连接则不会传递该信息，所以不会被窃取到Cookie 的具体内容。<br>2 HttpOnly属性<br>为了解决XSS（跨站脚本***）的问题，从IE6开始支持cookie的HttpOnly属性，这个属性目前已被大多数浏览器（IE、FF、Chrome、Safari）</p>
-<p>如果在Cookie中设置了”HttpOnly”属性，那么通过程序(JS脚本、Applet等)将无法读取到Cookie信息，这样能有效的防止XSS攻击。</p>
-<p>对于以上两个属性，<br>首先，secure属性是防止信息在传递的过程中被监听捕获后信息泄漏，HttpOnly属性的目的是防止程序获取cookie后进行攻击。<br>其次，GlassFish2.x支持的是servlet2.5，而servlet2.5不支持Session Cookie的”HttpOnly”属性。不过使用Filter做一定的处理可以简单的实现HttpOnly属性。GlashFish3.0(支持servlet3.0)默认开启Session Cookie的HttpOnly属性。<br>也就是说两个属性，并不能解决cookie在本机出现的信息泄漏的问题(FireFox的插件FireBug能直接看到cookie的相关信息)。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/05/安全/rsa/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/05/安全/rsa/" itemprop="url">rsa</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-05T20:02:18+08:00">
-                2018-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/06/05/安全/rsa/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/06/05/安全/rsa/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/06/05/安全/rsa/" class="leancloud_visitors" data-flag-title="rsa">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="最初认识rsa算法-ssh协议"><a href="#最初认识rsa算法-ssh协议" class="headerlink" title="最初认识rsa算法:ssh协议"></a>最初认识rsa算法:ssh协议</h1><p>对称加密的加密强度高，很难破解。但是在实际应用过程中不得不面临一个棘手的问题：如何安全的保存密钥呢？尤其是考虑到数量庞大的Client端，很难保证密钥不被泄露。一旦一个Client端的密钥被窃据，那么整个系统的安全性也就不复存在。为了解决这个问题，非对称加密应运而生。非对称加密有两个密钥：“公钥”和“私钥”。</p>
-<p>非对称加密方案的登录流程：</p>
-<p><img src="/images/pasted-169.png" alt="upload successful"></p>
-<ul>
-<li>远程Server收到Client端用户TopGun的登录请求，Server把自己的公钥发给用户。</li>
-<li>Client使用这个公钥，将密码进行加密。</li>
-<li>Client将加密的密码发送给Server端。</li>
-<li>远程Server用自己的私钥，解密登录密码，然后验证其合法性。</li>
-<li>若验证结果，给Client相应的响应。</li>
-</ul>
-<h2 id="基于公钥认证"><a href="#基于公钥认证" class="headerlink" title="基于公钥认证"></a>基于公钥认证</h2><p><img src="/images/pasted-170.png" alt="upload successful"></p>
-<ul>
-<li>Client将自己的公钥存放在Server上，追加在文件authorized_keys中。</li>
-<li>Server端接收到Client的连接请求后，会在authorized_keys中匹配到Client的公钥pubKey，并生成随机数R，用Client的公钥对该随机数进行加密得到pubKey(R)，然后将加密后信息发送给Client。</li>
-<li>Client端通过私钥进行解密得到随机数R，然后对随机数R和本次会话的SessionKey利用MD5生成摘要Digest1，发送给Server端。</li>
-<li>Server端会也会对R和SessionKey利用同样摘要算法生成Digest2。</li>
-<li>Server端会最后比较Digest1和Digest2是否相同，完成认证过程。</li>
-</ul>
-<p><img src="/images/pasted-171.png" alt="upload successful"></p>
-<h1 id="RSA签名体制-不希望有人冒充我发消息，只有我才能发布这个签名"><a href="#RSA签名体制-不希望有人冒充我发消息，只有我才能发布这个签名" class="headerlink" title="RSA签名体制 (不希望有人冒充我发消息，只有我才能发布这个签名)"></a>RSA签名体制 (不希望有人冒充我发消息，只有我才能发布这个签名)</h1><p>签名体制同样包含3个算法：KeyGen（密钥生成算法），Sign（签名算法），Verify（验证算法）。</p>
-<ul>
-<li>keygen(数)-&gt;(pk,sk)</li>
-<li>encrpt(pk,m)-&gt;ct密文</li>
-<li>decrypt(st,ct)-&gt;m 解密</li>
-</ul>
-<p>所以，在签名算法中，私钥用于对数据进行签名，公钥用于对签名进行验证。这也可以直观地进行理解：对一个文件签名，当然要用私钥，因为我们希望只有自己才能完成签字。验证过程当然希望所有人都能够执行，大家看到签名都能通过验证证明确实是我自己签的。</p>
-<h1 id="RSA的加密算法-不希望别人知道我的消息，所以只有我才能解密"><a href="#RSA的加密算法-不希望别人知道我的消息，所以只有我才能解密" class="headerlink" title="RSA的加密算法 (不希望别人知道我的消息，所以只有我才能解密)"></a>RSA的加密算法 (不希望别人知道我的消息，所以只有我才能解密)</h1><p>RSA公钥加密体制包含如下3个算法：KeyGen（密钥生成算法），Encrypt（加密算法）以及Decrypt（解密算法）</p>
-<ul>
-<li>keygen(数)-&gt;(pk,sk)</li>
-<li>sign(sk,m)-&gt;签名</li>
-<li>vertify(pk,签名,内容)-&gt;结果1or0</li>
-</ul>
-<p>所以，从算法描述中我们也可以看出：公钥用于对数据进行加密，私钥用于对数据进行解密。当然了，这个也可以很直观的理解：公钥就是公开的密钥，其公开了大家才能用它来加密数据。私钥是私有的密钥，谁有这个密钥才能够解密密文。否则大家都能看到私钥，就都能解密，那不就乱套了。</p>
-<h1 id="SSL-TLS协议"><a href="#SSL-TLS协议" class="headerlink" title="SSL/TLS协议"></a>SSL/TLS协议</h1><h2 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h2><p>（1） 所有信息都是加密传播，第三方无法窃听。<br>（2） 具有校验机制，一旦被篡改，通信双方会立刻发现。<br>（3） 配备身份证书，防止身份被冒充。</p>
-<h2 id="基本的运行过程"><a href="#基本的运行过程" class="headerlink" title="基本的运行过程"></a>基本的运行过程</h2><p>SSL/TLS协议的基本思路是采用公钥加密法，也就是说，客户端先向服务器端索要公钥，然后用公钥加密信息，服务器收到密文后，用自己的私钥解密。</p>
-<p>但是，这里有两个问题。</p>
-<p>（1）如何保证公钥不被篡改？</p>
-<p>解决方法：将公钥放在数字证书中。只要证书是可信的，公钥就是可信的。</p>
-<p>（2）公钥加密计算量太大，如何减少耗用的时间？</p>
-<p>解决方法：每一次对话（session），客户端和服务器端都生成一个”对话密钥”（session key），用它来加密信息。由于”对话密钥”是对称加密，所以运算速度非常快，而服务器公钥只用于加密”对话密钥”本身，这样就减少了加密运算的消耗时间。</p>
-<p>因此，SSL/TLS协议的基本过程是这样的：</p>
-<p>（1） 客户端向服务器端索要并验证公钥。</p>
-<p>（2） 双方协商生成”对话密钥”。</p>
-<p>（3） 双方采用”对话密钥”进行加密通信。</p>
-<p>上面过程的前两步，又称为”握手阶段”（handshake）。</p>
-<h3 id="1-客户端发出请求（ClientHello）"><a href="#1-客户端发出请求（ClientHello）" class="headerlink" title="1 客户端发出请求（ClientHello）"></a>1 客户端发出请求（ClientHello）</h3><p>首先，客户端（通常是浏览器）先向服务器发出加密通信的请求，这被叫做ClientHello请求。</p>
-<p>在这一步，客户端主要向服务器提供以下信息。</p>
-<ul>
-<li><p>（1） 支持的协议版本，比如TLS 1.0版。</p>
+<h2 id="k-anonymity（k-匿名化）"><a href="#k-anonymity（k-匿名化）" class="headerlink" title="k-anonymity（k-匿名化）"></a>k-anonymity（k-匿名化）</h2><p>我们把要表格中的公开属性分为以下三类：</p>
+<pre><code>-    Key attributes: 一般是个体的唯一标示，比如说姓名、地址、电话等等，这些内容需要在公开数据的时候删掉。
+
+-    Quasi-identifier: 类似邮编、年龄、生日、性别等不是唯一的，但是能帮助研究人员关联相关数据的标示。
+
+-    Sensitive attributes: 敏感数据，比如说购买偏好、薪水等等，这些数据是研究人员最关心的，所以一般都直接公开。
+</code></pre><p>简单来说，k-anonymity 的目的是保证公开的数据中包含的个人信息至少 k-1 条不能通过其他个人信息确定出来。也就是公开数据中的任意 quasi-identifier信息，相同的组合都需要出现至少 k 次。</p>
+<p>举个例子，假设一个公开的数据进行了 2-anonymity 保护。如果攻击者想确认一个人（小明）的敏感信息（购买偏好），通过查询他的年龄、邮编和性别，攻击者会发现数据里至少有两个人是有相同的年龄、邮编和性别。这样攻击者就没办法区分这两条数据到底哪个是小明了，从而也就保证了小明的隐私不会被泄露。</p>
+<p>k-anonymity的方法主要有两种，一种是删除对应的数据列，用星号（*）代替。另外一种方法是用概括的方法使之无法区分，比如把年龄这个数字概括成一个年龄段。对于邮编这样的数据，如果删除所有邮编，研究人员会失去很多有意义的信息，所以可以选择删除最后一位数字。</p>
+<p>从这个表中，即使我们知道小明是男性、24岁、邮编是100083，却仍然无法知道小明的购买偏好。而研究人员依然可以根据这些数据统计出一些有意义的结果，这样既兼顾了个人的隐私，又能为研究提供有效的数据。</p>
+<h3 id="k-anonymity能保证以下三点："><a href="#k-anonymity能保证以下三点：" class="headerlink" title="k-anonymity能保证以下三点："></a>k-anonymity能保证以下三点：</h3><ol>
+<li><p>攻击者无法知道某个人是否在公开的数据中</p>
 </li>
-<li><p>（2） 一个客户端生成的随机数，稍后用于生成”对话密钥”。</p>
+<li><p>给定一个人，攻击者无法确认他是否有某项敏感属性</p>
 </li>
-<li><p>（3） 支持的加密方法，比如RSA公钥加密。</p>
+<li><p>攻击者无法确认某条数据对应的是哪个人（这条假设攻击者除了 quasi-identifier 信息之外对其他数据一无所知，举个例子，如果所有用户的偏好都是购买电子产品，那么 k-anonymity 也无法保证隐私没有泄露）</p>
 </li>
-<li><p>（4） 支持的压缩方法。</p>
+</ol>
+<h3 id="攻击方法"><a href="#攻击方法" class="headerlink" title="攻击方法"></a>攻击方法</h3><p>未排序匹配攻击 (unsorted matching attack) ：当公开的数据记录和原始记录的顺序一样的时候，攻击者可以猜出匿名化的记录是属于谁。例如如果攻击者知道在数据中小明是排在小白前面，那么他就可以确认，小明的购买偏好是电子产品，小白是家用电器。解决方法也很简单，在公开数据之前先打乱原始数据的顺序就可以避免这类的攻击。</p>
+<p>补充数据攻击 (complementary release attack) ：假如公开的数据有多种类型，如果它们的 k-anonymity 方法不同，那么攻击者可以通过关联多种数据推测用户信息。</p>
+<p>除此之外，如果敏感属性在同一类 quasi-identifiers 中缺乏多样性，或者攻击者有其它的背景知识，k-anonymity 也无法避免隐私泄露。</p>
+<h2 id="l-diversity（l-多样化）"><a href="#l-diversity（l-多样化）" class="headerlink" title="l-diversity（l-多样化）"></a>l-diversity（l-多样化）</h2><p>通过上面的例子，我们引出了多样化的概念。简单来说，在公开的数据中，对于那些quasi-identifier 相同的数据中，敏感属性必须具有多样性，这样才能保证用户的隐私不能通过背景知识等方法推测出来。</p>
+<p>l-diversity 保证了相同类型数据中至少有 l 种内容不同的敏感属性。</p>
+<p>例如在上图的例子中，有 10 条相同的类型的数据，其中 8 条的购买偏好是电子产品，其他两条分别是图书和家用电器。那么在这个例子中，公开的数据就满足 3-diversity 的属性。</p>
+<p>除了以上介绍的简单 l-diversity 的定义，还有其他版本的 l-diversity，引入了其他统计方法。比如说：</p>
+<p>•         基于概率的l-diversity (probabilistic l-diversity): 在一个类型中出现频率最高的值的概率不大于 1/l。</p>
+<p>•         基于墒的l-diversity (entropy l-diversity): 在一个类型中敏感数据分布的墒至少是 log(l)。</p>
+<p>•         递归 (c,l)-diversity (recursive (c, l)-diversity): 简单来说就是保证最经常出现的值的出现频率不要太高。</p>
+<h3 id="l-diversity-也有其局限性："><a href="#l-diversity-也有其局限性：" class="headerlink" title="l-diversity 也有其局限性："></a>l-diversity 也有其局限性：</h3><p>•         敏感属性的性质决定即使保证了一定概率的 diversity 也很容易泄露隐私。例如，医院公开的艾滋病数据中，敏感属性是“艾滋病阳性”（出现概率是 1%）和“艾滋病阴性”（出现概率是 99%），这两种值的敏感性不同，造成的结果也不同。</p>
+<p>•         有些情况下 l-diversity 是没有意义的：比如说艾滋病数据的例子中仅含有两种不同的值，保证2-diversity 也是没有意义的。</p>
+<p>•         l-diversity 很难达成：例如，我们想在 10000 条数据中保证 2-diversity，那么可能最多需要 10000* 0.01 = 100 个相同的类型。这时可能通过之前介绍的 k-anonymity的方法很难达到。</p>
+<p>•         偏斜性攻击 (Skewness Attack)：假如我们要保证在同一类型的数据中出现“艾滋病阳性”和出现“艾滋病阴性”的概率是相同的，我们虽然保证了 diversity，但是我们泄露隐私的可能性会变大。因为l-diversity 并没有考虑敏感属性的总体的分布。</p>
+<p>•         l-diversity 没有考虑敏感属性的语义，比如说下面的例子，我们通过李雷的信息从公开数据中关联到了两条信息，通过这两条信息我们能得出两个结论。第一，李雷的工资相对较低；第二，李雷喜欢买电子电器相关的产品。</p>
+<h2 id="t-closeness"><a href="#t-closeness" class="headerlink" title="t-closeness"></a>t-closeness</h2><p>上面最后一个问题就引出了 t-closeness 的概念，t-closeness 是为了保证在相同的quasi-identifier类型组中，敏感信息的分布情况与整个数据的敏感信息分布情况接近(close)，不超过阈值 t。</p>
+<p>如果刚才的那个数据保证了 t-closeness 属性，那么通过李雷的信息查询出来的结果中，工资的分布就和整体的分布类似，进而很难推断出李雷工资的高低。</p>
+<p>最后，如果保证了 k-anonymity，l-diversity 和 t-closeness，隐私就不会泄露了么？答案并不是这样，我们看下面的例子：</p>
+<p>在这个例子中，我们保证了 2- anonymity , 2-diversity , t-closeness（分布近似），工资和购买偏好是敏感属性。攻击者通过李雷的个人信息找到了四条数据，同时知道李雷有很多书，这样就能很容易在四条数据中找到李雷的那一条，从而造成隐私泄露。可能有些读者会有疑问，通过背景知识攻击 k-anonymity 的前提是不是假设了解 quasi-identifier ？并不是这样，针对敏感属性的背景攻击对 k-anonymity 也适用，所以无论经过哪些属性保证，隐私泄露还是很难避免。</p>
+<h2 id="差分隐私（differential-privacy）"><a href="#差分隐私（differential-privacy）" class="headerlink" title="差分隐私（differential privacy）"></a>差分隐私（differential privacy）</h2><p>除了之前我们介绍的针对 k-anonymity, l-diversity,t-closeness 三种隐私保护方法的攻击之外，还有一种叫做差分攻击 ( differential attack )。举个例子，购物公司发布了购物偏好的数据，说我们有 100 个人的购物偏好数据，其中有 10 个人偏爱购买汽车用品，其他 90 个偏爱购买电子产品。如果攻击者知道其中 99 个人是偏爱汽车用品还是电子产品，就可以知道第 100 个人的购物偏好。这样通过比较公开数据和既有的知识推测出个人隐私，就叫做差分攻击。</p>
+<p>在 2009 年，微软研究院的Cynthia Dwork 提出差分隐私的概念，差分隐私就是为了防止差分攻击，也就是说尽管攻击者知道发布的 100 个人的个人以信息和其中 99 个人的信息，他也没办法通过比对这两个信息获得第 100 个人的信息。</p>
+<p>简单来说，差分隐私就是用一种方法使得查询 100 个信息和查询其中 99 个的信息得到的结果是相对一致的，那么攻击者就无法通过比较（差分）数据的不同找出第100 个人的信息。这种方法就是加入随机性，如果查询 100 个记录和 99 个记录，输出同样的值的概率是一样的，攻击者就无法进行差分攻击。进一步说，对于差别只有一条记录的两个数据集 D 和 D’ (neighboring datasets)，查询他们获得结果相同的概率非常接近。注意，这里并不能保证概率相同，如果一样的话，数据就需要完全的随机化，那样公开数据也就没有意义。所以，我们需要尽可能接近，保证在隐私和可用性之间找到一个平衡。</p>
+<p>ε-差分隐私 (ε-differential privacy， ε-DP) 可以用下面的定义来表示：<br>其中 M 是在 D 上做任意查询操作，对查询后的结果加入一定的随机性，也就是给数据加噪音，两个 datasets 加上同一随机噪音之后查询结果为 C 的概率比小于一个特定的数 。这样就能保证用户隐私泄露的概率有一个数学的上界，相比传统的 k-anonymity，差分隐私使隐私保护的模型更加清晰。</p>
+<p>无论查询是什么，两个相邻的数据库返回的结果总是近似的。</p>
+<h3 id="要达到数据的差分隐私有四种方法："><a href="#要达到数据的差分隐私有四种方法：" class="headerlink" title="要达到数据的差分隐私有四种方法："></a>要达到数据的差分隐私有四种方法：</h3><h4 id="输出结果变换"><a href="#输出结果变换" class="headerlink" title="输出结果变换"></a>输出结果变换</h4><p>输出结果变换：加入噪声<br>在差分隐私中，防止隐私泄露的重要因素是在查询结果中加噪音，对于数值的查询结果，一种常见的方法就是对结果进行数值变换。要解释如何加入噪音，我们先看一下下面的这个例子：</p>
+<p>那么如何选择噪声呢？</p>
+<p>差分隐私方法中，作者巧妙的利用了拉普拉斯分布的特性，找到了合适的噪声方法。针对数值或向量的查询输出，M(x) = f(x) + 噪声。我们能得出以下结论：</p>
+<h4 id="输入查询变换"><a href="#输入查询变换" class="headerlink" title="输入查询变换"></a>输入查询变换</h4><h4 id="中间值变换"><a href="#中间值变换" class="headerlink" title="中间值变换"></a>中间值变换</h4><h4 id="抽样和聚合数据"><a href="#抽样和聚合数据" class="headerlink" title="抽样和聚合数据"></a>抽样和聚合数据</h4><p>(ε,δ)-differential privacy, (ε, δ)-DP<br> ε-DP 是一种“严格”的隐私保护保证，当在数据库中添加和删除一条数据时候，保证所有查询的输出都类似。但是(ε, δ)-DP 在 ε-DP 的保证中允许了一定概率的错误发生，比如说，用户在 (ε, δ)-DP 的保护下会有 δ 概率的隐私泄露。</p>
+<p> 基于这些的概念，差分隐私在机器学习算法中也能够使用，常见的算法，比如说 PCA、logistic regression、SVM都有对应的差分隐私化算法。</p>
+<p>差分隐私在数据的实用性和隐私性之间达到了平衡，使用者可以通过设定自己的“隐私预算”（privacy budget）来调整数据的实用性和隐私性。但是差分隐私也不是万能的，其中加入噪声的很多算法需要在大量的数据集上才实用。除此之外，什么才是“隐私预算”的合理设定也是一个问题。这些都是差分隐私面临的问题和挑战。并且由于差分隐私对于“背景知识”的要求过于强，所以需要在结果中加入大量随机化，导致数据的可用性（utility）急剧下降。但是差分隐私作为一个非常优雅的数学工具，是隐私保护的研究在未来的一个发展方向。差分隐私用严格的数学证明告诉人们一个匿名化的公开数据究竟能保护用户多少的隐私。</p>
+<h2 id="k-匿名化与-ε-差分隐私的关系"><a href="#k-匿名化与-ε-差分隐私的关系" class="headerlink" title="k-匿名化与 ε-差分隐私的关系"></a>k-匿名化与 ε-差分隐私的关系</h2><p>我们前面分别单独介绍了 k-匿名化和 ε-差分隐私，k-匿名化相对比较容易理解和实践，差分隐私更像是从理论上证明了隐私保护的边界。虽然方法的分析角度完全不同，但是它们之间却有着紧密的联系。普渡大学的Ninghui Li教授在 Provably PrivateData Anonymization: Or, k-Anonymity Meets Differential Privacy 文章中详细分析了 k-匿名化和 ε-差分隐私之间的关系。文章证明了在使用 k-匿名化“得当”的情况下，可以满足一定条件的 (ε, δ)-differentialprivacy。同时也提出了一种 k-anonymity 的变形：β-Sampling+ Data-independent _Generalization + k-Suppression (k, β)-SDGS ，通过变形后的 k-anonymity 就可以使之满足差分隐私。通过使用差分隐私这种工具，我们就能精确的衡量前人提出的 k-anonymity，在理论研究上具有重要意义。</p>
+<h1 id="实际案例"><a href="#实际案例" class="headerlink" title="实际案例"></a>实际案例</h1><p>在实际应用中使用差分隐私时需要考虑的问题还有很多，我们在介绍差分隐私的时候假设所有的查询操作都由可信的数据库处理，数据库里存储着用户的原始数据。那么如果数据库被攻击了，包含用户隐私的原始数据就泄露了。</p>
+<p>如果不收集用户的原始数据，在客户端上先做差分隐私，再上传给服务器，这个问题就解决了。最近Google 率先使用RAPPOR系统在 Chrome 浏览器上通过这种方法收集用户的使用情况数据。RAPPOR 基于“随机应答”（randomized response）的方法保护用户的原始数据不被泄露，随机应答的流程如下：</p>
+<ol>
+<li><p>当用户需要上报个人数据的时候，首先“抛硬币”决定是否上报真实数据。如果是正面，则上报真实数据。如果不是，就上报一个随机的数据，再“抛一次硬币”决定随机数据的内容。</p>
 </li>
-</ul>
-<p>这里需要注意的是，客户端发送的信息之中不包括服务器的域名。也就是说，理论上服务器只能包含一个网站，否则会分不清应该向客户端提供哪一个网站的数字证书。这就是为什么通常一台服务器只能有一张数字证书的原因。</p>
-<p>对于虚拟主机的用户来说，这当然很不方便。2006年，TLS协议加入了一个Server Name Indication扩展，允许客户端向服务器提供它所请求的域名。</p>
-<h3 id="2-服务器回应（SeverHello）"><a href="#2-服务器回应（SeverHello）" class="headerlink" title="2 服务器回应（SeverHello）"></a>2 服务器回应（SeverHello）</h3><p>服务器收到客户端请求后，向客户端发出回应，这叫做SeverHello。服务器的回应包含以下内容。</p>
-<ul>
-<li><p>（1） 确认使用的加密通信协议版本，比如TLS 1.0版本。如果浏览器与服务器支持的版本不一致，服务器关闭加密通信。</p>
+<li><p>服务器收到所有的数据后，因为知道“抛硬币”是正面的概率，服务器就能够判断返回的数据是正确的概率。</p>
 </li>
-<li><p>（2） 一个服务器生成的随机数，稍后用于生成”对话密钥”。</p>
-</li>
-<li><p>（3） 确认使用的加密方法，比如RSA公钥加密。</p>
-</li>
-<li><p>（4） 服务器证书。</p>
-</li>
-</ul>
-<p>除了上面这些信息，如果服务器需要确认客户端的身份，就会再包含一项请求，要求客户端提供”客户端证书”。比如，金融机构往往只允许认证客户连入自己的网络，就会向正式客户提供USB密钥，里面就包含了一张客户端证书。</p>
-<h3 id="3客户端回应"><a href="#3客户端回应" class="headerlink" title="3客户端回应"></a>3客户端回应</h3><p>客户端收到服务器回应以后，首先验证服务器证书。如果证书不是可信机构颁布、或者证书中的域名与实际域名不一致、或者证书已经过期，就会向访问者显示一个警告，由其选择是否还要继续通信。</p>
-<p>如果证书没有问题，客户端就会从证书中取出服务器的公钥。然后，向服务器发送下面三项信息。</p>
-<ul>
-<li><p>（1） 一个随机数。该随机数用服务器公钥加密，防止被窃听。</p>
-</li>
-<li><p>（2） 编码改变通知，表示随后的信息都将用双方商定的加密方法和密钥发送。</p>
-</li>
-<li><p>（3） 客户端握手结束通知，表示客户端的握手阶段已经结束。这一项同时也是前面发送的所有内容的hash值，用来供服务器校验。</p>
-</li>
-</ul>
-<p>上面第一项的随机数，是整个握手阶段出现的第三个随机数，又称”pre-master key”。有了它以后，客户端和服务器就同时有了三个随机数，接着双方就用事先商定的加密方法，各自生成本次会话所用的同一把”会话密钥”。</p>
-<p>至于为什么一定要用三个随机数，来生成”会话密钥”，dog250解释得很好：</p>
-<p>“不管是客户端还是服务器，都需要随机数，这样生成的密钥才不会每次都一样。由于SSL协议中证书是静态的，因此十分有必要引入一种随机因素来保证协商出来的密钥的随机性。</p>
-<p>对于RSA密钥交换算法来说，pre-master-key本身就是一个随机数，再加上hello消息中的随机，三个随机数通过一个密钥导出器最终导出一个对称密钥。</p>
-<p>pre master的存在在于SSL协议不信任每个主机都能产生完全随机的随机数，如果随机数不随机，那么pre master secret就有可能被猜出来，那么仅适用pre master secret作为密钥就不合适了，因此必须引入新的随机因素，那么客户端和服务器加上pre master secret三个随机数一同生成的密钥就不容易被猜出了，一个伪随机可能完全不随机，可是是三个伪随机就十分接近随机了，每增加一个自由度，随机性增加的可不是一。”</p>
-<h3 id="4服务器的最后回应"><a href="#4服务器的最后回应" class="headerlink" title="4服务器的最后回应"></a>4服务器的最后回应</h3><p>服务器收到客户端的第三个随机数pre-master key之后，计算生成本次会话所用的”会话密钥”。然后，向客户端最后发送下面信息。</p>
-<ul>
-<li><p>（1）编码改变通知，表示随后的信息都将用双方商定的加密方法和密钥发送。</p>
-</li>
-<li><p>（2）服务器握手结束通知，表示服务器的握手阶段已经结束。这一项同时也是前面发送的所有内容的hash值，用来供客户端校验。</p>
-</li>
-</ul>
-<p>至此，整个握手阶段全部结束。接下来，客户端与服务器进入加密通信，就完全是使用普通的HTTP协议，只不过用”会话密钥”加密内容。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/05/分布式/拜占庭将军问题/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/05/分布式/拜占庭将军问题/" itemprop="url">拜占庭将军问题</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-05T20:01:03+08:00">
-                2018-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/06/05/分布式/拜占庭将军问题/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/06/05/分布式/拜占庭将军问题/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/06/05/分布式/拜占庭将军问题/" class="leancloud_visitors" data-flag-title="拜占庭将军问题">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="拜占庭将军问题"><a href="#拜占庭将军问题" class="headerlink" title="拜占庭将军问题"></a>拜占庭将军问题</h1><p>11位拜占庭将军去打仗, 他们各自有权力观测敌情并作出判断, 进攻或撤退, 那么怎么让他们只用传令兵达成一致呢?一种很符合直觉的方法就是投票,每位将军作出决定后都将结果”广播”给其余所有将军, 这样所有将军都能获得同样的11份(包括自己)结果, 取多数, 即可得到全军都同意的行为.但如果这11位将军中有间谍呢? 假设有9位忠诚的将军, 5位判断进攻, 4位判断撤退, 还有2个间谍恶意判断撤退, 虽然结果是错误的撤退, 但这种情况完全是允许的. 因为这11位将军依然保持着状态一致性.暂时从战争故事中抽离出来, 分布式数据库最糟糕的问题绝对不是写入或者读取失败, 而是状态不同步, 还感知不到. 这个的后果就是correctness不能保证, 那程序就没有任何意义了.2个间谍怎么破坏状态一致性呢? 他们跟5位判断进攻的将军说, 我们支持进攻, 那么这5位将军统计发现7位支持进攻, 4位支持撤退, 将发动进攻. 又跟4位撤退的将军说, 我们支持撤退, 一统计, 5票进攻, 6票撤退, 立马撤退. 这场战争必输无疑了.避免这种状态不同步的问题, 我称之为”广义拜占庭将军问题”.Lamport继续将这个问题规约为更小的问题,解决广义拜占庭问题, 必须满足两个条件:对任意忠诚的将军来说, 他们看到的其余将军的决定必须是一样的, 不允许出现前文那种, 5位将军统计结果是7攻4撤, 另外4位将军是5攻6撤. 所有忠诚将军的决定对于其余所有忠诚将军都是一样的. 比如, V(1)表示1号将军的决定. 那么其余所有忠诚将军的统计表上, V(1)一定是一样的. 如果这点不能保证, 说明间谍已经可以直接颠覆指挥系统了, 系统怎样都是无效的, 哪怕达成了一致.上面的条件等价于如何让一个将军(可以是间谍, 论文叫commander)对所有接收者(lieutenant)的指令(order)保持一致? 这个我叫”狭义拜占庭将军问题”.</p>
-<h1 id="什么是-Raft-算法？"><a href="#什么是-Raft-算法？" class="headerlink" title="什么是 Raft 算法？"></a>什么是 Raft 算法？</h1><p>Raft 算法是一种简单易懂的共识算法。它依靠 状态机 和 主从同步 的方式，在各个节点之间实现数据的一致性。</p>
-<p>在学习Raft算法的时候，大家需要了解Raft的两个核心要点：</p>
-<ul>
-<li>1.选取主节点</li>
-<li>2.同步数据</li>
-</ul>
-<p>Raft算法在选择主节点的过程中，也是通过多个节点之间的投票竞争。</p>
-<p>说到这里，不得不说一下Raft算法的状态机。Raft算法为节点定义了三种角色：</p>
-<p>1.Leader（主节点）</p>
-<p>2.Follower（从节点）</p>
-<p>3.Candidate（参与投票竞争的节点）</p>
-<p>具体流程</p>
-<p>第一步，在最初，还没有一个主节点的时候，所有节点的身份都是Follower。每一个节点都有自己的计时器，当计时达到了超时时间（Election Timeout），该节点会转变为Candidate。</p>
-<p>第二步，成为Candidate的节点，会首先给自己投票，然后向集群中其他所有的节点发起请求，要求大家都给自己投票。</p>
-<p>第三步，其他收到投票请求且还未投票的Follower节点会向发起者投票，发起者收到反馈通知后，票数增加。</p>
-<p>第四步，当得票数超过了集群节点数量的一半，该节点晋升为Leader节点。Leader节点会立刻向其他节点发出通知，告诉大家自己才是老大。收到通知的节点全部变为Follower，并且各自的计时器清零。</p>
-<p>这里需要说明一点，每个节点的超时时间都是不一样的。比如A节点的超时时间是3秒，B节点的超时时间是5秒，C节点的超时时间是4秒。这样一来，A节点将会最先发起投票请求，而不是所有节点同时发起。</p>
-<p>为什么这样设计呢？设想如果所有节点同时发起投票，必然会导致大家的票数差不多，形成僵局，谁也当不成老大。</p>
-<p>那么，成为Leader的节点是否就坐稳了老大的位置呢？并不是。Leader节点需要每隔一段时间向集群其他节点发送心跳通知，表明你们的老大还活着。</p>
-<p>一旦Leader节点挂掉，发不出通知，那么计时达到了超时时间的Follower节点会转变为Candidate节点，发起选主投票，周而复始……</p>
-<p>数据同步的流程</p>
-<p>第一步，由客户端提交数据到Leader节点。</p>
-<p>第二步，由Leader节点把数据复制到集群内所有的Follower节点。如果一次复制失败，会不断进行重试。</p>
-<p>第三步，Follower节点们接收到复制的数据，会反馈给Leader节点。</p>
-<p>第四步，如果Leader节点接收到超过半数的Follower反馈，表明复制成功。于是提交自己的数据，并通知客户端数据提交成功。</p>
-<p>第五步，由Leader节点通知集群内所有的Follower节点提交数据，从而完成数据同步流程。</p>
-<hr>
-<p>Paxos 算法：</p>
-<p>早期的共识算法，由拜占庭将军问题的提出者 Leslie Lamport 所发明。谷歌的分布式锁服务 Chubby 就是以 Paxos 算法为基础。</p>
-<p>ZAB 算法：</p>
-<p>Zookeeper 所使用的一致性算法，在流程上和 Raft 算法比较接近。</p>
-<p>PBFT 算法：</p>
-<p>区块链技术所使用的共识算法之一，适用于私有链的共识。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/05/分布式/loadbalance/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/05/分布式/loadbalance/" itemprop="url">负载均衡算法</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-05T19:59:53+08:00">
-                2018-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/06/05/分布式/loadbalance/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/06/05/分布式/loadbalance/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/06/05/分布式/loadbalance/" class="leancloud_visitors" data-flag-title="负载均衡算法">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="种类"><a href="#种类" class="headerlink" title="种类:"></a>种类:</h1><ul>
-<li>随机 (Random)</li>
-<li>轮询 (RoundRobin)</li>
-<li>一致性哈希 (ConsistentHash)</li>
-<li>哈希 (Hash)</li>
-<li>加权（Weighted）</li>
-<li>最小连接数</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">public Server choose(Object key) &#123;</span><br><span class="line">    if (loadBalancerStats == null) &#123;</span><br><span class="line">        return super.choose(key);</span><br><span class="line">    &#125;</span><br><span class="line">    List&lt;Server&gt; serverList = getLoadBalancer().getAllServers(); // 获取所有的服务器列表</span><br><span class="line">    int minimalConcurrentConnections = Integer.MAX_VALUE;</span><br><span class="line">    long currentTime = System.currentTimeMillis();</span><br><span class="line">    Server chosen = null;</span><br><span class="line">    for (Server server: serverList) &#123; // 遍历每个服务器</span><br><span class="line">        ServerStats serverStats = loadBalancerStats.getSingleServerStat(server); // 获取各个服务器的状态</span><br><span class="line">        if (!serverStats.isCircuitBreakerTripped(currentTime)) &#123; // 没有触发断路器的话继续执行</span><br><span class="line">            int concurrentConnections = serverStats.getActiveRequestsCount(currentTime); // 获取当前服务器的请求个数</span><br><span class="line">            if (concurrentConnections &lt; minimalConcurrentConnections) &#123; // 比较各个服务器之间的请求数，然后选取请求数最少的服务器并放到chosen变量中</span><br><span class="line">                minimalConcurrentConnections = concurrentConnections;</span><br><span class="line">                chosen = server;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    if (chosen == null) &#123; // 如果没有选上，调用父类ClientConfigEnabledRoundRobinRule的choose方法，也就是使用RoundRobinRule轮询的方式进行负载均衡        </span><br><span class="line">        return super.choose(key);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        return chosen;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;public Server choose(Object key) &#123;</span><br></pre></td></tr></table></figure>
-<p>参考:<a href="http://blog.51cto.com/wangwx/72842" target="_blank" rel="noopener">http://blog.51cto.com/wangwx/72842</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/05/java/ScheduledExecutorService/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/05/java/ScheduledExecutorService/" itemprop="url">ScheduledExecutorService</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-05T19:59:03+08:00">
-                2018-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/06/05/java/ScheduledExecutorService/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/06/05/java/ScheduledExecutorService/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/06/05/java/ScheduledExecutorService/" class="leancloud_visitors" data-flag-title="ScheduledExecutorService">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="官网api"><a href="#官网api" class="headerlink" title="官网api"></a>官网api</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line"> * ORACLE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.</span><br><span class="line"> *</span><br><span class="line"> * Written by Doug Lea with assistance from members of JCP JSR-166</span><br><span class="line"> * Expert Group and released to the public domain, as explained at</span><br><span class="line"> * http://creativecommons.org/publicdomain/zero/1.0/</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">package java.util.concurrent;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * An &#123;@link ExecutorService&#125; that can schedule commands to run after a given</span><br><span class="line"> * delay, or to execute periodically.</span><br><span class="line"> *</span><br><span class="line"> * &lt;p&gt;The &#123;@code schedule&#125; methods create tasks with various delays</span><br><span class="line"> * and return a task object that can be used to cancel or check</span><br><span class="line"> * execution. The &#123;@code scheduleAtFixedRate&#125; and</span><br><span class="line"> * &#123;@code scheduleWithFixedDelay&#125; methods create and execute tasks</span><br><span class="line"> * that run periodically until cancelled.</span><br><span class="line"> *</span><br><span class="line"> * &lt;p&gt;Commands submitted using the &#123;@link Executor#execute(Runnable)&#125;</span><br><span class="line"> * and &#123;@link ExecutorService&#125; &#123;@code submit&#125; methods are scheduled</span><br><span class="line"> * with a requested delay of zero. Zero and negative delays (but not</span><br><span class="line"> * periods) are also allowed in &#123;@code schedule&#125; methods, and are</span><br><span class="line"> * treated as requests for immediate execution.</span><br><span class="line"> *</span><br><span class="line"> * &lt;p&gt;All &#123;@code schedule&#125; methods accept &lt;em&gt;relative&lt;/em&gt; delays and</span><br><span class="line"> * periods as arguments, not absolute times or dates. It is a simple</span><br><span class="line"> * matter to transform an absolute time represented as a &#123;@link</span><br><span class="line"> * java.util.Date&#125; to the required form. For example, to schedule at</span><br><span class="line"> * a certain future &#123;@code date&#125;, you can use: &#123;@code schedule(task,</span><br><span class="line"> * date.getTime() - System.currentTimeMillis(),</span><br><span class="line"> * TimeUnit.MILLISECONDS)&#125;. Beware however that expiration of a</span><br><span class="line"> * relative delay need not coincide with the current &#123;@code Date&#125; at</span><br><span class="line"> * which the task is enabled due to network time synchronization</span><br><span class="line"> * protocols, clock drift, or other factors.</span><br><span class="line"> *</span><br><span class="line"> * &lt;p&gt;The &#123;@link Executors&#125; class provides convenient factory methods for</span><br><span class="line"> * the ScheduledExecutorService implementations provided in this package.</span><br><span class="line"> *</span><br><span class="line"> * &lt;h3&gt;Usage Example&lt;/h3&gt;</span><br><span class="line"> *</span><br><span class="line"> * Here is a class with a method that sets up a ScheduledExecutorService</span><br><span class="line"> * to beep every ten seconds for an hour:</span><br><span class="line"> *</span><br><span class="line"> *  &lt;pre&gt; &#123;@code</span><br><span class="line"> * import static java.util.concurrent.TimeUnit.*;</span><br><span class="line"> * class BeeperControl &#123;</span><br><span class="line"> *   private final ScheduledExecutorService scheduler =</span><br><span class="line"> *     Executors.newScheduledThreadPool(1);</span><br><span class="line"> *</span><br><span class="line"> *   public void beepForAnHour() &#123;</span><br><span class="line"> *     final Runnable beeper = new Runnable() &#123;</span><br><span class="line"> *       public void run() &#123; System.out.println(&quot;beep&quot;); &#125;</span><br><span class="line"> *     &#125;;</span><br><span class="line"> *     final ScheduledFuture&lt;?&gt; beeperHandle =</span><br><span class="line"> *       scheduler.scheduleAtFixedRate(beeper, 10, 10, SECONDS);</span><br><span class="line"> *     scheduler.schedule(new Runnable() &#123;</span><br><span class="line"> *       public void run() &#123; beeperHandle.cancel(true); &#125;</span><br><span class="line"> *     &#125;, 60 * 60, SECONDS);</span><br><span class="line"> *   &#125;</span><br><span class="line"> * &#125;&#125;&lt;/pre&gt;</span><br><span class="line"> *</span><br><span class="line"> * @since 1.5</span><br><span class="line"> * @author Doug Lea</span><br><span class="line"> */</span><br><span class="line">public interface ScheduledExecutorService extends ExecutorService &#123;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Creates and executes a one-shot action that becomes enabled</span><br><span class="line">     * after the given delay.</span><br><span class="line">     *</span><br><span class="line">     * @param command the task to execute</span><br><span class="line">     * @param delay the time from now to delay execution</span><br><span class="line">     * @param unit the time unit of the delay parameter</span><br><span class="line">     * @return a ScheduledFuture representing pending completion of</span><br><span class="line">     *         the task and whose &#123;@code get()&#125; method will return</span><br><span class="line">     *         &#123;@code null&#125; upon completion</span><br><span class="line">     * @throws RejectedExecutionException if the task cannot be</span><br><span class="line">     *         scheduled for execution</span><br><span class="line">     * @throws NullPointerException if command is null</span><br><span class="line">     */</span><br><span class="line">    public ScheduledFuture&lt;?&gt; schedule(Runnable command,</span><br><span class="line">                                       long delay, TimeUnit unit);</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Creates and executes a ScheduledFuture that becomes enabled after the</span><br><span class="line">     * given delay.</span><br><span class="line">     *</span><br><span class="line">     * @param callable the function to execute</span><br><span class="line">     * @param delay the time from now to delay execution</span><br><span class="line">     * @param unit the time unit of the delay parameter</span><br><span class="line">     * @param &lt;V&gt; the type of the callable&apos;s result</span><br><span class="line">     * @return a ScheduledFuture that can be used to extract result or cancel</span><br><span class="line">     * @throws RejectedExecutionException if the task cannot be</span><br><span class="line">     *         scheduled for execution</span><br><span class="line">     * @throws NullPointerException if callable is null</span><br><span class="line">     */</span><br><span class="line">    public &lt;V&gt; ScheduledFuture&lt;V&gt; schedule(Callable&lt;V&gt; callable,</span><br><span class="line">                                           long delay, TimeUnit unit);</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Creates and executes a periodic action that becomes enabled first</span><br><span class="line">     * after the given initial delay, and subsequently with the given</span><br><span class="line">     * period; that is executions will commence after</span><br><span class="line">     * &#123;@code initialDelay&#125; then &#123;@code initialDelay+period&#125;, then</span><br><span class="line">     * &#123;@code initialDelay + 2 * period&#125;, and so on.</span><br><span class="line">     * If any execution of the task</span><br><span class="line">     * encounters an exception, subsequent executions are suppressed.</span><br><span class="line">     * Otherwise, the task will only terminate via cancellation or</span><br><span class="line">     * termination of the executor.  If any execution of this task</span><br><span class="line">     * takes longer than its period, then subsequent executions</span><br><span class="line">     * may start late, but will not concurrently execute.</span><br><span class="line">     *</span><br><span class="line">     * @param command the task to execute</span><br><span class="line">     * @param initialDelay the time to delay first execution</span><br><span class="line">     * @param period the period between successive executions</span><br><span class="line">     * @param unit the time unit of the initialDelay and period parameters</span><br><span class="line">     * @return a ScheduledFuture representing pending completion of</span><br><span class="line">     *         the task, and whose &#123;@code get()&#125; method will throw an</span><br><span class="line">     *         exception upon cancellation</span><br><span class="line">     * @throws RejectedExecutionException if the task cannot be</span><br><span class="line">     *         scheduled for execution</span><br><span class="line">     * @throws NullPointerException if command is null</span><br><span class="line">     * @throws IllegalArgumentException if period less than or equal to zero</span><br><span class="line">     */</span><br><span class="line">    public ScheduledFuture&lt;?&gt; scheduleAtFixedRate(Runnable command,</span><br><span class="line">                                                  long initialDelay,</span><br><span class="line">                                                  long period,</span><br><span class="line">                                                  TimeUnit unit);</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Creates and executes a periodic action that becomes enabled first</span><br><span class="line">     * after the given initial delay, and subsequently with the</span><br><span class="line">     * given delay between the termination of one execution and the</span><br><span class="line">     * commencement of the next.  If any execution of the task</span><br><span class="line">     * encounters an exception, subsequent executions are suppressed.</span><br><span class="line">     * Otherwise, the task will only terminate via cancellation or</span><br><span class="line">     * termination of the executor.</span><br><span class="line">     *</span><br><span class="line">     * @param command the task to execute</span><br><span class="line">     * @param initialDelay the time to delay first execution</span><br><span class="line">     * @param delay the delay between the termination of one</span><br><span class="line">     * execution and the commencement of the next</span><br><span class="line">     * @param unit the time unit of the initialDelay and delay parameters</span><br><span class="line">     * @return a ScheduledFuture representing pending completion of</span><br><span class="line">     *         the task, and whose &#123;@code get()&#125; method will throw an</span><br><span class="line">     *         exception upon cancellation</span><br><span class="line">     * @throws RejectedExecutionException if the task cannot be</span><br><span class="line">     *         scheduled for execution</span><br><span class="line">     * @throws NullPointerException if command is null</span><br><span class="line">     * @throws IllegalArgumentException if delay less than or equal to zero</span><br><span class="line">     */</span><br><span class="line">    public ScheduledFuture&lt;?&gt; scheduleWithFixedDelay(Runnable command,</span><br><span class="line">                                                     long initialDelay,</span><br><span class="line">                                                     long delay,</span><br><span class="line">                                                     TimeUnit unit);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h1 id="核心方法"><a href="#核心方法" class="headerlink" title="核心方法"></a>核心方法</h1><table>
-<thead>
-<tr>
-<th style="text-align:left">Method</th>
-<th style="text-align:left">Desc</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">schedule(Callable&lt;V&gt; callable, long delay, TimeUnit unit)</td>
-<td style="text-align:left">创建并执行在给定延迟后启用的 ScheduledFuture。</td>
-</tr>
-<tr>
-<td style="text-align:left">schedule(Runnable command, long delay, TimeUnit unit)</td>
-<td style="text-align:left">创建并执行在给定延迟后启用的一次性操作。</td>
-</tr>
-<tr>
-<td style="text-align:left">scheduleAtFixedRate(Runnable command, long initialDelay,long period, TimeUnitunit)</td>
-<td style="text-align:left">创建并执行一个在给定初始延迟后首次启用的定期操作，后续操作具有给定的周期；也就是将在 initialDelay 后开始执行，然后在initialDelay+period 后执行，接着在 initialDelay + 2 * period 后执行，依此类推。</td>
-</tr>
-<tr>
-<td style="text-align:left">scheduleWithFixedDelay(Runnable command, long initialDelay, long delay,TimeUnit unit)</td>
-<td style="text-align:left">创建并执行一个在给定初始延迟后首次启用的定期操作，随后，在每一次执行终止和下一次执行开始之间都存在给定的延迟。</td>
-</tr>
-</tbody>
-</table>
-<h1 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h1><h2 id="执行多个不同任务"><a href="#执行多个不同任务" class="headerlink" title="执行多个不同任务"></a>执行多个不同任务</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">public class ScheduledException &#123;</span><br><span class="line"></span><br><span class="line">    static class TaskA implements Runnable &#123;</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        public void run() &#123;</span><br><span class="line">            System.out.println(&quot;task A&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    static class TaskB implements Runnable &#123;</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        public void run() &#123;</span><br><span class="line">            System.out.println(&quot;task B&quot;);</span><br><span class="line">            throw new RuntimeException();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) throws InterruptedException &#123;</span><br><span class="line">        ScheduledExecutorService timer = Executors</span><br><span class="line">                .newSingleThreadScheduledExecutor();</span><br><span class="line">        timer.scheduleWithFixedDelay(new TaskA(), 0, 1, TimeUnit.SECONDS);</span><br><span class="line">        timer.scheduleWithFixedDelay(new TaskB(), 2, 1, TimeUnit.SECONDS);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="第二个任务就不会被第一个任务延迟了"><a href="#第二个任务就不会被第一个任务延迟了" class="headerlink" title="第二个任务就不会被第一个任务延迟了"></a>第二个任务就不会被第一个任务延迟了</h2><h2 id="任务取消"><a href="#任务取消" class="headerlink" title="任务取消"></a>任务取消</h2><p>单个定时任务的异常不会再导致整个定时任务被取消了，即使背后只有一个线程执行任务</p>
-<h2 id="coreSzie的作用"><a href="#coreSzie的作用" class="headerlink" title="coreSzie的作用??"></a>coreSzie的作用??</h2><h1 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h1><p><a href="https://blog.csdn.net/top_code/article/details/52180239" target="_blank" rel="noopener">https://blog.csdn.net/top_code/article/details/52180239</a></p>
-<p><a href="https://www.zybuluo.com/mikumikulch/note/713546" target="_blank" rel="noopener">https://www.zybuluo.com/mikumikulch/note/713546</a></p>
-<p><a href="https://www.zybuluo.com/mikumikulch/note/712598" target="_blank" rel="noopener">https://www.zybuluo.com/mikumikulch/note/712598</a></p>
-<p><a href="http://www.cnblogs.com/swiftma/p/6724894.html" target="_blank" rel="noopener">http://www.cnblogs.com/swiftma/p/6724894.html</a></p>
+</ol>
+<p>这种“随机应答”的方法在理论上也被证明是服从ε-差分隐私的。对于用户来说，隐私数据在上报给服务器之前就已经加了噪声，从而具有一定保证。对于公司来说，也能收集到有效的数据。</p>
+<p>RAPPOR 使用“随机应答”的方法克服了之前只能回答简单查询语句的限制，现在可以上报包含字符串这类更加复杂的回答。RAPPOR 在上报字符串信息的时候首先使用“布隆过滤器”（bloom filter）算法把字符串哈希到一个数组中，然后再加入噪声传给服务器。布隆过滤器不需要存储元素本身，并可以用于检索一个元素是否在一个集合中。通过使用这种方法，就可以对字符串数据添加噪音，保护用户的隐私。</p>
+<p>苹果在 2016 年的世界开发者大会（WWDC）上也宣布使用差分隐私的方法收集用户数据。虽然苹果没有透露具体的细节，我们从官方的描述中也可以推测出苹果也使用了在客户端上做匿名化再传输到服务器的方法。</p>
+<p>Differentialprivacy is a research topic in the areas of statistics and data analytics thatuses hashing, subsampling and noiseinjection to enable…crowdsourced learning while keeping the data ofindividual users completely private. Apple has been doing some super-importantwork in this area to enable differential privacy to be deployed at scale.</p>
+<p>我们刚才介绍的 Google 和 Apple 的模型都是先在本地做差分隐私，然后再上报给服务器，我们把这种方法叫做本地模式（local mode）。这种差分隐私的做法在上报数据可以相互关联的情况下还是存在隐私泄漏。Google的RAPPOR虽然解决了对同一个数据的多次上报的隐私泄露问题，但并没有解决多个相关数据上报后产生的隐私泄露问题。对于这一问题，Apple也没有给出详细的解释。</p>
+<p>除了Google 和苹果在内部产品中使用差分隐私方法，哈佛大学公开了一个名为PSI (Ψ) 的项目，提供了一个便捷的差分隐私工具。使用者通过上传数据，调整差分隐私的参数，就可以获得满足差分隐私的数据集。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>本文介绍了学术界和工业界对于用户隐私保护的努力成果。我们首先介绍了 k-anonymity，即通过变换隐私数据，保证相同特性的用户在数据库出现的次数至少是 k 次。然后，为了防止攻击者通过隐私数据的背景知识推测用户身份，提出使用 l-diversity，保证相同特征的用户中，隐私数据相同的个数大于 l。除此之外，我们也讨论了 t-closeness。最后我们详细介绍了差分隐私的概念，以及实际应用中应如何使用差分隐私。</p>
+<p>从最开始的 k-anonymity, l-diversity , t-closeness 到现在的 ε-差分隐私，都是为了既保证用户的个人隐私，也能对实际应用和研究提供有价值的数据。在大数据的时代中，希望各公司在利用数据提供更好的服务的同时，能保护好用户的个人隐私。这是法律的要求，也是安全行业的追求。我们相信隐私保护技术会越来越受到重视，并从学术理论迅速投入工业界实战应用。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://mp.weixin.qq.com/s?__biz=MzA3NTQ3ODI0NA==&amp;mid=2247483923&amp;idx=1&amp;sn=bfa6d5efa074d1a93a449d66c2ee1046&amp;chksm=9f6ea798a8192e8e080afba90df416755af2586ff17d3a2c8854f89fd0e19544b5ab2ec8d0c1&amp;mpshare=1&amp;scene=1&amp;srcid=0613Os5d03IzCkuXsrHMo6tB#rd" target="_blank" rel="noopener">https://mp.weixin.qq.com/s?__biz=MzA3NTQ3ODI0NA==&amp;mid=2247483923&amp;idx=1&amp;sn=bfa6d5efa074d1a93a449d66c2ee1046&amp;chksm=9f6ea798a8192e8e080afba90df416755af2586ff17d3a2c8854f89fd0e19544b5ab2ec8d0c1&amp;mpshare=1&amp;scene=1&amp;srcid=0613Os5d03IzCkuXsrHMo6tB#rd</a></p>
 
           
         
@@ -2057,7 +2043,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/19/">19</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/20/">20</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2103,7 +2089,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">186</span>
+                  <span class="site-state-item-count">196</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

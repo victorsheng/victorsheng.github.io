@@ -326,7 +326,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/19/分布式/sofa-overview/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/03/java/java_common/java-annotation/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
@@ -345,7 +345,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/04/19/分布式/sofa-overview/" itemprop="url">sofa-overview</a></h1>
+                <a class="post-title-link" href="/2018/05/03/java/java_common/java-annotation/" itemprop="url">java_annotation</a></h1>
         
 
         <div class="post-meta">
@@ -357,8 +357,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-19T18:07:26+08:00">
-                2018-04-19
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-03T10:08:00+08:00">
+                2018-05-03
               </time>
             
 
@@ -376,9 +376,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/04/19/分布式/sofa-overview/#comments" itemprop="discussionUrl">
+                <a href="/2018/05/03/java/java_common/java-annotation/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/04/19/分布式/sofa-overview/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/05/03/java/java_common/java-annotation/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -386,7 +386,7 @@
 
           
           
-             <span id="/2018/04/19/分布式/sofa-overview/" class="leancloud_visitors" data-flag-title="sofa-overview">
+             <span id="/2018/05/03/java/java_common/java-annotation/" class="leancloud_visitors" data-flag-title="java_annotation">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -419,10 +419,371 @@
       
         
           
-            <h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ul>
-<li><a href="https://github.com/alipay/sofa-rpc" target="_blank" rel="noopener">https://github.com/alipay/sofa-rpc</a></li>
-<li><a href="https://github.com/alipay/sofa-rpc/wiki/DeveloperGuide" target="_blank" rel="noopener">https://github.com/alipay/sofa-rpc/wiki/DeveloperGuide</a></li>
-<li><a href="https://github.com/alipay/sofa-rpc/wiki/Programming" target="_blank" rel="noopener">https://github.com/alipay/sofa-rpc/wiki/Programming</a></li>
+            <h1 id="注解语法"><a href="#注解语法" class="headerlink" title="注解语法"></a>注解语法</h1><p>因为平常开发少见，相信有不少的人员会认为注解的地位不高。其实同 classs 和 interface 一样，注解也属于一种类型。它是在 Java SE 5.0 版本中开始引入的概念。</p>
+<h1 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">package com.example.demo.annotation;</span><br><span class="line"></span><br><span class="line">import java.lang.annotation.- ElementType;</span><br><span class="line">import java.lang.annotation.Retention;</span><br><span class="line">import java.lang.annotation.RetentionPolicy;</span><br><span class="line">import java.lang.annotation.Target;</span><br><span class="line"></span><br><span class="line">@Retention(RetentionPolicy.RUNTIME)</span><br><span class="line">@Target(- ElementType.TYPE)</span><br><span class="line">public @interface TestAnnotation &#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="元注解"><a href="#元注解" class="headerlink" title="元注解"></a>元注解</h1><p>元注解是什么意思呢？</p>
+<p>元注解是可以注解到注解上的注解，或者说元注解是一种基本注解，但是它能够应用到其它的注解上面。</p>
+<p>如果难于理解的话，你可以这样理解。元注解也是一张标签，但是它是一张特殊的标签，它的作用和目的就是给其他普通的标签进行解释说明的。</p>
+<p>元标签有 @Retention、@Documented、@Target、@Inherited、@Repeatable 5 种。</p>
+<h2 id="Retention"><a href="#Retention" class="headerlink" title="@Retention"></a>@Retention</h2><p>Retention 的英文意为保留期的意思。当 @Retention 应用到一个注解上的时候，它解释说明了这个注解的的存活时间。</p>
+<p>它的取值如下： </p>
+<ul>
+<li>RetentionPolicy.SOURCE 注解只在源码阶段保留，在编译器进行编译时它将被丢弃忽视。 </li>
+<li>RetentionPolicy.CLASS 注解只被保留到编译进行的时候，它并不会被加载到 JVM 中。 </li>
+<li>RetentionPolicy.RUNTIME 注解可以保留到程序运行的时候，它会被加载进入到 JVM 中，所以在程序运行时可以获取到它们。</li>
+</ul>
+<p>我们可以这样的方式来加深理解，@Retention 去给一张标签解释的时候，它指定了这张标签张贴的时间。@Retention 相当于给一张标签上面盖了一张时间戳，时间戳指明了标签张贴的时间周期。</p>
+<h2 id="Documented"><a href="#Documented" class="headerlink" title="@Documented"></a>@Documented</h2><p>顾名思义，这个元注解肯定是和文档有关。它的作用是能够将注解中的元素包含到 Javadoc 中去。</p>
+<h2 id="Target"><a href="#Target" class="headerlink" title="@Target"></a>@Target</h2><p>Target 是目标的意思，@Target 指定了注解运用的地方。</p>
+<p>你可以这样理解，当一个注解被 @Target 注解时，这个注解就被限定了运用的场景。</p>
+<p>类比到标签，原本标签是你想张贴到哪个地方就到哪个地方，但是因为 @Target 的存在，它张贴的地方就非常具体了，比如只能张贴到方法上、类上、方法参数上等等。@Target 有下面的取值</p>
+<ul>
+<li>ElementType.ANNOTATION_TYPE 可以给一个注解进行注解</li>
+<li>ElementType.CONSTRUCTOR 可以给构造方法进行注解</li>
+<li>ElementType.FIELD 可以给属性进行注解</li>
+<li>ElementType.LOCAL_VARIABLE 可以给局部变量进行注解</li>
+<li>ElementType.METHOD 可以给方法进行注解</li>
+<li>ElementType.PACKAGE 可以给一个包进行注解</li>
+<li>ElementType.PARAMETER 可以给一个方法内的参数进行注解</li>
+<li>ElementType.TYPE 可以给一个类型进行注解，比如类、接口、枚举</li>
+</ul>
+<h2 id="Inherited"><a href="#Inherited" class="headerlink" title="@Inherited"></a>@Inherited</h2><p>Inherited 是继承的意思，但是它并不是说注解本身可以继承，而是说如果一个超类被 @Inherited 注解过的注解进行注解的话，那么如果它的子类没有被任何注解应用的话，那么这个子类就继承了超类的注解。</p>
+<h2 id="Repeatable"><a href="#Repeatable" class="headerlink" title="@Repeatable"></a>@Repeatable</h2><p>Repeatable 自然是可重复的意思。@Repeatable 是 Java 1.8 才加进来的，所以算是一个新的特性。</p>
+<p>什么样的注解会多次应用呢？通常是注解的值可以同时取多个。</p>
+<p>举个例子，一个人他既是程序员又是产品经理,同时他还是个画家。</p>
+<h1 id="注解的属性"><a href="#注解的属性" class="headerlink" title="注解的属性"></a>注解的属性</h1><p>注解的属性也叫做成员变量。注解只有成员变量，没有方法。注解的成员变量在注解的定义中以“无形参的方法”形式来声明，其方法名定义了该成员变量的名字，其返回值定义了该成员变量的类型。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">package com.example.demo.annotation;</span><br><span class="line"></span><br><span class="line">import java.lang.annotation.ElementType;</span><br><span class="line">import java.lang.annotation.Retention;</span><br><span class="line">import java.lang.annotation.RetentionPolicy;</span><br><span class="line">import java.lang.annotation.Target;</span><br><span class="line"></span><br><span class="line">@Retention(RetentionPolicy.RUNTIME)</span><br><span class="line">@Target(ElementType.TYPE)</span><br><span class="line">public @interface TestAnnotation &#123;</span><br><span class="line"></span><br><span class="line">  int id();</span><br><span class="line"></span><br><span class="line">  String msg();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">package com.example.demo.annotation;</span><br><span class="line"></span><br><span class="line">import java.lang.annotation.ElementType;</span><br><span class="line">import java.lang.annotation.Retention;</span><br><span class="line">import java.lang.annotation.RetentionPolicy;</span><br><span class="line">import java.lang.annotation.Target;</span><br><span class="line"></span><br><span class="line">@Retention(RetentionPolicy.RUNTIME)</span><br><span class="line">@Target(ElementType.TYPE)</span><br><span class="line">public @interface TestAnnotation &#123;</span><br><span class="line"></span><br><span class="line">  int id();</span><br><span class="line"></span><br><span class="line">  String msg();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果一个注解内仅仅只有一个名字为 value 的属性时，应用这个注解时可以直接接属性值填写到括号内。</p>
+<h1 id="组合注解"><a href="#组合注解" class="headerlink" title="组合注解"></a>组合注解</h1><p>例子:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">//</span><br><span class="line">// Source code recreated from a .class file by IntelliJ IDEA</span><br><span class="line">// (powered by Fernflower decompiler)</span><br><span class="line">//</span><br><span class="line"></span><br><span class="line">package org.springframework.boot.autoconfigure;</span><br><span class="line"></span><br><span class="line">import java.lang.annotation.Documented;</span><br><span class="line">import java.lang.annotation.ElementType;</span><br><span class="line">import java.lang.annotation.Inherited;</span><br><span class="line">import java.lang.annotation.Retention;</span><br><span class="line">import java.lang.annotation.RetentionPolicy;</span><br><span class="line">import java.lang.annotation.Target;</span><br><span class="line">import org.springframework.boot.SpringBootConfiguration;</span><br><span class="line">import org.springframework.boot.context.TypeExcludeFilter;</span><br><span class="line">import org.springframework.context.annotation.ComponentScan;</span><br><span class="line">import org.springframework.context.annotation.FilterType;</span><br><span class="line">import org.springframework.context.annotation.ComponentScan.Filter;</span><br><span class="line">import org.springframework.core.annotation.AliasFor;</span><br><span class="line"></span><br><span class="line">@Target(&#123;ElementType.TYPE&#125;)</span><br><span class="line">@Retention(RetentionPolicy.RUNTIME)</span><br><span class="line">@Documented</span><br><span class="line">@Inherited</span><br><span class="line">@SpringBootConfiguration</span><br><span class="line">@EnableAutoConfiguration</span><br><span class="line">@ComponentScan(</span><br><span class="line">  excludeFilters = &#123;@Filter(</span><br><span class="line">  type = FilterType.CUSTOM,</span><br><span class="line">  classes = &#123;TypeExcludeFilter.class&#125;</span><br><span class="line">), @Filter(</span><br><span class="line">  type = FilterType.CUSTOM,</span><br><span class="line">  classes = &#123;AutoConfigurationExcludeFilter.class&#125;</span><br><span class="line">)&#125;</span><br><span class="line">)</span><br><span class="line">public @interface SpringBootApplication &#123;</span><br><span class="line">  @AliasFor(</span><br><span class="line">    annotation = EnableAutoConfiguration.class</span><br><span class="line">  )</span><br><span class="line">  Class&lt;?&gt;[] exclude() default &#123;&#125;;</span><br><span class="line"></span><br><span class="line">  @AliasFor(</span><br><span class="line">    annotation = EnableAutoConfiguration.class</span><br><span class="line">  )</span><br><span class="line">  String[] excludeName() default &#123;&#125;;</span><br><span class="line"></span><br><span class="line">  @AliasFor(</span><br><span class="line">    annotation = ComponentScan.class,</span><br><span class="line">    attribute = &quot;basePackages&quot;</span><br><span class="line">  )</span><br><span class="line">  String[] scanBasePackages() default &#123;&#125;;</span><br><span class="line"></span><br><span class="line">  @AliasFor(</span><br><span class="line">    annotation = ComponentScan.class,</span><br><span class="line">    attribute = &quot;basePackageClasses&quot;</span><br><span class="line">  )</span><br><span class="line">  Class&lt;?&gt;[] scanBasePackageClasses() default &#123;&#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://blog.csdn.net/briblue/article/details/73824058" target="_blank" rel="noopener">https://blog.csdn.net/briblue/article/details/73824058</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/27/其他/logback-study/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/27/其他/logback-study/" itemprop="url">logback-study</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-27T17:49:43+08:00">
+                2018-04-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/27/其他/logback-study/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/04/27/其他/logback-study/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/04/27/其他/logback-study/" class="leancloud_visitors" data-flag-title="logback-study">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="LogBack、Slf4j和Log4j之间的关系"><a href="#LogBack、Slf4j和Log4j之间的关系" class="headerlink" title="LogBack、Slf4j和Log4j之间的关系"></a>LogBack、Slf4j和Log4j之间的关系</h1><p>Slf4j是The Simple Logging Facade for Java的简称，是一个简单日志门面抽象框架，它本身只提供了日志Facade API和一个简单的日志类实现，一般常配合Log4j，LogBack，java.util.logging使用。Slf4j作为应用层的Log接入时，程序可以根据实际应用场景动态调整底层的日志实现框架(Log4j/LogBack/JdkLog…)。</p>
+<p>LogBack和Log4j都是开源日记工具库，LogBack是Log4j的改良版本，比Log4j拥有更多的特性，同时也带来很大性能提升。详细数据可参照下面地址：Reasons to prefer logback over log4j。</p>
+<h1 id="组件"><a href="#组件" class="headerlink" title="组件"></a>组件</h1><h2 id="appender"><a href="#appender" class="headerlink" title="appender"></a>appender</h2><p><appender>是<configuration>的子节点，是负责写日志的组件。<appender>有两个必要属性name和class。name指定appender名称，class指定appender的全限定名。</appender></configuration></appender></p>
+<h3 id="ConsoleAppender"><a href="#ConsoleAppender" class="headerlink" title="ConsoleAppender"></a>ConsoleAppender</h3><p>把日志添加到控制台，有以下子节点：</p>
+<p><encoder>：对日志进行格式化。（具体参数稍后讲解 ）</encoder></p>
+<p><target>：字符串 System.out 或者 System.err ，默认 System.out .</target></p>
+<h3 id="FileAppender"><a href="#FileAppender" class="headerlink" title="FileAppender"></a>FileAppender</h3><p>把日志添加到文件，有以下子节点：</p>
+<p><file>：被写入的文件名，可以是相对目录，也可以是绝对目录，如果上级目录不存在会自动创建，没有默认值。</file></p>
+<p><append>：如果是 true，日志被追加到文件结尾，如果是 false，清空现存文件，默认是true。</append></p>
+<p><encoder>：对记录事件进行格式化。（具体参数稍后讲解 ）</encoder></p>
+<p><prudent>：如果是 true，日志会被安全的写入文件，即使其他的FileAppender也在向此文件做写入操作，效率低，默认是 false。</prudent></p>
+<h3 id="RollingFIleAppender"><a href="#RollingFIleAppender" class="headerlink" title="RollingFIleAppender"></a>RollingFIleAppender</h3><p>滚动记录文件，先将日志记录到指定文件，当符合某个条件时，将日志记录到其他文件。有以下子节点：</p>
+<p><file>：被写入的文件名，可以是相对目录，也可以是绝对目录，如果上级目录不存在会自动创建，没有默认值。</file></p>
+<p><append>：如果是 true，日志被追加到文件结尾，如果是 false，清空现存文件，默认是true。</append></p>
+<p><encoder>：对记录事件进行格式化。（具体参数稍后讲解 ）</encoder></p>
+<p><rollingpolicy>:当发生滚动时，决定 RollingFileAppender 的行为，涉及文件移动和重命名。</rollingpolicy></p>
+<p><triggeringpolicy>: 告知 RollingFileAppender 何时激活滚动。</triggeringpolicy></p>
+<p><prudent>：当为true时，不支持FixedWindowRollingPolicy。支持TimeBasedRollingPolicy，但是有两个限制，1不支持也不允许文件压缩，2不能设置file属性，必须留空。</prudent></p>
+<h3 id="RollingPolicy"><a href="#RollingPolicy" class="headerlink" title="RollingPolicy"></a>RollingPolicy</h3><h4 id="TimeBasedRollingPolicy："><a href="#TimeBasedRollingPolicy：" class="headerlink" title="TimeBasedRollingPolicy："></a>TimeBasedRollingPolicy：</h4><p>最常用的滚动策略，它根据时间来制定滚动策略，既负责滚动也负责触发滚动。有以下子节点：</p>
+<p><filenamepattern>: 必要节点，包含文件名及“%d”转换符，%d”可以包含一个Java.text.SimpleDateFormat指定的时间格式，如：%d{yyyy-MM}。如果直接使用 %d，默认格式是 yyyy-MM-dd。RollingFileAppender 的file字节点可有可无，通过设置file，可以为活动文件和归档文件指定不同位置，当前日志总是记录到file指定的文件（活动文件），活动文件的名字不会改变；如果没设置file，活动文件的名字会根据fileNamePattern 的值，每隔一段时间改变一次。“/”或者“\”会被当做目录分隔符。</filenamepattern></p>
+<p><maxhistory>: 可选节点，控制保留的归档文件的最大数量，超出数量就删除旧文件。假设设置每个月滚动，且<maxhistory>是6，则只保存最近6</maxhistory></maxhistory></p>
+<h4 id="FixedWindowRollingPolicy："><a href="#FixedWindowRollingPolicy：" class="headerlink" title="FixedWindowRollingPolicy："></a>FixedWindowRollingPolicy：</h4><p>根据固定窗口算法重命名文件的滚动策略。有以下子节点：</p>
+<p><minindex>:窗口索引最小值。</minindex></p>
+<p><maxindex>:窗口索引最大值，当用户指定的窗口过大时，会自动将窗口设置为12。</maxindex></p>
+<p><filenamepattern>: 必须包含“%i”例如，假设最小值和最大值分别为1和2，命名模式为 mylog%i.log,会产生归档文件mylog1.log和mylog2.log。还可以指定文件压缩选项，例如，mylog%i.log.gz 或者 没有log%i.log.zip</filenamepattern></p>
+<h4 id="SizeBasedTriggeringPolicy："><a href="#SizeBasedTriggeringPolicy：" class="headerlink" title="SizeBasedTriggeringPolicy："></a>SizeBasedTriggeringPolicy：</h4><p>查看当前活动文件的大小，如果超过指定大小会告知RollingFileAppender 触发当前活动文件滚动。只有一个节点:</p>
+<p><maxfilesize>:这是活动文件的大小，默认值是10MB。</maxfilesize></p>
+<h2 id="logger"><a href="#logger" class="headerlink" title="logger"></a>logger</h2><p><logger><br>用来设置某一个包或者具体的某一个类的日志打印级别、以及指定<appender>。<logger>仅有一个name属性，一个可选的level和一个可选的additivity属性。</logger></appender></logger></p>
+<p>name：用来指定受此logger约束的某一个包或者具体的某一个类。<br>level：用来设置打印级别，大小写无关：TRACE, DEBUG, INFO, WARN, ERROR, ALL 和 OFF，还有一个特殊值INHERITED或者同义词NULL，代表强制执行上级的级别。<br>如果未设置此属性，那么当前logger将会继承上级的级别。<br>additivity：是否向上级logger传递打印信息。默认是true。</p>
+<p><logger>可以包含零个或多个<appender-ref>元素，标识这个appender将会添加到这个logger。</appender-ref></logger></p>
+<h2 id="root"><a href="#root" class="headerlink" title="root"></a>root</h2><p>也是<logger>元素，但是它是根logger。只有一个level属性，应为已经被命名为”root”.</logger></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/26/java/java_common/java-genercity/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/26/java/java_common/java-genercity/" itemprop="url">java-genercity</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-26T18:28:01+08:00">
+                2018-04-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/26/java/java_common/java-genercity/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/04/26/java/java_common/java-genercity/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/04/26/java/java_common/java-genercity/" class="leancloud_visitors" data-flag-title="java-genercity">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="泛型"><a href="#泛型" class="headerlink" title="泛型"></a>泛型</h1><p>Java 在 1.5 引入了泛型机制，泛型本质是参数化类型，也就是说变量的类型是一个参数，在使用时再指定为具体类型。泛型可以用于类、接口、方法，通过使用泛型可以使代码更简单、安全。然而 Java 中的泛型使用了类型擦除，所以只是伪泛型。这篇文章对泛型的使用以及存在的问题做个总结，主要参考自 《Java 编程思想》。</p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">public class Holder1 &#123;</span><br><span class="line">    private Object a;</span><br><span class="line"></span><br><span class="line">    public Holder1(Object a) &#123;</span><br><span class="line">        this.a = a;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void set(Object a) &#123;</span><br><span class="line">        this.a = a;</span><br><span class="line">    &#125;</span><br><span class="line">    public Object get()&#123;</span><br><span class="line">        return a;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        Holder1 holder1 = new Holder1(&quot;not Generic&quot;);</span><br><span class="line">        String s = (String) holder1.get();</span><br><span class="line">        holder1.set(1);</span><br><span class="line">        Integer x = (Integer) holder1.get();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>在 Holder1 中，有一个用 Object 引用的变量。因为任何类型都可以向上转型为 Object，所以这个 Holder 可以接受任何类型。在取出的时候 Holder 只知道它保存的是一个 Object 对象，所以要强制转换为对应的类型。在 main 方法中， holder1 先是保存了一个字符串，也就是 String 对象，接着又变为保存一个 Integer 对象(参数 1 会自动装箱)。从 Holder 中取出变量时强制转换已经比较麻烦，这里还要记住不同的类型，要是转错了就会出现运行时异常。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">public class Holder2&lt;T&gt; &#123;</span><br><span class="line"></span><br><span class="line">    private T a;</span><br><span class="line">    public Holder2(T a) &#123;</span><br><span class="line">        this.a = a;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public T get() &#123;</span><br><span class="line">        return a;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void set(T a) &#123;</span><br><span class="line">        this.a = a;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        Holder2&lt;String&gt; holder2 = new Holder2&lt;&gt;(&quot;Generic&quot;);</span><br><span class="line">        String s = holder2.get();</span><br><span class="line"></span><br><span class="line">        holder2.set(&quot;test&quot;);</span><br><span class="line">        holder2.set(1);//无法编译   参数 1 不是 String 类型</span><br><span class="line"></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>在 Holder2 中， 变量 a 是一个参数化类型 T，T 只是一个标识，用其它字母也是可以的。创建 Holder2 对象的时候，在尖括号中传入了参数 T 的类型，那么在这个对象中，所有出现 T 的地方相当于都用 String 替换了。现在的 get 的取出来的不是 Object ，而是 String 对象，因此不需要类型转换。另外，当调用 set 时，只能传入 String 类型，否则编译无法通过。这就保证了 holder2 中的类型安全，避免由于不小心传入错误的类型。</p>
+<p>通过上面的例子可以看出泛使得代码更简便、安全。引入泛型之后，Java 库的一些类，比如常用的容器类也被改写为支持泛型，我们使用的时候都会传入参数类型，如：ArrayList<integer> list = ArrayList&lt;&gt;();。</integer></p>
+<h1 id="类型擦除"><a href="#类型擦除" class="headerlink" title="类型擦除"></a>类型擦除</h1><p>Java 的泛型使用了类型擦除机制，这个引来了很大的争议，以至于 Java 的泛型功能受到限制，只能说是”伪泛型“。什么叫类型擦除呢？简单的说就是，类型参数只存在于编译期，在运行时，Java 的虚拟机 ( JVM ) 并不知道泛型的存在。</p>
+<h1 id="型参数“”-声明一个泛型类或泛型方法"><a href="#型参数“”-声明一个泛型类或泛型方法" class="headerlink" title="型参数“”(声明一个泛型类或泛型方法)"></a>型参数“<t>”(声明一个泛型类或泛型方法)</t></h1><h2 id="声明泛型类的类型参数"><a href="#声明泛型类的类型参数" class="headerlink" title="声明泛型类的类型参数"></a>声明泛型类的类型参数</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">class Box&lt;T&gt;&#123;</span><br><span class="line">    private T item1;</span><br><span class="line">    private T item2;   </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class Box&lt;T&gt;&#123;</span><br><span class="line">    private T item1;</span><br><span class="line">    private T item2;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="声明泛型方法"><a href="#声明泛型方法" class="headerlink" title="声明泛型方法"></a>声明泛型方法</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public &lt;T&gt; void print(T t) &#123;</span><br><span class="line">  System.out.println(t);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="通配符“-lt-gt-”-使用泛型类或泛型方法"><a href="#通配符“-lt-gt-”-使用泛型类或泛型方法" class="headerlink" title="通配符“&lt;?&gt;”(使用泛型类或泛型方法)"></a>通配符“&lt;?&gt;”(使用泛型类或泛型方法)</h1><h2 id="上边界限定通配符"><a href="#上边界限定通配符" class="headerlink" title="上边界限定通配符"></a>上边界限定通配符</h2><p>使用 List&lt;? extends C&gt; list 这种形式，表示 list 可以引用一个 ArrayList ( 或者其它 List 的 子类 ) 的对象，这个对象包含的元素类型是 C 的子类型 ( 包含 C 本身）的一种。</p>
+<h2 id="下边界限定通配符"><a href="#下边界限定通配符" class="headerlink" title="下边界限定通配符"></a>下边界限定通配符</h2><p>使用 List&lt;? super C&gt; list 这种形式，表示 list 可以引用一个 ArrayList ( 或者其它 List 的 子类 ) 的对象，这个对象包含的元素就类型是 C 的超类型 ( 包含 C 本身 ) 的一种。</p>
+<h2 id="无边界通配符"><a href="#无边界通配符" class="headerlink" title="无边界通配符"></a>无边界通配符</h2><h1 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h1><ul>
+<li>“?”不能添加元素</li>
+<li>“? extends T”也不能添加元素</li>
+<li>“? super T”能添加元素</li>
 </ul>
 
           
@@ -472,7 +833,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/19/http/restful-result-status/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/23/td_business/opal-overivew/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
@@ -491,7 +852,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/04/19/http/restful-result-status/" itemprop="url">restfule-result-status</a></h1>
+                <a class="post-title-link" href="/2018/04/23/td_business/opal-overivew/" itemprop="url">opal(open algorithm)概览</a></h1>
         
 
         <div class="post-meta">
@@ -503,8 +864,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-19T17:48:29+08:00">
-                2018-04-19
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-23T10:39:20+08:00">
+                2018-04-23
               </time>
             
 
@@ -522,9 +883,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/04/19/http/restful-result-status/#comments" itemprop="discussionUrl">
+                <a href="/2018/04/23/td_business/opal-overivew/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/04/19/http/restful-result-status/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/04/23/td_business/opal-overivew/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -532,7 +893,7 @@
 
           
           
-             <span id="/2018/04/19/http/restful-result-status/" class="leancloud_visitors" data-flag-title="restfule-result-status">
+             <span id="/2018/04/23/td_business/opal-overivew/" class="leancloud_visitors" data-flag-title="opal(open algorithm)概览">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -565,421 +926,18 @@
       
         
           
-            <h1 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h1><p><a href="http://xiaochutian.github.io/2017/08/01/design-of-server-status-code-1/" target="_blank" rel="noopener">http://xiaochutian.github.io/2017/08/01/design-of-server-status-code-1/</a><br><a href="http://xiaochutian.github.io/2017/08/03/design-of-server-status-code-2/" target="_blank" rel="noopener">http://xiaochutian.github.io/2017/08/03/design-of-server-status-code-2/</a></p>
-<h1 id="作者的设计"><a href="#作者的设计" class="headerlink" title="作者的设计"></a>作者的设计</h1><p>自定义错误代码，HTTP状态码统一为200。<br>为什么我不复用HTTP状态码？</p>
-<ul>
-<li>HTTP状态码可能不够用。跟项目业务相关的错误细节无法反应出来。</li>
-<li>HTTP状态码应该属于HTTP协议的定义之中。项目中服务器与客户端的协议，应该是HTTP的上层协议。上层协议不应该知道和依赖底层协议的细节。</li>
-</ul>
-<h2 id="协议设计"><a href="#协议设计" class="headerlink" title="协议设计"></a>协议设计</h2><p>HTTP状态码统一为200。Result对象里面的code为0表示正常返回，非0表示异常返回。<br>异常详情如下：</p>
-<p>4XXXX，表示客户端错误（参数问题等）<br>5XXXX，表示服务器错误（服务器的bug导致的异常）<br>6XXXX，表示业务逻辑上的异常逻辑的状态码（用于客户端执行异常逻辑流）</p>
-<blockquote>
-<p>注：五位的状态码分为三个部分。X-XX-XX表示：错误类别-项目或模块编号-具体错误编号</p>
-</blockquote>
-<p>这可以理解为，需求分析的时候，会有一个『主要成功场景』和一些『备选事件流』。<br>主要成功场景 的返回code为0，而 备选事件流 的返回code为6XXXX。</p>
-<blockquote>
-<p>举个栗子：有一个叫做『练耳大师』的产品，音乐爱好者可以在里面做乐感训练。<br>产品里面有一个功能叫做『练习分析』。产品规定某一种练习，需要练习超过30道题才能进行分析。<br>所以，在用户没有做满30道题，并且点了『练习分析』按钮的时候。服务器逻辑是完全正确执行的，发现用户没有做满30道题，这个时候就返回6XXXX给客户端。<br>客户端在获取到这个状态码就知道该执行『备选事件流』：提示用户『必须要做满30道题才能分析哦~』。</p>
-</blockquote>
-<h3 id="3-2-1-客户端错误"><a href="#3-2-1-客户端错误" class="headerlink" title="3.2.1 客户端错误"></a>3.2.1 客户端错误</h3><table>
-<thead>
-<tr>
-<th style="text-align:left">code</th>
-<th style="text-align:left">说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">40000</td>
-<td style="text-align:left">客户端错误，通用</td>
-</tr>
-<tr>
-<td style="text-align:left">40001</td>
-<td style="text-align:left">客户端参数非法</td>
-</tr>
-<tr>
-<td style="text-align:left">40002</td>
-<td style="text-align:left">客户端参数json不符合格式要求</td>
-</tr>
-</tbody>
-</table>
-<h3 id="3-2-2-服务器（api）错误"><a href="#3-2-2-服务器（api）错误" class="headerlink" title="3.2.2 服务器（api）错误"></a>3.2.2 服务器（api）错误</h3><table>
-<thead>
-<tr>
-<th style="text-align:left">code</th>
-<th style="text-align:left">说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">50000</td>
-<td style="text-align:left">服务器（api）错误，通用</td>
-</tr>
-</tbody>
-</table>
-<h3 id="3-2-3-服务器（dubbo）错误"><a href="#3-2-3-服务器（dubbo）错误" class="headerlink" title="3.2.3 服务器（dubbo）错误"></a>3.2.3 服务器（dubbo）错误</h3><table>
-<thead>
-<tr>
-<th style="text-align:left">code</th>
-<th style="text-align:left">说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">60000</td>
-<td style="text-align:left">服务器（dubbo）错误，通用</td>
-</tr>
-</tbody>
-</table>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/19/http/http-status-code/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/19/http/http-status-code/" itemprop="url">http-status-code</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-19T16:55:50+08:00">
-                2018-04-19
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/04/19/http/http-status-code/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/04/19/http/http-status-code/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/04/19/http/http-status-code/" class="leancloud_visitors" data-flag-title="http-status-code">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>一些常见的状态码为：</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">状态码</th>
-<th style="text-align:left">含义</th>
-<th style="text-align:left">备注</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">200</td>
-<td style="text-align:left">请求已完成</td>
-<td style="text-align:left">2XX状态码均为正常状态码返回</td>
-</tr>
-<tr>
-<td style="text-align:left">3XX</td>
-<td style="text-align:left"></td>
-<td style="text-align:left">3XX状态码为重定向状态码</td>
-</tr>
-<tr>
-<td style="text-align:left">300</td>
-<td style="text-align:left">多种选择</td>
-<td style="text-align:left">服务器根据请求可执行多种操作。服务器可根据请求者 (User agent) 来选择一项操作，或提供操作列表供请求者选择</td>
-</tr>
-<tr>
-<td style="text-align:left">301</td>
-<td style="text-align:left">永久移动</td>
-<td style="text-align:left">请求的网页已被永久移动到新位置。服务器返回此响应（作为对 GET 或 HEAD 请求的响应）时，会自动将请求者转到新位置。您应使用此代码通知 Googlebot 某个网页或网站已被永久移动到新位置</td>
-</tr>
-<tr>
-<td style="text-align:left">302</td>
-<td style="text-align:left">临时移动</td>
-<td style="text-align:left">服务器目前正从不同位置的网页响应请求，但请求者应继续使用原有位置来进行以后的请求。此代码与响应 GET 和 HEAD 请求的 301 代码类似，会自动将请求者转到不同的位置</td>
-</tr>
-<tr>
-<td style="text-align:left">303</td>
-<td style="text-align:left">查看其他位置</td>
-<td style="text-align:left">当请求者应对不同的位置进行单独的 GET 请求以检索响应时，服务器会返回此代码。对于除 HEAD 请求之外的所有请求，服务器会自动转到其他位置</td>
-</tr>
-<tr>
-<td style="text-align:left">304</td>
-<td style="text-align:left">未修改</td>
-<td style="text-align:left">自从上次请求后，请求的网页未被修改过。服务器返回此响应时，不会返回网页内容</td>
-</tr>
-<tr>
-<td style="text-align:left">305</td>
-<td style="text-align:left">使用代理</td>
-<td style="text-align:left">请求者只能使用代理访问请求的网页。如果服务器返回此响应，那么，服务器还会指明请求者应当使用的代理</td>
-</tr>
-<tr>
-<td style="text-align:left">307</td>
-<td style="text-align:left">临时重定向</td>
-<td style="text-align:left">服务器目前正从不同位置的网页响应请求，但请求者应继续使用原有位置来进行以后的请求。此代码与响应 GET 和 HEAD 请求的 301 代码类似，会自动将请求者转到不同的位置</td>
-</tr>
-<tr>
-<td style="text-align:left">4XX</td>
-<td style="text-align:left"></td>
-<td style="text-align:left">客户端类错误</td>
-</tr>
-<tr>
-<td style="text-align:left">400</td>
-<td style="text-align:left">错误请求</td>
-<td style="text-align:left">服务器不理解请求的语法</td>
-</tr>
-<tr>
-<td style="text-align:left">401</td>
-<td style="text-align:left">未授权</td>
-<td style="text-align:left">请求要求进行身份验证。登录后，服务器可能会返回对页面的此响应</td>
-</tr>
-<tr>
-<td style="text-align:left">403</td>
-<td style="text-align:left">已禁止</td>
-<td style="text-align:left">服务器拒绝请求</td>
-</tr>
-<tr>
-<td style="text-align:left">404</td>
-<td style="text-align:left">未找到</td>
-<td style="text-align:left">服务器找不到请求的网页。例如，如果请求是针对服务器上不存在的网页进行的，那么，服务器通常会返回此代码</td>
-</tr>
-<tr>
-<td style="text-align:left">405</td>
-<td style="text-align:left">方法禁用</td>
-<td style="text-align:left">禁用请求中所指定的方法</td>
-</tr>
-<tr>
-<td style="text-align:left">406</td>
-<td style="text-align:left">不接受</td>
-<td style="text-align:left">无法使用请求的内容特性来响应请求的网页</td>
-</tr>
-<tr>
-<td style="text-align:left">407</td>
-<td style="text-align:left">需要代理授权</td>
-<td style="text-align:left">此状态代码与401（未授权）类似，但却指定了请求者应当使用代理进行授权。如果服务器返回此响应，那么，服务器还会指明请求者应当使用的代理</td>
-</tr>
-<tr>
-<td style="text-align:left">408</td>
-<td style="text-align:left">请求超时</td>
-<td style="text-align:left">服务器等候请求时超时</td>
-</tr>
-<tr>
-<td style="text-align:left">409</td>
-<td style="text-align:left">冲突</td>
-<td style="text-align:left">服务器在完成请求时发生冲突。服务器必须包含有关响应中所发生的冲突的信息。服务器在响应与前一个请求相冲突的PUT请求时可能会返回此代码，同时会提供两个请求的差异列表</td>
-</tr>
-<tr>
-<td style="text-align:left">410</td>
-<td style="text-align:left">已删除</td>
-<td style="text-align:left">如果请求的资源已被永久删除，那么，服务器会返回此响应。该代码与404（未找到）代码类似，但在资源以前有但现在已经不复存在的情况下，有时会替代</td>
-</tr>
-<tr>
-<td style="text-align:left">411</td>
-<td style="text-align:left">需要有效长度</td>
-<td style="text-align:left">服务器不会接受包含无效内容长度标头字段的请求。</td>
-</tr>
-<tr>
-<td style="text-align:left">412</td>
-<td style="text-align:left">未满足前提条件</td>
-<td style="text-align:left">服务器未满足请求者在请求中设置的其中一个前提条件。</td>
-</tr>
-<tr>
-<td style="text-align:left">413</td>
-<td style="text-align:left">请求实体过大</td>
-<td style="text-align:left">服务器无法处理请求，因为请求实体过大，已超出服务器的处理能力。</td>
-</tr>
-<tr>
-<td style="text-align:left">414</td>
-<td style="text-align:left">请求的URI过长</td>
-<td style="text-align:left">请求的URI（通常为网址）过长，服务器无法进行处理。</td>
-</tr>
-<tr>
-<td style="text-align:left">415</td>
-<td style="text-align:left">不支持的媒体类型</td>
-<td style="text-align:left">请求的格式不受请求页面的支持。</td>
-</tr>
-<tr>
-<td style="text-align:left">416</td>
-<td style="text-align:left">请求范围不符合要求</td>
-<td style="text-align:left">如果请求是针对网页的无效范围进行的，那么，服务器会返回此状态代码。</td>
-</tr>
-<tr>
-<td style="text-align:left">417</td>
-<td style="text-align:left">未满足期望值</td>
-<td style="text-align:left">服务器未满足”期望”请求标头字段的要求。</td>
-</tr>
-<tr>
-<td style="text-align:left">499</td>
-<td style="text-align:left">客户端断开连接</td>
-<td style="text-align:left">服务端处理时间过长，导致客户端关闭了连接造成的</td>
-</tr>
-<tr>
-<td style="text-align:left">5XX</td>
-<td style="text-align:left"></td>
-<td style="text-align:left">服务器端发生错误</td>
-</tr>
-<tr>
-<td style="text-align:left">500</td>
-<td style="text-align:left">服务器内部错误</td>
-<td style="text-align:left">服务器遇到错误，无法完成请求。</td>
-</tr>
-<tr>
-<td style="text-align:left">501</td>
-<td style="text-align:left">尚未实施</td>
-<td style="text-align:left">服务器不具备完成请求的功能。例如，当服务器无法识别请求方法时，服务器可能会返回此代码。</td>
-</tr>
-<tr>
-<td style="text-align:left">502</td>
-<td style="text-align:left">错误网关</td>
-<td style="text-align:left">服务器作为网关或代理，从上游服务器收到了无效的响应。</td>
-</tr>
-<tr>
-<td style="text-align:left">503</td>
-<td style="text-align:left">服务不可用</td>
-<td style="text-align:left">目前无法使用服务器（由于超载或进行停机维护）。通常，这只是一种暂时的状态。</td>
-</tr>
-<tr>
-<td style="text-align:left">504</td>
-<td style="text-align:left">网关超时</td>
-<td style="text-align:left">服务器作为网关或代理，未及时从上游服务器接收请求。</td>
-</tr>
-<tr>
-<td style="text-align:left">505</td>
-<td style="text-align:left">HTTP版本不受支持</td>
-<td style="text-align:left">服务器不支持请求中所使用的HTTP协议版本。</td>
-</tr>
-</tbody>
-</table>
-<h1 id="常见的"><a href="#常见的" class="headerlink" title="常见的"></a>常见的</h1><h2 id="400-（错误请求）-服务器不理解请求的语法。"><a href="#400-（错误请求）-服务器不理解请求的语法。" class="headerlink" title="400  （错误请求） 服务器不理解请求的语法。"></a>400  （错误请求） 服务器不理解请求的语法。</h2><ul>
-<li>由于语法格式有误，服务器无法理解此请求。不作修改，客户程序就无法重复此请求。 </li>
-</ul>
-<ul>
-<li>账号已经欠费。</li>
-<li>指定的 DataDisk.n.Category 不合法。</li>
-<li>指定的 InternetMaxBandwidthOut 不合法或超出范围。</li>
-</ul>
-<h2 id="404-（未找到）-服务器找不到请求的网页。"><a href="#404-（未找到）-服务器找不到请求的网页。" class="headerlink" title="404  （未找到） 服务器找不到请求的网页。"></a>404  （未找到） 服务器找不到请求的网页。</h2><ul>
-<li>指定的 HostName 不合法。</li>
-<li>指定的 DataDisk.n.SnapshotId 不存在。</li>
-<li>指定的镜像不存在。</li>
-<li>指定的 InstanceChargeType 不存在。</li>
-</ul>
-<h2 id="403-（禁止）-服务器拒绝请求。"><a href="#403-（禁止）-服务器拒绝请求。" class="headerlink" title="403  （禁止） 服务器拒绝请求。"></a>403  （禁止） 服务器拒绝请求。</h2><ul>
-<li>该磁盘不支持挂载与卸载。</li>
-<li>您暂时无法使用该资源。</li>
-<li>没有订阅镜像市场的镜像。</li>
-<li>指定的磁盘类型组合不支持。</li>
-</ul>
-<h2 id="500"><a href="#500" class="headerlink" title="500"></a>500</h2><ul>
-<li>内部错误。</li>
+            <h1 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h1><p>The OPAL platform aims to unlock the potential of private data for public good in a privacy-conscientious, scalable, socially and economically sustainable manner.</p>
+<p>OPAL is a collaborative project being developed by a group of partners committed to leveraging the power of platforms, big data, and advanced analytics for the public good in a privacy-preserving, commercially sensible, stable, scalable, and sustainable manner.</p>
+<p>OPAL’s core will consist of an open suite of softwares and algorithms providing access to statistical information extracted from anonymized, secured, and formatted data. These algorithms, accessed by an API, will be run on OPAL servers of partner companies behind their firewalls. The vision is to strengthen the accuracy, timeliness, and reliability of key development indicators and statistics of relevance for an array of users. The project will start with APIs to access indicators such as population density, mobility, approximations of poverty indices, or literacy rate based on mobile data from telecom operators as well as a library of certified open algorithms to extract these indicators in a governed and trustworthy manner.</p>
+<p>The OPAL Project will also engage with data providers, users and analysts at all stages of its development, build local capacities and connections, and set-up local Data Governance and Advisory Boards for oversight and support of its operations.</p>
+<p>Two pilots will be undertaken in the form of public-private-people partnerships in Senegal with Orange Sonatel and in Colombia with Telefónica. The aim during the pilot phase is to develop a Beta platform and a suite of open algorithms, all accessible as open source. These pilots will also assess the quality of the statistical indicators that are obtained from the platform. If the first two pilots are considered successful, the project could be extended to other developing countries.</p>
+<p><img src="/images/pasted-165.png" alt="upload successful"></p>
+<p><img src="/images/pasted-166.png" alt="upload successful"></p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><ul>
+<li>dataset 可能只有因素,而没有指标,如何进行关联?? </li>
+<li>可能需要把两部分数据 关联在一起才更加有效</li>
+<li>拉取和订阅,这样就没有办法做到实时</li>
+<li>不再换新统计指标,而是关心个体</li>
 </ul>
 
           
@@ -1029,7 +987,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/19/其他/vocode-kemap/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/21/其他/finite-state-machine/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
@@ -1048,7 +1006,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/04/19/其他/vocode-kemap/" itemprop="url">vocode-kemap</a></h1>
+                <a class="post-title-link" href="/2018/04/21/其他/finite-state-machine/" itemprop="url">有限状态机的应用</a></h1>
         
 
         <div class="post-meta">
@@ -1060,8 +1018,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-19T09:02:53+08:00">
-                2018-04-19
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-21T15:17:19+08:00">
+                2018-04-21
               </time>
             
 
@@ -1079,9 +1037,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/04/19/其他/vocode-kemap/#comments" itemprop="discussionUrl">
+                <a href="/2018/04/21/其他/finite-state-machine/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/04/19/其他/vocode-kemap/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/04/21/其他/finite-state-machine/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -1089,7 +1047,7 @@
 
           
           
-             <span id="/2018/04/19/其他/vocode-kemap/" class="leancloud_visitors" data-flag-title="vocode-kemap">
+             <span id="/2018/04/21/其他/finite-state-machine/" class="leancloud_visitors" data-flag-title="有限状态机的应用">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -1122,7 +1080,21 @@
       
         
           
-            <h1 id="快捷键"><a href="#快捷键" class="headerlink" title="快捷键"></a>快捷键</h1><h2 id="放大-缩小窗口"><a href="#放大-缩小窗口" class="headerlink" title="放大/缩小窗口"></a>放大/缩小窗口</h2><p>ctrl + ‘=’ 和 ctrl + ‘-‘</p>
+            <h1 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h1><h2 id="前端"><a href="#前端" class="headerlink" title="前端:"></a>前端:</h2><p><a href="https://taobaofed.org/blog/2012/10/11/fsm-based-component-design-and-implementation/" target="_blank" rel="noopener">https://taobaofed.org/blog/2012/10/11/fsm-based-component-design-and-implementation/</a> </p>
+<p><img src="/images/pasted-160.png" alt="upload successful"></p>
+<p><img src="/images/pasted-161.png" alt="upload successful"></p>
+<p><img src="/images/pasted-162.png" alt="upload successful"></p>
+<p>流程图:<br><img src="/images/pasted-159.png" alt="upload successful"></p>
+<h2 id="游戏"><a href="#游戏" class="headerlink" title="游戏"></a>游戏</h2><p><img src="/images/pasted-163.png" alt="upload successful"></p>
+<h2 id="转门"><a href="#转门" class="headerlink" title="转门"></a>转门</h2><p>以一个转门为例，这种专门在一些会展、博物馆、公园的门口很常见，顾客可以投币或者刷卡刷票进入，我们下面以投币(Coin)统称这个触发事件。如果你不投币，闸门是锁着的，你推不动它的转臂，而且投一次币只能进去一个人，过去之后闸门又是锁着的</p>
+<p><img src="/images/pasted-164.png" alt="upload successful"></p>
+<p>它有两个状态：Locked、Unlocked。有两个输入（input）会影响它的状态，投币(coin)和推动转臂（push）。</p>
+<ul>
+<li>在Locked状态， push没有作用。不管比push多少次闸门的状态还是lock</li>
+<li>在Locked状态，投币会让闸门开锁，闸门可以让一个人通过</li>
+<li>在Unlocked状态，投币不起作用，闸门还是开着</li>
+<li>在Unlocked状态，如果有人push通过，人通过后闸门会由Unlocked状态转变成Locked状态。<br>这是一个简单的闸门的状态转换，却是一个很好的理解状态的典型例子。</li>
+</ul>
 
           
         
@@ -1171,7 +1143,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/17/java/java_netty/netty-usage/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/21/运维-测试/code-coverage/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
@@ -1190,7 +1162,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/04/17/java/java_netty/netty-usage/" itemprop="url">netty应用</a></h1>
+                <a class="post-title-link" href="/2018/04/21/运维-测试/code-coverage/" itemprop="url">代码覆盖率</a></h1>
         
 
         <div class="post-meta">
@@ -1202,8 +1174,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-17T23:29:08+08:00">
-                2018-04-17
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-21T14:18:46+08:00">
+                2018-04-21
               </time>
             
 
@@ -1221,9 +1193,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/04/17/java/java_netty/netty-usage/#comments" itemprop="discussionUrl">
+                <a href="/2018/04/21/运维-测试/code-coverage/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/04/17/java/java_netty/netty-usage/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/04/21/运维-测试/code-coverage/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -1231,7 +1203,7 @@
 
           
           
-             <span id="/2018/04/17/java/java_netty/netty-usage/" class="leancloud_visitors" data-flag-title="netty应用">
+             <span id="/2018/04/21/运维-测试/code-coverage/" class="leancloud_visitors" data-flag-title="代码覆盖率">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -1264,265 +1236,25 @@
       
         
           
-            <h1 id="navi-pbrpc"><a href="#navi-pbrpc" class="headerlink" title="navi-pbrpc"></a>navi-pbrpc</h1><p>教程：<br><a href="http://neoremind.com/2016/02/%E5%9F%BA%E4%BA%8Eprotobuf%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E9%AB%98%E6%80%A7%E8%83%BDrpc%E6%A1%86%E6%9E%B6-navi-pbrpc/" target="_blank" rel="noopener">http://neoremind.com/2016/02/%E5%9F%BA%E4%BA%8Eprotobuf%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E9%AB%98%E6%80%A7%E8%83%BDrpc%E6%A1%86%E6%9E%B6-navi-pbrpc/</a><br>github地址：<br><a href="https://github.com/neoremind/navi-pbrpc" target="_blank" rel="noopener">https://github.com/neoremind/navi-pbrpc</a></p>
-<h2 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h2><p>handler链条的顺序：</p>
+            <h1 id="代码覆盖率工具"><a href="#代码覆盖率工具" class="headerlink" title="代码覆盖率工具"></a>代码覆盖率工具</h1><p>目前Java常用覆盖率工具Jacoco、Emma和Cobertura</p>
+<h1 id="两种模式"><a href="#两种模式" class="headerlink" title="两种模式"></a>两种模式</h1><p>主流代码覆盖率工具都采用字节码插桩模式，通过钩子的方式来记录代码执行轨迹信息。其中字节码插桩又分为两种模式On-The-Fly和Offine</p>
 <ul>
-<li>序列化</li>
-<li>反序列化</li>
-<li>客户端处理</li>
+<li>On-The-Fly模式优点在于无需修改源代码，可以在系统不停机的情况下，实时收集代码覆盖率信息。</li>
+<li>Offine模式优点在于系统启动不需要额外开启代理，但是只能在系统停机的情况下才能获取代码覆盖率。 </li>
 </ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">SimplePbrpcClient(PbrpcClientConfiguration pbrpcClientConfiguration, boolean isShortLiveConn,</span><br><span class="line">            String ip, int port, int connTimeout, int readTimeout) &#123;</span><br><span class="line">        if (pbrpcClientConfiguration != null) &#123;</span><br><span class="line">            this.pbrpcClientConfiguration = pbrpcClientConfiguration;</span><br><span class="line">        &#125;</span><br><span class="line">        this.ip = ip;</span><br><span class="line">        this.port = port;</span><br><span class="line">        this.connTimeout = connTimeout;</span><br><span class="line">        this.readTimeout = readTimeout;</span><br><span class="line">        this.isShortAliveConn = isShortLiveConn;</span><br><span class="line">        bootstrap = new Bootstrap();</span><br><span class="line">        bootstrap.channel(NioSocketChannel.class);</span><br><span class="line">        bootstrap.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, this.connTimeout);</span><br><span class="line">        bootstrap.option(ChannelOption.SO_KEEPALIVE, this.pbrpcClientConfiguration.isSoKeepalive());</span><br><span class="line">        bootstrap.option(ChannelOption.SO_REUSEADDR, this.pbrpcClientConfiguration.isSoReuseaddr());</span><br><span class="line">        bootstrap.option(ChannelOption.TCP_NODELAY, this.pbrpcClientConfiguration.isTcpNodelay());</span><br><span class="line">        bootstrap.option(ChannelOption.SO_RCVBUF, this.pbrpcClientConfiguration.getSoRcvbuf());</span><br><span class="line">        bootstrap.option(ChannelOption.SO_SNDBUF, this.pbrpcClientConfiguration.getSoSndbuf());</span><br><span class="line"></span><br><span class="line">        ChannelInitializer&lt;SocketChannel&gt; initializer = new ChannelInitializer&lt;SocketChannel&gt;() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            protected void initChannel(SocketChannel ch) throws Exception &#123;</span><br><span class="line">                ch.pipeline().addLast(new PbrpcMessageSerializer());</span><br><span class="line">                ch.pipeline().addLast(new PbrpcMessageDeserializer());</span><br><span class="line">                ch.pipeline().addLast(new PbrpcClientHandler());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">        eventLoopGroup = new NioEventLoopGroup();</span><br><span class="line">        bootstrap.group(eventLoopGroup).handler(initializer);</span><br><span class="line"></span><br><span class="line">        startTimeoutEvictor();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<h3 id="序列化handler"><a href="#序列化handler" class="headerlink" title="序列化handler"></a>序列化handler</h3><p>拼装协议</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">protected void encode(ChannelHandlerContext ctx, PbrpcMsg pbrpcMsg, List&lt;Object&gt; out)</span><br><span class="line">        throws Exception &#123;</span><br><span class="line">    byte[] bodyBytes = ByteUtil.getNonEmptyBytes(pbrpcMsg.getData());</span><br><span class="line">    NsHead nsHead = contructNsHead(pbrpcMsg.getServiceId(), pbrpcMsg.getErrorCode(),</span><br><span class="line">            pbrpcMsg.getLogId(), pbrpcMsg.getData(), pbrpcMsg.getProvider());</span><br><span class="line">    byte[] nsHeadBytes = nsHead.toBytes();</span><br><span class="line">    ByteBuf encoded = Unpooled.copiedBuffer(nsHeadBytes, bodyBytes);</span><br><span class="line">    out.add(encoded);</span><br><span class="line">    // LOG.info(&quot;Send total byte size=&quot; + (nsHeadBytes.length + bodyBytes.length) + &quot;, body size=&quot;</span><br><span class="line">    // + bodyBytes.length);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="反序列化handler"><a href="#反序列化handler" class="headerlink" title="反序列化handler"></a>反序列化handler</h3><ul>
-<li>处理半包问题</li>
-<li>反序列化</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List&lt;Object&gt; out) throws Exception &#123;</span><br><span class="line">        // 解决半包问题，此时Nshead还没有接收全，channel中留存的字节流不做处理</span><br><span class="line">        if (in.readableBytes() &lt; NsHead.NSHEAD_LEN) &#123;</span><br><span class="line">            return;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        in.markReaderIndex();</span><br><span class="line"></span><br><span class="line">        byte[] bytes = new byte[NsHead.NSHEAD_LEN];</span><br><span class="line">        in.readBytes(bytes, 0, NsHead.NSHEAD_LEN);</span><br><span class="line"></span><br><span class="line">        NsHead nsHead = new NsHead();</span><br><span class="line">        nsHead.wrap(bytes);</span><br><span class="line"></span><br><span class="line">        // 解决半包问题，此时body还没有接收全，channel中留存的字节流不做处理，重置readerIndex</span><br><span class="line">        if (in.readableBytes() &lt; (int) nsHead.getBodyLen()) &#123;</span><br><span class="line">            in.resetReaderIndex();</span><br><span class="line">            return;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        // 此时接受到了足够的一个包，开始处理</span><br><span class="line">        in.markReaderIndex();</span><br><span class="line"></span><br><span class="line">        byte[] totalBytes = new byte[(int) nsHead.getBodyLen()];</span><br><span class="line">        in.readBytes(totalBytes, 0, (int) nsHead.getBodyLen());</span><br><span class="line"></span><br><span class="line">        PbrpcMsg decoded = PbrpcMsg.of(nsHead).setData(totalBytes);</span><br><span class="line">        ContextHolder.putContext(&quot;_logid&quot;, nsHead.getLogId()); // TODO</span><br><span class="line"></span><br><span class="line">        if (decoded != null) &#123;</span><br><span class="line">            out.add(decoded);</span><br><span class="line">        &#125;</span><br><span class="line">        // LOG.info(&quot;Deser data &quot; + nsHead.getLogId() + &quot; is&quot; + decoded + &quot; and using &quot;</span><br><span class="line">        // + (System.nanoTime() - start) / 1000 + &quot;us&quot;);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<h3 id="客户端handler"><a href="#客户端handler" class="headerlink" title="客户端handler"></a>客户端handler</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line">public class PbrpcClientHandler extends SimpleChannelInboundHandler&lt;PbrpcMsg&gt; &#123;</span><br><span class="line"></span><br><span class="line">    private static final Logger LOG = LoggerFactory.getLogger(PbrpcMessageDeserializer.class);</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 可配置，默认使用protobuf来做body的序列化</span><br><span class="line">     */</span><br><span class="line">    private Codec codec = new ProtobufCodec();</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * @see io.netty.channel.SimpleChannelInboundHandler#channelRead0(io.netty.channel.ChannelHandlerContext,</span><br><span class="line">     *      java.lang.Object)</span><br><span class="line">     */</span><br><span class="line">    @SuppressWarnings(&quot;unchecked&quot;)</span><br><span class="line">    @Override</span><br><span class="line">    public void channelRead0(ChannelHandlerContext ctx, PbrpcMsg pbrpcMsg) throws Exception &#123;</span><br><span class="line">        Preconditions</span><br><span class="line">                .checkArgument(pbrpcMsg != null, &quot;Pbrpc msg is null which should never happen&quot;);</span><br><span class="line">        try &#123;</span><br><span class="line">            // LOG.info(&quot;Got msg from server:&quot; + pbrpcMsg);</span><br><span class="line">            int logId = (int) pbrpcMsg.getLogId();</span><br><span class="line">            CallbackContext context = CallbackPool.getContext(logId);</span><br><span class="line">            if (context == null) &#123;</span><br><span class="line">                LOG.warn(&quot;Receive msg from server but no context found, logId=&quot; + logId);</span><br><span class="line">                return;</span><br><span class="line">            &#125;</span><br><span class="line">            Callback&lt;GeneratedMessage&gt; cb = (Callback&lt;GeneratedMessage&gt;) context.getCallback();</span><br><span class="line">            if (pbrpcMsg.getErrorCode() != null) &#123;</span><br><span class="line">                cb.handleError(ExceptionUtil.buildFromErrorCode(pbrpcMsg.getErrorCode()));</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                GeneratedMessage res = (GeneratedMessage) codec.decode(</span><br><span class="line">                        CallbackPool.getResClass(logId), pbrpcMsg.getData());</span><br><span class="line">                cb.handleResult(res);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            // 短连接则关闭channel</span><br><span class="line">            if (context.isShortAliveConn()) &#123;</span><br><span class="line">                Channel channel = context.getChannel();</span><br><span class="line">                if (channel != null) &#123;</span><br><span class="line">                    LOG.info(&quot;Close &quot; + channel + &quot;, logId=&quot; + logId);</span><br><span class="line">                    channel.close();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            // LOG.info(&quot;Decoding and invoking callback &quot; + pbrpcMsg.getLogId() + &quot; total &quot;</span><br><span class="line">            // + (System.currentTimeMillis() - context.getStarttime())</span><br><span class="line">            // + &quot;ms, transport using &quot; + (start - context.getStarttime()) + &quot;ms&quot;);</span><br><span class="line">        &#125; finally &#123;</span><br><span class="line">            CallbackPool.remove((int) pbrpcMsg.getLogId());</span><br><span class="line">            ContextHolder.clean();</span><br><span class="line">            // ctx.fireChannelReadComplete();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * @see io.netty.channel.ChannelInboundHandlerAdapter#channelReadComplete(io.netty.channel.ChannelHandlerContext)</span><br><span class="line">     */</span><br><span class="line">    @Override</span><br><span class="line">    public void channelReadComplete(ChannelHandlerContext ctx) &#123;</span><br><span class="line">        // LOG.debug(&quot;Client channelReadComplete&gt;&gt;&gt;&gt;&gt;&quot;);</span><br><span class="line">        // ctx.flush();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * @see io.netty.channel.ChannelInboundHandlerAdapter#channelActive(io.netty.channel.ChannelHandlerContext)</span><br><span class="line">     */</span><br><span class="line">    @Override</span><br><span class="line">    public void channelActive(ChannelHandlerContext ctx) throws Exception &#123;</span><br><span class="line">        // LOG.debug(&quot;Client channelActive&gt;&gt;&gt;&gt;&gt;&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * @see io.netty.channel.ChannelInboundHandlerAdapter#exceptionCaught(io.netty.channel.ChannelHandlerContext,</span><br><span class="line">     *      java.lang.Throwable)</span><br><span class="line">     */</span><br><span class="line">    @Override</span><br><span class="line">    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception &#123;</span><br><span class="line">        LOG.error(cause.getMessage(), cause);</span><br><span class="line">        ctx.close(); // FIXME</span><br><span class="line">        // ctx.fireChannelRead();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="服务端"><a href="#服务端" class="headerlink" title="服务端"></a>服务端</h2><p>顺序：</p>
-<ul>
-<li>空闲处理</li>
-<li>反序列化</li>
-<li>客户端处理</li>
-<li>序列化</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">public PbrpcServer(PbrpcServerConfiguration pbrpcServerConfiguration, int port) &#123;</span><br><span class="line">        // use default conf otherwise use specified one</span><br><span class="line">        if (pbrpcServerConfiguration == null) &#123;</span><br><span class="line">            pbrpcServerConfiguration = this.pbrpcServerConfiguration;</span><br><span class="line">        &#125;</span><br><span class="line">        this.port = port;</span><br><span class="line"></span><br><span class="line">        bootstrap = new ServerBootstrap();</span><br><span class="line">        bossGroup = new NioEventLoopGroup();</span><br><span class="line">        workerGroup = new NioEventLoopGroup();</span><br><span class="line"></span><br><span class="line">        bootstrap.channel(NioServerSocketChannel.class);</span><br><span class="line">        bootstrap.option(ChannelOption.SO_BACKLOG, pbrpcServerConfiguration.getSoBacklog());</span><br><span class="line"></span><br><span class="line">        bootstrap.childOption(ChannelOption.SO_KEEPALIVE, pbrpcServerConfiguration.isSoKeepalive());</span><br><span class="line">        bootstrap.childOption(ChannelOption.TCP_NODELAY, pbrpcServerConfiguration.isTcpNodelay());</span><br><span class="line">        bootstrap.childOption(ChannelOption.SO_REUSEADDR, true);</span><br><span class="line">        bootstrap.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);</span><br><span class="line">        bootstrap.childOption(ChannelOption.SO_LINGER, pbrpcServerConfiguration.getSoLinger());</span><br><span class="line">        bootstrap.childOption(ChannelOption.SO_RCVBUF, pbrpcServerConfiguration.getSoRcvbuf());</span><br><span class="line">        bootstrap.childOption(ChannelOption.SO_SNDBUF, pbrpcServerConfiguration.getSoSndbuf());</span><br><span class="line"></span><br><span class="line">        ChannelInitializer&lt;SocketChannel&gt; initializer = new ChannelInitializer&lt;SocketChannel&gt;() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            protected void initChannel(SocketChannel ch) throws Exception &#123;</span><br><span class="line">                ch.pipeline().addLast(</span><br><span class="line">                        &quot;idlestate&quot;,</span><br><span class="line">                        new IdleStateHandler(IDLE_CHANNEL_TIMEOUT, IDLE_CHANNEL_TIMEOUT,</span><br><span class="line">                                IDLE_CHANNEL_TIMEOUT));</span><br><span class="line">                ch.pipeline().addLast(&quot;idle&quot;, new RpcServerChannelIdleHandler());</span><br><span class="line">                ch.pipeline().addLast(&quot;deser&quot;, new PbrpcMessageDeserializer());</span><br><span class="line">                ch.pipeline().addLast(&quot;coreHandler&quot;, new PbrpcServerHandler(serviceLocator));</span><br><span class="line">                ch.pipeline().addLast(&quot;ser&quot;, new PbrpcMessageSerializer());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">        bootstrap.group(bossGroup, workerGroup).childHandler(initializer);</span><br><span class="line"></span><br><span class="line">        LOG.info(&quot;Pbrpc server init done&quot;);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<h3 id="ide-handler"><a href="#ide-handler" class="headerlink" title="ide handler"></a>ide handler</h3><p>处理一些空闲的连接闭关它们，防止占用服务端资源</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception &#123;</span><br><span class="line">    if (evt instanceof IdleStateEvent) &#123;</span><br><span class="line">        IdleStateEvent e = (IdleStateEvent) evt;</span><br><span class="line">        if (e.state() == IdleState.WRITER_IDLE) &#123;</span><br><span class="line">            LOG.warn(&quot;Write idle on channel:&quot; + ctx.channel() + &quot; is timeout&quot;);</span><br><span class="line">        &#125; else if (e.state() == IdleState.READER_IDLE) &#123;</span><br><span class="line">            LOG.warn(&quot;Read idle on channel:&quot; + ctx.channel() + &quot; is timeout on &quot;</span><br><span class="line">                    + ctx.channel().remoteAddress() + &quot;, so close it&quot;);</span><br><span class="line">            // ctx.fireExceptionCaught(ReadTimeoutException.INSTANCE);</span><br><span class="line">            ctx.close();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="服务端handler"><a href="#服务端handler" class="headerlink" title="服务端handler"></a>服务端handler</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br></pre></td><td class="code"><pre><span class="line">public class PbrpcServerHandler extends SimpleChannelInboundHandler&lt;PbrpcMsg&gt; &#123;</span><br><span class="line"></span><br><span class="line">    private static final Logger LOG = LoggerFactory.getLogger(PbrpcMessageDeserializer.class);</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 可配置，默认使用protobuf来做body的序列化</span><br><span class="line">     */</span><br><span class="line">    private Codec codec = new ProtobufCodec();</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 可配置，服务定位器</span><br><span class="line">     */</span><br><span class="line">    private ServiceLocator&lt;Integer&gt; serviceLocator;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Creates a new instance of PbrpcServerHandler.</span><br><span class="line">     * </span><br><span class="line">     * @param serviceLocator</span><br><span class="line">     */</span><br><span class="line">    @SuppressWarnings(&#123; &quot;rawtypes&quot;, &quot;unchecked&quot; &#125;)</span><br><span class="line">    public PbrpcServerHandler(ServiceLocator serviceLocator) &#123;</span><br><span class="line">        this.serviceLocator = (ServiceLocator&lt;Integer&gt;) serviceLocator;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * @see io.netty.channel.SimpleChannelInboundHandler#channelRead0(io.netty.channel.ChannelHandlerContext,</span><br><span class="line">     *      java.lang.Object)</span><br><span class="line">     */</span><br><span class="line">    @Override</span><br><span class="line">    public void channelRead0(ChannelHandlerContext ctx, PbrpcMsg pbrpcMsg) throws Exception &#123;</span><br><span class="line">        Preconditions</span><br><span class="line">                .checkArgument(pbrpcMsg != null, &quot;Pbrpc msg is null which should never happen&quot;);</span><br><span class="line">        try &#123;</span><br><span class="line">            if (pbrpcMsg.getErrorCode() != null) &#123;</span><br><span class="line">                ctx.channel().writeAndFlush(PbrpcMsg.copyLiteOf(pbrpcMsg)); // ONLY COMMUNICATIN ERROR HERE FIXME</span><br><span class="line">                return;</span><br><span class="line">            &#125;</span><br><span class="line">            int key = pbrpcMsg.getServiceId();</span><br><span class="line">            ServiceDescriptor&lt;Integer&gt; servDesc = serviceLocator.getServiceDescriptor(key);</span><br><span class="line">            if (servDesc == null) &#123;</span><br><span class="line">                throw new ServiceNotFoundException(&quot; serviceId=&quot; + pbrpcMsg.getServiceId());</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            GeneratedMessage arg = (GeneratedMessage) codec.decode(servDesc.getArgumentClass(),</span><br><span class="line">                    pbrpcMsg.getData());</span><br><span class="line">            GeneratedMessage ret = (GeneratedMessage) servDesc.getMethod().invoke(</span><br><span class="line">                    servDesc.getTarget(), arg);</span><br><span class="line"></span><br><span class="line">            PbrpcMsg retMsg = new PbrpcMsg();</span><br><span class="line">            retMsg.setLogId(pbrpcMsg.getLogId());</span><br><span class="line">            retMsg.setServiceId(key);</span><br><span class="line">            if (ret != null &amp;&amp; ret instanceof GeneratedMessage) &#123;</span><br><span class="line">                byte[] response = ((GeneratedMessage) ret).toByteArray();</span><br><span class="line">                retMsg.setData(response);</span><br><span class="line">            &#125;</span><br><span class="line">            // LOG.debug(&quot;Service biz logic will return:&quot; + ret);</span><br><span class="line">            ctx.channel().writeAndFlush(retMsg);</span><br><span class="line">            // LOG.info(servDesc + &quot; exec using &quot; + (System.currentTimeMillis() - start) + &quot;ms&quot;);</span><br><span class="line">        &#125; catch (ServiceNotFoundException e) &#123;</span><br><span class="line">            LOG.error(ErrorCode.SERVICE_NOT_FOUND.getMessage() + e.getMessage(), e);</span><br><span class="line">            ctx.channel().writeAndFlush(</span><br><span class="line">                    PbrpcMsg.copyLiteOf(pbrpcMsg).setErrorCode(ErrorCode.SERVICE_NOT_FOUND));</span><br><span class="line">        &#125; catch (CodecException e) &#123;</span><br><span class="line">            LOG.error(ErrorCode.PROTOBUF_CODEC_ERROR.getMessage() + e.getMessage(), e);</span><br><span class="line">            ctx.channel().writeAndFlush(</span><br><span class="line">                    PbrpcMsg.copyLiteOf(pbrpcMsg).setErrorCode(ErrorCode.PROTOBUF_CODEC_ERROR));</span><br><span class="line">        &#125; catch (InvocationTargetException e) &#123;</span><br><span class="line">            LOG.error(ErrorCode.INVOCATION_TARGET_EXCEPTION.getMessage() + e.getMessage(), e);</span><br><span class="line">            ctx.channel().writeAndFlush(</span><br><span class="line">                    PbrpcMsg.copyLiteOf(pbrpcMsg).setErrorCode(</span><br><span class="line">                            ErrorCode.INVOCATION_TARGET_EXCEPTION));</span><br><span class="line">        &#125; catch (Exception e) &#123;</span><br><span class="line">            LOG.error(ErrorCode.UNEXPECTED_ERROR.getMessage() + e.getMessage(), e);</span><br><span class="line">            ctx.channel().writeAndFlush(</span><br><span class="line">                    PbrpcMsg.copyLiteOf(pbrpcMsg).setErrorCode(ErrorCode.UNEXPECTED_ERROR));</span><br><span class="line">        &#125; finally &#123;</span><br><span class="line">            ContextHolder.clean();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * @see io.netty.channel.ChannelInboundHandlerAdapter#channelReadComplete(io.netty.channel.ChannelHandlerContext)</span><br><span class="line">     */</span><br><span class="line">    @Override</span><br><span class="line">    public void channelReadComplete(ChannelHandlerContext ctx) &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * @see io.netty.channel.ChannelInboundHandlerAdapter#channelActive(io.netty.channel.ChannelHandlerContext)</span><br><span class="line">     */</span><br><span class="line">    @Override</span><br><span class="line">    public void channelActive(ChannelHandlerContext ctx) throws Exception &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * @see io.netty.channel.ChannelInboundHandlerAdapter#exceptionCaught(io.netty.channel.ChannelHandlerContext,</span><br><span class="line">     *      java.lang.Throwable)</span><br><span class="line">     */</span><br><span class="line">    @Override</span><br><span class="line">    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception &#123;</span><br><span class="line">        LOG.error(cause.getCause().getMessage(), cause.getCause());</span><br><span class="line"></span><br><span class="line">        long logId = (Long) (ContextHolder.getContext(&quot;_logid&quot;));</span><br><span class="line">        PbrpcMsg retMsg = new PbrpcMsg();</span><br><span class="line">        retMsg.setLogId(logId);</span><br><span class="line">        retMsg.setErrorCode(ErrorCode.COMMUNICATION_ERROR);</span><br><span class="line">        // ctx.channel().writeAndFlush(retMsg);</span><br><span class="line">        ctx.fireChannelRead(retMsg); // FIXME 对于通信异常的这样处理是否OK？</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h1 id="gateway项目"><a href="#gateway项目" class="headerlink" title="gateway项目"></a>gateway项目</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">protected void initChannel(SocketChannel ch) throws Exception &#123;</span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">  CorsConfig corsConfig = CorsConfigBuilder.forOrigins(parseCorsAllowHostList())</span><br><span class="line">      .allowedRequestHeaders(&quot;X-Access-Token&quot;, &quot;content-type&quot;)</span><br><span class="line">      .allowedRequestMethods(HttpMethod.GET, HttpMethod.POST, HttpMethod.PUT).build();</span><br><span class="line"></span><br><span class="line">  ch.pipeline().addLast(&quot;codec&quot;, new HttpServerCodec());</span><br><span class="line">  ch.pipeline().addLast(&quot;aggegator&quot;, new HttpObjectAggregator(maxContentLength));</span><br><span class="line">  ch.pipeline().addLast(&quot;cors&quot;, new CorsHandler(corsConfig));</span><br><span class="line">  ch.pipeline().addLast(&quot;idleStateHandler&quot;, new IdleStateHandler(0, 0, 300, TimeUnit.SECONDS));</span><br><span class="line">  //zipkin相关的</span><br><span class="line">  if (ZipkinHelper.httpTracing().isPresent())</span><br><span class="line">    ch.pipeline().addLast(&quot;tracing&quot;, new RequestTracingHandler());</span><br><span class="line">  //业务相关的handler</span><br><span class="line">  for (ChannelHandler handler : handlers) &#123;</span><br><span class="line">    ch.pipeline().addLast(handler.getClass().getSimpleName(), handler); // Use this if need</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-<h1 id="聊天室"><a href="#聊天室" class="headerlink" title="聊天室"></a>聊天室</h1><p><a href="https://waylau.com/netty-chat/" target="_blank" rel="noopener">https://waylau.com/netty-chat/</a></p>
-<h1 id="聊天室websocket版本"><a href="#聊天室websocket版本" class="headerlink" title="聊天室websocket版本"></a>聊天室websocket版本</h1>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/17/java/java_netty/netty-study/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/17/java/java_netty/netty-study/" itemprop="url">netty-study</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-17T17:57:57+08:00">
-                2018-04-17
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/04/17/java/java_netty/netty-study/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/04/17/java/java_netty/netty-study/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/04/17/java/java_netty/netty-study/" class="leancloud_visitors" data-flag-title="netty-study">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="why"><a href="#why" class="headerlink" title="why"></a>why</h1><ul>
-<li>Netty 是一个提供 asynchronous event-driven （异步事件驱动）的网络应用框架，是一个用以快速开发高性能、可扩展协议的服务器和客户端。</li>
-<li>换句话说，Netty 是一个 NIO 客户端服务器框架，使用它可以快速简单地开发网络应用程序，比如服务器和客户端的协议。Netty 大大简化了网络程序的开发过程比如 TCP 和 UDP 的 socket 服务的开发。</li>
-<li>现在很多互联网上面的项目比如Dubbo、Hadoop系列，MQ等都在使用netty了</li>
-<li></li>
-</ul>
-<h2 id="原生jdk-nio"><a href="#原生jdk-nio" class="headerlink" title="原生jdk nio"></a>原生jdk nio</h2><p>（1）NIO的类库和API繁杂，使用麻烦，你需要熟练掌握Selector、ServerSocketChannel、SocketChannel、ByteBuffer等；</p>
-<p>（2）需要具备其他的额外技能做铺垫，例如熟悉Java多线程编程。这是因为NIO编程涉及到Reactor模式，你必须对多线程和网路编程非常熟悉，才能编写出高质量的NIO程序；</p>
-<p>（3）可靠性能力补齐，工作量和难度都非常大。例如客户端面临断连重连、网络闪断、半包读写、失败缓存、网络拥塞和异常码流的处理等问题，NIO编程的特点是功能开发相对容易，但是可靠性能力补齐的工作量和难度都非常大；</p>
-<p>（4）JDK NIO的BUG，例如臭名昭著的epoll bug，它会导致Selector空轮询，最终导致CPU 100%。官方声称在JDK1.6版本的update18修复了该问题，但是直到JDK1.7版本该问题仍旧存在，只不过该BUG发生概率降低了一些而已，它并没有被根本解决。该BUG以及与该BUG相关的问题单可以参见以下链接内容：</p>
-<p>◎ <a href="http://bugs.java.com/bugdatabase/view_bug.do?bug_id=6403933" target="_blank" rel="noopener">http://bugs.java.com/bugdatabase/view_bug.do?bug_id=6403933</a></p>
-<p>◎ <a href="http://bugs.java.com/bugdatabase/view_bug.do?bug_id=2147719" target="_blank" rel="noopener">http://bugs.java.com/bugdatabase/view_bug.do?bug_id=2147719</a></p>
-<h1 id="整体架构预览"><a href="#整体架构预览" class="headerlink" title="整体架构预览"></a>整体架构预览</h1><p><img src="https://waylau.gitbooks.io/netty-4-user-guide/images/components.png" alt="components"></p>
-<ul>
-<li>灵拷贝</li>
-<li>统一的异步io api,方便更改</li>
-<li>基于拦截链模式的事件模型</li>
-<li>适用快速开发的高级组件<ul>
-<li>Codec 框架</li>
-<li>SSL / TLS 支持</li>
-<li>HTTP 实现</li>
-<li>WebSockets 实现</li>
-<li>Google Protocol Buffer 整合</li>
-</ul>
-</li>
-</ul>
-<p>缓冲（buffer），通道（channel），事件模型（event model）</p>
-<h2 id="内部组件"><a href="#内部组件" class="headerlink" title="内部组件:"></a>内部组件:</h2><p><img src="/images/pasted-154.png" alt="upload successful"></p>
-<p>NioEventLoop 是 Netty 的 Reactor 线程，其角色：</p>
+<h1 id="情景"><a href="#情景" class="headerlink" title="情景"></a>情景</h1><h2 id="单元测试覆盖率"><a href="#单元测试覆盖率" class="headerlink" title="单元测试覆盖率"></a>单元测试覆盖率</h2><p>选取了Sonar+Cobertura来获取单元测试覆盖率。 </p>
+<h2 id="集成测试覆盖率"><a href="#集成测试覆盖率" class="headerlink" title="集成测试覆盖率"></a>集成测试覆盖率</h2><h2 id="自动化集成流程"><a href="#自动化集成流程" class="headerlink" title="自动化集成流程"></a>自动化集成流程</h2><p><img src="/images/pasted-158.png" alt="upload successful"></p>
 <ol>
-<li>Boss Group：作为服务端 Acceptor 线程，用于 accept 客户端链接，并转发给 WorkerGroup 中的线程。</li>
-<li>Worker Group：作为 IO 线程，负责 IO 的读写，从 SocketChannel 中读取报文或向 SocketChannel 写入报文。</li>
-<li>Task Queue／Delay Task Queue：作为定时任务线程，执行定时任务，例如链路空闲检测和发送心跳消息等。</li>
+<li>业务开发完成之后，开发人员做单元测试，单元测试完成之后，保证单元测试全部通过同时单元测试代码覆盖率达到一定程度（这个需要开发和测试约定，理论上越高越好），开发提测。 </li>
+<li>测试人员根据测试用例进行测试（包括手工测试和自动化测试），结合git获取本次变动代码的覆盖率信息。行覆盖率需达到100%，分支达到50%以上，这个需要具体场景具体分析。 </li>
+<li>测试通过之后，代码合并至主干，进行自动化回归。 </li>
+<li>回归测试通过之后，代码可以上线。</li>
 </ol>
-<h2 id="内部流程"><a href="#内部流程" class="headerlink" title="内部流程"></a>内部流程</h2><p><img src="/images/pasted-155.png" alt="upload successful"></p>
-<p>其中步骤一至步骤九是 Netty 服务端的创建时序，步骤十至步骤十三是 TCP 网关容器创建的时序。</p>
-<ul>
-<li>步骤一：创建 ServerBootstrap 实例，ServerBootstrap 是 Netty 服务端的启动辅助类。</li>
-<li>步骤二：设置并绑定 Reactor 线程池，EventLoopGroup 是 Netty 的 Reactor 线程池，EventLoop 负责所有注册到本线程的 Channel。</li>
-<li>步骤三：设置并绑定服务器 Channel，Netty Server 需要创建 NioServerSocketChannel 对象。</li>
-<li>步骤四：TCP 链接建立时创建 ChannelPipeline，ChannelPipeline 本质上是一个负责和执行 ChannelHandler 的职责链。</li>
-<li>步骤五：添加并设置 ChannelHandler，ChannelHandler 串行的加入 ChannelPipeline 中。</li>
-<li>步骤六：绑定监听端口并启动服务端，将 NioServerSocketChannel 注册到 Selector 上。</li>
-<li>步骤七：Selector 轮训，由 EventLoop 负责调度和执行 Selector 轮询操作。</li>
-<li>步骤八：执行网络请求事件通知，轮询准备就绪的 Channel，由 EventLoop 执行 ChannelPipeline。</li>
-<li>步骤九：执行 Netty 系统和业务 ChannelHandler，依次调度并执行 ChannelPipeline 的 ChannelHandler。</li>
-<li>步骤十：通过 Proxy 代理调用后端服务，ChannelRead 事件后，通过发射调度后端 Service。</li>
-<li>步骤十一：创建 Session，Session 与 Connection 是相互依赖关系。</li>
-<li>步骤十二：创建 Connection，Connection 保存 ChannelHandlerContext。</li>
-<li>步骤十三：添加 SessionListener，SessionListener 监听 SessionCreate 和 SessionDestory 等事件。</li>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ul>
+<li>代码覆盖率统计是用来发现没有被测试覆盖的代码</li>
+<li>代码覆盖率统计不能完全用来衡量代码质量</li>
 </ul>
-<h1 id="reactor"><a href="#reactor" class="headerlink" title="reactor"></a>reactor</h1><p><img src="/images/pasted-156.png" alt="upload successful"><br>如果你对 Java 网络 IO 这个话题感兴趣的话，肯定看过 Doug Lea 的《Scalable IO in Java》，在这个 PPT 里详细介绍了如何使用 Java NIO 的技术来实现 Douglas C. Schmidt 发表的 Reactor 论文里所描述的 IO 模型。针对这个高效的通信模型，Netty 做了非常友好的支持：</p>
-<ul>
-<li><p>Reactor模型</p>
-<ul>
-<li>我们只需要在初始化 ServerBootstrap 时，提供两个不同的 EventLoopGroup 实例，就实现了 Reactor 的主从模型。我们通常把处理建连事件的线程，叫做 BossGroup，对应 ServerBootstrap 构造方法里的 parentGroup 参数，即我们常说的 Acceptor 线程；处理已创建好的 channel  相关连 IO 事件的线程，叫做 WorkerGroup，对应 ServerBootstrap 构造方法里的 childGroup 参数，即我们常说的 IO 线程。</li>
-<li>最佳实践：通常 bossGroup 只需要设置为 1 即可，因为 ServerSocketChannel 在初始化阶段，只会注册到某一个 eventLoop 上，而这个 eventLoop 只会有一个线程在运行，所以没有必要设置为多线程（什么时候需要多线程呢，可以参考 Norman Maurer 在 StackOverflow 上的这个回答）；而 IO 线程，为了充分利用 CPU，同时考虑减少线上下文切换的开销，通常设置为 CPU 核数的两倍，这也是 Netty 提供的默认值。</li>
-</ul>
-</li>
-<li><p>串行化设计理念</p>
-<ul>
-<li>Netty 从 4.x 的版本之后，所推崇的设计理念是串行化处理一个 Channel 所对应的所有 IO 事件和异步任务，单线程处理来规避并发问题。Netty 里的 Channel 在创建后，会通过 EventLoopGroup 注册到某一个 EventLoop 上，之后该 Channel 所有读写事件，以及经由 ChannelPipeline 里各个 Handler 的处理，都是在这一个线程里。一个 Channel 只会注册到一个 EventLoop 上，而一个 EventLoop 可以注册多个 Channel 。所以我们在使用时，也需要尽可能避免使用带锁的实现，能无锁化就无锁。</li>
-<li>最佳实践：Channel 的实现是线程安全的，因此我们通常在运行时，会保存一个 Channel 的引用，同时为了保持 Netty 的无锁化理念，也应该尽可能避免使用带锁的实现，尤其是在 Handler 里的处理逻辑。举个例子：这里会有一个比较特殊的容易死锁的场景，比如在业务线程提交异步任务前需要先抢占某个锁，Handler 里某个异步任务的处理也需要获取同一把锁。如果某一个时刻业务线程先拿到锁 lock1，同时 Handler 里由于事件机制触发了一个异步任务 A，并在业务线程提交异步任务之前，提交到了 EventLoop 的队列里。之后，业务线程提交任务 B，等待 B 执行完成后才能释放锁 lock1；而任务 A 在队列里排在 B 之前，先被执行，执行过程需要获取锁 lock1 才能完成。这样死锁就发生了，与常见的资源竞争不同，而是任务执行权导致的死锁。要规避这类问题，最好的办法就是不要加锁；如果实在需要用锁，需要格外注意 Netty 的线程模型与任务处理机制。</li>
-</ul>
-</li>
-<li><p>业务处理</p>
-<ul>
-<li>IO 密集型的轻计算业务：此时线程的上下文切换消耗，会比 IO 线程的占用消耗更为突出，所以我们通常会建议在 IO 线程来处理请求；</li>
-<li>CPU 密集型的计算业务：比如需要做远程调用，操作 DB 的业务，此时 IO 线程的占用远远超过线程上下文切换的消耗，所以我们就会建议在单独的业务线程池里来处理请求，以此来释放 IO 线程的占用。该模式，也是我们蚂蚁微服务，消息通信等最常使用的模型。该模式在后面的 RPC 协议实现举例部分会详细介绍。</li>
-<li>如文章开头所描述的场景，我们需要合理设计，来将硬件的 IO 能力，CPU 计算能力与内存结合起来，发挥最佳的效果。针对不同的业务类型，我们会选择不同的处理方式</li>
-<li>最佳实践：“Never block the event loop, reduce context-swtiching”，引自Netty committer Norman Maurer，另外阿里 HSF 的作者毕玄也有类似的总结。</li>
-</ul>
-</li>
-<li><p>其他实践建议</p>
-<ul>
-<li>最小化线程池，能复用 EventLoopGroup 的地方尽量复用。比如蚂蚁因为历史原因，有过两版 RPC 协议，在两个协议升级过渡期间，我们会复用 Acceptor 线程与 IO 线程在同一个端口处理不同协议的请求；除此，针对多应用合并部署的场景，我们也会复用 IO 线程防止一个进程开过多的 IO 线程。</li>
-<li>对于无状态的 ChannelHandler ，设置成共享模式。比如我们的事件处理器，RPC 处理器都可以设置为共享，减少不同的 Channel 对应的 ChannelPipeline 里生成的对象个数。</li>
-<li>正确使用 ChannelHandlerContext 的 ctx.write() 与 ctx.channel().write() 方法。前者是从当前 Handler 的下一个 Handler 开始处理，而后者会从 tail 开始处理。大多情况下使用 ctx.write() 即可。</li>
-<li>在使用 Channel 写数据之前，建议使用 isWritable() 方法来判断一下当前 ChannelOutboundBuffer 里的写缓存水位，防止 OOM 发生。不过实践下来，正常的通信过程不太会 OOM，但当网络环境不好，同时传输报文很大时，确实会出现限流的情况。</li>
-</ul>
-</li>
-</ul>
-<h1 id="demo案例"><a href="#demo案例" class="headerlink" title="demo案例"></a>demo案例</h1><h2 id="discard服务器"><a href="#discard服务器" class="headerlink" title="discard服务器"></a>discard服务器</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">public class DiscardServerHandler extends ChannelInboundHandlerAdapter &#123; // (1)</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void channelRead(ChannelHandlerContext ctx, Object msg) &#123; // (2)</span><br><span class="line">        // 以静默方式丢弃接收的数据</span><br><span class="line">        ((ByteBuf) msg).release(); // (3)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) &#123; // (4)</span><br><span class="line">        // 出现异常时关闭连接。</span><br><span class="line">        cause.printStackTrace();</span><br><span class="line">        ctx.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">public class DiscardServer &#123;</span><br><span class="line"></span><br><span class="line">    private int port;</span><br><span class="line"></span><br><span class="line">    public DiscardServer(int port) &#123;</span><br><span class="line">        this.port = port;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void run() throws Exception &#123;</span><br><span class="line">        EventLoopGroup bossGroup = new NioEventLoopGroup(); // (1)</span><br><span class="line">        EventLoopGroup workerGroup = new NioEventLoopGroup();</span><br><span class="line">        try &#123;</span><br><span class="line">            ServerBootstrap b = new ServerBootstrap(); // (2)</span><br><span class="line">            b.group(bossGroup, workerGroup)</span><br><span class="line">             .channel(NioServerSocketChannel.class) // (3)</span><br><span class="line">             .childHandler(new ChannelInitializer&lt;SocketChannel&gt;() &#123; // (4)</span><br><span class="line">                 @Override</span><br><span class="line">                 public void initChannel(SocketChannel ch) throws Exception &#123;</span><br><span class="line">                     ch.pipeline().addLast(new DiscardServerHandler());</span><br><span class="line">                 &#125;</span><br><span class="line">             &#125;)</span><br><span class="line">             .option(ChannelOption.SO_BACKLOG, 128)          // (5)</span><br><span class="line">             .childOption(ChannelOption.SO_KEEPALIVE, true); // (6)</span><br><span class="line"></span><br><span class="line">            // Bind and start to accept incoming connections.</span><br><span class="line">            ChannelFuture f = b.bind(port).sync(); // (7)</span><br><span class="line"></span><br><span class="line">            // Wait until the server socket is closed.</span><br><span class="line">            // In this example, this does not happen, but you can do that to gracefully</span><br><span class="line">            // shut down your server.</span><br><span class="line">            f.channel().closeFuture().sync();</span><br><span class="line">        &#125; finally &#123;</span><br><span class="line">            workerGroup.shutdownGracefully();</span><br><span class="line">            bossGroup.shutdownGracefully();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) throws Exception &#123;</span><br><span class="line">        int port;</span><br><span class="line">        if (args.length &gt; 0) &#123;</span><br><span class="line">            port = Integer.parseInt(args[0]);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            port = 8080;</span><br><span class="line">        &#125;</span><br><span class="line">        new DiscardServer(port).run();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="echo服务"><a href="#echo服务" class="headerlink" title="echo服务"></a>echo服务</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">public void channelRead(ChannelHandlerContext ctx, Object msg) &#123;</span><br><span class="line">    ctx.write(msg); // (1)</span><br><span class="line">    ctx.flush(); // (2)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="time服务器"><a href="#time服务器" class="headerlink" title="time服务器"></a>time服务器</h2><p><a href="https://waylau.gitbooks.io/netty-4-user-guide/Getting%20Started/Writing%20a%20Time%20Server.html" target="_blank" rel="noopener">https://waylau.gitbooks.io/netty-4-user-guide/Getting%20Started/Writing%20a%20Time%20Server.html</a></p>
-<h2 id="处理一个基于流的传输"><a href="#处理一个基于流的传输" class="headerlink" title="处理一个基于流的传输"></a>处理一个基于流的传输</h2><p>基于流的传输比如 TCP/IP, 接收到数据是存在 socket 接收的 buffer 中。不幸的是，基于流的传输并不是一个数据包队列，而是一个字节队列。意味着，即使你发送了2个独立的数据包，操作系统也不会作为2个消息处理而仅仅是作为一连串的字节而言。因此这是不能保证你远程写入的数据就会准确地读取。举个例子，让我们假设操作系统的 TCP/TP 协议栈已经接收了3个数据包：</p>
-<p>由于基于流传输的协议的这种普通的性质，在你的应用程序里读取数据的时候会有很高的可能性被分成下面的片段<br>因此，一个接收方不管他是客户端还是服务端，都应该把接收到的数据整理成一个或者多个更有意思并且能够让程序的业务逻辑更好理解的数据。在上面的例子中，接收到的数据应该被构造成下面的格式</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://www.infoq.com/cn/articles/practice-of-java-nio-communication-framework" target="_blank" rel="noopener">http://www.infoq.com/cn/articles/practice-of-java-nio-communication-framework</a><br><a href="https://waylau.gitbooks.io/netty-4-user-guide" target="_blank" rel="noopener">https://waylau.gitbooks.io/netty-4-user-guide</a><br><a href="https://github.com/netty/netty/tree/4.0/example/src/main/java/io/netty/example" target="_blank" rel="noopener">https://github.com/netty/netty/tree/4.0/example/src/main/java/io/netty/example</a></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://tech.youzan.com/code-coverage/" target="_blank" rel="noopener">https://tech.youzan.com/code-coverage/</a></p>
 
           
         
@@ -1571,7 +1303,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/16/java/java_thread/CompletionService/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/21/运维-测试/mock-and-stub/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
@@ -1590,7 +1322,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/04/16/java/java_thread/CompletionService/" itemprop="url">并发工具之CompletionService</a></h1>
+                <a class="post-title-link" href="/2018/04/21/运维-测试/mock-and-stub/" itemprop="url">mock-and-stub</a></h1>
         
 
         <div class="post-meta">
@@ -1602,8 +1334,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-16T22:23:47+08:00">
-                2018-04-16
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-21T13:22:14+08:00">
+                2018-04-21
               </time>
             
 
@@ -1621,9 +1353,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/04/16/java/java_thread/CompletionService/#comments" itemprop="discussionUrl">
+                <a href="/2018/04/21/运维-测试/mock-and-stub/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/04/16/java/java_thread/CompletionService/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/04/21/运维-测试/mock-and-stub/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -1631,7 +1363,7 @@
 
           
           
-             <span id="/2018/04/16/java/java_thread/CompletionService/" class="leancloud_visitors" data-flag-title="并发工具之CompletionService">
+             <span id="/2018/04/21/运维-测试/mock-and-stub/" class="leancloud_visitors" data-flag-title="mock-and-stub">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -1664,18 +1396,27 @@
       
         
           
-            <h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>当向Executor提交多个任务并且希望获得它们在完成之后的结果，如果用FutureTask，可以循环获取task，并调用get方法去获取task执行结果，但是如果task还未完成，获取结果的线程将阻塞直到task完成，由于不知道哪个task优先执行完毕，使用这种方式效率不会很高。在jdk5时候提出接口CompletionService，它整合了Executor和BlockingQueue的功能，可以更加方便在多个任务执行时获取到任务执行结果。</p>
-<h1 id="案例"><a href="#案例" class="headerlink" title="案例"></a>案例</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">public class CompletionServiceTest &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) throws InterruptedException, ExecutionException &#123;</span><br><span class="line">        ExecutorService executorService = Executors.newFixedThreadPool(100);</span><br><span class="line">        ExecutorCompletionService&lt;Integer&gt; completionService = new ExecutorCompletionService&lt;Integer&gt;(executorService);</span><br><span class="line">        for (int i = 0; i &lt; 10; i++) &#123;</span><br><span class="line">            completionService.submit(new Callable&lt;Integer&gt;() &#123;</span><br><span class="line">                @Override</span><br><span class="line">                public Integer call() throws Exception &#123;</span><br><span class="line">                    TimeUnit.SECONDS.sleep(5);</span><br><span class="line">                    int i1 = new Random().nextInt();</span><br><span class="line">                    System.out.println(i1);</span><br><span class="line">                    return i1;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">        int sum = 0;</span><br><span class="line">        for (int i = 0; i &lt; 10; i++) &#123;</span><br><span class="line">            Future&lt;Integer&gt; poll = completionService.take();</span><br><span class="line">            Integer integer = poll.get();</span><br><span class="line">            sum += integer;</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(sum);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h1 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h1><p><img src="/images/pasted-153.png" alt="upload successful"><br>ExecutorCompletionService有三个成员变量：</p>
+            <h1 id="mock和stub的差异"><a href="#mock和stub的差异" class="headerlink" title="mock和stub的差异"></a>mock和stub的差异</h1><h2 id="1、相同点"><a href="#1、相同点" class="headerlink" title="1、相同点"></a>1、相同点</h2><p>先看看两者的相同点吧，非常明确的是，mock和stub都可以用来对系统(或者将粒度放小为模块，单元)进行隔离。<br>在测试，尤其是单元测试中，我们通常关注的是主要测试对象的功能和行为，对于主要测试对象涉及到的次要对象尤其是一些依赖，我们仅仅关注主要测试对象和次要测试对象的交互，比如是否调用，何时调用，调用的参数，调用的次数和顺序等，以及返回的结果或发生的异常。但次要对象是如何执行这次调用的具体细节，我们并不关注，因此常见的技巧就是用mock对象或者stub对象来替代真实的次要对象，模拟真实场景来进行对主要测试对象的测试工作。<br>因此从实现上看，mock和stub都是通过创建自己的对象来替代次要测试对象，然后按照测试的需要控制这个对象的行为。</p>
+<h2 id="2、不同点"><a href="#2、不同点" class="headerlink" title="2、不同点"></a>2、不同点</h2><h3 id="1）-类实现的方式"><a href="#1）-类实现的方式" class="headerlink" title="1） 类实现的方式"></a>1） 类实现的方式</h3><p>从类的实现方式上看，stub有一个显式的类实现，按照stub类的复用层次可以实现为普通类(被多个测试案例复用)，内部类(被同一个测试案例的多个测试方法复用)乃至内部匿名类(只用于当前测试方法)。对于stub的方法也会有具体的实现，哪怕简单到只有一个简单的return语句。<br>而mock则不同，mock的实现类通常是有mock的工具包如easymock, jmock来隐式实现，具体mock的方法的行为则通过record方式来指定。</p>
 <ul>
-<li><p>executor：执行task的线程池，创建CompletionService必须指定；</p>
-</li>
-<li><p>aes：主要用于创建待执行task；</p>
-</li>
-<li><p>completionQueue：存储已完成状态的task，默认是基于链表结构的阻塞队列LinkedBlockingQueue。</p>
-</li>
+<li>stub的标准实现，需要自己实现一个类并实现方法</li>
+<li>mock的实现，以easymock为例，只要指定mock的类并record期望的行为，并没有显式的构造新类</li>
 </ul>
-<p>从submit方法的源码可以看出，在提交到线程池的时候需要将FutureTask封装成QueueingFuture</p>
+<p>对比可以看出，mock编写相对简单，只需要关注被使用的函数，所谓”just enough”。stub要复杂一些，需要实现逻辑，即使是不需要关注的方法也至少要给出空实现。</p>
+<h3 id="2-测试逻辑的可读性"><a href="#2-测试逻辑的可读性" class="headerlink" title="2)测试逻辑的可读性"></a>2)测试逻辑的可读性</h3><p>从上面的代码可以看出，在形式上，mock通常是在测试代码中直接mock类和定义mock方法的行为，测试代码和mock的代码通常是放在一起的，因此测试代码的逻辑也容易从测试案例的代码上看出来。Easymock.expect(dao.getById(“1001”)).andReturn(user); 直截了当的指明了当前测试案例对UserDao这个依赖的预期: getById需要被调用，调用的参数应该是”1001”，调用次数为1(不明确指定调用次数时easymock默认为1)。<br>而stub的测试案例的代码中只有简单的UserDao userDao = new UserDaoStub ();构造语句和service.setUserDao(userDao);设置语句，我们无法直接从测试案例的代码中看出对依赖的预期，只能进入具体的UserServiceImpl类的query()方法，看到具体的实现是调用userDao.getById(userId)，这个时候才能明白完整的测试逻辑。因此当测试逻辑复杂，stub数量多并且某些stub需要传入一些标记比如true，false之类的来制定不同的行为时，测试逻辑的可读性就会下降。</p>
+<h3 id="3-可复用性"><a href="#3-可复用性" class="headerlink" title="3)可复用性"></a>3)可复用性</h3><p>Mock通常很少考虑复用，每个mock对象通过都是遵循”just enough”原则，一般只适用于当前测试方法。因此每个测试方法都必须实现自己的mock逻辑，当然在同一个测试类中还是可以有一些简单的初始化逻辑可以复用。<br>stub则通常比较方便复用，尤其是一些通用的stub，比如jdbc连接之类。spring框架就为此提供了大量的stub来方便测试，不过很遗憾的是，它的名字用错了：spring-mock！</p>
+<h3 id="4-设计和使用"><a href="#4-设计和使用" class="headerlink" title="4)设计和使用"></a>4)设计和使用</h3><p>接着我们从mock和stub的设计和使用上来比较两者，这里需要引入两个概念：interaction-based和state-based。</p>
+<ul>
+<li>stub是state-based，关注的是输入和输出。</li>
+<li>mock是interaction-based，关注的是交互过程。</li>
+</ul>
+<h3 id="5-expectiation-期望"><a href="#5-expectiation-期望" class="headerlink" title="5)expectiation/期望"></a>5)expectiation/期望</h3><p>这个才是mock和stub的最重要的区别：expectiation/期望。<br>对于mock来说，exception是重中之重：我们期待方法有没有被调用，期待适当的参数，期待调用的次数，甚至期待多个mock之间的调用顺序。所有的一切期待都是事先准备好，在测试过程中和测试结束后验证是否和预期的一致。</p>
+<p>而对于stub，通常都不会关注exception，就像上面给出的UserDaoStub的例子，没有任何代码来帮助判断这个stub类是否被调用。虽然理论上某些stub实现也可以通过自己编码的方式增加对expectiation的内容，比如增加一个计数器，每次调用+1之类，但是实际上极少这样做。    </p>
+<h3 id="6-总结"><a href="#6-总结" class="headerlink" title="6)总结"></a>6)总结</h3><p>关于mock和stub的不同，在Martin Fowler的”Mocks Aren’t Stubs”一文中，有以下结束，我将它列出来作为总结：<br>(1) Dummy<br>对象被四处传递，但是从不被真正使用。通常他们只是用来填充参数列表。<br>(2) Fake<br>有实际可工作的实现，但是通常有一些缺点导致不适合用于产品(基于内存的数据库就是一个好例子)。<br>(3) Stubs<br>在测试过程中产生的调用提供预备好的应答，通常不应答计划之外的任何事。stubs可能记录关于调用的信息，比如 邮件网关的stub 会记录它发送的消息，或者可能仅仅是发送了多少信息。<br>(4) Mocks<br>如我们在这里说的那样：预先计划好的对象，带有各种期待，他们组成了一个关于他们期待接受的调用的详细说明。</p>
+<h1 id="不同情境下的使用"><a href="#不同情境下的使用" class="headerlink" title="不同情境下的使用"></a>不同情境下的使用</h1><h2 id="stub"><a href="#stub" class="headerlink" title="stub"></a>stub</h2><p>Stubs一般用来stub out那些难于创建或操纵的对象。一个经典的例子就是一个database connection。因此，一般的stub都被发现于系统边界，或者围绕着系统中复杂的对象群。为了建立一个stub，你建立了一个接口的另一种实现，利用简单的数据替换了真实的方法。</p>
+<p>大多数团队一般编写custom stubs来stub任何需要的服务，毕竟数目并不多，而且它们经常可以在test cases之间复用。因此，你不需要构建一个通用的stub定义库。而利用mock库是可以很好地创建stub的。</p>
+<h2 id="mock"><a href="#mock" class="headerlink" title="mock"></a>mock</h2><p>在mock社区看来，最本质的区别就在于mock所具有的expectation setting机制，利用此机制可以测试mock上哪些方法被调用了。Mockists通常把一个刚刚返回值的mock object叫做’just a stub’。所以，一种观察mocks和stubs的区别的方法就是在使用mock的时候人们是把建立并且测试expectations当作测试的一部分的。似乎太简单了点 - 我也曾经编写过做一些简单形式expectation检查的stub（这些检查可能是设置一个布尔值来代表某个method是否被调用）。但是我想我们有理由认为expectations对于stubs来说是一种稀有的特性，而对于mocks来说是主要的特性。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://hongyitong.github.io/2016/12/23/%E6%B5%85%E8%B0%88mock%E5%92%8Cstub/" target="_blank" rel="noopener">http://hongyitong.github.io/2016/12/23/%E6%B5%85%E8%B0%88mock%E5%92%8Cstub/</a></p>
 
           
         
@@ -1724,7 +1465,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/15/reading-notes/java-con-2/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/20/java/java_netty/nio-reactor-model/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
@@ -1743,7 +1484,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/04/15/reading-notes/java-con-2/" itemprop="url">java并发编程实战-第二章-线程安全性</a></h1>
+                <a class="post-title-link" href="/2018/04/20/java/java_netty/nio-reactor-model/" itemprop="url">nio-reactor-model</a></h1>
         
 
         <div class="post-meta">
@@ -1755,8 +1496,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-15T23:12:07+08:00">
-                2018-04-15
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-20T19:52:52+08:00">
+                2018-04-20
               </time>
             
 
@@ -1774,9 +1515,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/04/15/reading-notes/java-con-2/#comments" itemprop="discussionUrl">
+                <a href="/2018/04/20/java/java_netty/nio-reactor-model/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/04/15/reading-notes/java-con-2/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/04/20/java/java_netty/nio-reactor-model/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -1784,7 +1525,7 @@
 
           
           
-             <span id="/2018/04/15/reading-notes/java-con-2/" class="leancloud_visitors" data-flag-title="java并发编程实战-第二章-线程安全性">
+             <span id="/2018/04/20/java/java_netty/nio-reactor-model/" class="leancloud_visitors" data-flag-title="nio-reactor-model">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -1817,30 +1558,23 @@
       
         
           
-            <h1 id="什么是线程安全型"><a href="#什么是线程安全型" class="headerlink" title="什么是线程安全型"></a>什么是线程安全型</h1><p> 首先使代码正确运行，然后再提高代码速度。【正确编写并发程序的方法】</p>
-<p>定义:当多个线程访问某个类时，不管是</p>
-<p>1）运行时环境采用何种调度方式，<br>2）或者这些线程如何交替执行，<br>3）并在在主调代码中不需要任何额外的同步或者协同，<br>这个类能<strong>始终</strong>表现出<strong>正确</strong>的行为。</p>
-<p>无状态对象一定是线程安全的</p>
-<p>Java主要用<code>synchronized</code>做同步，这是一种独占的加锁方式，其他还包括volatile、显式锁（explicit lock）等。</p>
+            <h1 id="Reactor模型"><a href="#Reactor模型" class="headerlink" title="Reactor模型"></a>Reactor模型</h1><ul>
+<li>Reactor模式是处理并发I/O比较常见的一种模式，用于同步I/O，中心思想是将所有要处理的I/O事件注册到一个中心I/O多路复用器上，同时主线程/进程阻塞在多路复用器上；一旦有I/O事件到来或是准备就绪(文件描述符或socket可读、写)，多路复用器返回并将事先注册的相应I/O事件分发到对应的处理器中。</li>
+<li><p>Reactor是一种事件驱动机制，和普通函数调用的不同之处在于：应用程序不是主动的调用某个API完成处理，而是恰恰相反，Reactor逆置了事件处理流程，应用程序需要提供相应的接口并注册到Reactor上，如果相应的事件发生，Reactor将主动调用应用程序注册的接口，这些接口又称为“回调函数”。用“好莱坞原则”来形容Reactor再合适不过了：不要打电话给我们，我们会打电话通知你。</p>
+</li>
+<li><p>Reactor模式与Observer模式在某些方面极为相似：当一个主体发生改变时，所有依属体都得到通知。不过，观察者模式与单个事件源关联，而反应器模式则与多个事件源关联 。</p>
+</li>
+</ul>
+<p>在Reactor模式中，有5个关键的参与者：</p>
 <ul>
-<li>如果出现线程安全问题，要怎么解决？<br>1）不在线程间共享（比如改成局部变量）<br>2）将状态改为不可变变量<br>3）访问状态变量时使用同步</li>
+<li>描述符（handle）：由操作系统提供的资源，用于识别每一个事件，如Socket描述符、文件描述符、信号的值等。在Linux中，它用一个整数来表示。事件可以来自外部，如来自客户端的连接请求、数据等。事件也可以来自内部，如信号、定时器事件。</li>
+<li>同步事件多路分离器（event demultiplexer）：事件的到来是随机的、异步的，无法预知程序何时收到一个客户连接请求或收到一个信号。所以程序要循环等待并处理事件，这就是事件循环。在事件循环中，等待事件一般使用I/O复用技术实现。在linux系统上一般是select、poll、epol_waitl等系统调用，用来等待一个或多个事件的发生。I/O框架库一般将各种I/O复用系统调用封装成统一的接口，称为事件多路分离器。调用者会被阻塞，直到分离器分离的描述符集上有事件发生。</li>
+<li>事件处理器（event handler）：I/O框架库提供的事件处理器通常是由一个或多个模板函数组成的接口。这些模板函数描述了和应用程序相关的对某个事件的操作，用户需要继承它来实现自己的事件处理器，即具体事件处理器。因此，事件处理器中的回调函数一般声明为虚函数，以支持用户拓展。</li>
+<li>具体的事件处理器（concrete event handler）：是事件处理器接口的实现。它实现了应用程序提供的某个服务。每个具体的事件处理器总和一个描述符相关。它使用描述符来识别事件、识别应用程序提供的服务。</li>
+<li>Reactor 管理器（reactor）：定义了一些接口，用于应用程序控制事件调度，以及应用程序注册、删除事件处理器和相关的描述符。它是事件处理器的调度核心。 Reactor管理器使用同步事件分离器来等待事件的发生。一旦事件发生，Reactor管理器先是分离每个事件，然后调度事件处理器，最后调用相关的模 板函数来处理这个事件。</li>
 </ul>
-<h1 id="原子性"><a href="#原子性" class="headerlink" title="原子性"></a>原子性</h1><h2 id="竞争条件"><a href="#竞争条件" class="headerlink" title="竞争条件"></a>竞争条件</h2><ul>
-<li>由于不恰当的执行时序而出现不正确的结果是一种重要的情况,叫做竞争条件</li>
-<li>当某个计算的正确性取决于多个线程的交替执行时序。最常见的竞态条件类型先检查后执行（Check-Then-Act）。</li>
-</ul>
-<h2 id="实例-延迟初始化中的竞争条件"><a href="#实例-延迟初始化中的竞争条件" class="headerlink" title="实例:延迟初始化中的竞争条件"></a>实例:延迟初始化中的竞争条件</h2><p>单例模式,如果不加锁,返回不同的实例</p>
-<h2 id="复合操作"><a href="#复合操作" class="headerlink" title="复合操作"></a>复合操作</h2><h1 id="加锁机制"><a href="#加锁机制" class="headerlink" title="加锁机制"></a>加锁机制</h1><p>需要同时更新两个值</p>
-<h2 id="内置锁"><a href="#内置锁" class="headerlink" title="内置锁"></a>内置锁</h2><ul>
-<li>synchronized</li>
-</ul>
-<h2 id="重入"><a href="#重入" class="headerlink" title="重入"></a>重入</h2><p>可重入意味着获取锁的操作的粒度是“线程”，而不是“调用”。重入的一种实现方法是为每一个锁关联一个获取计数值和一个所有者线程。当计数值为0时，这个锁没有被任何线程持有，当线程请求一个未被获取这个锁，计数值将递增，当线程退出同步代码块时，计数器会递减。当计数器为0时，释放该锁。</p>
-<h1 id="用锁来保护状态"><a href="#用锁来保护状态" class="headerlink" title="用锁来保护状态"></a>用锁来保护状态</h1><p>锁可以使其保护的代码路径以串行的方式来访问。</p>
-<ul>
-<li>如果用同步来协调对某个变量的访问时,那么在访问这个变量的所有位置上都需要使用同步</li>
-<li>最好注释变量是由哪个锁锁保护</li>
-</ul>
-<h1 id="活跃性与性能"><a href="#活跃性与性能" class="headerlink" title="活跃性与性能"></a>活跃性与性能</h1><p>可以将执行时间较长的操作从锁中移除</p>
+<p>Reactor管理器并不是应用程序负责等待事件、分离事件和调度事件。Reactor并没有被具体的事件处理器调度，而是管理器调度具体的事件处理器，由事件处理器对发生的事件作出处理，这就是Hollywood原则。应用程序要做的仅仅是实现一个具体的事件处理器，然后把它注册到Reactor管理器中。接下来的工作由管理器来完成：如果有相应的事件发生，Reactor会主动调用具体的事件处理器，由事件处理器对发生的事件作出处理。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://tech.youzan.com/yi-bu-wang-luo-mo-xing/" target="_blank" rel="noopener">https://tech.youzan.com/yi-bu-wang-luo-mo-xing/</a></p>
 
           
         
@@ -1889,7 +1623,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/15/reading-notes/java-con-3/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/20/td_bugfix/bugfix-remote-ssh/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
@@ -1908,7 +1642,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/04/15/reading-notes/java-con-3/" itemprop="url">java并发编程实战-第三章-对象的共享</a></h1>
+                <a class="post-title-link" href="/2018/04/20/td_bugfix/bugfix-remote-ssh/" itemprop="url">bugfix-remote-ssh</a></h1>
         
 
         <div class="post-meta">
@@ -1920,8 +1654,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-15T23:04:18+08:00">
-                2018-04-15
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-20T17:00:37+08:00">
+                2018-04-20
               </time>
             
 
@@ -1939,9 +1673,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/04/15/reading-notes/java-con-3/#comments" itemprop="discussionUrl">
+                <a href="/2018/04/20/td_bugfix/bugfix-remote-ssh/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/04/15/reading-notes/java-con-3/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/04/20/td_bugfix/bugfix-remote-ssh/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -1949,7 +1683,7 @@
 
           
           
-             <span id="/2018/04/15/reading-notes/java-con-3/" class="leancloud_visitors" data-flag-title="java并发编程实战-第三章-对象的共享">
+             <span id="/2018/04/20/td_bugfix/bugfix-remote-ssh/" class="leancloud_visitors" data-flag-title="bugfix-remote-ssh">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -1982,85 +1716,50 @@
       
         
           
-            <h1 id="3-1可见性"><a href="#3-1可见性" class="headerlink" title="3.1可见性"></a>3.1可见性</h1><ul>
-<li>首先我们需要知道的是，java的线程都有自己独立的缓存，线程之间进行共享变量的交互是通过自身和缓存和主存的交互实现的。</li>
-<li>如果线程的每次更改缓存都刷入主存，主存每次被一个线程的缓存修改，都通知所有的线程刷新自身的缓存的话，那样就太不经济了。</li>
-<li>由于1和2，就会产生一个现象：当线程1修改了一个共享变量之后，线程2获取的共享变量还是更改前的值。即线程1更改共享变量并没有刷入主存，或者线程2并没有去主存中获取到新的共享变量，或以上两者皆有</li>
-<li>为了解决内存可见性我们可以使用volatile关键字和同步这两种方式</li>
-<li>变量的读取,指令重排序</li>
-</ul>
-<h2 id="失效数据"><a href="#失效数据" class="headerlink" title="失效数据"></a>失效数据</h2><h2 id="非原子的64位操作"><a href="#非原子的64位操作" class="headerlink" title="非原子的64位操作"></a>非原子的64位操作</h2><p>当读取一个非volatile类型的long变量时,如果对该变量的读操作和写操作在不同的线程中执行,那么很可能读取到某个值的高32位和另外一个值的低32位</p>
-<h2 id="加锁和可见性"><a href="#加锁和可见性" class="headerlink" title="加锁和可见性"></a>加锁和可见性</h2><p>加锁的含义不仅互斥,还包括内存可见性</p>
-<h2 id="volatile变量"><a href="#volatile变量" class="headerlink" title="volatile变量"></a>volatile变量</h2><ul>
-<li>用来确保变量的更新操作通知到其他线程</li>
-<li>编译器与运行时都会注意到这个变量时共享的,不会进行重排序</li>
-<li>volatile不会被缓存在寄存器或者其他处理器不可见的地方,读取变量时,总能返回最新的写入值</li>
-</ul>
-<p>满足所有条件,才应该使用volatile</p>
-<ul>
-<li>对变量的写入不依赖变量的当前值,只有单个线程更新变脸的值</li>
-<li>该变量不会与其他状态一起纳入不变形条件中</li>
-<li>在访问时不需要加锁</li>
-</ul>
-<h1 id="3-2发布与溢出"><a href="#3-2发布与溢出" class="headerlink" title="3.2发布与溢出"></a>3.2发布与溢出</h1><blockquote>
-<p>一般自定义类需要考虑发布(构造方法), juc的类已经处理过了</p>
-</blockquote>
-<h2 id="发布-是对象能够在当前作用域之外的代码中使用"><a href="#发布-是对象能够在当前作用域之外的代码中使用" class="headerlink" title="发布:是对象能够在当前作用域之外的代码中使用"></a>发布:是对象能够在当前作用域之外的代码中使用</h2><ul>
-<li>将对象的引用存储到公共静态域。</li>
-<li>在非私有方法中返回引用。</li>
-<li>在发布某对象的时候可能会间接发布本不想发布的对象，如一个private的数组，一旦被发布，其中储存的对象也会被发布</li>
-</ul>
-<h2 id="溢出-不应该发布的被发布了"><a href="#溢出-不应该发布的被发布了" class="headerlink" title="溢出:不应该发布的被发布了"></a>溢出:不应该发布的被发布了</h2><p>类对自己的内部状态进行了同步操作,如果发布出去可能会破坏封装性,并使程序难以维护不变性条件<br>一个对象在尚未准备好就将它发布出去——溢出。</p>
-<ul>
-<li>“内部类发布也会引发溢出”，因为只有当对象通过构造函数返回之后，才处于稳定状态。这种发布会导致this溢出。</li>
-<li>“即使在构造函数的最后一行发布也会有该问题”，指令重排序可能会引发一些奇怪的问题。而且该引用已经不是null了，但是内容还没有初始化完毕也有可能。</li>
-<li>“不要让this在构造期溢出！”</li>
-</ul>
-<h2 id="常见错误"><a href="#常见错误" class="headerlink" title="常见错误"></a>常见错误</h2><ul>
-<li>1.在构造函数中创建并启动线程<br>这个时候线程已经获得了this的引用（即使是隐式的，因为该Runnable或者Thread是所属对象的内部类），this引用几乎总是被新线程所共享。<br>所以在构造函数中创建线程没有错误，但是不要在构造函数中启动它。</li>
-<li>2.注册一个内部类,使用this方法<br>可以使用静态工厂和私有构造函数来解决这个问题。</li>
-</ul>
-<h1 id="3-3线程封闭"><a href="#3-3线程封闭" class="headerlink" title="3.3线程封闭"></a>3.3线程封闭</h1><p>数据仅在单线程中被访问，即数据不共享。<br>几种方式：</p>
-<h2 id="特定的方法"><a href="#特定的方法" class="headerlink" title="特定的方法"></a>特定的方法</h2><p>例如在一个线程中进行 读取修改写入,其他线程中进行读取</p>
-<h2 id="栈封闭"><a href="#栈封闭" class="headerlink" title="栈封闭"></a>栈封闭</h2><p>引用在局部变量中<br>注意不要让当前线程中的对象从所在线程溢出！</p>
-<h2 id="java的ThreadLocal"><a href="#java的ThreadLocal" class="headerlink" title="java的ThreadLocal"></a>java的ThreadLocal</h2><p>使用ThreadLocal可以做到线程隔离，每个线程都有自己单独的一个区域保存变量。</p>
-<h1 id="3-4不变性对象"><a href="#3-4不变性对象" class="headerlink" title="3.4不变性对象"></a>3.4不变性对象</h1><ul>
-<li>不可变对象满足下列条件：<ol>
-<li>所有域是final的，域内部的域也是final的</li>
-<li>所有域不可改变</li>
-<li>this没有在构造的时候逸出</li>
-</ol>
+            <h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>通过ssh root@地址 “命令” 无法加载.bash_profile里面的配置</p>
+<h2 id="对比1"><a href="#对比1" class="headerlink" title="对比1"></a>对比1</h2><p>远程的ssh命令<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[ip1:vic@ip1:/home/vic]$ ssh hadoop@ip2 &quot;java -version&quot;</span><br><span class="line">java version &quot;1.7.0_101&quot;</span><br><span class="line">OpenJDK Runtime Environment (rhel-2.6.6.1.el7_2-x86_64 u101-b00)</span><br><span class="line">OpenJDK 64-Bit Server VM (build 24.95-b01, mixed mode)</span><br><span class="line">ssh登陆后的</span><br><span class="line">[ip2:hadoop@ip2:/home/hadoop]$ java -version</span><br><span class="line">java version &quot;1.8.0_66&quot;</span><br><span class="line">Java(TM) SE Runtime Environment (build 1.8.0_66-b17)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 25.66-b17, mixed mode)</span><br></pre></td></tr></table></figure></p>
+<h2 id="对比2"><a href="#对比2" class="headerlink" title="对比2"></a>对比2</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[ip1:vic@ip1:/home/vic]$ ssh hadoop@ip2 &apos;echo $PATH&apos;</span><br><span class="line">/usr/local/bin:/usr/bin</span><br><span class="line"></span><br><span class="line">[ip2:hadoop@ip2:/home/hadoop]$ echo $PATH</span><br><span class="line">/usr/java/jdk1.8.0_66/bin:/usr/java/default/bin:/usr/java/default/jre/bin:/usr/local/mysql3306/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin</span><br></pre></td></tr></table></figure>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><ul>
+<li>设置BASH_ENV(没有找到设置的地方,export只会在本次登陆生效)</li>
+<li>在远端要执脚本中加载配置文件(最终采取的方案)<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line">. ~/.bash_profile</span><br></pre></td></tr></table></figure>
 </li>
 </ul>
-<h2 id="final域"><a href="#final域" class="headerlink" title="final域"></a>final域</h2><h2 id="使用volatile类型来发布不可变对象"><a href="#使用volatile类型来发布不可变对象" class="headerlink" title="使用volatile类型来发布不可变对象"></a>使用volatile类型来发布不可变对象</h2><h1 id="3-5安全发布"><a href="#3-5安全发布" class="headerlink" title="3.5安全发布"></a>3.5安全发布</h1><h2 id="不正确的发布-正确的对象被破坏"><a href="#不正确的发布-正确的对象被破坏" class="headerlink" title="不正确的发布:正确的对象被破坏"></a>不正确的发布:正确的对象被破坏</h2><p>导致其他县城看到尚未创建完的对象</p>
-<h2 id="不可变对象与初始化安全"><a href="#不可变对象与初始化安全" class="headerlink" title="不可变对象与初始化安全"></a>不可变对象与初始化安全</h2><h2 id="安全发布的常用模式"><a href="#安全发布的常用模式" class="headerlink" title="安全发布的常用模式"></a>安全发布的常用模式</h2><ol>
-<li>在静态初始化对象引用，因为JVM的类加载过程中是同步的</li>
-<li>对对象引用使用volatile或AtomicReference</li>
-<li>将对象引用放入final域中</li>
-<li>对对象引用加锁</li>
-</ol>
-<p>案例:</p>
-<ul>
-<li>将一个键值对放入HashTable,syhronizedMap或者ConcurrentMap中</li>
-<li>静态构造的对象<br><code>public static Holder holder= new Holder(42)</code></li>
+<h1 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h1><p><a href="http://feihu.me/blog/2014/env-problem-when-ssh-executing-command-on-remote" target="_blank" rel="noopener">http://feihu.me/blog/2014/env-problem-when-ssh-executing-command-on-remote</a></p>
+<h1 id="bash的四种模式"><a href="#bash的四种模式" class="headerlink" title="bash的四种模式"></a>bash的四种模式</h1><p>在man page的INVOCATION一节讲述了bash的四种模式，bash会依据这四种模式而选择加载不同的配置文件，而且加载的顺序也有所不同。本文ssh问题的答案就存在于这几种模式当中，所以在我们揭开谜底之前先来分析这些模式。</p>
+<h2 id="interactive-login-shell"><a href="#interactive-login-shell" class="headerlink" title="interactive + login shell"></a>interactive + login shell</h2><p>第一种模式是交互式的登陆shell，这里面有两个概念需要解释：interactive和login：</p>
+<p>login故名思义，即登陆，login shell是指用户以非图形化界面或者以ssh登陆到机器上时获得的第一个shell，简单些说就是需要输入用户名和密码的shell。因此通常不管以何种方式登陆机器后用户获得的第一个shell就是login shell。</p>
+<p>interactive意为交互式，这也很好理解，interactive shell会有一个输入提示符，并且它的标准输入、输出和错误输出都会显示在控制台上。所以一般来说只要是需要用户交互的，即一个命令一个命令的输入的shell都是interactive shell。而如果无需用户交互，它便是non-interactive shell。通常来说如bash script.sh此类执行脚本的命令就会启动一个non-interactive shell，它不需要与用户进行交互，执行完后它便会退出创建的shell。</p>
+<p>那么此模式最简单的两个例子为：</p>
+<p>用户直接登陆到机器获得的第一个shell<br>用户使用ssh user@remote获得的shell</p>
+<h3 id="加载配置文件"><a href="#加载配置文件" class="headerlink" title="加载配置文件"></a>加载配置文件</h3><p>这种模式下，shell首先加载/etc/profile，然后再尝试依次去加载下列三个配置文件之一，一旦找到其中一个便不再接着寻找：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">~/.bash_profile</span><br><span class="line">~/.bash_login</span><br><span class="line">~/.profile</span><br></pre></td></tr></table></figure>
+<h2 id="non-interactive-login-shell"><a href="#non-interactive-login-shell" class="headerlink" title="non-interactive + login shell"></a>non-interactive + login shell</h2><p>第二种模式的shell为non-interactive login shell，即非交互式的登陆shell，这种是不太常见的情况。一种创建此shell的方法为：bash -l script.sh，前面提到过-l参数是将shell作为一个login shell启动，而执行脚本又使它为non-interactive shell。</p>
+<p>对于这种类型的shell，配置文件的加载与第一种完全一样，在此不再赘述。</p>
+<h2 id="interactive-non-login-shell"><a href="#interactive-non-login-shell" class="headerlink" title="interactive + non-login shell"></a>interactive + non-login shell</h2><p>bash，此时会打开一个交互式的shell，而因为不再需要登陆，因此不是login shell。</p>
+<h3 id="加载配置文件-1"><a href="#加载配置文件-1" class="headerlink" title="加载配置文件"></a>加载配置文件</h3><p>对于此种情况，启动shell时会去查找并加载/etc/bash.bashrc和~/.bashrc文件。</p>
+<h3 id="bashrc-VS-profile"><a href="#bashrc-VS-profile" class="headerlink" title="bashrc VS profile"></a>bashrc VS profile</h3><p>从刚引入的两个配置文件的存放路径可以很容易的判断，第一个文件是全局性的，第二个文件属于当前用户。在前面的模式当中，已经出现了几种配置文件，多数是以profile命名的，那么为什么这里又增加两个文件呢？这样不会增加复杂度么？我们来看看此处的文件和前面模式中的文件的区别。</p>
+<p>首先看第一种模式中的profile类型文件，它是某个用户唯一的用来设置全局环境变量的地方, 因为用户可以有多个shell比如bash, sh, zsh等, 但像环境变量这种其实只需要在统一的一个地方初始化就可以, 而这个地方就是profile，所以启动一个login shell会加载此文件，后面由此shell中启动的新shell进程如bash，sh，zsh等都可以由login shell中继承环境变量等配置。</p>
+<p>接下来看bashrc，其后缀rc的意思为Run Commands，由名字可以推断出，此处存放bash需要运行的命令，但注意，这些命令一般只用于交互式的shell，通常在这里会设置交互所需要的所有信息，比如bash的补全、alias、颜色、提示符等等。</p>
+<p>所以可以看出，引入多种配置文件完全是为了更好的管理配置，每个文件各司其职，只做好自己的事情。</p>
+<h2 id="non-interactive-non-login-shell"><a href="#non-interactive-non-login-shell" class="headerlink" title="non-interactive + non-login shell"></a>non-interactive + non-login shell</h2><p>最后一种模式为非交互非登陆的shell，创建这种shell典型有两种方式：</p>
+<p>bash script.sh<br>ssh user@remote command<br>这两种都是创建一个shell，执行完脚本之后便退出，不再需要与用户交互。</p>
+<h3 id="加载配置文件-2"><a href="#加载配置文件-2" class="headerlink" title="加载配置文件"></a>加载配置文件</h3><p>对于这种模式而言，它会去寻找环境变量BASH_ENV，将变量的值作为文件名进行查找，如果找到便加载它。</p>
+<h1 id="配置文件的种类"><a href="#配置文件的种类" class="headerlink" title="配置文件的种类"></a>配置文件的种类</h1><ul>
+<li>/etc/profile</li>
+<li>~/.bash_profile</li>
+<li>~/.bash_login</li>
+<li>~/.profile</li>
+<li>/etc/bash.bashrc</li>
+<li>~/.bashrc</li>
+<li>$BASH_ENV</li>
+<li>$ENV</li>
 </ul>
-<h2 id="事实不可变对象"><a href="#事实不可变对象" class="headerlink" title="事实不可变对象"></a>事实不可变对象</h2><p>程序不会去修改,例如Date虽然是可变的,但是放入了同步的HashMap中,且不会修改,那么就认为是不可变的对象</p>
-<h2 id="可变对象"><a href="#可变对象" class="headerlink" title="可变对象"></a>可变对象</h2><ul>
-<li>不仅要保证发布时的状态可见性</li>
-<li>每次访问时同样需要使用同步来确保后需修改操作的可见性</li>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><ul>
+<li>~/.bash_profile：应该尽可能的简单，通常会在最后加载.profile和.bashrc(注意顺序)</li>
+<li>~/.bash_login：在前面讨论过，别用它</li>
+<li>~/.profile：此文件用于login shell，所有你想在整个用户会话期间都有效的内容都应该放置于此，比如启动进程，环境变量等</li>
+<li>~/.bashrc：只放置与bash有关的命令，所有与交互有关的命令都应该出现在此，比如bash的补全、alias、颜色、提示符等等。特别注意：别在这里输出任何内容（我们前面只是为了演示，别学我哈）</li>
 </ul>
-<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><ul>
-<li>不可变对象可以通过任意机制来发布()</li>
-<li>事实不可变对象必须通过安全方式来发布</li>
-<li>可变对象必须通过安全方式来发布,并且是线程安全的或者由某个所保护起来</li>
-</ul>
-<h2 id="安全的共享对象"><a href="#安全的共享对象" class="headerlink" title="安全的共享对象"></a>安全的共享对象</h2><p>在发布一个对象的时候需要明确指出该对象的多线程共享规则：</p>
-<ol>
-<li>是线程封闭？：只能由一个线程拥有</li>
-<li>是只读共享？：只能并发读</li>
-<li>是线程安全共享？：类内部实现了同步，可以随意使用</li>
-<li>是保护对象？：类内部没有实现同步，需要使用者在外部同步</li>
-</ol>
 
           
         
@@ -2109,7 +1808,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/13/http/http-ajax-compare/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/20/其他/jenkins-Credentials/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
@@ -2128,7 +1827,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/04/13/http/http-ajax-compare/" itemprop="url">http和ajax区别和练习</a></h1>
+                <a class="post-title-link" href="/2018/04/20/其他/jenkins-Credentials/" itemprop="url">jenkins-Credentials</a></h1>
         
 
         <div class="post-meta">
@@ -2140,8 +1839,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-13T19:03:38+08:00">
-                2018-04-13
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-20T12:58:56+08:00">
+                2018-04-20
               </time>
             
 
@@ -2159,9 +1858,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/04/13/http/http-ajax-compare/#comments" itemprop="discussionUrl">
+                <a href="/2018/04/20/其他/jenkins-Credentials/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/04/13/http/http-ajax-compare/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/04/20/其他/jenkins-Credentials/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -2169,7 +1868,7 @@
 
           
           
-             <span id="/2018/04/13/http/http-ajax-compare/" class="leancloud_visitors" data-flag-title="http和ajax区别和练习">
+             <span id="/2018/04/20/其他/jenkins-Credentials/" class="leancloud_visitors" data-flag-title="jenkins-Credentials">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -2202,112 +1901,12 @@
       
         
           
-            <h1 id="AJAX和HTTP请求的区别"><a href="#AJAX和HTTP请求的区别" class="headerlink" title="AJAX和HTTP请求的区别"></a>AJAX和HTTP请求的区别</h1><p>从本质上将：AJAX就是浏览器发出的HTTP请求，只不过是浏览器加上了一个同源策略限制而已。</p>
-<p>AJAX请求的XMLHTTPRequest对象就是浏览器开放给JS调用HTTP请求用的。</p>
-<p>那么AJAX和HTTP的区别呢？列出以下几点：</p>
-<ul>
-<li><p>AJAX请求受到浏览器的同源策略限制，存在跨域问题</p>
-</li>
-<li><p>AJAX在进行复杂请求时，浏览器会预先发出OPTIONS预检（HTTP自己是不会预检的）</p>
-</li>
-<li><p>从使用角度上说，AJAX使用简单一点，少了些底层细节，多了些浏览器特性（如自动带上同域cookie等）</p>
-</li>
-<li><p>所以说，和认证上的HTTP请求的区别就是-多了一次浏览器的封装而已（浏览器会有自己的预处理，加上特定限制）</p>
-</li>
-</ul>
-<p>但是，从最终发出的报文来看，内容都是一样的（HTTP协议规范的内容），AJAX是发送HTTP请求的一种方式</p>
-<p><img src="/images/pasted-151.png" alt="upload successful"></p>
-<h1 id="CORS与AJAX安全性之间的关联"><a href="#CORS与AJAX安全性之间的关联" class="headerlink" title="CORS与AJAX安全性之间的关联"></a>CORS与AJAX安全性之间的关联</h1><p>这是一个跨域共享方案，大致流程就是：（仅以复杂请求的预检举例-这一部分要求提前掌握CORS相关知识）</p>
-<ol>
-<li><p>前端AJAX请求前发出一个OPTIONS预检，会带一堆相关头部发送给服务端</p>
-</li>
-<li><p>服务端在接受到预检时，检查头部，来源等信息是否合法，合法则接下来允许正常的请求，<br>否则直接无情的拒绝掉</p>
-</li>
-<li><p>浏览器端如果收到服务端拒绝的信息（响应头部检查），就抛出对应错误。<br>否则就是正常的响应，接下来发出真正的请求（如POST）<br>请求和响应的头部信息大概如下：</p>
-</li>
-</ol>
-<ul>
-<li><p>Request Headers</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 在CORS中专门作为Origin信息供后端比对，表示来源域。</span><br><span class="line">Origin: http://xxx</span><br><span class="line">Access-Control-Request-Headers: X-Requested-With</span><br><span class="line">// 所有用setRequestHeader方法设置的头部都将会以逗号隔开的形式包含在这个头中，一般POST请求中就会带上</span><br><span class="line">Access-Control-Request-Method: OPTIONS</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>Response Headers</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept</span><br><span class="line">Access-Control-Allow-Methods: GET, POST, OPTIONS</span><br><span class="line">Access-Control-Allow-Origin: http://xxx</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>最终，客户端发出的请求，必须符合服务端的校验规则才能正确，服务端才会返回正确头部，否则只会请求失败。报跨域错误。</p>
-<p>关键问题来了，在上面的CORS配置是这样的：</p>
-<p><code>Access-Control-Allow-Origin: http://xxx</code><br>但是这个配置只允许特定域名访问，鉴于前端的复杂性，有时候调试起来不是很方便，因此有时候，会偷懒的设置为：</p>
-<p><code>Access-Control-Allow-Origin: *</code></p>
-<ul>
-<li>会对cookie认证造成影响么？</li>
-</ul>
-<p>不会。虽然*代表了所有来源都能正常请求，但是同源策略下，是无法带上跨域cookie的。因此根本无法用身份验证。</p>
-<p>而且，就算用withCredentials强行带上跨域cookie，因为后台没有支持，所以会报错。（这可以看成是CORSs模型的最后一道防线）</p>
-<p>再者，后台就算配置Access-Control-Allow-Credentials允许跨域cookie，但是这时候的安全策略是Origin不允许为，必须是一个明确的地址。<br>（否则你就可以看到浏览器的报错信息-跨域cookie时，Origin不允许为）</p>
-<p><img src="/images/pasted-152.png" alt="upload successful"></p>
-<h1 id="两种请求"><a href="#两种请求" class="headerlink" title="两种请求"></a>两种请求</h1><p>浏览器将CORS请求分成两类：简单请求（simple request）和非简单请求（not-so-simple request）。</p>
-<p>只要同时满足以下两大条件，就属于简单请求。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">（1) 请求方法是以下三种方法之一：</span><br><span class="line"></span><br><span class="line">HEAD</span><br><span class="line">GET</span><br><span class="line">POST</span><br><span class="line">（2）HTTP的头信息不超出以下几种字段：</span><br><span class="line"></span><br><span class="line">Accept</span><br><span class="line">Accept-Language</span><br><span class="line">Content-Language</span><br><span class="line">Last-Event-ID</span><br><span class="line">Content-Type：只限于三个值application/x-www-form-urlencoded、multipart/form-data、text/plain</span><br></pre></td></tr></table></figure></p>
-<p>凡是不同时满足上面两个条件，就属于非简单请求。</p>
-<p>浏览器对这两种请求的处理，是不一样的。</p>
-<h1 id="简单请求"><a href="#简单请求" class="headerlink" title="简单请求"></a>简单请求</h1><h2 id="基本流程"><a href="#基本流程" class="headerlink" title="基本流程"></a>基本流程</h2><p>对于简单请求，浏览器直接发出CORS请求。具体来说，就是在头信息之中，增加一个Origin字段。</p>
-<p>下面是一个例子，浏览器发现这次跨源AJAX请求是简单请求，就自动在头信息之中，添加一个Origin字段。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">GET /cors HTTP/1.1</span><br><span class="line">Origin: http://api.bob.com</span><br><span class="line">Host: api.alice.com</span><br><span class="line">Accept-Language: en-US</span><br><span class="line">Connection: keep-alive</span><br><span class="line">User-Agent: Mozilla/5.0...</span><br></pre></td></tr></table></figure>
-<p>上面的头信息中，Origin字段用来说明，本次请求来自哪个源（协议 + 域名 + 端口）。服务器根据这个值，决定是否同意这次请求。</p>
-<p>如果Origin指定的源，不在许可范围内，服务器会返回一个正常的HTTP回应。浏览器发现，这个回应的头信息没有包含Access-Control-Allow-Origin字段（详见下文），就知道出错了，从而抛出一个错误，被XMLHttpRequest的onerror回调函数捕获。注意，这种错误无法通过状态码识别，因为HTTP回应的状态码有可能是200。</p>
-<p>如果Origin指定的域名在许可范围内，服务器返回的响应，会多出几个头信息字段。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Access-Control-Allow-Origin: http://api.bob.com</span><br><span class="line">Access-Control-Allow-Credentials: true</span><br><span class="line">Access-Control-Expose-Headers: FooBar</span><br><span class="line">Content-Type: text/html; charset=utf-8</span><br></pre></td></tr></table></figure>
-<p>上面的头信息之中，有三个与CORS请求相关的字段，都以Access-Control-开头。</p>
-<p>（1）Access-Control-Allow-Origin</p>
-<p>该字段是必须的。它的值要么是请求时Origin字段的值，要么是一个*，表示接受任意域名的请求。</p>
-<p>（2）Access-Control-Allow-Credentials</p>
-<p>该字段可选。它的值是一个布尔值，表示是否允许发送Cookie。默认情况下，Cookie不包括在CORS请求之中。设为true，即表示服务器明确许可，Cookie可以包含在请求中，一起发给服务器。这个值也只能设为true，如果服务器不要浏览器发送Cookie，删除该字段即可。</p>
-<p>（3）Access-Control-Expose-Headers</p>
-<p>该字段可选。CORS请求时，XMLHttpRequest对象的getResponseHeader()方法只能拿到6个基本字段：Cache-Control、Content-Language、Content-Type、Expires、Last-Modified、Pragma。如果想拿到其他字段，就必须在Access-Control-Expose-Headers里面指定。上面的例子指定，getResponseHeader(‘FooBar’)可以返回FooBar字段的值。</p>
-<p>3.2 withCredentials 属性<br>上面说到，CORS请求默认不发送Cookie和HTTP认证信息。如果要把Cookie发到服务器，一方面要服务器同意，指定Access-Control-Allow-Credentials字段。</p>
-<p>Access-Control-Allow-Credentials: true<br>另一方面，开发者必须在AJAX请求中打开withCredentials属性。</p>
-<p>var xhr = new XMLHttpRequest();<br>xhr.withCredentials = true;<br>否则，即使服务器同意发送Cookie，浏览器也不会发送。或者，服务器要求设置Cookie，浏览器也不会处理。</p>
-<p>但是，如果省略withCredentials设置，有的浏览器还是会一起发送Cookie。这时，可以显式关闭withCredentials。</p>
-<p>xhr.withCredentials = false;<br>需要注意的是，如果要发送Cookie，Access-Control-Allow-Origin就不能设为星号，必须指定明确的、与请求网页一致的域名。同时，Cookie依然遵循同源政策，只有用服务器域名设置的Cookie才会上传，其他域名的Cookie并不会上传，且（跨源）原网页代码中的document.cookie也无法读取服务器域名下的Cookie。</p>
-<h2 id="withCredentials-属性"><a href="#withCredentials-属性" class="headerlink" title="withCredentials 属性"></a>withCredentials 属性</h2><p>上面说到，CORS请求默认不发送Cookie和HTTP认证信息。如果要把Cookie发到服务器，一方面要服务器同意，指定Access-Control-Allow-Credentials字段。</p>
-<p><code>Access-Control-Allow-Credentials: true</code><br>另一方面，开发者必须在AJAX请求中打开withCredentials属性。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var xhr = new XMLHttpRequest();</span><br><span class="line">xhr.withCredentials = true;</span><br></pre></td></tr></table></figure>
-<p>否则，即使服务器同意发送Cookie，浏览器也不会发送。或者，服务器要求设置Cookie，浏览器也不会处理。</p>
-<h1 id="非简单请求"><a href="#非简单请求" class="headerlink" title="非简单请求"></a>非简单请求</h1><h2 id="预检请求"><a href="#预检请求" class="headerlink" title="预检请求"></a>预检请求</h2><p>非简单请求是那种对服务器有特殊要求的请求，比如请求方法是PUT或DELETE，或者Content-Type字段的类型是application/json。</p>
-<p>非简单请求的CORS请求，会在正式通信之前，增加一次HTTP查询请求，称为”预检”请求（preflight）。</p>
-<p>浏览器先询问服务器，当前网页所在的域名是否在服务器的许可名单之中，以及可以使用哪些HTTP动词和头信息字段。只有得到肯定答复，浏览器才会发出正式的XMLHttpRequest请求，否则就报错。</p>
-<p>下面是一段浏览器的JavaScript脚本。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">var url = &apos;http://api.alice.com/cors&apos;;</span><br><span class="line">var xhr = new XMLHttpRequest();</span><br><span class="line">xhr.open(&apos;PUT&apos;, url, true);</span><br><span class="line">xhr.setRequestHeader(&apos;X-Custom-Header&apos;, &apos;value&apos;);</span><br><span class="line">xhr.send();</span><br></pre></td></tr></table></figure>
-<p>上面代码中，HTTP请求的方法是PUT，并且发送一个自定义头信息X-Custom-Header。</p>
-<p>浏览器发现，这是一个非简单请求，就自动发出一个”预检”请求，要求服务器确认可以这样请求。下面是这个”预检”请求的HTTP头信息。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">OPTIONS /cors HTTP/1.1</span><br><span class="line">Origin: http://api.bob.com</span><br><span class="line">Access-Control-Request-Method: PUT</span><br><span class="line">Access-Control-Request-Headers: X-Custom-Header</span><br><span class="line">Host: api.alice.com</span><br><span class="line">Accept-Language: en-US</span><br><span class="line">Connection: keep-alive</span><br><span class="line">User-Agent: Mozilla/5.0...</span><br></pre></td></tr></table></figure>
-<p>“预检”请求用的请求方法是OPTIONS，表示这个请求是用来询问的。头信息里面，关键字段是Origin，表示请求来自哪个源。</p>
-<p>除了Origin字段，”预检”请求的头信息包括两个特殊字段。</p>
-<p>（1）Access-Control-Request-Method</p>
-<p>该字段是必须的，用来列出浏览器的CORS请求会用到哪些HTTP方法，上例是PUT。</p>
-<p>（2）Access-Control-Request-Headers</p>
-<p>该字段是一个逗号分隔的字符串，指定浏览器CORS请求会额外发送的头信息字段，上例是X-Custom-Header。</p>
-<h2 id="预检请求的回应"><a href="#预检请求的回应" class="headerlink" title="预检请求的回应"></a>预检请求的回应</h2><p>服务器收到”预检”请求以后，检查了Origin、Access-Control-Request-Method和Access-Control-Request-Headers字段以后，确认允许跨源请求，就可以做出回应。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Date: Mon, 01 Dec 2008 01:15:39 GMT</span><br><span class="line">Server: Apache/2.0.61 (Unix)</span><br><span class="line">Access-Control-Allow-Origin: http://api.bob.com</span><br><span class="line">Access-Control-Allow-Methods: GET, POST, PUT</span><br><span class="line">Access-Control-Allow-Headers: X-Custom-Header</span><br><span class="line">Content-Type: text/html; charset=utf-8</span><br><span class="line">Content-Encoding: gzip</span><br><span class="line">Content-Length: 0</span><br><span class="line">Keep-Alive: timeout=2, max=100</span><br><span class="line">Connection: Keep-Alive</span><br><span class="line">Content-Type: text/plain</span><br></pre></td></tr></table></figure>
-<p>上面的HTTP回应中，关键的是Access-Control-Allow-Origin字段，表示<a href="http://api.bob.com可以请求数据。该字段也可以设为星号，表示同意任意跨源请求。" target="_blank" rel="noopener">http://api.bob.com可以请求数据。该字段也可以设为星号，表示同意任意跨源请求。</a></p>
-<p><code>Access-Control-Allow-Origin: *</code><br>如果浏览器否定了”预检”请求，会返回一个正常的HTTP回应，但是没有任何CORS相关的头信息字段。这时，浏览器就会认定，服务器不同意预检请求，因此触发一个错误，被XMLHttpRequest对象的onerror回调函数捕获。控制台会打印出如下的报错信息。</p>
-<p>XMLHttpRequest cannot load <a href="http://api.alice.com" target="_blank" rel="noopener">http://api.alice.com</a>.<br>Origin <a href="http://api.bob.com" target="_blank" rel="noopener">http://api.bob.com</a> is not allowed by Access-Control-Allow-Origin.<br>服务器回应的其他CORS相关字段如下。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Access-Control-Allow-Methods: GET, POST, PUT</span><br><span class="line">Access-Control-Allow-Headers: X-Custom-Header</span><br><span class="line">Access-Control-Allow-Credentials: true</span><br><span class="line">Access-Control-Max-Age: 1728000</span><br></pre></td></tr></table></figure>
-<p>（1）Access-Control-Allow-Methods</p>
-<p>该字段必需，它的值是逗号分隔的一个字符串，表明服务器支持的所有跨域请求的方法。注意，返回的是所有支持的方法，而不单是浏览器请求的那个方法。这是为了避免多次”预检”请求。</p>
-<p>（2）Access-Control-Allow-Headers</p>
-<p>如果浏览器请求包括Access-Control-Request-Headers字段，则Access-Control-Allow-Headers字段是必需的。它也是一个逗号分隔的字符串，表明服务器支持的所有头信息字段，不限于浏览器在”预检”中请求的字段。</p>
-<p>（3）Access-Control-Allow-Credentials</p>
-<p>该字段与简单请求时的含义相同。</p>
-<p>（4）Access-Control-Max-Age</p>
-<p>该字段可选，用来指定本次预检请求的有效期，单位为秒。上面结果中，有效期是20天（1728000秒），即允许缓存该条回应1728000秒（即20天），在此期间，不用发出另一条预检请求。</p>
-<h2 id="浏览器的正常请求和回应"><a href="#浏览器的正常请求和回应" class="headerlink" title="浏览器的正常请求和回应"></a>浏览器的正常请求和回应</h2><p>一旦服务器通过了”预检”请求，以后每次浏览器正常的CORS请求，就都跟简单请求一样，会有一个Origin头信息字段。服务器的回应，也都会有一个Access-Control-Allow-Origin头信息字段。</p>
-<p>下面是”预检”请求之后，浏览器的正常CORS请求。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">PUT /cors HTTP/1.1</span><br><span class="line">Origin: http://api.bob.com</span><br><span class="line">Host: api.alice.com</span><br><span class="line">X-Custom-Header: value</span><br><span class="line">Accept-Language: en-US</span><br><span class="line">Connection: keep-alive</span><br><span class="line">User-Agent: Mozilla/5.0...</span><br></pre></td></tr></table></figure>
-<p>上面头信息的Origin字段是浏览器自动添加的。</p>
-<p>下面是服务器正常的回应。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Access-Control-Allow-Origin: http://api.bob.com</span><br><span class="line">Content-Type: text/html; charset=utf-8</span><br></pre></td></tr></table></figure>
-<p>上面头信息中，Access-Control-Allow-Origin字段是每次回应都必定包含的。</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://www.ruanyifeng.com/blog/2016/04/cors.html" target="_blank" rel="noopener">http://www.ruanyifeng.com/blog/2016/04/cors.html</a></p>
+            <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>之前一直是运维部署的Jenkins,今天自己部署也遇到了些问题</p>
+<h1 id="Credentials"><a href="#Credentials" class="headerlink" title="Credentials"></a>Credentials</h1><p>  Jenkins的“Credentials”直译为“证书”，“文凭”在这里，尽管说Jenkins界面中有相当一部分的文字经过了官方汉化，但是对于这个“Credentials”却仍然没有被汉化，可见对于其汉化之后对应的中文翻译，官方也是一脸懵逼的状态，在这里，我们可以把它直译为“证书”，如果通过意译，那它的理解就是“钥匙”，这个翻译对于我们而言是最为容易理解的。</p>
+<p>  如果要是把它理解为“钥匙”，那就不需要我进行过多的解释了，我们以SVN（版本控制器）为例来进行说明，当我们在访问SVN时，其实SVN是需要我们提供相应的账号与密码进行登录的，假如说我们把要访问的URL地址理解为锁，那么所提供的账号与密码就对应于开这把锁的钥匙，所以说“Credentials”中所记录的就是各种各样的这种钥匙，而这里的钥匙对应的锁是有多种可能的，可能是SVN，也可能是Git等，而“Credentials”就是对于这些钥匙所进行的统一管理。</p>
+<p><img src="/images/pasted-157.png" alt="upload successful"></p>
+<h1 id="Credentials-ID"><a href="#Credentials-ID" class="headerlink" title="Credentials ID"></a>Credentials ID</h1><p>Jenkins自动帮我们生成了一条“ID”信息,这个id就是用来在pipeline中对git项目进行登陆认证.</p>
+<p>例如:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">stage &apos;Build&apos;</span><br><span class="line">dir(&apos;gim&apos;) &#123;</span><br><span class="line">  git branch: BRANCH_NAME,credentialsId: &apos;fe65e7e9-2c93-48a9-81f8-db19ec174adc&apos;, url: &apos;http://xxx.git&apos;</span><br><span class="line">  sh &quot;mvn  clean package -Dmaven.test.skip=true -U&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 
           
         
@@ -2347,7 +1946,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/19/">19</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/20/">20</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2393,7 +1992,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">186</span>
+                  <span class="site-state-item-count">196</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

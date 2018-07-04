@@ -326,7 +326,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/05/运维-测试/study-wrk/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/21/sutdy-tdd/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
@@ -345,7 +345,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/06/05/运维-测试/study-wrk/" itemprop="url">study-wrk</a></h1>
+                <a class="post-title-link" href="/2018/06/21/sutdy-tdd/" itemprop="url">java测试驱动开发-读书笔记</a></h1>
         
 
         <div class="post-meta">
@@ -357,8 +357,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-05T19:58:40+08:00">
-                2018-06-05
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-21T09:58:16+08:00">
+                2018-06-21
               </time>
             
 
@@ -376,9 +376,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/06/05/运维-测试/study-wrk/#comments" itemprop="discussionUrl">
+                <a href="/2018/06/21/sutdy-tdd/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/06/05/运维-测试/study-wrk/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/06/21/sutdy-tdd/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -386,7 +386,7 @@
 
           
           
-             <span id="/2018/06/05/运维-测试/study-wrk/" class="leancloud_visitors" data-flag-title="study-wrk">
+             <span id="/2018/06/21/sutdy-tdd/" class="leancloud_visitors" data-flag-title="java测试驱动开发-读书笔记">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -419,14 +419,53 @@
       
         
           
-            <h1 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h1><p>使用方法: wrk &lt;选项&gt; &lt;被测HTTP服务的URL&gt;<br>  Options:<br>    -c, –connections <n>  跟服务器建立并保持的TCP连接数量<br>    -d, –duration    <t>  压测时间<br>    -t, –threads     <n>  使用多少个线程进行压测   </n></t></n></p>
-<pre><code>-s, --script      &lt;S&gt;  指定Lua脚本路径       
--H, --header      &lt;H&gt;  为每一个HTTP请求添加HTTP头      
-    --latency          在压测结束后，打印延迟统计信息   
-    --timeout     &lt;T&gt;  超时时间     
--v, --version          打印正在使用的wrk的详细版本信息
-</code></pre><p>  <n>代表数字参数，支持国际单位 (1k, 1M, 1G)<br>  <t>代表时间参数，支持时间单位 (2s, 2m, 2h)</t></n></p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://zhaox.github.io/benchmark/2016/12/28/wrk-guidelines" target="_blank" rel="noopener">http://zhaox.github.io/benchmark/2016/12/28/wrk-guidelines</a></p>
+            <h1 id="代码地址"><a href="#代码地址" class="headerlink" title="代码地址:"></a>代码地址:</h1><p><a href="https://bitbucket.org/vfarcic/" target="_blank" rel="noopener">https://bitbucket.org/vfarcic/</a></p>
+<h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><p>TDD 有广义和狭义之分，常说的是狭义的 TDD，也就是 UTDD（Unit Test Driven Development）。广义的 TDD 是 ATDD（Acceptance Test Driven Development），包括 BDD（Behavior Driven Development）和 Consumer-Driven Contracts Development 等。<br>本文所说的 TDD 指狭义上的 TDD，也就是「单元测试驱动开发」。</p>
+<h1 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h1><h2 id="传统编码方式"><a href="#传统编码方式" class="headerlink" title="传统编码方式"></a>传统编码方式</h2><ul>
+<li>需求分析，想不清楚细节，管他呢，先开始写</li>
+<li>发现需求细节不明确，去跟业务人员确认</li>
+<li>确认好几次终于写完所有逻辑</li>
+<li>运行起来测试一下，靠，果然不工作，调试</li>
+<li>调试好久终于工作了</li>
+<li>转测试，QA 测出 bug，debug， 打补丁</li>
+<li>终于，代码可以工作了</li>
+<li>一看代码烂的像坨屎，不敢动，动了还得手工测试，还得让 QA 测试，还得加班…</li>
+</ul>
+<h2 id="TDD-编码方式"><a href="#TDD-编码方式" class="headerlink" title="TDD 编码方式"></a>TDD 编码方式</h2><ul>
+<li>先分解任务，分离关注点（后面有演示）</li>
+<li>列 Example，用实例化需求，澄清需求细节</li>
+<li>写测试，只关注需求，程序的输入输出，不关心中间过程</li>
+<li>写实现，不考虑别的需求，用最简单的方式满足当前这个小需求即可</li>
+<li>重构，用手法消除代码里的坏味道</li>
+<li>写完，手动测试一下，基本没什么问题，有问题补个用例，修复</li>
+<li>转测试，小问题，补用例，修复</li>
+<li>代码整洁且用例齐全，信心满满地提交</li>
+</ul>
+<h1 id="基本流程"><a href="#基本流程" class="headerlink" title="基本流程"></a>基本流程</h1><p>TDD 的基本流程是：红，绿，重构。<br>更详细的流程是：</p>
+<ul>
+<li>写一个测试用例</li>
+<li>运行测试</li>
+<li>写刚好能让测试通过的实现</li>
+<li>运行测试</li>
+<li>识别坏味道，用手法修改代码</li>
+<li>运行测试</li>
+</ul>
+<h1 id="为什么很多人做-TDD-都做不起来？"><a href="#为什么很多人做-TDD-都做不起来？" class="headerlink" title="为什么很多人做 TDD 都做不起来？"></a>为什么很多人做 TDD 都做不起来？</h1><h2 id="不会合理拆分任务"><a href="#不会合理拆分任务" class="headerlink" title="不会合理拆分任务"></a>不会合理拆分任务</h2><p>TDD 之前要拆分任务，把一个大需求拆成多个小需求。<br>也可以拆出多个函数来。</p>
+<h2 id="不会写测试"><a href="#不会写测试" class="headerlink" title="不会写测试"></a>不会写测试</h2><p>什么是有效的单元测试，有很多人写测试，连到底在测什么都不清楚，也可能连断言都没有，通过控制台输出，肉眼对比来验证。<br>好的单元测试应该符合几条原则：</p>
+<ul>
+<li>简单，只测试一个需求</li>
+<li>符合 Given-When-Then 格式</li>
+<li>速度快</li>
+<li>包含断言</li>
+<li>可以重复执行</li>
+</ul>
+<h2 id="不会写刚好的实现"><a href="#不会写刚好的实现" class="headerlink" title="不会写刚好的实现"></a>不会写刚好的实现</h2><p>很多人写实现的时候无法专注当前需求，一不小心就把其他需求也实现了，就破坏了节奏感。<br>实现的时候不会小步快走。</p>
+<h2 id="不会重构"><a href="#不会重构" class="headerlink" title="不会重构"></a>不会重构</h2><p>不懂什么是 Clean Code，看不出 Smell，没有及时重构，等想要重构时已经难以下手了。<br>不知道用合适的「手法」消除 Smell。</p>
+<h2 id="基础设施"><a href="#基础设施" class="headerlink" title="基础设施"></a>基础设施</h2><p>对于特定技术栈，没有把单元测试基础设施搭建好，导致写测试时无法专注在测试用例上。</p>
+<h1 id="单元测试-模拟"><a href="#单元测试-模拟" class="headerlink" title="单元测试+模拟"></a>单元测试+模拟</h1><h2 id="第四章-什么事单元测试"><a href="#第四章-什么事单元测试" class="headerlink" title="第四章 什么事单元测试"></a>第四章 什么事单元测试</h2><h2 id="第五章-难以测试-代表设计不佳"><a href="#第五章-难以测试-代表设计不佳" class="headerlink" title="第五章 难以测试,代表设计不佳"></a>第五章 难以测试,代表设计不佳</h2><h2 id="第六章-模拟-消除外部依赖"><a href="#第六章-模拟-消除外部依赖" class="headerlink" title="第六章 模拟 消除外部依赖"></a>第六章 模拟 消除外部依赖</h2><p>测试使用调用了依赖的对象的某个方法</p>
+<h1 id="集成测试-行为驱动测试-vargant"><a href="#集成测试-行为驱动测试-vargant" class="headerlink" title="集成测试(行为驱动测试)+vargant"></a>集成测试(行为驱动测试)+vargant</h1><p>JBhave</p>
+<h1 id="相关讨论"><a href="#相关讨论" class="headerlink" title="相关讨论"></a>相关讨论</h1><p><a href="https://www.zhihu.com/question/27081528" target="_blank" rel="noopener">https://www.zhihu.com/question/27081528</a></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://www.jianshu.com/p/62f16cd4fef3" target="_blank" rel="noopener">https://www.jianshu.com/p/62f16cd4fef3</a></p>
 
           
         
@@ -475,7 +514,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/05/java/java_thread/coroutine-study/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/21/http/mid-attack/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
@@ -494,7 +533,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/06/05/java/java_thread/coroutine-study/" itemprop="url">Java里的协程</a></h1>
+                <a class="post-title-link" href="/2018/06/21/http/mid-attack/" itemprop="url">https中间人攻击</a></h1>
         
 
         <div class="post-meta">
@@ -506,8 +545,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-05T19:58:32+08:00">
-                2018-06-05
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-21T09:57:59+08:00">
+                2018-06-21
               </time>
             
 
@@ -525,9 +564,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/06/05/java/java_thread/coroutine-study/#comments" itemprop="discussionUrl">
+                <a href="/2018/06/21/http/mid-attack/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/06/05/java/java_thread/coroutine-study/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/06/21/http/mid-attack/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -535,7 +574,7 @@
 
           
           
-             <span id="/2018/06/05/java/java_thread/coroutine-study/" class="leancloud_visitors" data-flag-title="Java里的协程">
+             <span id="/2018/06/21/http/mid-attack/" class="leancloud_visitors" data-flag-title="https中间人攻击">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -568,44 +607,24 @@
       
         
           
-            <h1 id="什么是协程-coroutine"><a href="#什么是协程-coroutine" class="headerlink" title="什么是协程(coroutine)"></a>什么是协程(coroutine)</h1><p>这东西其实有很多名词，比如有的人喜欢称为纤程(Fiber)，或者绿色线程(GreenThread)。其实最直观的解释可以定义为线程的线程。有点拗口，但本质上就是这样。</p>
-<p>Java的JDK里有封装很好的ThreadPool，可以用来管理大量的线程生命周期，但是本质上还是不能很好的解决线程数量的问题，以及线程空转占用CPU资源的问题。</p>
-<p>先阶段行业里的比较流行的解决方案之一就是单线程加上异步回调。其代表派是node.js以及Java里的新秀Vert.x。他们的核心思想是一样的，遇到需要进行I/O操作的地方，就直接让出CPU资源，然后注册一个回调函数，其他逻辑则继续往下走，I/O结束后带着结果向事件队列里插入执行结果，然后由事件调度器调度回调函数，传入结果。这时候执行的地方可能就不是你原来的代码区块了，具体表现在代码层面上，你会发现你的局部变量全部丢失，毕竟相关的栈已经被覆盖了，所以为了保存之前的栈上数据，你要么选择带着一起放入回调函数里，要么就不停的嵌套，从而引起反人类的Callback hell.</p>
-<p>因此相关的Promise，CompletableFuture等技术都是为解决相关的问题而产生的。但是本质上还是不能解决业务逻辑的割裂。</p>
-<h1 id="quasar"><a href="#quasar" class="headerlink" title="quasar"></a>quasar</h1><p><a href="http://docs.paralleluniverse.co/quasar/" target="_blank" rel="noopener">http://docs.paralleluniverse.co/quasar/</a><br>Quasar目前是由一家商业公司Parallel Universe控制着，且有自己的一套体系，包括Quasar-actor，Quasar-galaxy等各个模块，但是Quasar-core是开源的，此外Quasar自己也通过Fiber封装了很多的第三方库，目前全都在comsat这个项目里。随便找一个项目看看，你会发现其实通过Quasar的Fiber去封装第三方的同步库还是很简单的。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * http://colobu.com/2016/08/01/talk-about-quasar-again/</span><br><span class="line"> */</span><br><span class="line">public class Helloworld &#123;</span><br><span class="line">    @Suspendable</span><br><span class="line">    static void m1() throws InterruptedException, SuspendExecution &#123;</span><br><span class="line">        String m = &quot;m1&quot;;</span><br><span class="line">        //System.out.println(&quot;m1 begin&quot;);</span><br><span class="line">        m = m2();</span><br><span class="line">        //System.out.println(&quot;m1 end&quot;);</span><br><span class="line">        //System.out.println(m);</span><br><span class="line">    &#125;</span><br><span class="line">    static String m2() throws SuspendExecution, InterruptedException &#123;</span><br><span class="line">        String m = m3();</span><br><span class="line">        Strand.sleep(1000);</span><br><span class="line">        return m;</span><br><span class="line">    &#125;</span><br><span class="line">    //or define in META-INF/suspendables</span><br><span class="line">    @Suspendable</span><br><span class="line">    static String m3() &#123;</span><br><span class="line">        List l = Stream.of(1,2,3).filter(i -&gt; i%2 == 0).collect(Collectors.toList());</span><br><span class="line">        return l.toString();</span><br><span class="line">    &#125;</span><br><span class="line">    static public void main(String[] args) throws ExecutionException, InterruptedException &#123;</span><br><span class="line">        int count = 10000;</span><br><span class="line">        testThreadpool(count);</span><br><span class="line">        testFiber(count);</span><br><span class="line">    &#125;</span><br><span class="line">    static void testThreadpool(int count) throws InterruptedException &#123;</span><br><span class="line">        final CountDownLatch latch = new CountDownLatch(count);</span><br><span class="line">        ExecutorService es = Executors.newFixedThreadPool(200);</span><br><span class="line">        LongAdder latency = new LongAdder();</span><br><span class="line">        long t = System.currentTimeMillis();</span><br><span class="line">        for (int i =0; i&lt; count; i++) &#123;</span><br><span class="line">            es.submit(() -&gt; &#123;</span><br><span class="line">                long start = System.currentTimeMillis();</span><br><span class="line">                try &#123;</span><br><span class="line">                    m1();</span><br><span class="line">                &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125; catch (SuspendExecution suspendExecution) &#123;</span><br><span class="line">                    suspendExecution.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">                start = System.currentTimeMillis() - start;</span><br><span class="line">                latency.add(start);</span><br><span class="line">                latch.countDown();</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">        latch.await();</span><br><span class="line">        t = System.currentTimeMillis() - t;</span><br><span class="line">        long l = latency.longValue() / count;</span><br><span class="line">        System.out.println(&quot;thread pool took: &quot; + t + &quot;, latency: &quot; + l + &quot; ms&quot;);</span><br><span class="line">        es.shutdownNow();</span><br><span class="line">    &#125;</span><br><span class="line">    static void testFiber(int count) throws InterruptedException &#123;</span><br><span class="line">        final CountDownLatch latch = new CountDownLatch(count);</span><br><span class="line">        LongAdder latency = new LongAdder();</span><br><span class="line">        long t = System.currentTimeMillis();</span><br><span class="line">        for (int i =0; i&lt; count; i++) &#123;</span><br><span class="line">            new Fiber&lt;Void&gt;(&quot;Caller&quot;, new SuspendableRunnable() &#123;</span><br><span class="line">                @Override</span><br><span class="line">                public void run() throws SuspendExecution, InterruptedException &#123;</span><br><span class="line">                    long start = System.currentTimeMillis();</span><br><span class="line">                    m1();</span><br><span class="line">                    start = System.currentTimeMillis() - start;</span><br><span class="line">                    latency.add(start);</span><br><span class="line">                    latch.countDown();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;).start();</span><br><span class="line">        &#125;</span><br><span class="line">        latch.await();</span><br><span class="line">        t = System.currentTimeMillis() - t;</span><br><span class="line">        long l = latency.longValue() / count;</span><br><span class="line">        System.out.println(&quot;fiber took: &quot; + t  + &quot;, latency: &quot; + l + &quot; ms&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>如果使用线程，执行完1万个操作需要50秒，平均延迟为1秒左右(我们故意让延迟至少1秒)，线程池数量为200。(其实总时间50秒可以计算出来)<br>但是如果使用纤程，执行完1万个操作仅需要1.158秒，平均延迟时间为1秒，线程数量为CPU core数(缺省使用ForkJoinPool)。</p>
-<p>可以看到，通过使用纤程，尽受限于系统的业务逻辑，我们没有办法提升业务的处理时间， 但是我们确可以极大的提高系统的吞吐率，如上面的简单的例子将10000个操作的处理时间从50秒提高到1秒，非凡的成就。</p>
-<p>如果我们将方法m2中的Strand.sleep(1000);注释掉，这样这个例子中就没有什么阻塞了，我们看看在这种纯计算的情况下两者的表现：</p>
-<p>可以看到，纤程非但没有提升性能，反而会带来性能的下降。对于这种纯计算没有阻塞的case,Quasar并不适合。</p>
-<h2 id="Suspendable方法"><a href="#Suspendable方法" class="headerlink" title="Suspendable方法"></a>Suspendable方法</h2><p>Fiber中的run方法，如SuspendableRunnable 和 SuspendableCallable声明了SuspendExecution异常。这并不是一个真的异常，而是fiber内部工作的机制。任何运行在fiber中的可能阻塞的方法，如果声明了这个异常，就被叫做 suspendable 方法。 如果你的方法调用了一个suspendable方法，那么你的方法也是suspendable方法，所以也需要声明抛出SuspendExecution异常。</p>
-<p>有时候不能在某个方法上声明抛出SuspendExecution异常，比如你实现某个接口，你不能更改接口的方法声明，你不得不使用其它的方法来指定suspendable方法。方法之一就是使用@Suspendable注解，在你需要指定的suspendable方法上加上这个注解就可以告诉Quasar这个方法是suspendable方法。</p>
-<p>另一个情况就是对于第三的库，你不可能更改它们的代码，如果想指定这些库的某些方法是suspendable方法,比如java.net.URL.openStream()Ljava/io/InputStream;, 就需要另外一种解决办法，也就是在META-INF/suspendables和META-INF/suspendable-supers定义。<br>文件中每个方法占一行，具体(concrete)的suspendable方法应该写在META-INF/suspendables中，non-suspendable方法，但是有suspendable override的类、接口写在META-INF/suspendable-supers中(可以是具体类单不能是final, 接口和抽象类也可以)。<br>每一行应该是方法的签名的全称“full.class.name.methodName” 以及*通配符。<br>使用｀SuspendablesScanner｀可以自动增加你的方法到这些文件中，待会介绍它。</p>
-<p>java.lang包下的方法不能标记为suspendable，其它的JDK方法则可以显示地在文件META-INF/suspendables和META-INF/suspendable-supers中标记为suspendable，并且设置环境变量co.paralleluniverse.fibers.allowJdkInstrumentation为true,但是很少这样使用。</p>
-<p>还有一些特殊的情况也会被认为是suspendable的。</p>
-<p>反射调用总是被看作是suspendable的。</p>
-<p>Java 8 lambda也总是被看作suspendable的。</p>
-<p>构造函数／类初始化器不能被标记为suspendable。</p>
-<p>缺省情况下synchronized和blocking thread 调用不能运行在Fiber中。这是因为它们会阻塞Fiber使用的线程，导致系统处理变慢，但是如果你非要在Fiber中使用它们，可以可以将allowMonitors和allowBlocking传给instrumentation Ant task，或者将b、m传给Quasar Java agent。</p>
-<h1 id="vert-x"><a href="#vert-x" class="headerlink" title="vert.x"></a>vert.x</h1><p><a href="https://vertx.io/" target="_blank" rel="noopener">https://vertx.io/</a><br><a href="https://github.com/vert-x3" target="_blank" rel="noopener">https://github.com/vert-x3</a><br>Vert.x诞生于2011年，当时叫node.x，不过后来因为某些原因改名位Vert.x。经过三年多的发展，现在已经到了3.2版本，社区也越来越活跃，在最新的官网Vertx.io上，作者用一句话介绍了它，JVM上的Reative开发套件。Vert.x目前是见过最功能最强大，第三方库依赖最少的Java框架，它只依赖Netty4以及Jacskon，另外如果你需要建立分布式的Vert.x则再依赖HazelCast这个分布式框架，注意Vert.x3必须基于Java8。由于基于JVM，所以Vert.x可以用其他语言来实现你的业务。默认官方维护的语言是Groovy，JavaScript以及 JRuby。</p>
-<p>Vert.x是一个异步无阻塞的网络框架，其参照物是node.js。基本上node.js能干的事情，Vert.x都能干。Vert.x利用Netty4的EventLoop来做单线程的事件循环，所以跑在Vert.x上的业务不能做CPU密集型的运算，这样会导致整个线程被阻塞。</p>
-<p>Vert.x的执行单元叫verticle。即程序的入口，每个语言可能实现的方式不一样，比如Java需要继承一个AbstractVerticle抽象类，而javascript则直接require(“vertx”)就可以了。</p>
-<p>verticle分两种，一种是基于EventLoop的适合I/O密集型的，还有一种是适合CPU密集型的worker verticle。而verticle之间相互通信只能通过Eventbus，可以支持point to point 的通信，也可以支持publish &amp; subscribe通信方式。</p>
-<ul>
-<li>所有业务逻辑其实都会跑在Netty里的EventLoop上，而EventLoop通过循环事件队列来执行所有的业务逻辑，这样可以把一些I/O操作频繁的事件及时从CPU上剥离开来，最后通过注册一个回调Handler来处理所有的事件回调。</li>
-<li>worker verticle。主要是用来处理同步处理的。比如第三方框架没有异步接口，最典型就是JDBC。所以可以通过worker verticle来退化到传统的基于多线程模型的实现。这也是匹配一些原项目的手段。</li>
-</ul>
-<p><a href="http://img.ptcms.csdn.net/article/201512/21/5677b09250397.jpg" target="_blank" rel="noopener">http://img.ptcms.csdn.net/article/201512/21/5677b09250397.jpg</a></p>
-<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>如果你希望你的代码能够跑在Fiber里面，需要一个很大的前提条件，那就是你所有的库，必须是异步无阻塞的，也就说必须类似于node.js上的库，所有的逻辑都是异步回调，而自Java里基本上所有的库都是同步阻塞的，很少见到异步无阻塞的。而且得益于J2EE，以及Java上的三大框架(SSH)洗脑，大部分Java程序员都已经习惯了基于线程，线性的完成一个业务逻辑，很难让他们接受一种将逻辑割裂的异步编程模型。</p>
-<ul>
-<li>线程:Fiber</li>
-<li>网络I/O问题:Netty</li>
-<li>文件I/O:JDK7提供的NIO2就可以满足，通过AsynchronousFileChannel即可。</li>
-<li>剩下的就是如何将他们封装成更友好的API了。目前能达到生产级别的这种异步工具库，JVM上只有Vert.x3，封装了Netty4，封装了AsynchronousFileChannel，而且Vert.x官方也出了一个相对应的封装了Quasar的库vertx-sync。</li>
-</ul>
-<p>异步无阻塞的编码方式其实有很多种实现，比如node.js的提倡的Promise，对应到Java8的就是CompletableFuture。</p>
-<p>事件响应式也算是一个比较流行的做法，比如ReactiveX系列，RxJava，Rxjs，RxSwift，等。我个人觉得RxJava是一个非常好的函数式响应实现(JDK9会有对应的JDK实现)，但是我们不能要求所有的程序员一眼就提炼出业务里的functor，monad(这些能力需要长期浸淫在函数式编程思想里)，反而RxJava特别适合用在前端与用户交互的部分，因为用户的点击滑动行为是一个个真实的事件流，这也是为什么RxJava在Android端非常火的原因，而后端基本上都是通过Rest请求过来，每一个请求其实已经限定了业务范围，不会再有复杂的事件逻辑，所以基本上RxJava在Vert.x这端只是做了一堆的flatmap，再加上微服务化，所有的业务逻辑都已经做了最小的边界，所以顺序的同步的编码方式更适合写业务逻辑的后端程序员。</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://segmentfault.com/a/1190000005342905" target="_blank" rel="noopener">https://segmentfault.com/a/1190000005342905</a><br><a href="http://colobu.com/2016/07/14/Java-Fiber-Quasar/" target="_blank" rel="noopener">http://colobu.com/2016/07/14/Java-Fiber-Quasar/</a><br><a href="http://colobu.com/2016/08/01/talk-about-quasar-again/" target="_blank" rel="noopener">http://colobu.com/2016/08/01/talk-about-quasar-again/</a></p>
+            <h1 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h1><p>假设爱丽丝（Alice）希望与鲍伯（Bob）通信。同时，马洛里（Mallory）希望拦截窃会话以进行窃听并可能在某些时候传送给鲍伯一个虚假的消息。</p>
+<p>首先，爱丽丝会向鲍勃索取他的公钥。如果Bob将他的公钥发送给Alice，并且此时马洛里能够拦截到这个公钥，就可以实施中间人攻击。马洛里发送给爱丽丝一个伪造的消息，声称自己是鲍伯，并且附上了马洛里自己的公钥（而不是鲍伯的）。</p>
+<p>爱丽丝收到公钥后相信这个公钥是鲍伯的，于是爱丽丝将她的消息用马洛里的公钥（爱丽丝以为是鲍伯的）加密，并将加密后的消息回给鲍伯。马洛里再次截获爱丽丝回给鲍伯的消息，并使用马洛里自己的私钥对消息进行解密，如果马洛里愿意，她也可以对消息进行修改，然后马洛里使用鲍伯原先发给爱丽丝的公钥对消息再次加密。当鲍伯收到新加密后的消息时，他会相信这是从爱丽丝那里发来的消息。</p>
+<p>1.爱丽丝发送给鲍伯一条消息，却被马洛里截获：</p>
+<p>爱丽丝“嗨，鲍勃，我是爱丽丝。给我你的公钥” –&gt; 马洛里 鲍勃</p>
+<p>2.马洛里将这条截获的消息转送给鲍伯；此时鲍伯并无法分辨这条消息是否从真的爱丽丝那里发来的：</p>
+<p>爱丽丝 马洛里“嗨，鲍勃，我是爱丽丝。给我你的公钥” –&gt; 鲍伯</p>
+<p>3.鲍伯回应爱丽丝的消息，并附上了他的公钥：</p>
+<p>爱丽丝 马洛里&lt;– [鲍伯的公钥]– 鲍伯</p>
+<p>4.马洛里用自己的密钥<em>替换</em>了消息中鲍伯的密钥，并将消息转发给爱丽丝，声称这是鲍伯的公钥：</p>
+<p>爱丽丝&lt;– [马洛里的公钥]– 马洛里 鲍勃</p>
+<p>5.爱丽丝用她以为是鲍伯的公钥加密了她的消息，以为只有鲍伯才能读到它：</p>
+<p>爱丽丝“我们在公共汽车站见面！”–[使用马洛里的公钥加密] –&gt; 马洛里 鲍勃</p>
+<p>6.然而，由于这个消息实际上是用马洛里的密钥加密的，所以马洛里可以解密它，阅读它，并在愿意的时候修改它。他使用鲍伯的密钥重新加密，并将重新加密后的消息转发给鲍伯：</p>
+<p>爱丽丝 马洛里“在家等我！”–[使用鲍伯的公钥加密] –&gt; 鲍伯</p>
+<p>7.鲍勃认为，这条消息是经由安全的传输通道从爱丽丝那里传来的。</p>
+<p>这个例子显示了爱丽丝和鲍伯需要某种方法来确定他们是真正拿到了属于对方的公钥，而不是拿到来自攻击者的公钥。否则，这类攻击一般都是可行的，在原理上，可以针对任何使用公钥——密钥技术的通讯消息发起攻击。幸运的是，有各种不同的技术可以帮助抵御MITM攻击。</p>
+<h1 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h1><p>无法替换 ,通过证书签名的方式,使得bob的信息无法被伪造(当然如果CA给Mallory也颁发了证书,那么还是没用的)</p>
 
           
         
@@ -654,7 +673,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/05/运维-测试/maven-jetty-plugin/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/08/4-1视图模型/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
@@ -673,7 +692,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/06/05/运维-测试/maven-jetty-plugin/" itemprop="url">通过mvn jetty:run启动项目</a></h1>
+                <a class="post-title-link" href="/2018/06/08/4-1视图模型/" itemprop="url">4+1视图模型</a></h1>
         
 
         <div class="post-meta">
@@ -685,8 +704,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-05T19:56:54+08:00">
-                2018-06-05
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-08T10:47:46+08:00">
+                2018-06-08
               </time>
             
 
@@ -704,9 +723,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/06/05/运维-测试/maven-jetty-plugin/#comments" itemprop="discussionUrl">
+                <a href="/2018/06/08/4-1视图模型/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/06/05/运维-测试/maven-jetty-plugin/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/06/08/4-1视图模型/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -714,7 +733,7 @@
 
           
           
-             <span id="/2018/06/05/运维-测试/maven-jetty-plugin/" class="leancloud_visitors" data-flag-title="通过mvn jetty:run启动项目">
+             <span id="/2018/06/08/4-1视图模型/" class="leancloud_visitors" data-flag-title="4+1视图模型">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -747,349 +766,25 @@
       
         
           
-            <h1 id="maven配置例子"><a href="#maven配置例子" class="headerlink" title="maven配置例子"></a>maven配置例子</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;plugin&gt;</span><br><span class="line">  &lt;groupId&gt;org.eclipse.jetty&lt;/groupId&gt;</span><br><span class="line">  &lt;artifactId&gt;jetty-maven-plugin&lt;/artifactId&gt;</span><br><span class="line">  &lt;version&gt;9.2.8.v20150217&lt;/version&gt;</span><br><span class="line">  &lt;configuration&gt;</span><br><span class="line">    &lt;httpConnector&gt;</span><br><span class="line">      &lt;port&gt;8081&lt;/port&gt;</span><br><span class="line">    &lt;/httpConnector&gt;</span><br><span class="line">    &lt;stopKey&gt;shutdown&lt;/stopKey&gt;</span><br><span class="line">    &lt;stopPort&gt;9966&lt;/stopPort&gt;</span><br><span class="line">  &lt;/configuration&gt;</span><br><span class="line">&lt;/plugin&gt;</span><br></pre></td></tr></table></figure>
-<h1 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h1><p><a href="http://www.blogjava.net/fancydeepin/archive/2012/06/23/maven-jetty-plugin.html" target="_blank" rel="noopener">http://www.blogjava.net/fancydeepin/archive/2012/06/23/maven-jetty-plugin.html</a></p>
-<h1 id="问题解决"><a href="#问题解决" class="headerlink" title="问题解决"></a>问题解决</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">[WARNING] Failed startup of context o.e.j.m.p.JettyWebAppContext@13192275&#123;/,file:/Users/victor/code/tdProjects/td-opal-dataset/src/main/webapp/,STARTING&#125;&#123;file:/Users/victor/code/tdProjects/td-opal-dataset/src/main/webapp/&#125;</span><br><span class="line">org.eclipse.jetty.util.MultiException: Multiple exceptions</span><br><span class="line">    at org.eclipse.jetty.annotations.AnnotationConfiguration.scanForAnnotations (AnnotationConfiguration.java:536)</span><br><span class="line">    at org.eclipse.jetty.annotations.AnnotationConfiguration.configure (AnnotationConfiguration.java:447)</span><br><span class="line">    at org.eclipse.jetty.webapp.WebAppContext.configure (WebAppContext.java:479)</span><br><span class="line">    at org.eclipse.jetty.webapp.WebAppContext.startContext (WebAppContext.java:1337)</span><br><span class="line">    at org.eclipse.jetty.server.handler.ContextHandler.doStart (ContextHandler.java:741)</span><br><span class="line">    at org.eclipse.jetty.webapp.WebAppContext.doStart (WebAppContext.java:505)</span><br><span class="line">    at org.eclipse.jetty.maven.plugin.JettyWebAppContext.doStart (JettyWebAppContext.java:365)</span><br><span class="line">    at org.eclipse.jetty.util.component.AbstractLifeCycle.start (AbstractLifeCycle.java:68)</span><br><span class="line">    at org.eclipse.jetty.util.component.ContainerLifeCycle.start (ContainerLifeCycle.java:132)</span><br><span class="line">    at org.eclipse.jetty.util.component.ContainerLifeCycle.doStart (ContainerLifeCycle.java:114)</span><br><span class="line">    at org.eclipse.jetty.server.handler.AbstractHandler.doStart (AbstractHandler.java:61)</span><br><span class="line">    at org.eclipse.jetty.server.handler.ContextHandlerCollection.doStart (ContextHandlerCollection.java:163)</span><br><span class="line">    at org.eclipse.jetty.util.component.AbstractLifeCycle.start (AbstractLifeCycle.java:68)</span><br><span class="line">    at org.eclipse.jetty.util.component.ContainerLifeCycle.start (ContainerLifeCycle.java:132)</span><br><span class="line">    at org.eclipse.jetty.util.component.ContainerLifeCycle.doStart (ContainerLifeCycle.java:114)</span><br><span class="line">    at org.eclipse.jetty.server.handler.AbstractHandler.doStart (AbstractHandler.java:61)</span><br><span class="line">    at org.eclipse.jetty.util.component.AbstractLifeCycle.start (AbstractLifeCycle.java:68)</span><br><span class="line">    at org.eclipse.jetty.util.component.ContainerLifeCycle.start (ContainerLifeCycle.java:132)</span><br><span class="line">    at org.eclipse.jetty.server.Server.start (Server.java:387)</span><br><span class="line">    at org.eclipse.jetty.util.component.ContainerLifeCycle.doStart (ContainerLifeCycle.java:114)</span><br><span class="line">    at org.eclipse.jetty.server.handler.AbstractHandler.doStart (AbstractHandler.java:61)</span><br><span class="line">    at org.eclipse.jetty.server.Server.doStart (Server.java:354)</span><br><span class="line">    at org.eclipse.jetty.maven.plugin.JettyServer.doStart (JettyServer.java:73)</span><br><span class="line">    at org.eclipse.jetty.util.component.AbstractLifeCycle.start (AbstractLifeCycle.java:68)</span><br><span class="line">    at org.eclipse.jetty.maven.plugin.AbstractJettyMojo.startJetty (AbstractJettyMojo.java:534)</span><br><span class="line">    at org.eclipse.jetty.maven.plugin.AbstractJettyMojo.execute (AbstractJettyMojo.java:357)</span><br><span class="line">    at org.eclipse.jetty.maven.plugin.JettyRunMojo.execute (JettyRunMojo.java:167)</span><br><span class="line">    at org.apache.maven.plugin.DefaultBuildPluginManager.executeMojo (DefaultBuildPluginManager.java:137)</span><br><span class="line">    at org.apache.maven.lifecycle.internal.MojoExecutor.execute (MojoExecutor.java:208)</span><br><span class="line">    at org.apache.maven.lifecycle.internal.MojoExecutor.execute (MojoExecutor.java:154)</span><br><span class="line">    at org.apache.maven.lifecycle.internal.MojoExecutor.execute (MojoExecutor.java:146)</span><br><span class="line">    at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject (LifecycleModuleBuilder.java:117)</span><br><span class="line">    at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject (LifecycleModuleBuilder.java:81)</span><br><span class="line">    at org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder.build (SingleThreadedBuilder.java:56)</span><br><span class="line">    at org.apache.maven.lifecycle.internal.LifecycleStarter.execute (LifecycleStarter.java:128)</span><br><span class="line">    at org.apache.maven.DefaultMaven.doExecute (DefaultMaven.java:305)</span><br><span class="line">    at org.apache.maven.DefaultMaven.doExecute (DefaultMaven.java:192)</span><br><span class="line">    at org.apache.maven.DefaultMaven.execute (DefaultMaven.java:105)</span><br><span class="line">    at org.apache.maven.cli.MavenCli.execute (MavenCli.java:956)</span><br><span class="line">    at org.apache.maven.cli.MavenCli.doMain (MavenCli.java:290)</span><br><span class="line">    at org.apache.maven.cli.MavenCli.main (MavenCli.java:194)</span><br><span class="line">    at sun.reflect.NativeMethodAccessorImpl.invoke0 (Native Method)</span><br><span class="line">    at sun.reflect.NativeMethodAccessorImpl.invoke (NativeMethodAccessorImpl.java:62)</span><br><span class="line">    at sun.reflect.DelegatingMethodAccessorImpl.invoke (DelegatingMethodAccessorImpl.java:43)</span><br><span class="line">    at java.lang.reflect.Method.invoke (Method.java:498)</span><br><span class="line">    at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced (Launcher.java:289)</span><br><span class="line">    at org.codehaus.plexus.classworlds.launcher.Launcher.launch (Launcher.java:229)</span><br><span class="line">    at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode (Launcher.java:415)</span><br><span class="line">    at org.codehaus.plexus.classworlds.launcher.Launcher.main (Launcher.java:356)</span><br></pre></td></tr></table></figure>
-<p><a href="https://stackoverflow.com/questions/50087942/gretty-build-fails-with-springboot" target="_blank" rel="noopener">https://stackoverflow.com/questions/50087942/gretty-build-fails-with-springboot</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/05/egenie_bugfix/fix-twice-init-spring-bean/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/05/egenie_bugfix/fix-twice-init-spring-bean/" itemprop="url">fix-twice-init-spring-bean</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-05T19:56:33+08:00">
-                2018-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/06/05/egenie_bugfix/fix-twice-init-spring-bean/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/06/05/egenie_bugfix/fix-twice-init-spring-bean/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/06/05/egenie_bugfix/fix-twice-init-spring-bean/" class="leancloud_visitors" data-flag-title="fix-twice-init-spring-bean">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p><a href="https://www.jianshu.com/p/ccad14b8ad08" target="_blank" rel="noopener">https://www.jianshu.com/p/ccad14b8ad08</a></p>
-<p><a href="https://q.cnblogs.com/q/100351/" target="_blank" rel="noopener">https://q.cnblogs.com/q/100351/</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/05/java/java-nio-study/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/05/java/java-nio-study/" itemprop="url">java-nio-study</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-05T19:50:59+08:00">
-                2018-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/06/05/java/java-nio-study/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/06/05/java/java-nio-study/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/06/05/java/java-nio-study/" class="leancloud_visitors" data-flag-title="java-nio-study">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Java-NIO-由以下几个核心部分组成："><a href="#Java-NIO-由以下几个核心部分组成：" class="headerlink" title="Java NIO 由以下几个核心部分组成："></a>Java NIO 由以下几个核心部分组成：</h1><ul>
-<li>Channels</li>
-<li>Buffers</li>
-<li>Selectors</li>
-</ul>
-<h2 id="JAVA-NIO中的一些主要Channel的实现："><a href="#JAVA-NIO中的一些主要Channel的实现：" class="headerlink" title="JAVA NIO中的一些主要Channel的实现："></a>JAVA NIO中的一些主要Channel的实现：</h2><ul>
-<li>FileChannel</li>
-<li>DatagramChannel</li>
-<li>SocketChannel</li>
-<li>ServerSocketChannel<br>正如你所看到的，这些通道涵盖了UDP 和 TCP 网络IO，以及文件IO。</li>
-</ul>
-<h2 id="buffers"><a href="#buffers" class="headerlink" title="buffers"></a>buffers</h2><p>ByteBuffer<br>CharBuffer<br>DoubleBuffer<br>FloatBuffer<br>IntBuffer<br>LongBuffer<br>ShortBuffer</p>
-<h2 id="Selector"><a href="#Selector" class="headerlink" title="Selector"></a>Selector</h2><p>Selector允许单线程处理多个 Channel。如果你的应用打开了多个连接（通道），但每个连接的流量都很低，使用Selector就会很方便。例如，在一个聊天服务器中。</p>
-<p>这是在一个单线程中使用一个Selector处理3个Channel的图示：</p>
-<h1 id="buffers-1"><a href="#buffers-1" class="headerlink" title="buffers"></a>buffers</h1><h2 id="Buffer的基本用法"><a href="#Buffer的基本用法" class="headerlink" title="Buffer的基本用法"></a>Buffer的基本用法</h2><p>使用Buffer读写数据一般遵循以下四个步骤：</p>
+            <h1 id="架构模型"><a href="#架构模型" class="headerlink" title="架构模型"></a>架构模型</h1><p>软件架构涉及到抽象、分解和组合、风格和美学。我们用由多个视图或视角组成的模型来描述它。为了最终处理大型的、富有挑战性的架构，该模型包含五个主要的视图（请对照图 1）：</p>
 <ul>
-<li>写入数据到Buffer</li>
-<li>调用flip()方法(从写模式切换到读模式)</li>
-<li>从Buffer中读取数据</li>
-<li>调用clear()方法或者compact()方法<br>当向buffer写入数据时，buffer会记录下写了多少数据。一旦要读取数据，需要通过flip()方法将Buffer从写模式切换到读模式。在读模式下，可以读取之前写入到buffer的所有数据。</li>
-</ul>
-<p>一旦读完了所有的数据，就需要清空缓冲区，让它可以再次被写入。有两种方式能清空缓冲区：调用clear()或compact()方法。clear()方法会清空整个缓冲区。compact()方法只会清除已经读过的数据。任何未读的数据都被移到缓冲区的起始处，新写入<br>的数据将放到缓冲区未读数据的后面。</p>
-<h2 id="Buffer的capacity-position和limit"><a href="#Buffer的capacity-position和limit" class="headerlink" title="Buffer的capacity,position和limit"></a>Buffer的capacity,position和limit</h2><p>缓冲区本质上是一块可以写入数据，然后可以从中读取数据的内存。这块内存被包装成NIO Buffer对象，并提供了一组方法，用来方便的访问该块内存。</p>
-<p>为了理解Buffer的工作原理，需要熟悉它的三个属性：</p>
-<ul>
-<li>capacity</li>
-<li>position<ul>
-<li>当你写数据到Buffer中时，position表示当前的位置。初始的position值为0.当一个byte、long等数据写到Buffer后， position会向前移动到下一个可插入数据的Buffer单元。position最大可为capacity – 1.</li>
-<li>当读取数据时，也是从某个特定位置读。当将Buffer从写模式切换到读模式，position会被重置为0. 当从Buffer的position处读取数据时，position向前移动到下一个可读的位置。</li>
-</ul>
+<li>逻辑视图（Logical View），设计的</li>
+<li>对象模型（使用面向对象的设计方法时）。</li>
+<li>过程视图（Process View），捕捉设计的并发和同步特征。</li>
+<li><p>物理视图（Physical View），描述了软件到硬件的映射，反映了分布式特性。</p>
 </li>
-<li>limit<ul>
-<li>在写模式下，Buffer的limit表示你最多能往Buffer里写多少数据。 写模式下，limit等于Buffer的capacity。</li>
-<li>当切换Buffer到读模式时， limit表示你最多能读到多少数据。因此，当切换Buffer到读模式时，limit会被设置成写模式下的position值。</li>
-</ul>
+<li><p>场景视图：用例图</p>
 </li>
+<li>逻辑视图：类图、对象图、状态图、组合结构图、交互图（顺序、通信、时序）</li>
+<li>开发视图：包图、组件图</li>
+<li>进程视图：活动图</li>
+<li>部署视图：部署图</li>
 </ul>
-<h2 id="Buffer的分配"><a href="#Buffer的分配" class="headerlink" title="Buffer的分配"></a>Buffer的分配</h2><p>要想获得一个Buffer对象首先要进行分配。 每一个Buffer类都有一个allocate方法。下面是一个分配48字节capacity的ByteBuffer的例子。</p>
-<p><code>ByteBuffer buf = ByteBuffer.allocate(48);</code></p>
-<h2 id="向Buffer中写数据"><a href="#向Buffer中写数据" class="headerlink" title="向Buffer中写数据"></a>向Buffer中写数据</h2><p>写数据到Buffer有两种方式：</p>
-<ul>
-<li>从Channel写到Buffer。</li>
-<li>通过Buffer的put()方法写到Buffer里。</li>
-</ul>
-<p>从Channel写到Buffer的例子</p>
-<p><code>int bytesRead = inChannel.read(buf); //read into buffer.</code><br>通过put方法写Buffer的例子：</p>
-<p><code>buf.put(127);</code></p>
-<h2 id="从Buffer中读取数据"><a href="#从Buffer中读取数据" class="headerlink" title="从Buffer中读取数据"></a>从Buffer中读取数据</h2><p>从Buffer中读取数据有两种方式：</p>
-<ul>
-<li>从Buffer读取数据到Channel。</li>
-<li>使用get()方法从Buffer中读取数据。<br>从Buffer读取数据到Channel的例子：</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">//read from buffer into channel.</span><br><span class="line">int bytesWritten = inChannel.write(buf);</span><br></pre></td></tr></table></figure>
-<p>使用get()方法从Buffer中读取数据的例子</p>
-<p><code>byte aByte = buf.get();</code> </p>
+<p><img src="/images/pasted-175.png" alt="upload successful"></p>
+<p><img src="/images/pasted-178.png" alt="upload successful"></p>
+<p><img src="/images/pasted-177.png" alt="upload successful"></p>
+<h1 id="软件架构文档提纲"><a href="#软件架构文档提纲" class="headerlink" title="软件架构文档提纲"></a>软件架构文档提纲</h1><p><img src="/images/pasted-176.png" alt="upload successful"></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://www.ibm.com/developerworks/cn/rational/r-4p1-view/index.html" target="_blank" rel="noopener">https://www.ibm.com/developerworks/cn/rational/r-4p1-view/index.html</a><br><a href="https://www.ibm.com/developerworks/cn/rational/06/r-wenyu/index.html" target="_blank" rel="noopener">https://www.ibm.com/developerworks/cn/rational/06/r-wenyu/index.html</a></p>
 
           
         
@@ -1138,7 +833,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/05/安全/JWT/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/07/study-dhcp/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
@@ -1157,7 +852,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/06/05/安全/JWT/" itemprop="url">JWT</a></h1>
+                <a class="post-title-link" href="/2018/06/07/study-dhcp/" itemprop="url">study-dhcp</a></h1>
         
 
         <div class="post-meta">
@@ -1169,7 +864,505 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-05T19:50:13+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-07T17:31:21+08:00">
+                2018-06-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/06/07/study-dhcp/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/06/07/study-dhcp/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/06/07/study-dhcp/" class="leancloud_visitors" data-flag-title="study-dhcp">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>最近总是遇到公司WiFi ip地址冲突的问题,于是百度了下</p>
+<h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><p>DHCP协议全称为“动态主机设置协议”（Dynamic Host Configuration Protocol）。通常来说，普通电脑中都内置有DHCP客户端模块。电脑接上网络后，DHCP客户端发现新连通的网络，会在该网络上找DHCP服务器。DHCP服务器将给电脑提供合理的网络配置，并把设置信息传回本机。所谓的DHCP服务器，其实就是一些运行有DHCP服务器端软件的特殊电脑。他们像等候在网络上的服务员，为新来的顾客排忧解难。本机和DHCP服务器之间的通信，都是通过DHCP协议进行的。</p>
+<p>动态管理100个ip地址,并设置有效期,如果过期没有续租,则收回ip</p>
+<h1 id="通信过程"><a href="#通信过程" class="headerlink" title="通信过程"></a>通信过程</h1><p>DHCP协议的底层是UDP协议。我们知道，网络上的点对点沟通需要有IP地址。但新接入网络的客户机正是想通过DHCP通信来获得IP地址。这简直成了“鸡生蛋、蛋生鸡”的死胡同。幸好，除了点对点通信，UDP协议还允许广播通信。把UDP数据包发送到网络的广播地址，网络上的每个设备都能收到。因此，DHCP通信主要靠这种广播的形式进行。<br>DHCP通信分为四步：</p>
+<ul>
+<li>Discovery：客户机发广播，搜寻DHCP服务器。</li>
+<li>Offer：DHCP服务器发出邀请，提供一个可用的IP地址。</li>
+<li>Request：客户机正式请求使用该IP地址。</li>
+<li>Acknowledge：DHCP服务器确认，并提供其他配置参数。</li>
+</ul>
+<p><img src="/images/pasted-174.png" alt="upload successful"></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://wizardforcel.gitbooks.io/protocol-forest-vamei/content/content/16.html" target="_blank" rel="noopener">https://wizardforcel.gitbooks.io/protocol-forest-vamei/content/content/16.html</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/06/安全/openid-connect/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/06/安全/openid-connect/" itemprop="url">openid-connect</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-06T16:37:06+08:00">
+                2018-06-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/06/06/安全/openid-connect/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/06/06/安全/openid-connect/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/06/06/安全/openid-connect/" class="leancloud_visitors" data-flag-title="openid-connect">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><p>OpenID Connect 1.0 is a simple identity layer on top of the OAuth 2.0 protocol. It enables Clients to verify the identity of the End-User based on the authentication performed by an Authorization Server, as well as to obtain basic profile information about the End-User in an interoperable and REST-like manner.</p>
+<p>This specification defines the core OpenID Connect functionality: authentication built on top of OAuth 2.0 and the use of Claims to communicate information about the End-User. It also describes the security and privacy considerations for using OpenID Connect.</p>
+<h1 id="Id-Token的好处"><a href="#Id-Token的好处" class="headerlink" title="Id Token的好处"></a>Id Token的好处</h1><ul>
+<li>无状态会话  :放入浏览器cookie中，ID令牌可以实现轻量级无状态会话。 这消除了将会话存储在服务器端（存储器或磁盘上）的需要，这可能是管理和扩展的负担。 通过验证ID令牌来检查会话。 当令牌达到超过其发布时间戳（iat）的某个预定义年龄时，应用程序可以简单地通过静默向op发出请求</li>
+<li>将身份传递给第三方  :当需要知道用户身份时，可以将ID令牌传递给其他应用程序组件或后端服务，例如记录审计跟踪。</li>
+<li>令牌交换  :</li>
+</ul>
+<h1 id="标准规范"><a href="#标准规范" class="headerlink" title="标准规范"></a>标准规范</h1><p><a href="http://openid.net/specs/openid-connect-core-1_0.html" target="_blank" rel="noopener">http://openid.net/specs/openid-connect-core-1_0.html</a></p>
+<p>#$ 实际流程:<br><a href="https://connect2id.com/learn/openid-connect" target="_blank" rel="noopener">https://connect2id.com/learn/openid-connect</a></p>
+<h1 id="标准中的接口"><a href="#标准中的接口" class="headerlink" title="标准中的接口"></a>标准中的接口</h1><p><img src="/images/pasted-173.png" alt="upload successful"></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Endpoint</th>
+<th style="text-align:left">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><a href="https://connect2id.com/products/server/docs/api/discovery" target="_blank" rel="noopener">Server discovery</a></td>
+<td style="text-align:left">Discover the OAuth 2.0 / OpenID Connect endpoints, capabilities, supported cryptographic algoritms and features.</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="https://connect2id.com/products/server/docs/api/jwk-set" target="_blank" rel="noopener">Server JWK set</a></td>
+<td style="text-align:left">Retrieve the public server JSON Web Key (JWK) required to verify the authenticity of issued ID and access tokens.</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="https://connect2id.com/products/server/docs/api/client-registration" target="_blank" rel="noopener">Client registration</a></td>
+<td style="text-align:left">Create, access, update and delete client registrations with the server.</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="https://connect2id.com/products/server/docs/api/authorization" target="_blank" rel="noopener">Authorisation</a></td>
+<td style="text-align:left">The client sends the end-user’s browser to this endpoint to request their authentication and consent. This endpoint is used in the code and implicit OAuth 2.0 flows which require end-user interaction.</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="https://connect2id.com/products/server/docs/api/token" target="_blank" rel="noopener">Token</a></td>
+<td style="text-align:left">Post an OAuth 2.0 grant (code, refresh token, resource owner password credentials, client credentials) to obtain an ID and / or access token.</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="https://connect2id.com/products/server/docs/api/token-introspection" target="_blank" rel="noopener">Token introspection</a></td>
+<td style="text-align:left">Validate an access token and retrieve its underlying authorisation (for resource servers).</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="https://connect2id.com/products/server/docs/api/token-revocation" target="_blank" rel="noopener">Token revocation</a></td>
+<td style="text-align:left">Revoke an obtained access or refresh token.</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="https://connect2id.com/products/server/docs/api/userinfo" target="_blank" rel="noopener">UserInfo</a></td>
+<td style="text-align:left">Retrieve profile information and other attributes for a logged-in end-user.</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="https://connect2id.com/products/server/docs/api/check-session" target="_blank" rel="noopener">Check session iframe</a></td>
+<td style="text-align:left">Poll the OpenID provider for changes of end-user authentication status.</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="https://connect2id.com/products/server/docs/api/logout" target="_blank" rel="noopener">Logout (end-session)</a></td>
+<td style="text-align:left">Sign out an end-user.</td>
+</tr>
+</tbody>
+</table>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/06/http/http-header-httponly/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/06/http/http-header-httponly/" itemprop="url">http-header-httponly</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-06T15:53:09+08:00">
+                2018-06-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/06/06/http/http-header-httponly/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/06/06/http/http-header-httponly/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/06/06/http/http-header-httponly/" class="leancloud_visitors" data-flag-title="http-header-httponly">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="属性说明："><a href="#属性说明：" class="headerlink" title="属性说明："></a>属性说明：</h1><p>1 secure属性<br>当设置为true时，表示创建的 Cookie 会被以安全的形式向服务器传输，也就是只能在 HTTPS 连接中被浏览器传递到服务器端进行会话验证，如果是 HTTP 连接则不会传递该信息，所以不会被窃取到Cookie 的具体内容。<br>2 HttpOnly属性<br>为了解决XSS（跨站脚本***）的问题，从IE6开始支持cookie的HttpOnly属性，这个属性目前已被大多数浏览器（IE、FF、Chrome、Safari）</p>
+<p>如果在Cookie中设置了”HttpOnly”属性，那么通过程序(JS脚本、Applet等)将无法读取到Cookie信息，这样能有效的防止XSS攻击。</p>
+<p>对于以上两个属性，<br>首先，secure属性是防止信息在传递的过程中被监听捕获后信息泄漏，HttpOnly属性的目的是防止程序获取cookie后进行攻击。<br>其次，GlassFish2.x支持的是servlet2.5，而servlet2.5不支持Session Cookie的”HttpOnly”属性。不过使用Filter做一定的处理可以简单的实现HttpOnly属性。GlashFish3.0(支持servlet3.0)默认开启Session Cookie的HttpOnly属性。<br>也就是说两个属性，并不能解决cookie在本机出现的信息泄漏的问题(FireFox的插件FireBug能直接看到cookie的相关信息)。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/05/安全/rsa/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/05/安全/rsa/" itemprop="url">rsa</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-05T20:02:18+08:00">
                 2018-06-05
               </time>
             
@@ -1188,9 +1381,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/06/05/安全/JWT/#comments" itemprop="discussionUrl">
+                <a href="/2018/06/05/安全/rsa/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/06/05/安全/JWT/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/06/05/安全/rsa/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -1198,7 +1391,7 @@
 
           
           
-             <span id="/2018/06/05/安全/JWT/" class="leancloud_visitors" data-flag-title="JWT">
+             <span id="/2018/06/05/安全/rsa/" class="leancloud_visitors" data-flag-title="rsa">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -1231,56 +1424,100 @@
       
         
           
-            <p>JSON Web Token（JWT）是一个非常轻巧的规范。这个规范允许我们使用JWT在用户和服务器之间传递安全可靠的信息。</p>
+            <h1 id="最初认识rsa算法-ssh协议"><a href="#最初认识rsa算法-ssh协议" class="headerlink" title="最初认识rsa算法:ssh协议"></a>最初认识rsa算法:ssh协议</h1><p>对称加密的加密强度高，很难破解。但是在实际应用过程中不得不面临一个棘手的问题：如何安全的保存密钥呢？尤其是考虑到数量庞大的Client端，很难保证密钥不被泄露。一旦一个Client端的密钥被窃据，那么整个系统的安全性也就不复存在。为了解决这个问题，非对称加密应运而生。非对称加密有两个密钥：“公钥”和“私钥”。</p>
+<p>非对称加密方案的登录流程：</p>
+<p><img src="/images/pasted-169.png" alt="upload successful"></p>
 <ul>
-<li><p>简洁(Compact): 可以通过URL，POST参数或者在HTTP header发送，因为数据量小，传输速度也很快</p>
+<li>远程Server收到Client端用户TopGun的登录请求，Server把自己的公钥发给用户。</li>
+<li>Client使用这个公钥，将密码进行加密。</li>
+<li>Client将加密的密码发送给Server端。</li>
+<li>远程Server用自己的私钥，解密登录密码，然后验证其合法性。</li>
+<li>若验证结果，给Client相应的响应。</li>
+</ul>
+<h2 id="基于公钥认证"><a href="#基于公钥认证" class="headerlink" title="基于公钥认证"></a>基于公钥认证</h2><p><img src="/images/pasted-170.png" alt="upload successful"></p>
+<ul>
+<li>Client将自己的公钥存放在Server上，追加在文件authorized_keys中。</li>
+<li>Server端接收到Client的连接请求后，会在authorized_keys中匹配到Client的公钥pubKey，并生成随机数R，用Client的公钥对该随机数进行加密得到pubKey(R)，然后将加密后信息发送给Client。</li>
+<li>Client端通过私钥进行解密得到随机数R，然后对随机数R和本次会话的SessionKey利用MD5生成摘要Digest1，发送给Server端。</li>
+<li>Server端会也会对R和SessionKey利用同样摘要算法生成Digest2。</li>
+<li>Server端会最后比较Digest1和Digest2是否相同，完成认证过程。</li>
+</ul>
+<p><img src="/images/pasted-171.png" alt="upload successful"></p>
+<h1 id="RSA签名体制-不希望有人冒充我发消息，只有我才能发布这个签名"><a href="#RSA签名体制-不希望有人冒充我发消息，只有我才能发布这个签名" class="headerlink" title="RSA签名体制 (不希望有人冒充我发消息，只有我才能发布这个签名)"></a>RSA签名体制 (不希望有人冒充我发消息，只有我才能发布这个签名)</h1><p>签名体制同样包含3个算法：KeyGen（密钥生成算法），Sign（签名算法），Verify（验证算法）。</p>
+<ul>
+<li>keygen(数)-&gt;(pk,sk)</li>
+<li>encrpt(pk,m)-&gt;ct密文</li>
+<li>decrypt(st,ct)-&gt;m 解密</li>
+</ul>
+<p>所以，在签名算法中，私钥用于对数据进行签名，公钥用于对签名进行验证。这也可以直观地进行理解：对一个文件签名，当然要用私钥，因为我们希望只有自己才能完成签字。验证过程当然希望所有人都能够执行，大家看到签名都能通过验证证明确实是我自己签的。</p>
+<h1 id="RSA的加密算法-不希望别人知道我的消息，所以只有我才能解密"><a href="#RSA的加密算法-不希望别人知道我的消息，所以只有我才能解密" class="headerlink" title="RSA的加密算法 (不希望别人知道我的消息，所以只有我才能解密)"></a>RSA的加密算法 (不希望别人知道我的消息，所以只有我才能解密)</h1><p>RSA公钥加密体制包含如下3个算法：KeyGen（密钥生成算法），Encrypt（加密算法）以及Decrypt（解密算法）</p>
+<ul>
+<li>keygen(数)-&gt;(pk,sk)</li>
+<li>sign(sk,m)-&gt;签名</li>
+<li>vertify(pk,签名,内容)-&gt;结果1or0</li>
+</ul>
+<p>所以，从算法描述中我们也可以看出：公钥用于对数据进行加密，私钥用于对数据进行解密。当然了，这个也可以很直观的理解：公钥就是公开的密钥，其公开了大家才能用它来加密数据。私钥是私有的密钥，谁有这个密钥才能够解密密文。否则大家都能看到私钥，就都能解密，那不就乱套了。</p>
+<h1 id="SSL-TLS协议"><a href="#SSL-TLS协议" class="headerlink" title="SSL/TLS协议"></a>SSL/TLS协议</h1><h2 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h2><p>（1） 所有信息都是加密传播，第三方无法窃听。<br>（2） 具有校验机制，一旦被篡改，通信双方会立刻发现。<br>（3） 配备身份证书，防止身份被冒充。</p>
+<h2 id="基本的运行过程"><a href="#基本的运行过程" class="headerlink" title="基本的运行过程"></a>基本的运行过程</h2><p>SSL/TLS协议的基本思路是采用公钥加密法，也就是说，客户端先向服务器端索要公钥，然后用公钥加密信息，服务器收到密文后，用自己的私钥解密。</p>
+<p>但是，这里有两个问题。</p>
+<p>（1）如何保证公钥不被篡改？</p>
+<p>解决方法：将公钥放在数字证书中。只要证书是可信的，公钥就是可信的。</p>
+<p>（2）公钥加密计算量太大，如何减少耗用的时间？</p>
+<p>解决方法：每一次对话（session），客户端和服务器端都生成一个”对话密钥”（session key），用它来加密信息。由于”对话密钥”是对称加密，所以运算速度非常快，而服务器公钥只用于加密”对话密钥”本身，这样就减少了加密运算的消耗时间。</p>
+<p>因此，SSL/TLS协议的基本过程是这样的：</p>
+<p>（1） 客户端向服务器端索要并验证公钥。</p>
+<p>（2） 双方协商生成”对话密钥”。</p>
+<p>（3） 双方采用”对话密钥”进行加密通信。</p>
+<p>上面过程的前两步，又称为”握手阶段”（handshake）。</p>
+<h3 id="1-客户端发出请求（ClientHello）"><a href="#1-客户端发出请求（ClientHello）" class="headerlink" title="1 客户端发出请求（ClientHello）"></a>1 客户端发出请求（ClientHello）</h3><p>首先，客户端（通常是浏览器）先向服务器发出加密通信的请求，这被叫做ClientHello请求。</p>
+<p>在这一步，客户端主要向服务器提供以下信息。</p>
+<ul>
+<li><p>（1） 支持的协议版本，比如TLS 1.0版。</p>
 </li>
-<li><p>自包含(Self-contained)：负载中包含了所有用户所需要的信息，避免了多次查询数据库</p>
+<li><p>（2） 一个客户端生成的随机数，稍后用于生成”对话密钥”。</p>
+</li>
+<li><p>（3） 支持的加密方法，比如RSA公钥加密。</p>
+</li>
+<li><p>（4） 支持的压缩方法。</p>
 </li>
 </ul>
-<h1 id="JWT的组成"><a href="#JWT的组成" class="headerlink" title="JWT的组成"></a>JWT的组成</h1><p>一个JWT实际上就是一个字符串，它由三部分组成，头部、载荷与签名。</p>
-<h2 id="载荷（Payload）"><a href="#载荷（Payload）" class="headerlink" title="载荷（Payload）"></a>载荷（Payload）</h2><p>我们先将上面的添加好友的操作描述成一个JSON对象。其中添加了一些其他的信息，帮助今后收到这个JWT的服务器理解这个JWT。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;iss&quot;: &quot;John Wu JWT&quot;,</span><br><span class="line">    &quot;iat&quot;: 1441593502,</span><br><span class="line">    &quot;exp&quot;: 1441594722,</span><br><span class="line">    &quot;aud&quot;: &quot;www.example.com&quot;,</span><br><span class="line">    &quot;sub&quot;: &quot;jrocket@example.com&quot;,</span><br><span class="line">    &quot;from_user&quot;: &quot;B&quot;,</span><br><span class="line">    &quot;target_user&quot;: &quot;A&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>这里面的前五个字段都是由JWT的标准所定义的。</p>
+<p>这里需要注意的是，客户端发送的信息之中不包括服务器的域名。也就是说，理论上服务器只能包含一个网站，否则会分不清应该向客户端提供哪一个网站的数字证书。这就是为什么通常一台服务器只能有一张数字证书的原因。</p>
+<p>对于虚拟主机的用户来说，这当然很不方便。2006年，TLS协议加入了一个Server Name Indication扩展，允许客户端向服务器提供它所请求的域名。</p>
+<h3 id="2-服务器回应（SeverHello）"><a href="#2-服务器回应（SeverHello）" class="headerlink" title="2 服务器回应（SeverHello）"></a>2 服务器回应（SeverHello）</h3><p>服务器收到客户端请求后，向客户端发出回应，这叫做SeverHello。服务器的回应包含以下内容。</p>
 <ul>
-<li>iss: 该JWT的签发者</li>
-<li>sub: 该JWT所面向的用户</li>
-<li>aud: 接收该JWT的一方</li>
-<li>exp(expires): 什么时候过期，这里是一个Unix时间戳</li>
-<li>iat(issued at): 在什么时候签发的<br>这些定义都可以在标准中找到。</li>
+<li><p>（1） 确认使用的加密通信协议版本，比如TLS 1.0版本。如果浏览器与服务器支持的版本不一致，服务器关闭加密通信。</p>
+</li>
+<li><p>（2） 一个服务器生成的随机数，稍后用于生成”对话密钥”。</p>
+</li>
+<li><p>（3） 确认使用的加密方法，比如RSA公钥加密。</p>
+</li>
+<li><p>（4） 服务器证书。</p>
+</li>
 </ul>
-<p>将上面的JSON对象进行<strong>base64编码</strong>可以得到下面的字符串。这个字符串我们将它称作JWT的Payload（载荷）。</p>
-<h2 id="头部（Header）"><a href="#头部（Header）" class="headerlink" title="头部（Header）"></a>头部（Header）</h2><p>JWT还需要一个头部，头部用于描述关于该JWT的最基本的信息，例如其类型以及签名所用的算法等。这也可以被表示成一个JSON对象。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;typ&quot;: &quot;JWT&quot;,</span><br><span class="line">  &quot;alg&quot;: &quot;HS256&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>在这里，我们说明了这是一个JWT，并且我们所用的签名算法（后面会提到）是HS256算法。</p>
-<p>对它也要进行Base64编码，之后的字符串就成了JWT的Header（头部）。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9</span><br></pre></td></tr></table></figure>
-<h2 id="签名"><a href="#签名" class="headerlink" title="签名"></a>签名</h2><p>将上面拼接完的字符串用HS256算法进行加密。在加密的时候，我们还需要提供一个密钥（secret）。如果我们用mystar作为密钥的话，那么就可以得到我们加密后的内容</p>
-<p>最后将这一部分签名也拼接在被签名的字符串后面，我们就得到了完整的JWT</p>
-<h3 id="签名的目的"><a href="#签名的目的" class="headerlink" title="签名的目的"></a>签名的目的</h3><p>服务器应用在接受到JWT后，会首先对头部和载荷的内容用同一算法再次签名。那么服务器应用是怎么知道我们用的是哪一种算法呢？别忘了，我们在JWT的头部中已经用alg字段指明了我们的加密算法了。</p>
-<p>如果服务器应用对头部和载荷再次以同样方法签名之后发现，自己计算出来的签名和接受到的签名不一样，那么就说明这个Token的内容被别人动过的，我们应该拒绝这个Token，返回一个HTTP 401 Unauthorized响应。</p>
-<h2 id="信息会暴露？"><a href="#信息会暴露？" class="headerlink" title="信息会暴露？"></a>信息会暴露？</h2><p>是的。</p>
-<p>所以，在JWT中，不应该在载荷里面加入任何敏感的数据。在上面的例子中，我们传输的是用户的User ID。这个值实际上不是什么敏感内容，一般情况下被知道也是安全的。</p>
-<p>但是像密码这样的内容就不能被放在JWT中了。如果将用户的密码放在了JWT中，那么怀有恶意的第三方通过Base64解码就能很快地知道你的密码了。</p>
-<h1 id="jwt校验"><a href="#jwt校验" class="headerlink" title="jwt校验"></a>jwt校验</h1><h2 id="规范"><a href="#规范" class="headerlink" title="规范:"></a>规范:</h2><p><a href="https://tools.ietf.org/html/rfc7523#section-2.1" target="_blank" rel="noopener">https://tools.ietf.org/html/rfc7523#section-2.1</a></p>
-<h2 id="mitreid中对jwt格式的id-token的校验逻辑"><a href="#mitreid中对jwt格式的id-token的校验逻辑" class="headerlink" title="mitreid中对jwt格式的id_token的校验逻辑"></a>mitreid中对jwt格式的id_token的校验逻辑</h2><p><a href="https://github.com/mitreid-connect/simple-web-app" target="_blank" rel="noopener">https://github.com/mitreid-connect/simple-web-app</a></p>
+<p>除了上面这些信息，如果服务器需要确认客户端的身份，就会再包含一项请求，要求客户端提供”客户端证书”。比如，金融机构往往只允许认证客户连入自己的网络，就会向正式客户提供USB密钥，里面就包含了一张客户端证书。</p>
+<h3 id="3客户端回应"><a href="#3客户端回应" class="headerlink" title="3客户端回应"></a>3客户端回应</h3><p>客户端收到服务器回应以后，首先验证服务器证书。如果证书不是可信机构颁布、或者证书中的域名与实际域名不一致、或者证书已经过期，就会向访问者显示一个警告，由其选择是否还要继续通信。</p>
+<p>如果证书没有问题，客户端就会从证书中取出服务器的公钥。然后，向服务器发送下面三项信息。</p>
 <ul>
-<li>从seesion中取issuer</li>
-<li>访问issuer上的jwk接口</li>
-<li>通过公钥校验jwt</li>
-<li>校验jwt的issuer字段</li>
-<li>校验jwt的issuer字段和从seesion中取issuer字段</li>
-<li>校验jwt的issue时间是否为空</li>
-<li>校验jwt的issue时间是否在当前时间+窗口时间之后</li>
-<li>校验jwt的Audience字段是否为空</li>
-<li>校验jwt的Audience字段是否包含clientId</li>
-<li>校验jwt的nonce字段是否为空</li>
-<li>校验jwt的nonce字段是否与seesion中的nonce相同</li>
+<li><p>（1） 一个随机数。该随机数用服务器公钥加密，防止被窃听。</p>
+</li>
+<li><p>（2） 编码改变通知，表示随后的信息都将用双方商定的加密方法和密钥发送。</p>
+</li>
+<li><p>（3） 客户端握手结束通知，表示客户端的握手阶段已经结束。这一项同时也是前面发送的所有内容的hash值，用来供服务器校验。</p>
+</li>
 </ul>
-<h1 id="jwt校验公钥获取方式"><a href="#jwt校验公钥获取方式" class="headerlink" title="jwt校验公钥获取方式"></a>jwt校验公钥获取方式</h1><ul>
-<li>本地获取</li>
-<li>jwk接口获取</li>
+<p>上面第一项的随机数，是整个握手阶段出现的第三个随机数，又称”pre-master key”。有了它以后，客户端和服务器就同时有了三个随机数，接着双方就用事先商定的加密方法，各自生成本次会话所用的同一把”会话密钥”。</p>
+<p>至于为什么一定要用三个随机数，来生成”会话密钥”，dog250解释得很好：</p>
+<p>“不管是客户端还是服务器，都需要随机数，这样生成的密钥才不会每次都一样。由于SSL协议中证书是静态的，因此十分有必要引入一种随机因素来保证协商出来的密钥的随机性。</p>
+<p>对于RSA密钥交换算法来说，pre-master-key本身就是一个随机数，再加上hello消息中的随机，三个随机数通过一个密钥导出器最终导出一个对称密钥。</p>
+<p>pre master的存在在于SSL协议不信任每个主机都能产生完全随机的随机数，如果随机数不随机，那么pre master secret就有可能被猜出来，那么仅适用pre master secret作为密钥就不合适了，因此必须引入新的随机因素，那么客户端和服务器加上pre master secret三个随机数一同生成的密钥就不容易被猜出了，一个伪随机可能完全不随机，可是是三个伪随机就十分接近随机了，每增加一个自由度，随机性增加的可不是一。”</p>
+<h3 id="4服务器的最后回应"><a href="#4服务器的最后回应" class="headerlink" title="4服务器的最后回应"></a>4服务器的最后回应</h3><p>服务器收到客户端的第三个随机数pre-master key之后，计算生成本次会话所用的”会话密钥”。然后，向客户端最后发送下面信息。</p>
+<ul>
+<li><p>（1）编码改变通知，表示随后的信息都将用双方商定的加密方法和密钥发送。</p>
+</li>
+<li><p>（2）服务器握手结束通知，表示服务器的握手阶段已经结束。这一项同时也是前面发送的所有内容的hash值，用来供客户端校验。</p>
+</li>
 </ul>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://blog.leapoahead.com/2015/09/07/user-authentication-with-jwt/" target="_blank" rel="noopener">http://blog.leapoahead.com/2015/09/07/user-authentication-with-jwt/</a></p>
+<p>至此，整个握手阶段全部结束。接下来，客户端与服务器进入加密通信，就完全是使用普通的HTTP协议，只不过用”会话密钥”加密内容。</p>
 
           
         
@@ -1329,7 +1566,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/03/http/http-status-code-301/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/05/分布式/拜占庭将军问题/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
@@ -1348,7 +1585,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/06/03/http/http-status-code-301/" itemprop="url">http-status-code-301-302</a></h1>
+                <a class="post-title-link" href="/2018/06/05/分布式/拜占庭将军问题/" itemprop="url">拜占庭将军问题</a></h1>
         
 
         <div class="post-meta">
@@ -1360,8 +1597,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-03T14:18:28+08:00">
-                2018-06-03
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-05T20:01:03+08:00">
+                2018-06-05
               </time>
             
 
@@ -1379,9 +1616,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/06/03/http/http-status-code-301/#comments" itemprop="discussionUrl">
+                <a href="/2018/06/05/分布式/拜占庭将军问题/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/06/03/http/http-status-code-301/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/06/05/分布式/拜占庭将军问题/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -1389,7 +1626,7 @@
 
           
           
-             <span id="/2018/06/03/http/http-status-code-301/" class="leancloud_visitors" data-flag-title="http-status-code-301-302">
+             <span id="/2018/06/05/分布式/拜占庭将军问题/" class="leancloud_visitors" data-flag-title="拜占庭将军问题">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -1422,17 +1659,40 @@
       
         
           
-            <h1 id="301和302都是重定向，他们之间有什么区别呢？"><a href="#301和302都是重定向，他们之间有什么区别呢？" class="headerlink" title="301和302都是重定向，他们之间有什么区别呢？"></a>301和302都是重定向，他们之间有什么区别呢？</h1><p>301 Moved Permanently 被请求的资源已永久移动到新位置，并且将来任何对此资源的引用都应该使用本响应返回的若干个URI之一。如果可能，拥有链接编辑功能的客户端应当自动把请求的地址修改为从服务器反馈回来的地址。除非额外指定，否则这个响应也是可缓存的。</p>
-<p>302 Found 请求的资源现在临时从不同的URI响应请求。由于这样的重定向是临时的，客户端应当继续向原有地址发送以后的请求。只有在Cache-Control或Expires中进行了指定的情况下，这个响应才是可缓存的。</p>
-<h2 id="301适合永久重定向"><a href="#301适合永久重定向" class="headerlink" title="301适合永久重定向"></a>301适合永久重定向</h2><p>比较常用的场景是做域名跳转。</p>
-<p>请求后的状态码为301，并在返回头的Location中会指明重定向的目标地址。</p>
-<p>同时301请求可以缓存（See Status Code，后边写着from cache）</p>
+            <h1 id="拜占庭将军问题"><a href="#拜占庭将军问题" class="headerlink" title="拜占庭将军问题"></a>拜占庭将军问题</h1><p>11位拜占庭将军去打仗, 他们各自有权力观测敌情并作出判断, 进攻或撤退, 那么怎么让他们只用传令兵达成一致呢?一种很符合直觉的方法就是投票,每位将军作出决定后都将结果”广播”给其余所有将军, 这样所有将军都能获得同样的11份(包括自己)结果, 取多数, 即可得到全军都同意的行为.但如果这11位将军中有间谍呢? 假设有9位忠诚的将军, 5位判断进攻, 4位判断撤退, 还有2个间谍恶意判断撤退, 虽然结果是错误的撤退, 但这种情况完全是允许的. 因为这11位将军依然保持着状态一致性.暂时从战争故事中抽离出来, 分布式数据库最糟糕的问题绝对不是写入或者读取失败, 而是状态不同步, 还感知不到. 这个的后果就是correctness不能保证, 那程序就没有任何意义了.2个间谍怎么破坏状态一致性呢? 他们跟5位判断进攻的将军说, 我们支持进攻, 那么这5位将军统计发现7位支持进攻, 4位支持撤退, 将发动进攻. 又跟4位撤退的将军说, 我们支持撤退, 一统计, 5票进攻, 6票撤退, 立马撤退. 这场战争必输无疑了.避免这种状态不同步的问题, 我称之为”广义拜占庭将军问题”.Lamport继续将这个问题规约为更小的问题,解决广义拜占庭问题, 必须满足两个条件:对任意忠诚的将军来说, 他们看到的其余将军的决定必须是一样的, 不允许出现前文那种, 5位将军统计结果是7攻4撤, 另外4位将军是5攻6撤. 所有忠诚将军的决定对于其余所有忠诚将军都是一样的. 比如, V(1)表示1号将军的决定. 那么其余所有忠诚将军的统计表上, V(1)一定是一样的. 如果这点不能保证, 说明间谍已经可以直接颠覆指挥系统了, 系统怎样都是无效的, 哪怕达成了一致.上面的条件等价于如何让一个将军(可以是间谍, 论文叫commander)对所有接收者(lieutenant)的指令(order)保持一致? 这个我叫”狭义拜占庭将军问题”.</p>
+<h1 id="什么是-Raft-算法？"><a href="#什么是-Raft-算法？" class="headerlink" title="什么是 Raft 算法？"></a>什么是 Raft 算法？</h1><p>Raft 算法是一种简单易懂的共识算法。它依靠 状态机 和 主从同步 的方式，在各个节点之间实现数据的一致性。</p>
+<p>在学习Raft算法的时候，大家需要了解Raft的两个核心要点：</p>
 <ul>
-<li>如果你把网页的后缀从.php改为.html，301也是非常适合的。</li>
-<li>把网站从http重定向到https，301也非常适合。</li>
+<li>1.选取主节点</li>
+<li>2.同步数据</li>
 </ul>
-<h2 id="302用来做临时跳转"><a href="#302用来做临时跳转" class="headerlink" title="302用来做临时跳转"></a>302用来做临时跳转</h2><p>比如未登陆的用户访问用户中心重定向到登陆页面。</p>
-<p>访问404页面会自动重定向到首页</p>
+<p>Raft算法在选择主节点的过程中，也是通过多个节点之间的投票竞争。</p>
+<p>说到这里，不得不说一下Raft算法的状态机。Raft算法为节点定义了三种角色：</p>
+<p>1.Leader（主节点）</p>
+<p>2.Follower（从节点）</p>
+<p>3.Candidate（参与投票竞争的节点）</p>
+<p>具体流程</p>
+<p>第一步，在最初，还没有一个主节点的时候，所有节点的身份都是Follower。每一个节点都有自己的计时器，当计时达到了超时时间（Election Timeout），该节点会转变为Candidate。</p>
+<p>第二步，成为Candidate的节点，会首先给自己投票，然后向集群中其他所有的节点发起请求，要求大家都给自己投票。</p>
+<p>第三步，其他收到投票请求且还未投票的Follower节点会向发起者投票，发起者收到反馈通知后，票数增加。</p>
+<p>第四步，当得票数超过了集群节点数量的一半，该节点晋升为Leader节点。Leader节点会立刻向其他节点发出通知，告诉大家自己才是老大。收到通知的节点全部变为Follower，并且各自的计时器清零。</p>
+<p>这里需要说明一点，每个节点的超时时间都是不一样的。比如A节点的超时时间是3秒，B节点的超时时间是5秒，C节点的超时时间是4秒。这样一来，A节点将会最先发起投票请求，而不是所有节点同时发起。</p>
+<p>为什么这样设计呢？设想如果所有节点同时发起投票，必然会导致大家的票数差不多，形成僵局，谁也当不成老大。</p>
+<p>那么，成为Leader的节点是否就坐稳了老大的位置呢？并不是。Leader节点需要每隔一段时间向集群其他节点发送心跳通知，表明你们的老大还活着。</p>
+<p>一旦Leader节点挂掉，发不出通知，那么计时达到了超时时间的Follower节点会转变为Candidate节点，发起选主投票，周而复始……</p>
+<p>数据同步的流程</p>
+<p>第一步，由客户端提交数据到Leader节点。</p>
+<p>第二步，由Leader节点把数据复制到集群内所有的Follower节点。如果一次复制失败，会不断进行重试。</p>
+<p>第三步，Follower节点们接收到复制的数据，会反馈给Leader节点。</p>
+<p>第四步，如果Leader节点接收到超过半数的Follower反馈，表明复制成功。于是提交自己的数据，并通知客户端数据提交成功。</p>
+<p>第五步，由Leader节点通知集群内所有的Follower节点提交数据，从而完成数据同步流程。</p>
+<hr>
+<p>Paxos 算法：</p>
+<p>早期的共识算法，由拜占庭将军问题的提出者 Leslie Lamport 所发明。谷歌的分布式锁服务 Chubby 就是以 Paxos 算法为基础。</p>
+<p>ZAB 算法：</p>
+<p>Zookeeper 所使用的一致性算法，在流程上和 Raft 算法比较接近。</p>
+<p>PBFT 算法：</p>
+<p>区块链技术所使用的共识算法之一，适用于私有链的共识。</p>
 
           
         
@@ -1481,7 +1741,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/17/http/content-type/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/05/分布式/loadbalance/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
@@ -1500,7 +1760,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/05/17/http/content-type/" itemprop="url">content-type</a></h1>
+                <a class="post-title-link" href="/2018/06/05/分布式/loadbalance/" itemprop="url">负载均衡算法</a></h1>
         
 
         <div class="post-meta">
@@ -1512,8 +1772,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-17T10:31:00+08:00">
-                2018-05-17
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-05T19:59:53+08:00">
+                2018-06-05
               </time>
             
 
@@ -1531,9 +1791,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/05/17/http/content-type/#comments" itemprop="discussionUrl">
+                <a href="/2018/06/05/分布式/loadbalance/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/05/17/http/content-type/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/06/05/分布式/loadbalance/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -1541,7 +1801,7 @@
 
           
           
-             <span id="/2018/05/17/http/content-type/" class="leancloud_visitors" data-flag-title="content-type">
+             <span id="/2018/06/05/分布式/loadbalance/" class="leancloud_visitors" data-flag-title="负载均衡算法">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -1574,12 +1834,16 @@
       
         
           
-            <h1 id="Media-Type-Content-Type-MIME-Type"><a href="#Media-Type-Content-Type-MIME-Type" class="headerlink" title="Media Type/Content Type/MIME Type"></a>Media Type/Content Type/MIME Type</h1><p>Media Type/Content Type/MIME Type 这三者都是指同一个东西，即互联网媒体类型，用来标识互联网中传输的内容类型。浏览器会识别各种Content Type，显示不同的内容。如音频、图片、视频、文档。<br>一个媒体配型至少包括两部分：一个类型，和一个子类型，还可以包括一个或多个可选的参数。 比如说<br>text/html; charset=UTF-8 中text是类型；html是子类型；charset=UTF-8是可选参数。 </p>
-<h1 id="Accept与Content-Type"><a href="#Accept与Content-Type" class="headerlink" title="Accept与Content-Type"></a>Accept与Content-Type</h1><p>1.Accept属于请求头， Content-Type属于实体头。<br>Http报头分为通用报头，请求报头，响应报头和实体报头。<br>请求方的http报头结构：通用报头|请求报头|实体报头<br>响应方的http报头结构：通用报头|响应报头|实体报头</p>
-<p>2.Accept代表发送端（客户端）希望接受的数据类型。<br>比如：Accept：text/xml;<br>代表客户端希望接受的数据类型是xml类型</p>
-<p>Content-Type代表发送端（客户端|服务器）发送的实体数据的数据类型。<br>比如：Content-Type：text/html;<br>代表发送端发送的数据格式是html。</p>
-<p>二者合起来，<br>Accept:text/xml；<br>Content-Type:text/html<br>即代表希望接受的数据类型是xml格式，本次请求发送的数据的数据格式是html。</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://zh.wikipedia.org/wiki/%E4%BA%92%E8%81%94%E7%BD%91%E5%AA%92%E4%BD%93%E7%B1%BB%E5%9E%8B" target="_blank" rel="noopener">https://zh.wikipedia.org/wiki/%E4%BA%92%E8%81%94%E7%BD%91%E5%AA%92%E4%BD%93%E7%B1%BB%E5%9E%8B</a></p>
+            <h1 id="种类"><a href="#种类" class="headerlink" title="种类:"></a>种类:</h1><ul>
+<li>随机 (Random)</li>
+<li>轮询 (RoundRobin)</li>
+<li>一致性哈希 (ConsistentHash)</li>
+<li>哈希 (Hash)</li>
+<li>加权（Weighted）</li>
+<li>最小连接数</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">public Server choose(Object key) &#123;</span><br><span class="line">    if (loadBalancerStats == null) &#123;</span><br><span class="line">        return super.choose(key);</span><br><span class="line">    &#125;</span><br><span class="line">    List&lt;Server&gt; serverList = getLoadBalancer().getAllServers(); // 获取所有的服务器列表</span><br><span class="line">    int minimalConcurrentConnections = Integer.MAX_VALUE;</span><br><span class="line">    long currentTime = System.currentTimeMillis();</span><br><span class="line">    Server chosen = null;</span><br><span class="line">    for (Server server: serverList) &#123; // 遍历每个服务器</span><br><span class="line">        ServerStats serverStats = loadBalancerStats.getSingleServerStat(server); // 获取各个服务器的状态</span><br><span class="line">        if (!serverStats.isCircuitBreakerTripped(currentTime)) &#123; // 没有触发断路器的话继续执行</span><br><span class="line">            int concurrentConnections = serverStats.getActiveRequestsCount(currentTime); // 获取当前服务器的请求个数</span><br><span class="line">            if (concurrentConnections &lt; minimalConcurrentConnections) &#123; // 比较各个服务器之间的请求数，然后选取请求数最少的服务器并放到chosen变量中</span><br><span class="line">                minimalConcurrentConnections = concurrentConnections;</span><br><span class="line">                chosen = server;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    if (chosen == null) &#123; // 如果没有选上，调用父类ClientConfigEnabledRoundRobinRule的choose方法，也就是使用RoundRobinRule轮询的方式进行负载均衡        </span><br><span class="line">        return super.choose(key);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        return chosen;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;public Server choose(Object key) &#123;</span><br></pre></td></tr></table></figure>
+<p>参考:<a href="http://blog.51cto.com/wangwx/72842" target="_blank" rel="noopener">http://blog.51cto.com/wangwx/72842</a></p>
 
           
         
@@ -1628,7 +1892,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/03/运维-测试/javassist-usage/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/05/java/java_thread/ScheduledExecutorService/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
@@ -1647,7 +1911,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/05/03/运维-测试/javassist-usage/" itemprop="url">javassist在easy-mapper和dubbo项目中的应用</a></h1>
+                <a class="post-title-link" href="/2018/06/05/java/java_thread/ScheduledExecutorService/" itemprop="url">ScheduledExecutorService</a></h1>
         
 
         <div class="post-meta">
@@ -1659,8 +1923,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-03T20:38:58+08:00">
-                2018-05-03
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-05T19:59:03+08:00">
+                2018-06-05
               </time>
             
 
@@ -1678,9 +1942,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/05/03/运维-测试/javassist-usage/#comments" itemprop="discussionUrl">
+                <a href="/2018/06/05/java/java_thread/ScheduledExecutorService/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/05/03/运维-测试/javassist-usage/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/06/05/java/java_thread/ScheduledExecutorService/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -1688,7 +1952,7 @@
 
           
           
-             <span id="/2018/05/03/运维-测试/javassist-usage/" class="leancloud_visitors" data-flag-title="javassist在easy-mapper和dubbo项目中的应用">
+             <span id="/2018/06/05/java/java_thread/ScheduledExecutorService/" class="leancloud_visitors" data-flag-title="ScheduledExecutorService">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -1721,183 +1985,39 @@
       
         
           
-            <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>Javassist是一个开源的分析、编辑和创建Java字节码的类库。是由东京工业大学的数学和计算机科学系的 Shigeru Chiba （千叶 滋）所创建的。它已加入了开放源代码JBoss 应用服务器项目,通过使用Javassist对字节码操作为JBoss实现动态”AOP”框架。</p>
-<p>Javassist的官方网站：<a href="http://jboss-javassist.github.io/javassist/" target="_blank" rel="noopener">http://jboss-javassist.github.io/javassist/</a><br>通过javasssit，我们可以：</p>
-<ul>
-<li>动态创建新类或新接口的二进制字节码</li>
-<li>动态扩展现有类或接口的二进制字节码(AOP)</li>
-</ul>
-<h1 id="入门程序"><a href="#入门程序" class="headerlink" title="入门程序"></a>入门程序</h1><h2 id="生成新的class"><a href="#生成新的class" class="headerlink" title="生成新的class"></a>生成新的class</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line">package com.example.demo.javassist;</span><br><span class="line"></span><br><span class="line">import java.lang.reflect.Constructor;</span><br><span class="line">import java.lang.reflect.Method;</span><br><span class="line">import javassist.ClassPool;</span><br><span class="line">import javassist.CtClass;</span><br><span class="line">import javassist.CtConstructor;</span><br><span class="line">import javassist.CtField;</span><br><span class="line">import javassist.CtMethod;</span><br><span class="line">import javassist.CtNewMethod;</span><br><span class="line">import javassist.Modifier;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * package com.tianshouzhi;</span><br><span class="line"> *</span><br><span class="line"> * public class User &#123;</span><br><span class="line"> *     private String name;</span><br><span class="line"> *</span><br><span class="line"> *     public User(String name) &#123;</span><br><span class="line"> *         this.name = name;</span><br><span class="line"> *     &#125;</span><br><span class="line"> *</span><br><span class="line"> *     public User() &#123;</span><br><span class="line"> *     &#125;</span><br><span class="line"> *</span><br><span class="line"> *     public String getName() &#123;</span><br><span class="line"> *         return name;</span><br><span class="line"> *     &#125;</span><br><span class="line"> *</span><br><span class="line"> *     public void setName(String name) &#123;</span><br><span class="line"> *         this.name = name;</span><br><span class="line"> *     &#125;</span><br><span class="line"> *</span><br><span class="line"> *     @Override</span><br><span class="line"> *     public String toString() &#123;</span><br><span class="line"> *         return &quot;name=&quot;+name;</span><br><span class="line"> *     &#125;</span><br><span class="line"> * &#125;</span><br><span class="line"> */</span><br><span class="line">public class UserGenerator &#123;</span><br><span class="line">  public static void main(String[] args) throws Exception &#123;</span><br><span class="line">    ClassPool classPool = ClassPool.getDefault();</span><br><span class="line">    //定义User类</span><br><span class="line">    CtClass ctClassUser = classPool.makeClass(&quot;com.tianshouzhi.User&quot;);</span><br><span class="line"></span><br><span class="line">    //定义name字段</span><br><span class="line">    CtClass fieldType = classPool.get(&quot;java.lang.String&quot;);//字段类型</span><br><span class="line">    String name = &quot;name&quot;;//字段名称</span><br><span class="line">    CtField ctFieldName=new CtField(fieldType, name,ctClassUser);</span><br><span class="line">    ctFieldName.setModifiers(Modifier.PRIVATE);//设置访问修饰符</span><br><span class="line">    ctClassUser.addField(ctFieldName, CtField.Initializer.constant(&quot;javasssit&quot;));//添加name字段，赋值为javassist</span><br><span class="line"></span><br><span class="line">    //定义构造方法</span><br><span class="line">    CtClass[] parameters = new CtClass[]&#123;classPool.get(&quot;java.lang.String&quot;)&#125;;//构造方法参数</span><br><span class="line">    CtConstructor constructor=new CtConstructor(parameters,ctClassUser);</span><br><span class="line">    String body = &quot;&#123;this.name=$1;&#125;&quot;;//方法体 $1表示的第一个参数</span><br><span class="line">    constructor.setBody(body);</span><br><span class="line">    ctClassUser.addConstructor(constructor);</span><br><span class="line"></span><br><span class="line">    //setName getName方法</span><br><span class="line">    ctClassUser.addMethod(CtNewMethod.setter(&quot;setName&quot;,ctFieldName));</span><br><span class="line">    ctClassUser.addMethod(CtNewMethod.getter(&quot;getName&quot;,ctFieldName));</span><br><span class="line"></span><br><span class="line">    //toString方法</span><br><span class="line">    CtClass returnType = classPool.get(&quot;java.lang.String&quot;);</span><br><span class="line">    String methodName = &quot;toString&quot;;</span><br><span class="line">    CtMethod toStringMethod=new CtMethod(returnType, methodName, null,ctClassUser);</span><br><span class="line">    toStringMethod.setModifiers(Modifier.PUBLIC);</span><br><span class="line">    String methodBody = &quot;&#123;return \&quot;name=\&quot;+$0.name;&#125;&quot;;//$0表示的是this</span><br><span class="line">    toStringMethod.setBody(methodBody);</span><br><span class="line">    ctClassUser.addMethod(toStringMethod);</span><br><span class="line"></span><br><span class="line">    //代表class文件的CtClass创建完成，现在将其转换成class对象</span><br><span class="line">    Class clazz = ctClassUser.toClass();</span><br><span class="line">    Constructor cons = clazz.getConstructor(String.class);</span><br><span class="line">    Object user = cons.newInstance(&quot;wangxiaoxiao&quot;);</span><br><span class="line">    Method toString = clazz.getMethod(&quot;toString&quot;);</span><br><span class="line">    System.out.println(toString.invoke(user));</span><br><span class="line"></span><br><span class="line">    ctClassUser.writeFile(&quot;.&quot;);//在当前目录下，生成com/tianshouzhi/User.class文件</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="修改class"><a href="#修改class" class="headerlink" title="修改class"></a>修改class</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">package com.example.demo.javassist;</span><br><span class="line"></span><br><span class="line">public class Looper &#123;</span><br><span class="line"></span><br><span class="line">  public void loop()&#123;</span><br><span class="line">    try &#123;</span><br><span class="line">      System.out.println(&quot;Looper.loop() invoked&quot;);</span><br><span class="line">      Thread.sleep(1000L);</span><br><span class="line">    &#125; catch (InterruptedException e) &#123;</span><br><span class="line">      e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>现在我们想统计Looper的loop方法的耗时时间。最简单的思路是使用javassist修改loop方法的源码：</p>
-<p>在最前加入：long start=System.currentTimeMillis();</p>
-<p>在最后插入：System.out.println(“耗时:”+(System.currentTimeMillis()-start)+”ms”);</p>
-<p>将原有的loop方法名改为loop$impl，然后再定义一个loop方法，新的loop方法内部会调用loop$impl，在调用之前和调用之后分别加入上述的代码片段。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">package com.example.demo.javassist;</span><br><span class="line"></span><br><span class="line">import javassist.ClassPool;</span><br><span class="line">import javassist.CtClass;</span><br><span class="line">import javassist.CtMethod;</span><br><span class="line">import javassist.CtNewMethod;</span><br><span class="line"></span><br><span class="line">public class JavassisTiming &#123;</span><br><span class="line">  public static void main(String[] args) throws Exception&#123;</span><br><span class="line">    //需要修改的已有的类名和方法名</span><br><span class="line">    String className=&quot;com.example.demo.javassist.Looper&quot;;</span><br><span class="line">    String methodName=&quot;loop&quot;;</span><br><span class="line"></span><br><span class="line">    //修改为原有类的方法名为loop$impl</span><br><span class="line">    CtClass clazz = ClassPool.getDefault().get(className);</span><br><span class="line">    CtMethod method = clazz.getDeclaredMethod(methodName);</span><br><span class="line">    String newname = methodName + &quot;$impl&quot;;</span><br><span class="line">    method.setName(newname);</span><br><span class="line"></span><br><span class="line">    //使用原始方法名loop，定义一个新方法，在这个方法内部调用loop$impl</span><br><span class="line">    CtMethod newMethod = CtNewMethod.make(&quot;public void &quot;+methodName+&quot;()&#123;&quot; +</span><br><span class="line">            &quot;long start=System.currentTimeMillis();&quot; +</span><br><span class="line">            &quot;&quot;+newname+&quot;();&quot; +//调用loop$impl</span><br><span class="line">            &quot;System.out.println(\&quot;耗时:\&quot;+(System.currentTimeMillis()-start)+\&quot;ms\&quot;);&quot; +</span><br><span class="line">            &quot;&#125;&quot;</span><br><span class="line">        , clazz);</span><br><span class="line">    clazz.addMethod(newMethod);</span><br><span class="line"></span><br><span class="line">    //调用修改的Looper类的loop方法</span><br><span class="line">    Looper looper = (Looper) clazz.toClass().newInstance();</span><br><span class="line">    looper.loop();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h2 id="aop"><a href="#aop" class="headerlink" title="aop"></a>aop</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">package com.example.demo.javassist;</span><br><span class="line"></span><br><span class="line">import javassist.ClassPool;</span><br><span class="line">import javassist.CtClass;</span><br><span class="line">import javassist.CtMethod;</span><br><span class="line">import javassist.CtNewMethod;</span><br><span class="line"></span><br><span class="line">public class JavassisTiming &#123;</span><br><span class="line">  public static void main(String[] args) throws Exception&#123;</span><br><span class="line">    //需要修改的已有的类名和方法名</span><br><span class="line">    String className=&quot;com.example.demo.javassist.Looper&quot;;</span><br><span class="line">    String methodName=&quot;loop&quot;;</span><br><span class="line"></span><br><span class="line">    //修改为原有类的方法名为loop$impl</span><br><span class="line">    CtClass clazz = ClassPool.getDefault().get(className);</span><br><span class="line">    CtMethod method = clazz.getDeclaredMethod(methodName);</span><br><span class="line">    String newname = methodName + &quot;$impl&quot;;</span><br><span class="line">    method.setName(newname);</span><br><span class="line"></span><br><span class="line">    //使用原始方法名loop，定义一个新方法，在这个方法内部调用loop$impl</span><br><span class="line">    CtMethod newMethod = CtNewMethod.make(&quot;public void &quot;+methodName+&quot;()&#123;&quot; +</span><br><span class="line">            &quot;long start=System.currentTimeMillis();&quot; +</span><br><span class="line">            &quot;&quot;+newname+&quot;();&quot; +//调用loop$impl</span><br><span class="line">            &quot;System.out.println(\&quot;耗时:\&quot;+(System.currentTimeMillis()-start)+\&quot;ms\&quot;);&quot; +</span><br><span class="line">            &quot;&#125;&quot;</span><br><span class="line">        , clazz);</span><br><span class="line">    clazz.addMethod(newMethod);</span><br><span class="line"></span><br><span class="line">    //调用修改的Looper类的loop方法</span><br><span class="line">    Looper looper = (Looper) clazz.toClass().newInstance();</span><br><span class="line">    looper.loop();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h1 id="Javassist在easy-mapper中的应用"><a href="#Javassist在easy-mapper中的应用" class="headerlink" title="Javassist在easy-mapper中的应用"></a>Javassist在easy-mapper中的应用</h1><p>使用Javassist字节码增强技术，在运行时动态生成mapping过程的源代码</p>
-<p>类似的组件:</p>
-<ul>
-<li>Apache PropertyUtils</li>
-<li>Apache BeanUtils</li>
-<li>Cglib BeanCopier</li>
-<li>Spring BeanUtils</li>
-<li>Dozer</li>
-</ul>
-<p>教程:<br><a href="http://neoremind.com/2016/08/easy-mapper-%E4%B8%80%E4%B8%AA%E7%81%B5%E6%B4%BB%E5%8F%AF%E6%89%A9%E5%B1%95%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BDbean-mapping%E7%B1%BB%E5%BA%93/" target="_blank" rel="noopener">http://neoremind.com/2016/08/easy-mapper-%E4%B8%80%E4%B8%AA%E7%81%B5%E6%B4%BB%E5%8F%AF%E6%89%A9%E5%B1%95%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BDbean-mapping%E7%B1%BB%E5%BA%93/</a></p>
-<p>github地址:<br><a href="https://github.com/neoremind/easy-mapper" target="_blank" rel="noopener">https://github.com/neoremind/easy-mapper</a></p>
-<h2 id="生成的java文件"><a href="#生成的java文件" class="headerlink" title="生成的java文件"></a>生成的java文件</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">package com.baidu.unbiz.generated</span><br><span class="line"></span><br><span class="line">public class EasyMapper_AlgorithmBaseEntity_TO_FullAlgorithmEntity_Mapper23487587931824$1 extends GeneratedMapperBase &#123;</span><br><span class="line">	public void map(java.lang.Object a, java.lang.Object b) &#123;</span><br><span class="line"></span><br><span class="line">com.talkingdata.opal.algorithm.entity.AlgorithmBaseEntity source = ((com.talkingdata.opal.algorithm.entity.AlgorithmBaseEntity)a);</span><br><span class="line">com.talkingdata.opal.algorithm.entity.request.FullAlgorithmEntity destination = ((com.talkingdata.opal.algorithm.entity.request.FullAlgorithmEntity)b);</span><br><span class="line">if ( !(((java.lang.String)source.getDataset()) == null))&#123; </span><br><span class="line">destination.setDataset(((java.lang.String)source.getDataset())); </span><br><span class="line">&#125;</span><br><span class="line">if ( !(((java.lang.String)source.getId()) == null))&#123; </span><br><span class="line">destination.setId(((java.lang.String)source.getId())); </span><br><span class="line">&#125;</span><br><span class="line">if ( !(((java.lang.String)source.getIssId()) == null))&#123; </span><br><span class="line">destination.setIssId(((java.lang.String)source.getIssId())); </span><br><span class="line">&#125;</span><br><span class="line">if ( !(((java.lang.String)source.getLang()) == null))&#123; </span><br><span class="line">destination.setLang(((java.lang.String)source.getLang())); </span><br><span class="line">&#125;</span><br><span class="line">if ( !(((java.lang.String)source.getLangVersion()) == null))&#123; </span><br><span class="line">destination.setLangVersion(((java.lang.String)source.getLangVersion())); </span><br><span class="line">&#125;</span><br><span class="line">if ( !(((java.lang.Integer)source.getStatus()) == null))&#123; </span><br><span class="line">destination.setStatus(((java.lang.Integer)source.getStatus())); </span><br><span class="line">&#125;</span><br><span class="line">if ( !(((java.lang.String)source.getTitle()) == null))&#123; </span><br><span class="line">destination.setTitle(((java.lang.String)source.getTitle())); </span><br><span class="line">&#125;</span><br><span class="line">		if(customMapping != null) &#123; </span><br><span class="line">			 customMapping.map(source, destination);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="调用javassist的代码"><a href="#调用javassist的代码" class="headerlink" title="调用javassist的代码:"></a>调用javassist的代码:</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">public Class&lt;?&gt; compileClass(SourceCodeContext sourceCode) throws MappingCodeGenerationException &#123;</span><br><span class="line">        StringBuilder className = new StringBuilder(sourceCode.getClassName());</span><br><span class="line">        //二进制class</span><br><span class="line">        CtClass byteCodeClass = classPool.makeClass(className.toString());</span><br><span class="line"></span><br><span class="line">        Class&lt;?&gt; compiledClass;</span><br><span class="line">        try &#123;</span><br><span class="line">            writeSourceFile(sourceCode);</span><br><span class="line">            CtClass abstractMapperClass = classPool.get(sourceCode.getSuperClass().getCanonicalName());</span><br><span class="line">            //父类</span><br><span class="line">            byteCodeClass.setSuperclass(abstractMapperClass);</span><br><span class="line"></span><br><span class="line">            for (String fieldDef : sourceCode.getFields()) &#123;</span><br><span class="line">                try &#123;</span><br><span class="line">                    //字段</span><br><span class="line">                    byteCodeClass.addField(CtField.make(fieldDef, byteCodeClass));</span><br><span class="line">                &#125; catch (CannotCompileException e) &#123;</span><br><span class="line">                    LOGGER.error(</span><br><span class="line">                            &quot;An exception occurred while compiling: &quot; + fieldDef + &quot; for &quot; + sourceCode.getClassName(),</span><br><span class="line">                            e);</span><br><span class="line">                    throw e;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            for (String methodDef : sourceCode.getMethods()) &#123;</span><br><span class="line">                try &#123;</span><br><span class="line">                    //方法</span><br><span class="line">                    byteCodeClass.addMethod(CtNewMethod.make(methodDef, byteCodeClass));</span><br><span class="line">                &#125; catch (CannotCompileException e) &#123;</span><br><span class="line">                    LOGGER.error(</span><br><span class="line">                            &quot;An exception occurred while compiling the following method:\n\n &quot; + methodDef + &quot;\n\n for &quot;</span><br><span class="line">                                    + sourceCode.getClassName() + &quot;\n&quot;, e);</span><br><span class="line">                    throw e;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            compiledClass = byteCodeClass.toClass(Thread.currentThread().getContextClassLoader(),</span><br><span class="line">                    this.getClass().getProtectionDomain());</span><br><span class="line"></span><br><span class="line">            writeClassFile(byteCodeClass);</span><br><span class="line">        &#125; catch (CannotCompileException e) &#123;</span><br><span class="line">            throw new MappingCodeGenerationException(</span><br><span class="line">                    String.format(&quot;Failed to compile class %s, reason is %s&quot;, className, e.getMessage()), e);</span><br><span class="line">        &#125; catch (NotFoundException e) &#123;</span><br><span class="line">            throw new MappingCodeGenerationException(</span><br><span class="line">                    String.format(&quot;Failed to compile class %s, reason is %s&quot;, className, e.getMessage()), e);</span><br><span class="line">        &#125;</span><br><span class="line">        return compiledClass;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<h1 id="Javassist在dubbo中的应用"><a href="#Javassist在dubbo中的应用" class="headerlink" title="Javassist在dubbo中的应用"></a>Javassist在dubbo中的应用</h1><h2 id="生成代理"><a href="#生成代理" class="headerlink" title="生成代理"></a>生成代理</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&quot;main@1&quot; prio=5 tid=0x1 nid=NA runnable</span><br><span class="line">  java.lang.Thread.State: RUNNABLE</span><br><span class="line">	  at com.alibaba.dubbo.common.bytecode.ClassGenerator.toClass(ClassGenerator.java:260)</span><br><span class="line">	  at com.alibaba.dubbo.common.bytecode.ClassGenerator.toClass(ClassGenerator.java:256)</span><br><span class="line">	  at com.alibaba.dubbo.common.bytecode.Wrapper.makeWrapper(Wrapper.java:237)</span><br><span class="line">	  at com.alibaba.dubbo.common.bytecode.Wrapper.getWrapper(Wrapper.java:99)</span><br><span class="line">	  at com.alibaba.dubbo.config.ServiceConfig.doExportUrlsFor1Protocol(ServiceConfig.java:444)</span><br><span class="line">	  at com.alibaba.dubbo.config.ServiceConfig.doExportUrls(ServiceConfig.java:357)</span><br><span class="line">	  at com.alibaba.dubbo.config.ServiceConfig.doExport(ServiceConfig.java:316)</span><br><span class="line">	  - locked &lt;0x7c0&gt; (a com.alibaba.dubbo.config.spring.ServiceBean)</span><br><span class="line">	  at com.alibaba.dubbo.config.ServiceConfig.export(ServiceConfig.java:215)</span><br><span class="line">	  at com.alibaba.dubbo.config.spring.ServiceBean.onApplicationEvent(ServiceBean.java:121)</span><br><span class="line">	  at com.alibaba.dubbo.config.spring.ServiceBean.onApplicationEvent(ServiceBean.java:50)</span><br><span class="line">	  at org.springframework.context.event.SimpleApplicationEventMulticaster.invokeListener(SimpleApplicationEventMulticaster.java:167)</span><br><span class="line">	  at org.springframework.context.event.SimpleApplicationEventMulticaster.multicastEvent(SimpleApplicationEventMulticaster.java:139)</span><br><span class="line">	  at org.springframework.context.support.AbstractApplicationContext.publishEvent(AbstractApplicationContext.java:393)</span><br><span class="line">	  at org.springframework.context.support.AbstractApplicationContext.publishEvent(AbstractApplicationContext.java:347)</span><br><span class="line">	  at org.springframework.context.support.AbstractApplicationContext.finishRefresh(AbstractApplicationContext.java:883)</span><br><span class="line">	  at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:546)</span><br><span class="line">	  - locked &lt;0x859&gt; (a java.lang.Object)</span><br><span class="line">	  at org.springframework.context.support.ClassPathXmlApplicationContext.&lt;init&gt;(ClassPathXmlApplicationContext.java:139)</span><br><span class="line">	  at org.springframework.context.support.ClassPathXmlApplicationContext.&lt;init&gt;(ClassPathXmlApplicationContext.java:93)</span><br><span class="line">	  at com.alibaba.dubbo.demo.provider.Provider.main(Provider.java:27)</span><br></pre></td></tr></table></figure>
-<h2 id="代理工厂"><a href="#代理工厂" class="headerlink" title="代理工厂"></a>代理工厂</h2><h3 id="接口"><a href="#接口" class="headerlink" title="接口"></a>接口</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">@SPI(&quot;javassist&quot;)</span><br><span class="line">public interface ProxyFactory &#123;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * create proxy.</span><br><span class="line">     *</span><br><span class="line">     * @param invoker</span><br><span class="line">     * @return proxy</span><br><span class="line">     */</span><br><span class="line">    @Adaptive(&#123;Constants.PROXY_KEY&#125;)</span><br><span class="line">    &lt;T&gt; T getProxy(Invoker&lt;T&gt; invoker) throws RpcException;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * create invoker.</span><br><span class="line">     *</span><br><span class="line">     * @param &lt;T&gt;</span><br><span class="line">     * @param proxy</span><br><span class="line">     * @param type</span><br><span class="line">     * @param url</span><br><span class="line">     * @return invoker</span><br><span class="line">     */</span><br><span class="line">    @Adaptive(&#123;Constants.PROXY_KEY&#125;)</span><br><span class="line">    &lt;T&gt; Invoker&lt;T&gt; getInvoker(T proxy, Class&lt;T&gt; type, URL url) throws RpcException;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">public class JavassistProxyFactory extends AbstractProxyFactory &#123;</span><br><span class="line"></span><br><span class="line">    @SuppressWarnings(&quot;unchecked&quot;)</span><br><span class="line">    public &lt;T&gt; T getProxy(Invoker&lt;T&gt; invoker, Class&lt;?&gt;[] interfaces) &#123;</span><br><span class="line">        return (T) Proxy.getProxy(interfaces).newInstance(new InvokerInvocationHandler(invoker));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public &lt;T&gt; Invoker&lt;T&gt; getInvoker(T proxy, Class&lt;T&gt; type, URL url) &#123;</span><br><span class="line">        // TODO Wrapper cannot handle this scenario correctly: the classname contains &apos;$&apos;</span><br><span class="line">        final Wrapper wrapper = Wrapper.getWrapper(proxy.getClass().getName().indexOf(&apos;$&apos;) &lt; 0 ? proxy.getClass() : type);</span><br><span class="line">        return new AbstractProxyInvoker&lt;T&gt;(proxy, type, url) &#123;</span><br><span class="line">            @Override</span><br><span class="line">            protected Object doInvoke(T proxy, String methodName,</span><br><span class="line">                                      Class&lt;?&gt;[] parameterTypes,</span><br><span class="line">                                      Object[] arguments) throws Throwable &#123;</span><br><span class="line">                return wrapper.invokeMethod(proxy, methodName, parameterTypes, arguments);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="实际生成的代码"><a href="#实际生成的代码" class="headerlink" title="实际生成的代码:"></a>实际生成的代码:</h2><p>修改源码,在生成字节码文件的时候,也输出至当前目录<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Class aClass = mCtc.toClass(loader, pd);</span><br><span class="line">try &#123;</span><br><span class="line">    mCtc.writeFile(&quot;.&quot;);//在当前目录下</span><br><span class="line">&#125; catch (IOException e) &#123;</span><br><span class="line">    e.printStackTrace();</span><br><span class="line">&#125;</span><br><span class="line">return aClass;</span><br></pre></td></tr></table></figure></p>
-<p>Warpper0.class文件内容如下:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><span class="line">//</span><br><span class="line">// Source code recreated from a .class file by IntelliJ IDEA</span><br><span class="line">// (powered by Fernflower decompiler)</span><br><span class="line">//</span><br><span class="line"></span><br><span class="line">package com.alibaba.dubbo.common.bytecode;</span><br><span class="line"></span><br><span class="line">import com.alibaba.dubbo.common.bytecode.ClassGenerator.DC;</span><br><span class="line">import com.alibaba.dubbo.demo.DemoService;</span><br><span class="line">import java.lang.reflect.InvocationTargetException;</span><br><span class="line">import java.util.Map;</span><br><span class="line"></span><br><span class="line">public class Wrapper0 extends Wrapper implements DC &#123;</span><br><span class="line">  public static String[] pns;</span><br><span class="line">  public static Map pts;</span><br><span class="line">  public static String[] mns;</span><br><span class="line">  public static String[] dmns;</span><br><span class="line">  public static Class[] mts0;</span><br><span class="line"></span><br><span class="line">  public String[] getPropertyNames() &#123;</span><br><span class="line">    return pns;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public boolean hasProperty(String var1) &#123;</span><br><span class="line">    return pts.containsKey(var1);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public Class getPropertyType(String var1) &#123;</span><br><span class="line">    return (Class)pts.get(var1);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public String[] getMethodNames() &#123;</span><br><span class="line">    return mns;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public String[] getDeclaredMethodNames() &#123;</span><br><span class="line">    return dmns;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public void setPropertyValue(Object var1, String var2, Object var3) &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">      DemoService var4 = (DemoService)var1;</span><br><span class="line">    &#125; catch (Throwable var6) &#123;</span><br><span class="line">      throw new IllegalArgumentException(var6);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    throw new NoSuchPropertyException(&quot;Not found property \&quot;&quot; + var2 + &quot;\&quot; filed or setter method in class com.alibaba.dubbo.demo.DemoService.&quot;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public Object getPropertyValue(Object var1, String var2) &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">      DemoService var3 = (DemoService)var1;</span><br><span class="line">    &#125; catch (Throwable var5) &#123;</span><br><span class="line">      throw new IllegalArgumentException(var5);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    throw new NoSuchPropertyException(&quot;Not found property \&quot;&quot; + var2 + &quot;\&quot; filed or setter method in class com.alibaba.dubbo.demo.DemoService.&quot;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public Object invokeMethod(Object var1, String var2, Class[] var3, Object[] var4) throws InvocationTargetException &#123;</span><br><span class="line">    DemoService var5;</span><br><span class="line">    try &#123;</span><br><span class="line">      var5 = (DemoService)var1;</span><br><span class="line">    &#125; catch (Throwable var8) &#123;</span><br><span class="line">      throw new IllegalArgumentException(var8);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    try &#123;</span><br><span class="line">      if (&quot;sayHello&quot;.equals(var2) &amp;&amp; var3.length == 1) &#123;</span><br><span class="line">        return var5.sayHello((String)var4[0]);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; catch (Throwable var9) &#123;</span><br><span class="line">      throw new InvocationTargetException(var9);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    throw new NoSuchMethodException(&quot;Not found method \&quot;&quot; + var2 + &quot;\&quot; in class com.alibaba.dubbo.demo.DemoService.&quot;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public Wrapper0() &#123;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h1 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h1><p><a href="http://www.tianshouzhi.com/api/tutorials/bytecode/354" target="_blank" rel="noopener">http://www.tianshouzhi.com/api/tutorials/bytecode/354</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/03/java/JSR-303-bean-validation/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/05/03/java/JSR-303-bean-validation/" itemprop="url">JSR-303-bean-validation</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-03T10:20:38+08:00">
-                2018-05-03
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/05/03/java/JSR-303-bean-validation/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/05/03/java/JSR-303-bean-validation/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/05/03/java/JSR-303-bean-validation/" class="leancloud_visitors" data-flag-title="JSR-303-bean-validation">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="关于-Bean-Validation"><a href="#关于-Bean-Validation" class="headerlink" title="关于 Bean Validation"></a>关于 Bean Validation</h1><p>在任何时候，当你要处理一个应用程序的业务逻辑，数据校验是你必须要考虑和面对的事情。应用程序必须通过某种手段来确保输入进来的数据从语义上来讲是正确的。在通常的情况下，应用程序是分层的，不同的层由不同的开发人员来完成。很多时候同样的数据验证逻辑会出现在不同的层，这样就会导致代码冗余和一些管理的问题，比如说语义的一致性等。为了避免这样的情况发生，最好是将验证逻辑与相应的域模型进行绑定。</p>
-<p>Bean Validation 为 JavaBean 验证定义了相应的元数据模型和 API。缺省的元数据是 Java Annotations，通过使用 XML 可以对原有的元数据信息进行覆盖和扩展。在应用程序中，通过使用 Bean Validation 或是你自己定义的 constraint，例如 @NotNull, @Max, @ZipCode， 就可以确保数据模型（JavaBean）的正确性。constraint 可以附加到字段，getter 方法，类或者接口上面。对于一些特定的需求，用户可以很容易的开发定制化的 constraint。Bean Validation 是一个运行时的数据验证框架，在验证之后验证的错误信息会被马上返回。</p>
-<p>下载 JSR 303 – Bean Validation 规范 <a href="http://jcp.org/en/jsr/detail?id=303" target="_blank" rel="noopener">http://jcp.org/en/jsr/detail?id=303</a></p>
-<p>Hibernate Validator 是 Bean Validation 的参考实现 . Hibernate Validator 提供了 JSR 303 规范中所有内置 constraint 的实现，除此之外还有一些附加的 constraint。如果想了解更多有关 Hibernate Validator 的信息，请查看 <a href="http://www.hibernate.org/subprojects/validator.html" target="_blank" rel="noopener">http://www.hibernate.org/subprojects/validator.html</a></p>
+            <h1 id="官网api"><a href="#官网api" class="headerlink" title="官网api"></a>官网api</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line"> * ORACLE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.</span><br><span class="line"> *</span><br><span class="line"> * Written by Doug Lea with assistance from members of JCP JSR-166</span><br><span class="line"> * Expert Group and released to the public domain, as explained at</span><br><span class="line"> * http://creativecommons.org/publicdomain/zero/1.0/</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">package java.util.concurrent;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * An &#123;@link ExecutorService&#125; that can schedule commands to run after a given</span><br><span class="line"> * delay, or to execute periodically.</span><br><span class="line"> *</span><br><span class="line"> * &lt;p&gt;The &#123;@code schedule&#125; methods create tasks with various delays</span><br><span class="line"> * and return a task object that can be used to cancel or check</span><br><span class="line"> * execution. The &#123;@code scheduleAtFixedRate&#125; and</span><br><span class="line"> * &#123;@code scheduleWithFixedDelay&#125; methods create and execute tasks</span><br><span class="line"> * that run periodically until cancelled.</span><br><span class="line"> *</span><br><span class="line"> * &lt;p&gt;Commands submitted using the &#123;@link Executor#execute(Runnable)&#125;</span><br><span class="line"> * and &#123;@link ExecutorService&#125; &#123;@code submit&#125; methods are scheduled</span><br><span class="line"> * with a requested delay of zero. Zero and negative delays (but not</span><br><span class="line"> * periods) are also allowed in &#123;@code schedule&#125; methods, and are</span><br><span class="line"> * treated as requests for immediate execution.</span><br><span class="line"> *</span><br><span class="line"> * &lt;p&gt;All &#123;@code schedule&#125; methods accept &lt;em&gt;relative&lt;/em&gt; delays and</span><br><span class="line"> * periods as arguments, not absolute times or dates. It is a simple</span><br><span class="line"> * matter to transform an absolute time represented as a &#123;@link</span><br><span class="line"> * java.util.Date&#125; to the required form. For example, to schedule at</span><br><span class="line"> * a certain future &#123;@code date&#125;, you can use: &#123;@code schedule(task,</span><br><span class="line"> * date.getTime() - System.currentTimeMillis(),</span><br><span class="line"> * TimeUnit.MILLISECONDS)&#125;. Beware however that expiration of a</span><br><span class="line"> * relative delay need not coincide with the current &#123;@code Date&#125; at</span><br><span class="line"> * which the task is enabled due to network time synchronization</span><br><span class="line"> * protocols, clock drift, or other factors.</span><br><span class="line"> *</span><br><span class="line"> * &lt;p&gt;The &#123;@link Executors&#125; class provides convenient factory methods for</span><br><span class="line"> * the ScheduledExecutorService implementations provided in this package.</span><br><span class="line"> *</span><br><span class="line"> * &lt;h3&gt;Usage Example&lt;/h3&gt;</span><br><span class="line"> *</span><br><span class="line"> * Here is a class with a method that sets up a ScheduledExecutorService</span><br><span class="line"> * to beep every ten seconds for an hour:</span><br><span class="line"> *</span><br><span class="line"> *  &lt;pre&gt; &#123;@code</span><br><span class="line"> * import static java.util.concurrent.TimeUnit.*;</span><br><span class="line"> * class BeeperControl &#123;</span><br><span class="line"> *   private final ScheduledExecutorService scheduler =</span><br><span class="line"> *     Executors.newScheduledThreadPool(1);</span><br><span class="line"> *</span><br><span class="line"> *   public void beepForAnHour() &#123;</span><br><span class="line"> *     final Runnable beeper = new Runnable() &#123;</span><br><span class="line"> *       public void run() &#123; System.out.println(&quot;beep&quot;); &#125;</span><br><span class="line"> *     &#125;;</span><br><span class="line"> *     final ScheduledFuture&lt;?&gt; beeperHandle =</span><br><span class="line"> *       scheduler.scheduleAtFixedRate(beeper, 10, 10, SECONDS);</span><br><span class="line"> *     scheduler.schedule(new Runnable() &#123;</span><br><span class="line"> *       public void run() &#123; beeperHandle.cancel(true); &#125;</span><br><span class="line"> *     &#125;, 60 * 60, SECONDS);</span><br><span class="line"> *   &#125;</span><br><span class="line"> * &#125;&#125;&lt;/pre&gt;</span><br><span class="line"> *</span><br><span class="line"> * @since 1.5</span><br><span class="line"> * @author Doug Lea</span><br><span class="line"> */</span><br><span class="line">public interface ScheduledExecutorService extends ExecutorService &#123;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Creates and executes a one-shot action that becomes enabled</span><br><span class="line">     * after the given delay.</span><br><span class="line">     *</span><br><span class="line">     * @param command the task to execute</span><br><span class="line">     * @param delay the time from now to delay execution</span><br><span class="line">     * @param unit the time unit of the delay parameter</span><br><span class="line">     * @return a ScheduledFuture representing pending completion of</span><br><span class="line">     *         the task and whose &#123;@code get()&#125; method will return</span><br><span class="line">     *         &#123;@code null&#125; upon completion</span><br><span class="line">     * @throws RejectedExecutionException if the task cannot be</span><br><span class="line">     *         scheduled for execution</span><br><span class="line">     * @throws NullPointerException if command is null</span><br><span class="line">     */</span><br><span class="line">    public ScheduledFuture&lt;?&gt; schedule(Runnable command,</span><br><span class="line">                                       long delay, TimeUnit unit);</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Creates and executes a ScheduledFuture that becomes enabled after the</span><br><span class="line">     * given delay.</span><br><span class="line">     *</span><br><span class="line">     * @param callable the function to execute</span><br><span class="line">     * @param delay the time from now to delay execution</span><br><span class="line">     * @param unit the time unit of the delay parameter</span><br><span class="line">     * @param &lt;V&gt; the type of the callable&apos;s result</span><br><span class="line">     * @return a ScheduledFuture that can be used to extract result or cancel</span><br><span class="line">     * @throws RejectedExecutionException if the task cannot be</span><br><span class="line">     *         scheduled for execution</span><br><span class="line">     * @throws NullPointerException if callable is null</span><br><span class="line">     */</span><br><span class="line">    public &lt;V&gt; ScheduledFuture&lt;V&gt; schedule(Callable&lt;V&gt; callable,</span><br><span class="line">                                           long delay, TimeUnit unit);</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Creates and executes a periodic action that becomes enabled first</span><br><span class="line">     * after the given initial delay, and subsequently with the given</span><br><span class="line">     * period; that is executions will commence after</span><br><span class="line">     * &#123;@code initialDelay&#125; then &#123;@code initialDelay+period&#125;, then</span><br><span class="line">     * &#123;@code initialDelay + 2 * period&#125;, and so on.</span><br><span class="line">     * If any execution of the task</span><br><span class="line">     * encounters an exception, subsequent executions are suppressed.</span><br><span class="line">     * Otherwise, the task will only terminate via cancellation or</span><br><span class="line">     * termination of the executor.  If any execution of this task</span><br><span class="line">     * takes longer than its period, then subsequent executions</span><br><span class="line">     * may start late, but will not concurrently execute.</span><br><span class="line">     *</span><br><span class="line">     * @param command the task to execute</span><br><span class="line">     * @param initialDelay the time to delay first execution</span><br><span class="line">     * @param period the period between successive executions</span><br><span class="line">     * @param unit the time unit of the initialDelay and period parameters</span><br><span class="line">     * @return a ScheduledFuture representing pending completion of</span><br><span class="line">     *         the task, and whose &#123;@code get()&#125; method will throw an</span><br><span class="line">     *         exception upon cancellation</span><br><span class="line">     * @throws RejectedExecutionException if the task cannot be</span><br><span class="line">     *         scheduled for execution</span><br><span class="line">     * @throws NullPointerException if command is null</span><br><span class="line">     * @throws IllegalArgumentException if period less than or equal to zero</span><br><span class="line">     */</span><br><span class="line">    public ScheduledFuture&lt;?&gt; scheduleAtFixedRate(Runnable command,</span><br><span class="line">                                                  long initialDelay,</span><br><span class="line">                                                  long period,</span><br><span class="line">                                                  TimeUnit unit);</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Creates and executes a periodic action that becomes enabled first</span><br><span class="line">     * after the given initial delay, and subsequently with the</span><br><span class="line">     * given delay between the termination of one execution and the</span><br><span class="line">     * commencement of the next.  If any execution of the task</span><br><span class="line">     * encounters an exception, subsequent executions are suppressed.</span><br><span class="line">     * Otherwise, the task will only terminate via cancellation or</span><br><span class="line">     * termination of the executor.</span><br><span class="line">     *</span><br><span class="line">     * @param command the task to execute</span><br><span class="line">     * @param initialDelay the time to delay first execution</span><br><span class="line">     * @param delay the delay between the termination of one</span><br><span class="line">     * execution and the commencement of the next</span><br><span class="line">     * @param unit the time unit of the initialDelay and delay parameters</span><br><span class="line">     * @return a ScheduledFuture representing pending completion of</span><br><span class="line">     *         the task, and whose &#123;@code get()&#125; method will throw an</span><br><span class="line">     *         exception upon cancellation</span><br><span class="line">     * @throws RejectedExecutionException if the task cannot be</span><br><span class="line">     *         scheduled for execution</span><br><span class="line">     * @throws NullPointerException if command is null</span><br><span class="line">     * @throws IllegalArgumentException if delay less than or equal to zero</span><br><span class="line">     */</span><br><span class="line">    public ScheduledFuture&lt;?&gt; scheduleWithFixedDelay(Runnable command,</span><br><span class="line">                                                     long initialDelay,</span><br><span class="line">                                                     long delay,</span><br><span class="line">                                                     TimeUnit unit);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="核心方法"><a href="#核心方法" class="headerlink" title="核心方法"></a>核心方法</h1><table>
+<thead>
+<tr>
+<th style="text-align:left">Method</th>
+<th style="text-align:left">Desc</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">schedule(Callable&lt;V&gt; callable, long delay, TimeUnit unit)</td>
+<td style="text-align:left">创建并执行在给定延迟后启用的 ScheduledFuture。</td>
+</tr>
+<tr>
+<td style="text-align:left">schedule(Runnable command, long delay, TimeUnit unit)</td>
+<td style="text-align:left">创建并执行在给定延迟后启用的一次性操作。</td>
+</tr>
+<tr>
+<td style="text-align:left">scheduleAtFixedRate(Runnable command, long initialDelay,long period, TimeUnitunit)</td>
+<td style="text-align:left">创建并执行一个在给定初始延迟后首次启用的定期操作，后续操作具有给定的周期；也就是将在 initialDelay 后开始执行，然后在initialDelay+period 后执行，接着在 initialDelay + 2 * period 后执行，依此类推。</td>
+</tr>
+<tr>
+<td style="text-align:left">scheduleWithFixedDelay(Runnable command, long initialDelay, long delay,TimeUnit unit)</td>
+<td style="text-align:left">创建并执行一个在给定初始延迟后首次启用的定期操作，随后，在每一次执行终止和下一次执行开始之间都存在给定的延迟。</td>
+</tr>
+</tbody>
+</table>
+<h1 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h1><h2 id="执行多个不同任务"><a href="#执行多个不同任务" class="headerlink" title="执行多个不同任务"></a>执行多个不同任务</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">public class ScheduledException &#123;</span><br><span class="line"></span><br><span class="line">    static class TaskA implements Runnable &#123;</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        public void run() &#123;</span><br><span class="line">            System.out.println(&quot;task A&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    static class TaskB implements Runnable &#123;</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        public void run() &#123;</span><br><span class="line">            System.out.println(&quot;task B&quot;);</span><br><span class="line">            throw new RuntimeException();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) throws InterruptedException &#123;</span><br><span class="line">        ScheduledExecutorService timer = Executors</span><br><span class="line">                .newSingleThreadScheduledExecutor();</span><br><span class="line">        timer.scheduleWithFixedDelay(new TaskA(), 0, 1, TimeUnit.SECONDS);</span><br><span class="line">        timer.scheduleWithFixedDelay(new TaskB(), 2, 1, TimeUnit.SECONDS);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="第二个任务就不会被第一个任务延迟了"><a href="#第二个任务就不会被第一个任务延迟了" class="headerlink" title="第二个任务就不会被第一个任务延迟了"></a>第二个任务就不会被第一个任务延迟了</h2><h2 id="任务取消"><a href="#任务取消" class="headerlink" title="任务取消"></a>任务取消</h2><p>单个定时任务的异常不会再导致整个定时任务被取消了，即使背后只有一个线程执行任务</p>
+<h2 id="coreSzie的作用"><a href="#coreSzie的作用" class="headerlink" title="coreSzie的作用??"></a>coreSzie的作用??</h2><h1 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h1><p><a href="https://blog.csdn.net/top_code/article/details/52180239" target="_blank" rel="noopener">https://blog.csdn.net/top_code/article/details/52180239</a></p>
+<p><a href="https://www.zybuluo.com/mikumikulch/note/713546" target="_blank" rel="noopener">https://www.zybuluo.com/mikumikulch/note/713546</a></p>
+<p><a href="https://www.zybuluo.com/mikumikulch/note/712598" target="_blank" rel="noopener">https://www.zybuluo.com/mikumikulch/note/712598</a></p>
+<p><a href="http://www.cnblogs.com/swiftma/p/6724894.html" target="_blank" rel="noopener">http://www.cnblogs.com/swiftma/p/6724894.html</a></p>
 
           
         
@@ -1937,7 +2057,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/19/">19</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/20/">20</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1983,7 +2103,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">186</span>
+                  <span class="site-state-item-count">196</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
