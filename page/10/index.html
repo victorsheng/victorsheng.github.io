@@ -326,6 +326,200 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/27/redis/redis-getall/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/27/redis/redis-getall/" itemprop="url">redis中获取全部的方法</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-27T13:07:36+08:00">
+                2018-03-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/redis/" itemprop="url" rel="index">
+                    <span itemprop="name">redis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/27/redis/redis-getall/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/03/27/redis/redis-getall/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/03/27/redis/redis-getall/" class="leancloud_visitors" data-flag-title="redis中获取全部的方法">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="String"><a href="#String" class="headerlink" title="String"></a>String</h1><h1 id="hash"><a href="#hash" class="headerlink" title="hash"></a>hash</h1><h2 id="HGETALL"><a href="#HGETALL" class="headerlink" title="HGETALL"></a>HGETALL</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; HSET people jack &quot;Jack Sparrow&quot;</span><br><span class="line">(integer) 1</span><br><span class="line"></span><br><span class="line">redis&gt; HSET people gump &quot;Forrest Gump&quot;</span><br><span class="line">(integer) 1</span><br><span class="line"></span><br><span class="line">redis&gt; HGETALL people</span><br><span class="line">1) &quot;jack&quot;          # 域(key)</span><br><span class="line">2) &quot;Jack Sparrow&quot;  # 值(value)</span><br><span class="line">3) &quot;gump&quot;</span><br><span class="line">4) &quot;Forrest Gump&quot;</span><br></pre></td></tr></table></figure>
+<h1 id="List-链表"><a href="#List-链表" class="headerlink" title="List(链表)"></a>List(链表)</h1><h2 id="LRANGE"><a href="#LRANGE" class="headerlink" title="LRANGE"></a>LRANGE</h2><p>LRANGE key start stop</p>
+<p>返回列表 key 中指定区间内的元素，区间以偏移量 start 和 stop 指定。</p>
+<p>下标(index)参数 start 和 stop 都以 0 为底，也就是说，以 0 表示列表的第一个元素，以 1 表示列表的第二个元素，以此类推。</p>
+<p>你也可以使用负数下标，以 -1 表示列表的最后一个元素， -2 表示列表的倒数第二个元素，以此类推。</p>
+<p>注意LRANGE命令和编程语言区间函数的区别</p>
+<p>假如你有一个包含一百个元素的列表，对该列表执行 LRANGE list 0 10 ，结果是一个包含11个元素的列表，这表明 stop 下标也在 LRANGE 命令的取值范围之内(闭区间)，这和某些语言的区间函数可能不一致，比如Ruby的 Range.new 、 Array#slice 和Python的 range() 函数。</p>
+<p>超出范围的下标</p>
+<p>超出范围的下标值不会引起错误。</p>
+<p>如果 start 下标比列表的最大下标 end ( LLEN list 减去 1 )还要大，那么 LRANGE 返回一个空列表。</p>
+<p>如果 stop 下标比 end 下标还要大，Redis将 stop 的值设置为 end 。</p>
+<p>时间复杂度:<br>O(S+N)， S 为偏移量 start ， N 为指定区间内元素的数量。<br>返回值:<br>一个列表，包含指定区间内的元素。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; RPUSH fp-language lisp</span><br><span class="line">(integer) 1</span><br><span class="line"></span><br><span class="line">redis&gt; LRANGE fp-language 0 0</span><br><span class="line">1) &quot;lisp&quot;</span><br><span class="line"></span><br><span class="line">redis&gt; RPUSH fp-language scheme</span><br><span class="line">(integer) 2</span><br><span class="line"></span><br><span class="line">redis&gt; LRANGE fp-language 0 1</span><br><span class="line">1) &quot;lisp&quot;</span><br><span class="line">2) &quot;scheme&quot;</span><br></pre></td></tr></table></figure>
+<h1 id="set"><a href="#set" class="headerlink" title="set"></a>set</h1><h2 id="SMEMBERS"><a href="#SMEMBERS" class="headerlink" title="SMEMBERS"></a>SMEMBERS</h2><p>SMEMBERS key</p>
+<p>返回集合 key 中的所有成员。</p>
+<p>不存在的 key 被视为空集合。</p>
+<p>时间复杂度:<br>O(N)， N 为集合的基数。<br>返回值:<br>集合中的所有成员。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"># key 不存在或集合为空</span><br><span class="line"></span><br><span class="line">redis&gt; EXISTS not_exists_key</span><br><span class="line">(integer) 0</span><br><span class="line"></span><br><span class="line">redis&gt; SMEMBERS not_exists_key</span><br><span class="line">(empty list or set)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 非空集合</span><br><span class="line"></span><br><span class="line">redis&gt; SADD language Ruby Python Clojure</span><br><span class="line">(integer) 3</span><br><span class="line"></span><br><span class="line">redis&gt; SMEMBERS language</span><br><span class="line">1) &quot;Python&quot;</span><br><span class="line">2) &quot;Ruby&quot;</span><br><span class="line">3) &quot;Clojure&quot;</span><br></pre></td></tr></table></figure>
+<h1 id="sortset"><a href="#sortset" class="headerlink" title="sortset"></a>sortset</h1><h2 id="ZRANGE"><a href="#ZRANGE" class="headerlink" title="ZRANGE"></a>ZRANGE</h2><p>返回有序集 key 中，指定区间内的成员。</p>
+<p>其中成员的位置按 score 值递增(从小到大)来排序。</p>
+<p>具有相同 score 值的成员按字典序(lexicographical order )来排列。</p>
+<p>如果你需要成员按 score 值递减(从大到小)来排列，请使用 ZREVRANGE 命令。</p>
+<p>下标参数 start 和 stop 都以 0 为底，也就是说，以 0 表示有序集第一个成员，以 1 表示有序集第二个成员，以此类推。<br>你也可以使用负数下标，以 -1 表示最后一个成员， -2 表示倒数第二个成员，以此类推。<br>超出范围的下标并不会引起错误。<br>比如说，当 start 的值比有序集的最大下标还要大，或是 start &gt; stop 时， ZRANGE 命令只是简单地返回一个空列表。<br>另一方面，假如 stop 参数的值比有序集的最大下标还要大，那么 Redis 将 stop 当作最大下标来处理。<br>可以通过使用 WITHSCORES 选项，来让成员和它的 score 值一并返回，返回列表以 value1,score1, …, valueN,scoreN 的格式表示。<br>客户端库可能会返回一些更复杂的数据类型，比如数组、元组等。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">redis &gt; ZRANGE salary 0 -1 WITHSCORES             # 显示整个有序集成员</span><br><span class="line">1) &quot;jack&quot;</span><br><span class="line">2) &quot;3500&quot;</span><br><span class="line">3) &quot;tom&quot;</span><br><span class="line">4) &quot;5000&quot;</span><br><span class="line">5) &quot;boss&quot;</span><br><span class="line">6) &quot;10086&quot;</span><br><span class="line"></span><br><span class="line">redis &gt; ZRANGE salary 1 2 WITHSCORES              # 显示有序集下标区间 1 至 2 的成员</span><br><span class="line">1) &quot;tom&quot;</span><br><span class="line">2) &quot;5000&quot;</span><br><span class="line">3) &quot;boss&quot;</span><br><span class="line">4) &quot;10086&quot;</span><br><span class="line"></span><br><span class="line">redis &gt; ZRANGE salary 0 200000 WITHSCORES         # 测试 end 下标超出最大下标时的情况</span><br><span class="line">1) &quot;jack&quot;</span><br><span class="line">2) &quot;3500&quot;</span><br><span class="line">3) &quot;tom&quot;</span><br><span class="line">4) &quot;5000&quot;</span><br><span class="line">5) &quot;boss&quot;</span><br><span class="line">6) &quot;10086&quot;</span><br><span class="line"></span><br><span class="line">redis &gt; ZRANGE salary 200000 3000000 WITHSCORES   # 测试当给定区间不存在于有序集时的情况</span><br><span class="line">(empty list or set)</span><br></pre></td></tr></table></figure>
+<h2 id="ZRANGEBYSCORE"><a href="#ZRANGEBYSCORE" class="headerlink" title="ZRANGEBYSCORE"></a>ZRANGEBYSCORE</h2><p>ZRANGEBYSCORE key min max [WITHSCORES] [LIMIT offset count]</p>
+<p>返回有序集 key 中，所有 score 值介于 min 和 max 之间(包括等于 min 或 max )的成员。有序集成员按 score 值递增(从小到大)次序排列。</p>
+<p>具有相同 score 值的成员按字典序(lexicographical order)来排列(该属性是有序集提供的，不需要额外的计算)。</p>
+<p>可选的 LIMIT 参数指定返回结果的数量及区间(就像SQL中的 SELECT LIMIT offset, count )，注意当 offset 很大时，定位 offset 的操作可能需要遍历整个有序集，此过程最坏复杂度为 O(N) 时间。</p>
+<p>可选的 WITHSCORES 参数决定结果集是单单返回有序集的成员，还是将有序集成员及其 score 值一起返回。<br>该选项自 Redis 2.0 版本起可用。<br>区间及无限</p>
+<p>min 和 max 可以是 -inf 和 +inf ，这样一来，你就可以在不知道有序集的最低和最高 score 值的情况下，使用 ZRANGEBYSCORE 这类命令。</p>
+<p>默认情况下，区间的取值使用闭区间 (小于等于或大于等于)，你也可以通过给参数前增加 ( 符号来使用可选的开区间 (小于或大于)。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; ZADD salary 2500 jack                        # 测试数据</span><br><span class="line">(integer) 0</span><br><span class="line">redis&gt; ZADD salary 5000 tom</span><br><span class="line">(integer) 0</span><br><span class="line">redis&gt; ZADD salary 12000 peter</span><br><span class="line">(integer) 0</span><br><span class="line"></span><br><span class="line">redis&gt; ZRANGEBYSCORE salary -inf +inf               # 显示整个有序集</span><br><span class="line">1) &quot;jack&quot;</span><br><span class="line">2) &quot;tom&quot;</span><br><span class="line">3) &quot;peter&quot;</span><br><span class="line"></span><br><span class="line">redis&gt; ZRANGEBYSCORE salary -inf +inf WITHSCORES    # 显示整个有序集及成员的 score 值</span><br><span class="line">1) &quot;jack&quot;</span><br><span class="line">2) &quot;2500&quot;</span><br><span class="line">3) &quot;tom&quot;</span><br><span class="line">4) &quot;5000&quot;</span><br><span class="line">5) &quot;peter&quot;</span><br><span class="line">6) &quot;12000&quot;</span><br><span class="line"></span><br><span class="line">redis&gt; ZRANGEBYSCORE salary -inf 5000 WITHSCORES    # 显示工资 &lt;=5000 的所有成员</span><br><span class="line">1) &quot;jack&quot;</span><br><span class="line">2) &quot;2500&quot;</span><br><span class="line">3) &quot;tom&quot;</span><br><span class="line">4) &quot;5000&quot;</span><br><span class="line"></span><br><span class="line">redis&gt; ZRANGEBYSCORE salary (5000 400000            # 显示工资大于 5000 小于等于 400000 的成员</span><br><span class="line">1) &quot;peter&quot;</span><br></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/27/redis/redis-key-persist/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1095,192 +1289,6 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/26/redis/redis-fast/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/26/redis/redis-fast/" itemprop="url">Redis 快的原因</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-26T18:21:00+08:00">
-                2018-03-26
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/redis/" itemprop="url" rel="index">
-                    <span itemprop="name">redis</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/03/26/redis/redis-fast/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/26/redis/redis-fast/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/03/26/redis/redis-fast/" class="leancloud_visitors" data-flag-title="Redis 快的原因">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>R<br>edis 采用的是基于内存的采用的是单进程单线程模型的 KV 数据库，由 C 语言编写。官方提供的数据是可以达到100000+的 qps。这个数据不比采用单进程多线程的同样基于内存的 KV 数据库 Memcached 差。</p>
-<p>Redis 快的主要原因有：</p>
-<ol>
-<li>完全基于内存；</li>
-<li>数据结构简单，对数据操作也简单；</li>
-<li>使用多路 I/O 复用模型；</li>
-</ol>
-<p>第一、二点不细讲，主要围绕第三点采用多路 I/O 复用技术来展开。</p>
-<p>多路 I/O 复用模型是利用 select、poll、epoll 可以<strong>同时监察多个流的 I/O 事件</strong>的能力，在空闲的时候，会把当前线程阻塞掉，当有一个或多个流有 I/O 事件时，就从阻塞态中唤醒，于是程序就会轮询一遍所有的流（epoll 是只轮询那些真正发出了事件的流），并且只依次顺序的处理就绪的流，这种做法就避免了大量的无用操作。这里“多路”指的是多个网络连接，“复用”指的是复用同一个线程。采用多路 I/O 复用技术可以让单个线程高效的处理多个连接请求（尽量减少网络 IO 的时间消耗），且 Redis 在内存中操作数据的速度非常快（内存内的操作不会成为这里的性能瓶颈），主要以上两点造就了 Redis 具有很高的吞吐量。</p>
-<p><img src="http://www.syyong.com/usr/uploads/2016/07/3587411016.png" alt=""></p>
-<p>和 Memcached 不同，Redis 并没有直接使用 Libevent，而是自己完成了一个非常轻量级的对 select、epoll、evport、kqueue 这些通用的接口的实现。在不同的系统调用选用适合的接口，linux 下默认是 epoll。因为 Libevent 比较重，更通用，代码量也就很庞大，拥有很多 Redis 用不上的功能，Redis 为了追求“轻巧”并且去除依赖，就选择自己去封装了一套。</p>
-<h3 id="单进程单线程好处"><a href="#单进程单线程好处" class="headerlink" title="单进程单线程好处"></a>单进程单线程好处</h3><ol>
-<li>代码更清晰，处理逻辑更简单</li>
-<li>不用去考虑各种锁的问题，不存在加锁释放锁操作，没有因为可能出现死锁而导致的性能消耗</li>
-<li>不存在多进程或者多线程导致的切换而消耗 CPU</li>
-</ol>
-<h3 id="单进程单线程弊端"><a href="#单进程单线程弊端" class="headerlink" title="单进程单线程弊端"></a>单进程单线程弊端</h3><ol>
-<li>无法发挥多核 CPU 性能，不过可以通过在单机开多个 Redis 实例来完善；</li>
-</ol>
-<h3 id="其他一些优秀的开源软件采用的模型"><a href="#其他一些优秀的开源软件采用的模型" class="headerlink" title="其他一些优秀的开源软件采用的模型"></a>其他一些优秀的开源软件采用的模型</h3><ul>
-<li>多进程单线程模型：Nginx</li>
-<li>单进程多线程模型：Memcached</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/26/redis/redis-persist/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1437,6 +1445,192 @@
 <li>对于相同的数据集来说，AOF 文件的体积通常要大于 RDB 文件的体积。</li>
 <li>根据所使用的 fsync 策略，AOF 的速度可能会慢于 RDB 。 在一般情况下， 每秒 fsync 的性能依然非常高， 而关闭 fsync 可以让 AOF 的速度和 RDB 一样快， 即使在高负荷之下也是如此。 不过在处理巨大的写入载入时，RDB 可以提供更有保证的最大延迟时间（latency）。</li>
 <li>AOF 在过去曾经发生过这样的 bug ： 因为个别命令的原因，导致 AOF 文件在重新载入时，无法将数据集恢复成保存时的原样。 （举个例子，阻塞命令 BRPOPLPUSH 就曾经引起过这样的 bug 。） 测试套件里为这种情况添加了测试： 它们会自动生成随机的、复杂的数据集， 并通过重新载入这些数据来确保一切正常。 虽然这种 bug 在 AOF 文件中并不常见， 但是对比来说， RDB 几乎是不可能出现这种 bug 的。</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/26/redis/redis-fast/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/26/redis/redis-fast/" itemprop="url">Redis 快的原因</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-26T18:21:00+08:00">
+                2018-03-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/redis/" itemprop="url" rel="index">
+                    <span itemprop="name">redis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/26/redis/redis-fast/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/03/26/redis/redis-fast/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/03/26/redis/redis-fast/" class="leancloud_visitors" data-flag-title="Redis 快的原因">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>R<br>edis 采用的是基于内存的采用的是单进程单线程模型的 KV 数据库，由 C 语言编写。官方提供的数据是可以达到100000+的 qps。这个数据不比采用单进程多线程的同样基于内存的 KV 数据库 Memcached 差。</p>
+<p>Redis 快的主要原因有：</p>
+<ol>
+<li>完全基于内存；</li>
+<li>数据结构简单，对数据操作也简单；</li>
+<li>使用多路 I/O 复用模型；</li>
+</ol>
+<p>第一、二点不细讲，主要围绕第三点采用多路 I/O 复用技术来展开。</p>
+<p>多路 I/O 复用模型是利用 select、poll、epoll 可以<strong>同时监察多个流的 I/O 事件</strong>的能力，在空闲的时候，会把当前线程阻塞掉，当有一个或多个流有 I/O 事件时，就从阻塞态中唤醒，于是程序就会轮询一遍所有的流（epoll 是只轮询那些真正发出了事件的流），并且只依次顺序的处理就绪的流，这种做法就避免了大量的无用操作。这里“多路”指的是多个网络连接，“复用”指的是复用同一个线程。采用多路 I/O 复用技术可以让单个线程高效的处理多个连接请求（尽量减少网络 IO 的时间消耗），且 Redis 在内存中操作数据的速度非常快（内存内的操作不会成为这里的性能瓶颈），主要以上两点造就了 Redis 具有很高的吞吐量。</p>
+<p><img src="http://www.syyong.com/usr/uploads/2016/07/3587411016.png" alt=""></p>
+<p>和 Memcached 不同，Redis 并没有直接使用 Libevent，而是自己完成了一个非常轻量级的对 select、epoll、evport、kqueue 这些通用的接口的实现。在不同的系统调用选用适合的接口，linux 下默认是 epoll。因为 Libevent 比较重，更通用，代码量也就很庞大，拥有很多 Redis 用不上的功能，Redis 为了追求“轻巧”并且去除依赖，就选择自己去封装了一套。</p>
+<h3 id="单进程单线程好处"><a href="#单进程单线程好处" class="headerlink" title="单进程单线程好处"></a>单进程单线程好处</h3><ol>
+<li>代码更清晰，处理逻辑更简单</li>
+<li>不用去考虑各种锁的问题，不存在加锁释放锁操作，没有因为可能出现死锁而导致的性能消耗</li>
+<li>不存在多进程或者多线程导致的切换而消耗 CPU</li>
+</ol>
+<h3 id="单进程单线程弊端"><a href="#单进程单线程弊端" class="headerlink" title="单进程单线程弊端"></a>单进程单线程弊端</h3><ol>
+<li>无法发挥多核 CPU 性能，不过可以通过在单机开多个 Redis 实例来完善；</li>
+</ol>
+<h3 id="其他一些优秀的开源软件采用的模型"><a href="#其他一些优秀的开源软件采用的模型" class="headerlink" title="其他一些优秀的开源软件采用的模型"></a>其他一些优秀的开源软件采用的模型</h3><ul>
+<li>多进程单线程模型：Nginx</li>
+<li>单进程多线程模型：Memcached</li>
 </ul>
 
           
@@ -2018,160 +2212,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/25/messages/message-simple/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/25/messages/message-simple/" itemprop="url">初识消息队列</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-25T02:14:00+08:00">
-                2018-03-25
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/03/25/messages/message-simple/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/25/messages/message-simple/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/03/25/messages/message-simple/" class="leancloud_visitors" data-flag-title="初识消息队列">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://tech.meituan.com/mq-design.html" target="_blank" rel="noopener">https://tech.meituan.com/mq-design.html</a></p>
-<p>消息队列已经逐渐成为企业IT系统内部通信的核心手段。它具有低耦合、可靠投递、广播、流量控制、最终一致性等一系列功能，成为异步RPC的主要手段之一。<br>当今市面上有很多主流的消息中间件，如老牌的ActiveMQ、RabbitMQ，炙手可热的Kafka，阿里巴巴自主开发的Notify、MetaQ、RocketMQ等。</p>
-<h1 id="何时需要消息队列"><a href="#何时需要消息队列" class="headerlink" title="何时需要消息队列"></a>何时需要消息队列</h1><p>当你需要使用消息队列时，首先需要考虑它的必要性。可以使用mq的场景有很多，最常用的几种，是做业务解耦/最终一致性/广播/错峰流控等。反之，如果需要强一致性，关注业务逻辑的处理结果，则RPC显得更为合适。</p>
-<h2 id="解耦"><a href="#解耦" class="headerlink" title="解耦"></a>解耦</h2><p>解耦是消息队列要解决的最本质问题。所谓解耦，简单点讲就是一个事务，只关心核心的流程。而需要依赖其他系统但不那么重要的事情，有通知即可，无需等待结果。换句话说，基于消息的模型，关心的是“通知”，而非“处理”。<br>比如在美团旅游，我们有一个产品中心，产品中心上游对接的是主站、移动后台、旅游供应链等各个数据源；下游对接的是筛选系统、API系统等展示系统。当上游的数据发生变更的时候，如果不使用消息系统，势必要调用我们的接口来更新数据，就特别依赖产品中心接口的稳定性和处理能力。但其实，作为旅游的产品中心，也许只有对于旅游自建供应链，产品中心更新成功才是他们关心的事情。而对于团购等外部系统，产品中心更新成功也好、失败也罢，并不是他们的职责所在。他们只需要保证在信息变更的时候通知到我们就好了。<br>而我们的下游，可能有更新索引、刷新缓存等一系列需求。对于产品中心来说，这也不是我们的职责所在。说白了，如果他们定时来拉取数据，也能保证数据的更新，只是实时性没有那么强。但使用接口方式去更新他们的数据，显然对于产品中心来说太过于“重量级”了，只需要发布一个产品ID变更的通知，由下游系统来处理，可能更为合理。<br>再举一个例子，对于我们的订单系统，订单最终支付成功之后可能需要给用户发送短信积分什么的，但其实这已经不是我们系统的核心流程了。如果外部系统速度偏慢（比如短信网关速度不好），那么主流程的时间会加长很多，用户肯定不希望点击支付过好几分钟才看到结果。那么我们只需要通知短信系统“我们支付成功了”，不一定非要等待它处理完成。</p>
-<h2 id="最终一致性"><a href="#最终一致性" class="headerlink" title="最终一致性"></a>最终一致性</h2><p>最终一致性指的是两个系统的状态保持一致，要么都成功，要么都失败。当然有个时间限制，理论上越快越好，但实际上在各种异常的情况下，可能会有一定延迟达到最终一致状态，但最后两个系统的状态是一样的。<br>业界有一些为“最终一致性”而生的消息队列，如Notify（阿里）、QMQ（去哪儿）等，其设计初衷，就是为了交易系统中的高可靠通知。<br>以一个银行的转账过程来理解最终一致性，转账的需求很简单，如果A系统扣钱成功，则B系统加钱一定成功。反之则一起回滚，像什么都没发生一样。<br>然而，这个过程中存在很多可能的意外：</p>
-<p>A扣钱成功，调用B加钱接口失败。<br>A扣钱成功，调用B加钱接口虽然成功，但获取最终结果时网络异常引起超时。<br>A扣钱成功，B加钱失败，A想回滚扣的钱，但A机器down机。<br>可见，想把这件看似简单的事真正做成，真的不那么容易。所有跨VM的一致性问题，从技术的角度讲通用的解决方案是：</p>
-<ul>
-<li>强一致性，分布式事务，但落地太难且成本太高，后文会具体提到。</li>
-<li>最终一致性，主要是用“记录”和“补偿”的方式。在做所有的不确定的事情之前，先把事情记录下来，然后去做不确定的事情，结果可能是：成功、失败或是不确定，“不确定”（例如超时等）可以等价为失败。成功就可以把记录的东西清理掉了，对于失败和不确定，可以依靠定时任务等方式把所有失败的事情重新搞一遍，直到成功为止。<br>回到刚才的例子，系统在A扣钱成功的情况下，把要给B“通知”这件事记录在库里（为了保证最高的可靠性可以把通知B系统加钱和扣钱成功这两件事维护在一个本地事务里），通知成功则删除这条记录，通知失败或不确定则依靠定时任务补偿性地通知我们，直到我们把状态更新成正确的为止。<br>整个这个模型依然可以基于RPC来做，但可以抽象成一个统一的模型，基于消息队列来做一个“企业总线”。<br>具体来说，本地事务维护业务变化和通知消息，一起落地（失败则一起回滚），然后RPC到达broker，在broker成功落地后，RPC返回成功，本地消息可以删除。否则本地消息一直靠定时任务轮询不断重发，这样就保证了消息可靠落地broker。<br>broker往consumer发送消息的过程类似，一直发送消息，直到consumer发送消费成功确认。<br>我们先不理会重复消息的问题，通过两次消息落地加补偿，下游是一定可以收到消息的。然后依赖状态机版本号等方式做判重，更新自己的业务，就实现了最终一致性。<br>最终一致性不是消息队列的必备特性，但确实可以依靠消息队列来做最终一致性的事情。另外，所有不保证100%不丢消息的消息队列，理论上无法实现最终一致性。好吧，应该说理论上的100%，排除系统严重故障和bug。<br>像Kafka一类的设计，在设计层面上就有丢消息的可能（比如定时刷盘，如果掉电就会丢消息）。哪怕只丢千分之一的消息，业务也必须用其他的手段来保证结果正确。</li>
-</ul>
-<h2 id="广播"><a href="#广播" class="headerlink" title="广播"></a>广播</h2><p>消息队列的基本功能之一是进行广播。如果没有消息队列，每当一个新的业务方接入，我们都要联调一次新接口。有了消息队列，我们只需要关心消息是否送达了队列，至于谁希望订阅，是下游的事情，无疑极大地减少了开发和联调的工作量。<br>比如本文开始提到的产品中心发布产品变更的消息，以及景点库很多去重更新的消息，可能“关心”方有很多个，但产品中心和景点库只需要发布变更消息即可，谁关心谁接入。</p>
-<h2 id="错峰与流控"><a href="#错峰与流控" class="headerlink" title="错峰与流控"></a>错峰与流控</h2><p>试想上下游对于事情的处理能力是不同的。比如，Web前端每秒承受上千万的请求，并不是什么神奇的事情，只需要加多一点机器，再搭建一些LVS负载均衡设备和Nginx等即可。但数据库的处理能力却十分有限，即使使用SSD加分库分表，单机的处理能力仍然在万级。由于成本的考虑，我们不能奢求数据库的机器数量追上前端。<br>这种问题同样存在于系统和系统之间，如短信系统可能由于短板效应，速度卡在网关上（每秒几百次请求），跟前端的并发量不是一个数量级。但用户晚上个半分钟左右收到短信，一般是不会有太大问题的。如果没有消息队列，两个系统之间通过协商、滑动窗口等复杂的方案也不是说不能实现。但系统复杂性指数级增长，势必在上游或者下游做存储，并且要处理定时、拥塞等一系列问题。而且每当有处理能力有差距的时候，都需要单独开发一套逻辑来维护这套逻辑。所以，利用中间系统转储两个系统的通信内容，并在下游系统有能力处理这些消息的时候，再处理这些消息，是一套相对较通用的方式。</p>
-<p>总而言之，消息队列不是万能的。对于需要强事务保证而且延迟敏感的，RPC是优于消息队列的。<br>对于一些无关痛痒，或者对于别人非常重要但是对于自己不是那么关心的事情，可以利用消息队列去做。<br>支持最终一致性的消息队列，能够用来处理延迟不那么敏感的“分布式事务”场景，而且相对于笨重的分布式事务，可能是更优的处理方式。<br>当上下游系统处理能力存在差距的时候，利用消息队列做一个通用的“漏斗”。在下游有能力处理的时候，再进行分发。<br>如果下游有很多系统关心你的系统发出的通知的时候，果断地使用消息队列吧。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2222,7 +2262,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">196</span>
+                  <span class="site-state-item-count">197</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

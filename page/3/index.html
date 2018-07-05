@@ -326,6 +326,220 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/21/安全/data-privacy/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/21/安全/data-privacy/" itemprop="url">拆分隐私</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-21T09:59:05+08:00">
+                2018-06-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/06/21/安全/data-privacy/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/06/21/安全/data-privacy/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/06/21/安全/data-privacy/" class="leancloud_visitors" data-flag-title="拆分隐私">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="什么是隐私"><a href="#什么是隐私" class="headerlink" title="什么是隐私"></a>什么是隐私</h1><p>对于隐私这个词，科学研究上普遍接受的定义是“单个用户的某一些属性”，只要符合这一定义都可以被看做是隐私。我们在提“隐私”的时候，更加强调的是“单个用户”。那么，一群用户的某一些属性，可以认为不是隐私。</p>
+<p>隐私是针对单个用户的概念，公开群体用户的信息不算是隐私泄漏，但是如果能从数据中能准确推测出个体的信息，那么就算是隐私泄漏。</p>
+<h1 id="隐私保护的方法"><a href="#隐私保护的方法" class="headerlink" title="隐私保护的方法"></a>隐私保护的方法</h1><p>从信息时代开始，关于隐私保护的研究就开始了。随着数据不断地增长，人们对隐私越来越重视。我们在讨论隐私保护的时候包括两种情况。</p>
+<ul>
+<li>第一种是公司为了学术研究和数据交流开放用户数据，学术机构或者个人可以向数据库发起查询请求，公司返回对应的数据时需要保证用户的隐私。</li>
+<li>第二种情况是公司作为服务提供商，为了提高服务质量，主动收集用户的数据，这些在客户端上收集的数据也需要保证隐私性。学术界提出了多种保护隐私的方法和测量隐私是否泄露的工具，例如k-anonymity（k-匿名化）、l-diversity（l-多样化）、t-closeness、 ε-differentialprivacy（差分隐私）、同态加密（homomorphic encryption）、零知识证明（zero-knowledge proof）等等。今天主要介绍k-anonymity（k-匿名化）,l-diversity（l-多样化）,t-closeness 和 ε-differential privacy（差分隐私）。这些方法先从直观的角度去衡量一个公开数据的隐私性，再到使用密码学、统计学等工具保证数据的隐私性。</li>
+</ul>
+<h2 id="k-anonymity（k-匿名化）"><a href="#k-anonymity（k-匿名化）" class="headerlink" title="k-anonymity（k-匿名化）"></a>k-anonymity（k-匿名化）</h2><p>我们把要表格中的公开属性分为以下三类：</p>
+<pre><code>-    Key attributes: 一般是个体的唯一标示，比如说姓名、地址、电话等等，这些内容需要在公开数据的时候删掉。
+
+-    Quasi-identifier: 类似邮编、年龄、生日、性别等不是唯一的，但是能帮助研究人员关联相关数据的标示。
+
+-    Sensitive attributes: 敏感数据，比如说购买偏好、薪水等等，这些数据是研究人员最关心的，所以一般都直接公开。
+</code></pre><p>简单来说，k-anonymity 的目的是保证公开的数据中包含的个人信息至少 k-1 条不能通过其他个人信息确定出来。也就是公开数据中的任意 quasi-identifier信息，相同的组合都需要出现至少 k 次。</p>
+<p>举个例子，假设一个公开的数据进行了 2-anonymity 保护。如果攻击者想确认一个人（小明）的敏感信息（购买偏好），通过查询他的年龄、邮编和性别，攻击者会发现数据里至少有两个人是有相同的年龄、邮编和性别。这样攻击者就没办法区分这两条数据到底哪个是小明了，从而也就保证了小明的隐私不会被泄露。</p>
+<p>k-anonymity的方法主要有两种，一种是删除对应的数据列，用星号（*）代替。另外一种方法是用概括的方法使之无法区分，比如把年龄这个数字概括成一个年龄段。对于邮编这样的数据，如果删除所有邮编，研究人员会失去很多有意义的信息，所以可以选择删除最后一位数字。</p>
+<p>从这个表中，即使我们知道小明是男性、24岁、邮编是100083，却仍然无法知道小明的购买偏好。而研究人员依然可以根据这些数据统计出一些有意义的结果，这样既兼顾了个人的隐私，又能为研究提供有效的数据。</p>
+<h3 id="k-anonymity能保证以下三点："><a href="#k-anonymity能保证以下三点：" class="headerlink" title="k-anonymity能保证以下三点："></a>k-anonymity能保证以下三点：</h3><ol>
+<li><p>攻击者无法知道某个人是否在公开的数据中</p>
+</li>
+<li><p>给定一个人，攻击者无法确认他是否有某项敏感属性</p>
+</li>
+<li><p>攻击者无法确认某条数据对应的是哪个人（这条假设攻击者除了 quasi-identifier 信息之外对其他数据一无所知，举个例子，如果所有用户的偏好都是购买电子产品，那么 k-anonymity 也无法保证隐私没有泄露）</p>
+</li>
+</ol>
+<h3 id="攻击方法"><a href="#攻击方法" class="headerlink" title="攻击方法"></a>攻击方法</h3><p>未排序匹配攻击 (unsorted matching attack) ：当公开的数据记录和原始记录的顺序一样的时候，攻击者可以猜出匿名化的记录是属于谁。例如如果攻击者知道在数据中小明是排在小白前面，那么他就可以确认，小明的购买偏好是电子产品，小白是家用电器。解决方法也很简单，在公开数据之前先打乱原始数据的顺序就可以避免这类的攻击。</p>
+<p>补充数据攻击 (complementary release attack) ：假如公开的数据有多种类型，如果它们的 k-anonymity 方法不同，那么攻击者可以通过关联多种数据推测用户信息。</p>
+<p>除此之外，如果敏感属性在同一类 quasi-identifiers 中缺乏多样性，或者攻击者有其它的背景知识，k-anonymity 也无法避免隐私泄露。</p>
+<h2 id="l-diversity（l-多样化）"><a href="#l-diversity（l-多样化）" class="headerlink" title="l-diversity（l-多样化）"></a>l-diversity（l-多样化）</h2><p>通过上面的例子，我们引出了多样化的概念。简单来说，在公开的数据中，对于那些quasi-identifier 相同的数据中，敏感属性必须具有多样性，这样才能保证用户的隐私不能通过背景知识等方法推测出来。</p>
+<p>l-diversity 保证了相同类型数据中至少有 l 种内容不同的敏感属性。</p>
+<p>例如在上图的例子中，有 10 条相同的类型的数据，其中 8 条的购买偏好是电子产品，其他两条分别是图书和家用电器。那么在这个例子中，公开的数据就满足 3-diversity 的属性。</p>
+<p>除了以上介绍的简单 l-diversity 的定义，还有其他版本的 l-diversity，引入了其他统计方法。比如说：</p>
+<p>•         基于概率的l-diversity (probabilistic l-diversity): 在一个类型中出现频率最高的值的概率不大于 1/l。</p>
+<p>•         基于墒的l-diversity (entropy l-diversity): 在一个类型中敏感数据分布的墒至少是 log(l)。</p>
+<p>•         递归 (c,l)-diversity (recursive (c, l)-diversity): 简单来说就是保证最经常出现的值的出现频率不要太高。</p>
+<h3 id="l-diversity-也有其局限性："><a href="#l-diversity-也有其局限性：" class="headerlink" title="l-diversity 也有其局限性："></a>l-diversity 也有其局限性：</h3><p>•         敏感属性的性质决定即使保证了一定概率的 diversity 也很容易泄露隐私。例如，医院公开的艾滋病数据中，敏感属性是“艾滋病阳性”（出现概率是 1%）和“艾滋病阴性”（出现概率是 99%），这两种值的敏感性不同，造成的结果也不同。</p>
+<p>•         有些情况下 l-diversity 是没有意义的：比如说艾滋病数据的例子中仅含有两种不同的值，保证2-diversity 也是没有意义的。</p>
+<p>•         l-diversity 很难达成：例如，我们想在 10000 条数据中保证 2-diversity，那么可能最多需要 10000* 0.01 = 100 个相同的类型。这时可能通过之前介绍的 k-anonymity的方法很难达到。</p>
+<p>•         偏斜性攻击 (Skewness Attack)：假如我们要保证在同一类型的数据中出现“艾滋病阳性”和出现“艾滋病阴性”的概率是相同的，我们虽然保证了 diversity，但是我们泄露隐私的可能性会变大。因为l-diversity 并没有考虑敏感属性的总体的分布。</p>
+<p>•         l-diversity 没有考虑敏感属性的语义，比如说下面的例子，我们通过李雷的信息从公开数据中关联到了两条信息，通过这两条信息我们能得出两个结论。第一，李雷的工资相对较低；第二，李雷喜欢买电子电器相关的产品。</p>
+<h2 id="t-closeness"><a href="#t-closeness" class="headerlink" title="t-closeness"></a>t-closeness</h2><p>上面最后一个问题就引出了 t-closeness 的概念，t-closeness 是为了保证在相同的quasi-identifier类型组中，敏感信息的分布情况与整个数据的敏感信息分布情况接近(close)，不超过阈值 t。</p>
+<p>如果刚才的那个数据保证了 t-closeness 属性，那么通过李雷的信息查询出来的结果中，工资的分布就和整体的分布类似，进而很难推断出李雷工资的高低。</p>
+<p>最后，如果保证了 k-anonymity，l-diversity 和 t-closeness，隐私就不会泄露了么？答案并不是这样，我们看下面的例子：</p>
+<p>在这个例子中，我们保证了 2- anonymity , 2-diversity , t-closeness（分布近似），工资和购买偏好是敏感属性。攻击者通过李雷的个人信息找到了四条数据，同时知道李雷有很多书，这样就能很容易在四条数据中找到李雷的那一条，从而造成隐私泄露。可能有些读者会有疑问，通过背景知识攻击 k-anonymity 的前提是不是假设了解 quasi-identifier ？并不是这样，针对敏感属性的背景攻击对 k-anonymity 也适用，所以无论经过哪些属性保证，隐私泄露还是很难避免。</p>
+<h2 id="差分隐私（differential-privacy）"><a href="#差分隐私（differential-privacy）" class="headerlink" title="差分隐私（differential privacy）"></a>差分隐私（differential privacy）</h2><p>除了之前我们介绍的针对 k-anonymity, l-diversity,t-closeness 三种隐私保护方法的攻击之外，还有一种叫做差分攻击 ( differential attack )。举个例子，购物公司发布了购物偏好的数据，说我们有 100 个人的购物偏好数据，其中有 10 个人偏爱购买汽车用品，其他 90 个偏爱购买电子产品。如果攻击者知道其中 99 个人是偏爱汽车用品还是电子产品，就可以知道第 100 个人的购物偏好。这样通过比较公开数据和既有的知识推测出个人隐私，就叫做差分攻击。</p>
+<p>在 2009 年，微软研究院的Cynthia Dwork 提出差分隐私的概念，差分隐私就是为了防止差分攻击，也就是说尽管攻击者知道发布的 100 个人的个人以信息和其中 99 个人的信息，他也没办法通过比对这两个信息获得第 100 个人的信息。</p>
+<p>简单来说，差分隐私就是用一种方法使得查询 100 个信息和查询其中 99 个的信息得到的结果是相对一致的，那么攻击者就无法通过比较（差分）数据的不同找出第100 个人的信息。这种方法就是加入随机性，如果查询 100 个记录和 99 个记录，输出同样的值的概率是一样的，攻击者就无法进行差分攻击。进一步说，对于差别只有一条记录的两个数据集 D 和 D’ (neighboring datasets)，查询他们获得结果相同的概率非常接近。注意，这里并不能保证概率相同，如果一样的话，数据就需要完全的随机化，那样公开数据也就没有意义。所以，我们需要尽可能接近，保证在隐私和可用性之间找到一个平衡。</p>
+<p>ε-差分隐私 (ε-differential privacy， ε-DP) 可以用下面的定义来表示：<br>其中 M 是在 D 上做任意查询操作，对查询后的结果加入一定的随机性，也就是给数据加噪音，两个 datasets 加上同一随机噪音之后查询结果为 C 的概率比小于一个特定的数 。这样就能保证用户隐私泄露的概率有一个数学的上界，相比传统的 k-anonymity，差分隐私使隐私保护的模型更加清晰。</p>
+<p>无论查询是什么，两个相邻的数据库返回的结果总是近似的。</p>
+<h3 id="要达到数据的差分隐私有四种方法："><a href="#要达到数据的差分隐私有四种方法：" class="headerlink" title="要达到数据的差分隐私有四种方法："></a>要达到数据的差分隐私有四种方法：</h3><h4 id="输出结果变换"><a href="#输出结果变换" class="headerlink" title="输出结果变换"></a>输出结果变换</h4><p>输出结果变换：加入噪声<br>在差分隐私中，防止隐私泄露的重要因素是在查询结果中加噪音，对于数值的查询结果，一种常见的方法就是对结果进行数值变换。要解释如何加入噪音，我们先看一下下面的这个例子：</p>
+<p>那么如何选择噪声呢？</p>
+<p>差分隐私方法中，作者巧妙的利用了拉普拉斯分布的特性，找到了合适的噪声方法。针对数值或向量的查询输出，M(x) = f(x) + 噪声。我们能得出以下结论：</p>
+<h4 id="输入查询变换"><a href="#输入查询变换" class="headerlink" title="输入查询变换"></a>输入查询变换</h4><h4 id="中间值变换"><a href="#中间值变换" class="headerlink" title="中间值变换"></a>中间值变换</h4><h4 id="抽样和聚合数据"><a href="#抽样和聚合数据" class="headerlink" title="抽样和聚合数据"></a>抽样和聚合数据</h4><p>(ε,δ)-differential privacy, (ε, δ)-DP<br> ε-DP 是一种“严格”的隐私保护保证，当在数据库中添加和删除一条数据时候，保证所有查询的输出都类似。但是(ε, δ)-DP 在 ε-DP 的保证中允许了一定概率的错误发生，比如说，用户在 (ε, δ)-DP 的保护下会有 δ 概率的隐私泄露。</p>
+<p> 基于这些的概念，差分隐私在机器学习算法中也能够使用，常见的算法，比如说 PCA、logistic regression、SVM都有对应的差分隐私化算法。</p>
+<p>差分隐私在数据的实用性和隐私性之间达到了平衡，使用者可以通过设定自己的“隐私预算”（privacy budget）来调整数据的实用性和隐私性。但是差分隐私也不是万能的，其中加入噪声的很多算法需要在大量的数据集上才实用。除此之外，什么才是“隐私预算”的合理设定也是一个问题。这些都是差分隐私面临的问题和挑战。并且由于差分隐私对于“背景知识”的要求过于强，所以需要在结果中加入大量随机化，导致数据的可用性（utility）急剧下降。但是差分隐私作为一个非常优雅的数学工具，是隐私保护的研究在未来的一个发展方向。差分隐私用严格的数学证明告诉人们一个匿名化的公开数据究竟能保护用户多少的隐私。</p>
+<h2 id="k-匿名化与-ε-差分隐私的关系"><a href="#k-匿名化与-ε-差分隐私的关系" class="headerlink" title="k-匿名化与 ε-差分隐私的关系"></a>k-匿名化与 ε-差分隐私的关系</h2><p>我们前面分别单独介绍了 k-匿名化和 ε-差分隐私，k-匿名化相对比较容易理解和实践，差分隐私更像是从理论上证明了隐私保护的边界。虽然方法的分析角度完全不同，但是它们之间却有着紧密的联系。普渡大学的Ninghui Li教授在 Provably PrivateData Anonymization: Or, k-Anonymity Meets Differential Privacy 文章中详细分析了 k-匿名化和 ε-差分隐私之间的关系。文章证明了在使用 k-匿名化“得当”的情况下，可以满足一定条件的 (ε, δ)-differentialprivacy。同时也提出了一种 k-anonymity 的变形：β-Sampling+ Data-independent _Generalization + k-Suppression (k, β)-SDGS ，通过变形后的 k-anonymity 就可以使之满足差分隐私。通过使用差分隐私这种工具，我们就能精确的衡量前人提出的 k-anonymity，在理论研究上具有重要意义。</p>
+<h1 id="实际案例"><a href="#实际案例" class="headerlink" title="实际案例"></a>实际案例</h1><p>在实际应用中使用差分隐私时需要考虑的问题还有很多，我们在介绍差分隐私的时候假设所有的查询操作都由可信的数据库处理，数据库里存储着用户的原始数据。那么如果数据库被攻击了，包含用户隐私的原始数据就泄露了。</p>
+<p>如果不收集用户的原始数据，在客户端上先做差分隐私，再上传给服务器，这个问题就解决了。最近Google 率先使用RAPPOR系统在 Chrome 浏览器上通过这种方法收集用户的使用情况数据。RAPPOR 基于“随机应答”（randomized response）的方法保护用户的原始数据不被泄露，随机应答的流程如下：</p>
+<ol>
+<li><p>当用户需要上报个人数据的时候，首先“抛硬币”决定是否上报真实数据。如果是正面，则上报真实数据。如果不是，就上报一个随机的数据，再“抛一次硬币”决定随机数据的内容。</p>
+</li>
+<li><p>服务器收到所有的数据后，因为知道“抛硬币”是正面的概率，服务器就能够判断返回的数据是正确的概率。</p>
+</li>
+</ol>
+<p>这种“随机应答”的方法在理论上也被证明是服从ε-差分隐私的。对于用户来说，隐私数据在上报给服务器之前就已经加了噪声，从而具有一定保证。对于公司来说，也能收集到有效的数据。</p>
+<p>RAPPOR 使用“随机应答”的方法克服了之前只能回答简单查询语句的限制，现在可以上报包含字符串这类更加复杂的回答。RAPPOR 在上报字符串信息的时候首先使用“布隆过滤器”（bloom filter）算法把字符串哈希到一个数组中，然后再加入噪声传给服务器。布隆过滤器不需要存储元素本身，并可以用于检索一个元素是否在一个集合中。通过使用这种方法，就可以对字符串数据添加噪音，保护用户的隐私。</p>
+<p>苹果在 2016 年的世界开发者大会（WWDC）上也宣布使用差分隐私的方法收集用户数据。虽然苹果没有透露具体的细节，我们从官方的描述中也可以推测出苹果也使用了在客户端上做匿名化再传输到服务器的方法。</p>
+<p>Differentialprivacy is a research topic in the areas of statistics and data analytics thatuses hashing, subsampling and noiseinjection to enable…crowdsourced learning while keeping the data ofindividual users completely private. Apple has been doing some super-importantwork in this area to enable differential privacy to be deployed at scale.</p>
+<p>我们刚才介绍的 Google 和 Apple 的模型都是先在本地做差分隐私，然后再上报给服务器，我们把这种方法叫做本地模式（local mode）。这种差分隐私的做法在上报数据可以相互关联的情况下还是存在隐私泄漏。Google的RAPPOR虽然解决了对同一个数据的多次上报的隐私泄露问题，但并没有解决多个相关数据上报后产生的隐私泄露问题。对于这一问题，Apple也没有给出详细的解释。</p>
+<p>除了Google 和苹果在内部产品中使用差分隐私方法，哈佛大学公开了一个名为PSI (Ψ) 的项目，提供了一个便捷的差分隐私工具。使用者通过上传数据，调整差分隐私的参数，就可以获得满足差分隐私的数据集。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>本文介绍了学术界和工业界对于用户隐私保护的努力成果。我们首先介绍了 k-anonymity，即通过变换隐私数据，保证相同特性的用户在数据库出现的次数至少是 k 次。然后，为了防止攻击者通过隐私数据的背景知识推测用户身份，提出使用 l-diversity，保证相同特征的用户中，隐私数据相同的个数大于 l。除此之外，我们也讨论了 t-closeness。最后我们详细介绍了差分隐私的概念，以及实际应用中应如何使用差分隐私。</p>
+<p>从最开始的 k-anonymity, l-diversity , t-closeness 到现在的 ε-差分隐私，都是为了既保证用户的个人隐私，也能对实际应用和研究提供有价值的数据。在大数据的时代中，希望各公司在利用数据提供更好的服务的同时，能保护好用户的个人隐私。这是法律的要求，也是安全行业的追求。我们相信隐私保护技术会越来越受到重视，并从学术理论迅速投入工业界实战应用。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://mp.weixin.qq.com/s?__biz=MzA3NTQ3ODI0NA==&amp;mid=2247483923&amp;idx=1&amp;sn=bfa6d5efa074d1a93a449d66c2ee1046&amp;chksm=9f6ea798a8192e8e080afba90df416755af2586ff17d3a2c8854f89fd0e19544b5ab2ec8d0c1&amp;mpshare=1&amp;scene=1&amp;srcid=0613Os5d03IzCkuXsrHMo6tB#rd" target="_blank" rel="noopener">https://mp.weixin.qq.com/s?__biz=MzA3NTQ3ODI0NA==&amp;mid=2247483923&amp;idx=1&amp;sn=bfa6d5efa074d1a93a449d66c2ee1046&amp;chksm=9f6ea798a8192e8e080afba90df416755af2586ff17d3a2c8854f89fd0e19544b5ab2ec8d0c1&amp;mpshare=1&amp;scene=1&amp;srcid=0613Os5d03IzCkuXsrHMo6tB#rd</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/21/sutdy-tdd/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1879,180 +2093,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/05/java/java_thread/ScheduledExecutorService/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/05/java/java_thread/ScheduledExecutorService/" itemprop="url">ScheduledExecutorService</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-05T19:59:03+08:00">
-                2018-06-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/06/05/java/java_thread/ScheduledExecutorService/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/06/05/java/java_thread/ScheduledExecutorService/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/06/05/java/java_thread/ScheduledExecutorService/" class="leancloud_visitors" data-flag-title="ScheduledExecutorService">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="官网api"><a href="#官网api" class="headerlink" title="官网api"></a>官网api</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line"> * ORACLE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.</span><br><span class="line"> *</span><br><span class="line"> * Written by Doug Lea with assistance from members of JCP JSR-166</span><br><span class="line"> * Expert Group and released to the public domain, as explained at</span><br><span class="line"> * http://creativecommons.org/publicdomain/zero/1.0/</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">package java.util.concurrent;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * An &#123;@link ExecutorService&#125; that can schedule commands to run after a given</span><br><span class="line"> * delay, or to execute periodically.</span><br><span class="line"> *</span><br><span class="line"> * &lt;p&gt;The &#123;@code schedule&#125; methods create tasks with various delays</span><br><span class="line"> * and return a task object that can be used to cancel or check</span><br><span class="line"> * execution. The &#123;@code scheduleAtFixedRate&#125; and</span><br><span class="line"> * &#123;@code scheduleWithFixedDelay&#125; methods create and execute tasks</span><br><span class="line"> * that run periodically until cancelled.</span><br><span class="line"> *</span><br><span class="line"> * &lt;p&gt;Commands submitted using the &#123;@link Executor#execute(Runnable)&#125;</span><br><span class="line"> * and &#123;@link ExecutorService&#125; &#123;@code submit&#125; methods are scheduled</span><br><span class="line"> * with a requested delay of zero. Zero and negative delays (but not</span><br><span class="line"> * periods) are also allowed in &#123;@code schedule&#125; methods, and are</span><br><span class="line"> * treated as requests for immediate execution.</span><br><span class="line"> *</span><br><span class="line"> * &lt;p&gt;All &#123;@code schedule&#125; methods accept &lt;em&gt;relative&lt;/em&gt; delays and</span><br><span class="line"> * periods as arguments, not absolute times or dates. It is a simple</span><br><span class="line"> * matter to transform an absolute time represented as a &#123;@link</span><br><span class="line"> * java.util.Date&#125; to the required form. For example, to schedule at</span><br><span class="line"> * a certain future &#123;@code date&#125;, you can use: &#123;@code schedule(task,</span><br><span class="line"> * date.getTime() - System.currentTimeMillis(),</span><br><span class="line"> * TimeUnit.MILLISECONDS)&#125;. Beware however that expiration of a</span><br><span class="line"> * relative delay need not coincide with the current &#123;@code Date&#125; at</span><br><span class="line"> * which the task is enabled due to network time synchronization</span><br><span class="line"> * protocols, clock drift, or other factors.</span><br><span class="line"> *</span><br><span class="line"> * &lt;p&gt;The &#123;@link Executors&#125; class provides convenient factory methods for</span><br><span class="line"> * the ScheduledExecutorService implementations provided in this package.</span><br><span class="line"> *</span><br><span class="line"> * &lt;h3&gt;Usage Example&lt;/h3&gt;</span><br><span class="line"> *</span><br><span class="line"> * Here is a class with a method that sets up a ScheduledExecutorService</span><br><span class="line"> * to beep every ten seconds for an hour:</span><br><span class="line"> *</span><br><span class="line"> *  &lt;pre&gt; &#123;@code</span><br><span class="line"> * import static java.util.concurrent.TimeUnit.*;</span><br><span class="line"> * class BeeperControl &#123;</span><br><span class="line"> *   private final ScheduledExecutorService scheduler =</span><br><span class="line"> *     Executors.newScheduledThreadPool(1);</span><br><span class="line"> *</span><br><span class="line"> *   public void beepForAnHour() &#123;</span><br><span class="line"> *     final Runnable beeper = new Runnable() &#123;</span><br><span class="line"> *       public void run() &#123; System.out.println(&quot;beep&quot;); &#125;</span><br><span class="line"> *     &#125;;</span><br><span class="line"> *     final ScheduledFuture&lt;?&gt; beeperHandle =</span><br><span class="line"> *       scheduler.scheduleAtFixedRate(beeper, 10, 10, SECONDS);</span><br><span class="line"> *     scheduler.schedule(new Runnable() &#123;</span><br><span class="line"> *       public void run() &#123; beeperHandle.cancel(true); &#125;</span><br><span class="line"> *     &#125;, 60 * 60, SECONDS);</span><br><span class="line"> *   &#125;</span><br><span class="line"> * &#125;&#125;&lt;/pre&gt;</span><br><span class="line"> *</span><br><span class="line"> * @since 1.5</span><br><span class="line"> * @author Doug Lea</span><br><span class="line"> */</span><br><span class="line">public interface ScheduledExecutorService extends ExecutorService &#123;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Creates and executes a one-shot action that becomes enabled</span><br><span class="line">     * after the given delay.</span><br><span class="line">     *</span><br><span class="line">     * @param command the task to execute</span><br><span class="line">     * @param delay the time from now to delay execution</span><br><span class="line">     * @param unit the time unit of the delay parameter</span><br><span class="line">     * @return a ScheduledFuture representing pending completion of</span><br><span class="line">     *         the task and whose &#123;@code get()&#125; method will return</span><br><span class="line">     *         &#123;@code null&#125; upon completion</span><br><span class="line">     * @throws RejectedExecutionException if the task cannot be</span><br><span class="line">     *         scheduled for execution</span><br><span class="line">     * @throws NullPointerException if command is null</span><br><span class="line">     */</span><br><span class="line">    public ScheduledFuture&lt;?&gt; schedule(Runnable command,</span><br><span class="line">                                       long delay, TimeUnit unit);</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Creates and executes a ScheduledFuture that becomes enabled after the</span><br><span class="line">     * given delay.</span><br><span class="line">     *</span><br><span class="line">     * @param callable the function to execute</span><br><span class="line">     * @param delay the time from now to delay execution</span><br><span class="line">     * @param unit the time unit of the delay parameter</span><br><span class="line">     * @param &lt;V&gt; the type of the callable&apos;s result</span><br><span class="line">     * @return a ScheduledFuture that can be used to extract result or cancel</span><br><span class="line">     * @throws RejectedExecutionException if the task cannot be</span><br><span class="line">     *         scheduled for execution</span><br><span class="line">     * @throws NullPointerException if callable is null</span><br><span class="line">     */</span><br><span class="line">    public &lt;V&gt; ScheduledFuture&lt;V&gt; schedule(Callable&lt;V&gt; callable,</span><br><span class="line">                                           long delay, TimeUnit unit);</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Creates and executes a periodic action that becomes enabled first</span><br><span class="line">     * after the given initial delay, and subsequently with the given</span><br><span class="line">     * period; that is executions will commence after</span><br><span class="line">     * &#123;@code initialDelay&#125; then &#123;@code initialDelay+period&#125;, then</span><br><span class="line">     * &#123;@code initialDelay + 2 * period&#125;, and so on.</span><br><span class="line">     * If any execution of the task</span><br><span class="line">     * encounters an exception, subsequent executions are suppressed.</span><br><span class="line">     * Otherwise, the task will only terminate via cancellation or</span><br><span class="line">     * termination of the executor.  If any execution of this task</span><br><span class="line">     * takes longer than its period, then subsequent executions</span><br><span class="line">     * may start late, but will not concurrently execute.</span><br><span class="line">     *</span><br><span class="line">     * @param command the task to execute</span><br><span class="line">     * @param initialDelay the time to delay first execution</span><br><span class="line">     * @param period the period between successive executions</span><br><span class="line">     * @param unit the time unit of the initialDelay and period parameters</span><br><span class="line">     * @return a ScheduledFuture representing pending completion of</span><br><span class="line">     *         the task, and whose &#123;@code get()&#125; method will throw an</span><br><span class="line">     *         exception upon cancellation</span><br><span class="line">     * @throws RejectedExecutionException if the task cannot be</span><br><span class="line">     *         scheduled for execution</span><br><span class="line">     * @throws NullPointerException if command is null</span><br><span class="line">     * @throws IllegalArgumentException if period less than or equal to zero</span><br><span class="line">     */</span><br><span class="line">    public ScheduledFuture&lt;?&gt; scheduleAtFixedRate(Runnable command,</span><br><span class="line">                                                  long initialDelay,</span><br><span class="line">                                                  long period,</span><br><span class="line">                                                  TimeUnit unit);</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Creates and executes a periodic action that becomes enabled first</span><br><span class="line">     * after the given initial delay, and subsequently with the</span><br><span class="line">     * given delay between the termination of one execution and the</span><br><span class="line">     * commencement of the next.  If any execution of the task</span><br><span class="line">     * encounters an exception, subsequent executions are suppressed.</span><br><span class="line">     * Otherwise, the task will only terminate via cancellation or</span><br><span class="line">     * termination of the executor.</span><br><span class="line">     *</span><br><span class="line">     * @param command the task to execute</span><br><span class="line">     * @param initialDelay the time to delay first execution</span><br><span class="line">     * @param delay the delay between the termination of one</span><br><span class="line">     * execution and the commencement of the next</span><br><span class="line">     * @param unit the time unit of the initialDelay and delay parameters</span><br><span class="line">     * @return a ScheduledFuture representing pending completion of</span><br><span class="line">     *         the task, and whose &#123;@code get()&#125; method will throw an</span><br><span class="line">     *         exception upon cancellation</span><br><span class="line">     * @throws RejectedExecutionException if the task cannot be</span><br><span class="line">     *         scheduled for execution</span><br><span class="line">     * @throws NullPointerException if command is null</span><br><span class="line">     * @throws IllegalArgumentException if delay less than or equal to zero</span><br><span class="line">     */</span><br><span class="line">    public ScheduledFuture&lt;?&gt; scheduleWithFixedDelay(Runnable command,</span><br><span class="line">                                                     long initialDelay,</span><br><span class="line">                                                     long delay,</span><br><span class="line">                                                     TimeUnit unit);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h1 id="核心方法"><a href="#核心方法" class="headerlink" title="核心方法"></a>核心方法</h1><table>
-<thead>
-<tr>
-<th style="text-align:left">Method</th>
-<th style="text-align:left">Desc</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">schedule(Callable&lt;V&gt; callable, long delay, TimeUnit unit)</td>
-<td style="text-align:left">创建并执行在给定延迟后启用的 ScheduledFuture。</td>
-</tr>
-<tr>
-<td style="text-align:left">schedule(Runnable command, long delay, TimeUnit unit)</td>
-<td style="text-align:left">创建并执行在给定延迟后启用的一次性操作。</td>
-</tr>
-<tr>
-<td style="text-align:left">scheduleAtFixedRate(Runnable command, long initialDelay,long period, TimeUnitunit)</td>
-<td style="text-align:left">创建并执行一个在给定初始延迟后首次启用的定期操作，后续操作具有给定的周期；也就是将在 initialDelay 后开始执行，然后在initialDelay+period 后执行，接着在 initialDelay + 2 * period 后执行，依此类推。</td>
-</tr>
-<tr>
-<td style="text-align:left">scheduleWithFixedDelay(Runnable command, long initialDelay, long delay,TimeUnit unit)</td>
-<td style="text-align:left">创建并执行一个在给定初始延迟后首次启用的定期操作，随后，在每一次执行终止和下一次执行开始之间都存在给定的延迟。</td>
-</tr>
-</tbody>
-</table>
-<h1 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h1><h2 id="执行多个不同任务"><a href="#执行多个不同任务" class="headerlink" title="执行多个不同任务"></a>执行多个不同任务</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">public class ScheduledException &#123;</span><br><span class="line"></span><br><span class="line">    static class TaskA implements Runnable &#123;</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        public void run() &#123;</span><br><span class="line">            System.out.println(&quot;task A&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    static class TaskB implements Runnable &#123;</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        public void run() &#123;</span><br><span class="line">            System.out.println(&quot;task B&quot;);</span><br><span class="line">            throw new RuntimeException();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) throws InterruptedException &#123;</span><br><span class="line">        ScheduledExecutorService timer = Executors</span><br><span class="line">                .newSingleThreadScheduledExecutor();</span><br><span class="line">        timer.scheduleWithFixedDelay(new TaskA(), 0, 1, TimeUnit.SECONDS);</span><br><span class="line">        timer.scheduleWithFixedDelay(new TaskB(), 2, 1, TimeUnit.SECONDS);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="第二个任务就不会被第一个任务延迟了"><a href="#第二个任务就不会被第一个任务延迟了" class="headerlink" title="第二个任务就不会被第一个任务延迟了"></a>第二个任务就不会被第一个任务延迟了</h2><h2 id="任务取消"><a href="#任务取消" class="headerlink" title="任务取消"></a>任务取消</h2><p>单个定时任务的异常不会再导致整个定时任务被取消了，即使背后只有一个线程执行任务</p>
-<h2 id="coreSzie的作用"><a href="#coreSzie的作用" class="headerlink" title="coreSzie的作用??"></a>coreSzie的作用??</h2><h1 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h1><p><a href="https://blog.csdn.net/top_code/article/details/52180239" target="_blank" rel="noopener">https://blog.csdn.net/top_code/article/details/52180239</a></p>
-<p><a href="https://www.zybuluo.com/mikumikulch/note/713546" target="_blank" rel="noopener">https://www.zybuluo.com/mikumikulch/note/713546</a></p>
-<p><a href="https://www.zybuluo.com/mikumikulch/note/712598" target="_blank" rel="noopener">https://www.zybuluo.com/mikumikulch/note/712598</a></p>
-<p><a href="http://www.cnblogs.com/swiftma/p/6724894.html" target="_blank" rel="noopener">http://www.cnblogs.com/swiftma/p/6724894.html</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2103,7 +2143,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">196</span>
+                  <span class="site-state-item-count">197</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
