@@ -195,5 +195,10 @@ https://github.com/square/okhttp/issues/1240#issuecomment-329197762
 
 在实际开发中，响应主体 RessponseBody 持有的资源可能会很大，所以 OkHttp 并不会将其直接保存到内存中，只是持有数据流连接。只有当我们需要时，才会从服务器获取数据并返回。同时，考虑到应用重复读取数据的可能性很小，所以将其设计为一次性流(one-shot)，读取后即 '关闭并释放资源'。
 
+# 进行被kill时 socket资源的关闭方式:RST
+
+![upload successful](/images/pasted-207.png)
+
+
 # 参考
 https://juejin.im/post/5a524eef518825732c536025

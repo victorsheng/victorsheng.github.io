@@ -266,5 +266,7 @@ public class Test {
 | 01111111 | 177 | 127 | 7F | DEL \(delete\) | 删除 |
 
 
+# 各个字符集对比
+
 # 参考
 https://blog.csdn.net/darxin/article/details/5079242

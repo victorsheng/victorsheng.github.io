@@ -104,6 +104,9 @@ java中网络编程时很大一部分代码在做各种fail时的处理，了解
 ## 问题
 通过socket代码打断点,未发现okhttpClient 进行设置了setSoLinger
 
+## 对比
+https://docs.oracle.com/javase/8/docs/technotes/guides/net/articles/connection_release.html
+
 
 # 参考
 http://novoland.github.io/%E7%BD%91%E7%BB%9C/2014/07/26/RST%E5%8F%8Ajava%20socket%E5%85%B3%E9%97%AD%E5%90%8E%E8%AF%BB%E5%86%99%E7%9A%84%E5%90%84%E7%A7%8D%E5%BC%82%E5%B8%B8.html
