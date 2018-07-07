@@ -96,7 +96,8 @@
 <meta property="og:image" content="http://yoursite.com/images/pasted-201.png">
 <meta property="og:image" content="http://yoursite.com/images/pasted-202.png">
 <meta property="og:image" content="http://yoursite.com/images/pasted-203.png">
-<meta property="og:updated_time" content="2018-07-03T14:52:01.609Z">
+<meta property="og:image" content="http://yoursite.com/images/pasted-209.png">
+<meta property="og:updated_time" content="2018-07-06T12:39:21.025Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="linux-socket挥手">
 <meta name="twitter:description" content="Socket是什么socket起源于Unix，而Unix/Linux基本哲学之一就是“一切皆文件”，都可以用“打开open –&amp;gt; 读写write/read –&amp;gt; 关闭close”模式来操作。Socket就是该模式的一个实现，        socket即是一种特殊的文件，一些socket函数就是对其进行的操作（读/写IO、打开、关闭）.     说白了Socket是应用层与TCP/IP">
@@ -110,7 +111,7 @@
     root: '/',
     scheme: 'Muse',
     version: '5.1.3',
-    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
     fancybox: true,
     tabs: true,
     motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
@@ -342,7 +343,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -458,6 +459,9 @@
 <p>java中网络编程时很大一部分代码在做各种fail时的处理，了解各种异常发生时背后的逻辑才能正确地处理之。以上列举的只是连接关闭的异常，还有其他各种异常没有提及，以后有机会再补上。</p>
 <h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>之所以由本篇文章中,是因为在工作中用到了okhttpClient,其理念就是尽可能复用之前socket连接,并通过后台线程回收空闲的socket连接,然而对于客户端意外关闭,似乎没有处理,经过试验发现,其socket的关闭方式正是rst方式.</p>
 <h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>通过socket代码打断点,未发现okhttpClient 进行设置了setSoLinger</p>
+<h2 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h2><p><a href="https://docs.oracle.com/javase/8/docs/technotes/guides/net/articles/connection_release.html" target="_blank" rel="noopener">https://docs.oracle.com/javase/8/docs/technotes/guides/net/articles/connection_release.html</a></p>
+<h1 id="利用socket模拟http请求-然后在不关闭的情况下退出进程"><a href="#利用socket模拟http请求-然后在不关闭的情况下退出进程" class="headerlink" title="利用socket模拟http请求,然后在不关闭的情况下退出进程"></a>利用socket模拟http请求,然后在不关闭的情况下退出进程</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">package com.example.demo.socket;</span><br><span class="line"></span><br><span class="line">import java.io.BufferedReader;</span><br><span class="line">import java.io.IOException;</span><br><span class="line">import java.io.InputStream;</span><br><span class="line">import java.io.InputStreamReader;</span><br><span class="line">import java.io.OutputStream;</span><br><span class="line">import java.net.Socket;</span><br><span class="line">import java.nio.charset.StandardCharsets;</span><br><span class="line"></span><br><span class="line">public class SelfHttpSocketClient &#123;</span><br><span class="line"></span><br><span class="line">  public static void main(String[] args) throws InterruptedException &#123;</span><br><span class="line">    String host = &quot;localhost&quot;;</span><br><span class="line">    String httpStr = &quot;GET / HTTP/1.1\r\n&quot;</span><br><span class="line">        + &quot;cache-control: no-cache\r\n&quot;</span><br><span class="line">        + &quot;Accept: */*\r\n&quot;</span><br><span class="line">        + &quot;Connection: keep-alive\r\n&quot;</span><br><span class="line">        + &quot;\r\n&quot;;</span><br><span class="line"></span><br><span class="line">    int port = 8080;</span><br><span class="line">    try &#123;</span><br><span class="line">      System.out.println(&quot;连接到主机：&quot; + host + &quot; ，端口号：&quot; + port);</span><br><span class="line">      Socket client = new Socket(host, port);</span><br><span class="line">//      client.setSoLinger(true, 0);</span><br><span class="line">      System.out.println(&quot;远程主机地址：&quot; + client.getRemoteSocketAddress());</span><br><span class="line">      OutputStream outToServer = client.getOutputStream();</span><br><span class="line">      outToServer.write(httpStr.getBytes());</span><br><span class="line">//      client.shutdownOutput();</span><br><span class="line">      InputStream inFromServer = client.getInputStream();</span><br><span class="line"></span><br><span class="line">      BufferedReader br = new BufferedReader(</span><br><span class="line">          new InputStreamReader(inFromServer, StandardCharsets.ISO_8859_1));</span><br><span class="line">      String data;</span><br><span class="line">      while ((data = br.readLine()) != null) &#123;</span><br><span class="line">        System.out.println(&quot;服务器响应&quot; + data);</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">//      client.close();</span><br><span class="line">      Thread.sleep(100000000);</span><br><span class="line">    &#125; catch (IOException e) &#123;</span><br><span class="line">      e.printStackTrace();</span><br><span class="line">    &#125; finally &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="/images/pasted-209.png" alt="upload successful"></p>
 <h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://novoland.github.io/%E7%BD%91%E7%BB%9C/2014/07/26/RST%E5%8F%8Ajava%20socket%E5%85%B3%E9%97%AD%E5%90%8E%E8%AF%BB%E5%86%99%E7%9A%84%E5%90%84%E7%A7%8D%E5%BC%82%E5%B8%B8.html" target="_blank" rel="noopener">http://novoland.github.io/%E7%BD%91%E7%BB%9C/2014/07/26/RST%E5%8F%8Ajava%20socket%E5%85%B3%E9%97%AD%E5%90%8E%E8%AF%BB%E5%86%99%E7%9A%84%E5%90%84%E7%A7%8D%E5%BC%82%E5%B8%B8.html</a></p>
 
       
@@ -589,6 +593,10 @@
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
+              <img class="site-author-image" itemprop="image"
+                src="/images/tennis.jpg"
+                alt="Victor" />
+            
               <p class="site-author-name" itemprop="name">Victor</p>
               <p class="site-description motion-element" itemprop="description">victor的个人博客,作为一枚后端开发工程师,写本博客目的,旨在记录自己在工作生活中的点点滴滴,形成自己的知识体系</p>
           </div>
@@ -600,7 +608,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">197</span>
+                  <span class="site-state-item-count">199</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -634,6 +642,20 @@
 
           <div class="links-of-author motion-element">
             
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/victorsheng" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="psychovitor@gmail.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            
           </div>
 
           
@@ -657,7 +679,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Socket是什么"><span class="nav-number">1.</span> <span class="nav-text">Socket是什么</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#四次挥手流程"><span class="nav-number">2.</span> <span class="nav-text">四次挥手流程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#服务端发起流程"><span class="nav-number">2.1.</span> <span class="nav-text">服务端发起流程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-服务端发起关闭"><span class="nav-number">2.1.1.</span> <span class="nav-text">1.服务端发起关闭</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-中间状态"><span class="nav-number">2.1.2.</span> <span class="nav-text">2.中间状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-客户端关闭"><span class="nav-number">2.1.3.</span> <span class="nav-text">3.客户端关闭</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#客户端发起流程"><span class="nav-number">2.2.</span> <span class="nav-text">客户端发起流程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-客户端发起关闭"><span class="nav-number">2.2.1.</span> <span class="nav-text">1.客户端发起关闭</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-中间状态-1"><span class="nav-number">2.2.2.</span> <span class="nav-text">2.中间状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-服务端关闭"><span class="nav-number">2.2.3.</span> <span class="nav-text">3.服务端关闭</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RST关闭流程-一次通讯"><span class="nav-number">3.</span> <span class="nav-text">RST关闭流程(一次通讯)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#服务端发起"><span class="nav-number">3.1.</span> <span class="nav-text">服务端发起</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-服务端发起关闭-1"><span class="nav-number">3.1.1.</span> <span class="nav-text">1.服务端发起关闭</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-客户端状态"><span class="nav-number">3.1.2.</span> <span class="nav-text">2. 客户端状态</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#客户端发起"><span class="nav-number">3.2.</span> <span class="nav-text">客户端发起</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#客户端发起关闭"><span class="nav-number">3.2.1.</span> <span class="nav-text">客户端发起关闭</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-服务端状态"><span class="nav-number">3.2.2.</span> <span class="nav-text">2. 服务端状态</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#对已关闭socket读写会产生的异常"><span class="nav-number">4.</span> <span class="nav-text">对已关闭socket读写会产生的异常</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#主动关闭方"><span class="nav-number">4.1.</span> <span class="nav-text">主动关闭方</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#被动关闭方"><span class="nav-number">4.2.</span> <span class="nav-text">被动关闭方</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#被FIN关闭"><span class="nav-number">4.2.1.</span> <span class="nav-text">被FIN关闭</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#被RST关闭"><span class="nav-number">4.2.2.</span> <span class="nav-text">被RST关闭</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重点在于："><span class="nav-number">4.2.3.</span> <span class="nav-text">重点在于：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#小结"><span class="nav-number">5.</span> <span class="nav-text">小结</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#问题"><span class="nav-number">5.1.</span> <span class="nav-text">问题</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">6.</span> <span class="nav-text">参考</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Socket是什么"><span class="nav-number">1.</span> <span class="nav-text">Socket是什么</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#四次挥手流程"><span class="nav-number">2.</span> <span class="nav-text">四次挥手流程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#服务端发起流程"><span class="nav-number">2.1.</span> <span class="nav-text">服务端发起流程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-服务端发起关闭"><span class="nav-number">2.1.1.</span> <span class="nav-text">1.服务端发起关闭</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-中间状态"><span class="nav-number">2.1.2.</span> <span class="nav-text">2.中间状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-客户端关闭"><span class="nav-number">2.1.3.</span> <span class="nav-text">3.客户端关闭</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#客户端发起流程"><span class="nav-number">2.2.</span> <span class="nav-text">客户端发起流程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-客户端发起关闭"><span class="nav-number">2.2.1.</span> <span class="nav-text">1.客户端发起关闭</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-中间状态-1"><span class="nav-number">2.2.2.</span> <span class="nav-text">2.中间状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-服务端关闭"><span class="nav-number">2.2.3.</span> <span class="nav-text">3.服务端关闭</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RST关闭流程-一次通讯"><span class="nav-number">3.</span> <span class="nav-text">RST关闭流程(一次通讯)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#服务端发起"><span class="nav-number">3.1.</span> <span class="nav-text">服务端发起</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-服务端发起关闭-1"><span class="nav-number">3.1.1.</span> <span class="nav-text">1.服务端发起关闭</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-客户端状态"><span class="nav-number">3.1.2.</span> <span class="nav-text">2. 客户端状态</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#客户端发起"><span class="nav-number">3.2.</span> <span class="nav-text">客户端发起</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#客户端发起关闭"><span class="nav-number">3.2.1.</span> <span class="nav-text">客户端发起关闭</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-服务端状态"><span class="nav-number">3.2.2.</span> <span class="nav-text">2. 服务端状态</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#对已关闭socket读写会产生的异常"><span class="nav-number">4.</span> <span class="nav-text">对已关闭socket读写会产生的异常</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#主动关闭方"><span class="nav-number">4.1.</span> <span class="nav-text">主动关闭方</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#被动关闭方"><span class="nav-number">4.2.</span> <span class="nav-text">被动关闭方</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#被FIN关闭"><span class="nav-number">4.2.1.</span> <span class="nav-text">被FIN关闭</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#被RST关闭"><span class="nav-number">4.2.2.</span> <span class="nav-text">被RST关闭</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重点在于："><span class="nav-number">4.2.3.</span> <span class="nav-text">重点在于：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#小结"><span class="nav-number">5.</span> <span class="nav-text">小结</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#问题"><span class="nav-number">5.1.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对比"><span class="nav-number">5.2.</span> <span class="nav-text">对比</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#利用socket模拟http请求-然后在不关闭的情况下退出进程"><span class="nav-number">6.</span> <span class="nav-text">利用socket模拟http请求,然后在不关闭的情况下退出进程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">7.</span> <span class="nav-text">参考</span></a></li></ol></div>
             
 
           </div>
@@ -665,6 +687,13 @@
       <!--/noindex-->
       
 
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
       
 
     </div>
@@ -717,11 +746,6 @@
       </div>
     </footer>
 
-    
-      <div class="back-to-top">
-        <i class="fa fa-arrow-up"></i>
-        
-      </div>
     
 
     

@@ -98,7 +98,7 @@
     root: '/',
     scheme: 'Muse',
     version: '5.1.3',
-    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
     fancybox: true,
     tabs: true,
     motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
@@ -326,12 +326,330 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/02/java/java_thread/JUC-ReentrantReadWriteLock/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/tennis.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/02/java/java_thread/JUC-ReentrantReadWriteLock/" itemprop="url">AQS-ReentrantReadWriteLock</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-02T23:02:00+08:00">
+                2018-04-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/02/java/java_thread/JUC-ReentrantReadWriteLock/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/04/02/java/java_thread/JUC-ReentrantReadWriteLock/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/04/02/java/java_thread/JUC-ReentrantReadWriteLock/" class="leancloud_visitors" data-flag-title="AQS-ReentrantReadWriteLock">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><strong>读写所允许同一时刻被多个读线程访问，但是在写线程访问时，所有的读线程和其他的写线程都会被阻塞。</strong></p>
+<p>ReentrantReadWriteLock维护了一对相关的锁：共享锁readLock和独占锁writeLock。共享锁readLock用于读操作，能同时被多个线程获取；独占锁writeLock用于写入操作，只能被一个线程持有。独占锁的实现和我们上篇所讨论的ReentrantLock相似，共享锁我们接下来会详细分析。ReentrantReadWriteLock具有以下几种特性：</p>
+<ol>
+<li>公平性：</li>
+</ol>
+<p>非公平模式：默认模式。一个持续争用的非公平锁，可能会使其他读线程或写线程无限延期，但它比公平锁有更高的吞吐量。<br>公平模式：当构造一个公平锁时，线程争用使用一个近似顺序到达的策略。当目前持有的锁被释放，要么是等待时间最长的单个写入线程被分配写入锁，或者如果有一组读线程比所有等待写线程等待更长的时间，该组将被分配读取锁。<br>如果已经持有写锁，或者有一个正在等待写的线程，尝试获取公平读锁的线程（非重入）将会阻塞。在等待时间最长的写线程获取并释放写锁之前，当前线程将不能获取读锁。如果一个等待写入的线程放弃等待，并且在队列中等待时间最长的一个或多个读线程正在等待写锁空闲，那么这些读线程将被分配读取锁。</p>
+<p>当读锁和写锁都是空闲时（这意味着已经没有等待线程）， 一个尝试获取公平写锁（非重入）的线程才会获取成功。注意非阻塞方法tryLock()会立即尝试获取锁，它并不会按照公平原则那样去等待前继节点。</p>
+<ol start="2">
+<li><p>重入性：<br>ReentrantReadWriteLock允许读线程和写线程重复获取读锁或写锁。当所有写锁都被释放，不可重入读线程才允许获取锁。此外，一个写入线程可以获取读锁，但是一个读线程不能获取写锁。</p>
+</li>
+<li><p>锁降级：<br>重入性允许从写锁降级到读锁：首先获取写锁，然后获取读锁，然后释放写锁。不过，从一个读锁升级到写锁是不允许的。读锁和写锁在获取过程中都支持中断。</p>
+</li>
+<li><p>Condition支持：<br>Condition只有在写锁中用到，读锁是不支持Condition的。</p>
+</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/02/java/java_thread/study-locksupport/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/tennis.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/02/java/java_thread/study-locksupport/" itemprop="url">study-locksupport</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-02T18:39:55+08:00">
+                2018-04-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/02/java/java_thread/study-locksupport/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/04/02/java/java_thread/study-locksupport/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/04/02/java/java_thread/study-locksupport/" class="leancloud_visitors" data-flag-title="study-locksupport">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>这个类比较简单，是一个静态类，不需要实例化直接使用，底层是通过java未开源的Unsafe直接调用底层操作系统来完成对线程的阻塞。</p>
+<h1 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h1><p>park函数是将当前调用Thread阻塞，而unpark函数则是将指定线程Thread唤醒。</p>
+<h2 id="park"><a href="#park" class="headerlink" title="park()"></a>park()</h2><h2 id="unpark-Thread-thread"><a href="#unpark-Thread-thread" class="headerlink" title="unpark(Thread thread)"></a>unpark(Thread thread)</h2><h2 id="parkNanos-long-nanos"><a href="#parkNanos-long-nanos" class="headerlink" title="parkNanos(long nanos)"></a>parkNanos(long nanos)</h2><p>阻塞当前线程，最长不超过nanos纳秒，返回条件在park()的基础上增加了超时返回。</p>
+<h2 id="parkUntil-long-deadline"><a href="#parkUntil-long-deadline" class="headerlink" title="parkUntil(long deadline)"></a>parkUntil(long deadline)</h2><p>阻塞当前线程，知道deadline时间（deadline - 毫秒数）。</p>
+<h2 id="park-Object-blocker"><a href="#park-Object-blocker" class="headerlink" title="park(Object blocker)"></a>park(Object blocker)</h2><p>记录当前线程等待的对象（阻塞对象）；</p>
+<p>阻塞当前线程；</p>
+<p>当前线程等待对象置为null。</p>
+<p>为什么在java6要在入参引入blocker呢？blocker的作用到底是什么？</p>
+<p>从线程dump结果可以看出：<br>有blocker的可以传递给开发人员更多的现场信息，可以查看到当前线程的阻塞对象，方便定位问题。所以java6新增加带blocker入参的系列park方法，替代原有的park方法。</p>
+<h1 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h1><p>与Object类的wait/notify机制相比，park/unpark有两个优点：</p>
+<ul>
+<li>以thread为操作对象更符合阻塞线程的直观定义</li>
+<li>操作更精准，可以准确地唤醒某一个线程（notify随机唤醒一个线程，notifyAll唤醒所有等待的线程），增加了灵活性。</li>
+</ul>
+<p>（2）关于“许可”</p>
+<p>在上面的文字中，我使用了阻塞和唤醒，是为了和wait/notify做对比。</p>
+<p>其实park/unpark的设计原理核心是“许可”：park是等待一个许可，unpark是为某线程提供一个许可。<br>如果某线程A调用park，那么除非另外一个线程调用unpark(A)给A一个许可，否则线程A将阻塞在park操作上。</p>
+<p>有一点比较难理解的，是unpark操作可以再park操作之前。<br>也就是说，先提供许可。当某线程调用park时，已经有许可了，它就消费这个许可，然后可以继续运行。这其实是必须的。考虑最简单的生产者(Producer)消费者(Consumer)模型：Consumer需要消费一个资源，于是调用park操作等待；Producer则生产资源，然后调用unpark给予Consumer使用的许可。非常有可能的一种情况是，Producer先生产，这时候Consumer可能还没有构造好（比如线程还没启动，或者还没切换到该线程）。那么等Consumer准备好要消费时，显然这时候资源已经生产好了，可以直接用，那么park操作当然可以直接运行下去。如果没有这个语义，那将非常难以操作。</p>
+<p>但是这个“许可”是不能叠加的，“许可”是一次性的。<br>比如线程B连续调用了三次unpark函数，当线程A调用park函数就使用掉这个“许可”，如果线程A再次调用park，则进入等待状态。</p>
+<h1 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) &#123;</span><br><span class="line"></span><br><span class="line">        final Thread mainThread = Thread.currentThread();</span><br><span class="line"></span><br><span class="line">        Thread thread = new Thread(new Runnable() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            public void run() &#123;</span><br><span class="line">                System.out.println(&quot;3秒后解锁主线程&quot;);</span><br><span class="line">                try &#123;</span><br><span class="line">                    Thread.sleep(3000);</span><br><span class="line">                    LockSupport.unpark(mainThread);</span><br><span class="line">                &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        thread.start();</span><br><span class="line">        LockSupport.park();</span><br><span class="line"></span><br><span class="line">        System.out.println(&quot;Demo.main()&quot;);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="底层实现原理"><a href="#底层实现原理" class="headerlink" title="底层实现原理"></a>底层实现原理</h1><p>在Linux系统下，是用的Posix线程库pthread中的mutex（互斥量），condition（条件变量）来实现的。<br>mutex和condition保护了一个_counter的变量，当park时，这个变量被设置为0，当unpark时，这个变量被设置为1。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/02/java/java_thread/JUC-3-AQS/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -578,7 +896,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -729,7 +1047,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -903,7 +1221,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -1046,7 +1364,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -1253,7 +1571,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -1476,7 +1794,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -1659,7 +1977,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -1809,551 +2127,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/28/其他/gauze-mask-comparison/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/28/其他/gauze-mask-comparison/" itemprop="url">ffp2 ffp3 n95 n99差别</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-28T09:02:08+08:00">
-                2018-03-28
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/其他/" itemprop="url" rel="index">
-                    <span itemprop="name">其他</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/03/28/其他/gauze-mask-comparison/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/28/其他/gauze-mask-comparison/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/03/28/其他/gauze-mask-comparison/" class="leancloud_visitors" data-flag-title="ffp2 ffp3 n95 n99差别">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>最近打算买口罩,发现了FPP和N两种 度量的标准,以下是两种计量单位之间的比较</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">等级</th>
-<th style="text-align:left">Penetration 渗透率</th>
-<th style="text-align:left">　　捕集率</th>
-<th style="text-align:left">Resistant 阻抗</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">FFP1</td>
-<td style="text-align:left">20%</td>
-<td style="text-align:left">≥80%</td>
-<td style="text-align:left">21mm H2O</td>
-</tr>
-<tr>
-<td style="text-align:left">FFP2</td>
-<td style="text-align:left">6%</td>
-<td style="text-align:left">≥94%</td>
-<td style="text-align:left">24mm H2O</td>
-</tr>
-<tr>
-<td style="text-align:left">FFP3</td>
-<td style="text-align:left">1%</td>
-<td style="text-align:left">≥99%</td>
-<td style="text-align:left">30mm H2O</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">等级</th>
-<th style="text-align:left">Penetration渗透率</th>
-<th style="text-align:left">　　捕集率</th>
-<th style="text-align:left">Resistant 阻抗</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">N95</td>
-<td style="text-align:left">5%</td>
-<td style="text-align:left">≥95%</td>
-<td style="text-align:left">35mm H2O</td>
-</tr>
-<tr>
-<td style="text-align:left">N99</td>
-<td style="text-align:left">1%</td>
-<td style="text-align:left">≥99%</td>
-<td style="text-align:left">　35mm H2O</td>
-</tr>
-<tr>
-<td style="text-align:left">N100</td>
-<td style="text-align:left">0.03%</td>
-<td style="text-align:left">≥99.97%</td>
-<td style="text-align:left">35mm H2O</td>
-</tr>
-</tbody>
-</table>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/27/java/java_jvm/java-object-menory-compute/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/27/java/java_jvm/java-object-menory-compute/" itemprop="url">java对象字节码占用计算</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-27T22:22:30+08:00">
-                2018-03-27
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/03/27/java/java_jvm/java-object-menory-compute/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/27/java/java_jvm/java-object-menory-compute/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/03/27/java/java_jvm/java-object-menory-compute/" class="leancloud_visitors" data-flag-title="java对象字节码占用计算">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://www.jianshu.com/p/91e398d5d17c" target="_blank" rel="noopener">https://www.jianshu.com/p/91e398d5d17c</a><br><a href="https://www.jianshu.com/p/12a3c97dc2b7" target="_blank" rel="noopener">https://www.jianshu.com/p/12a3c97dc2b7</a></p>
-<h1 id="对象内存结构"><a href="#对象内存结构" class="headerlink" title="对象内存结构"></a>对象内存结构</h1><p><img src="/images/pasted-104.png" alt="upload successful"><br>各种类型分别占多少个字节(bytes)：</p>
-<p>计算方式：</p>
-<p>① 对象头（Header）<br>② 实例数据（Instance Data）<br>③ 对齐填充 （Padding）</p>
-<h2 id="对象头（Header）"><a href="#对象头（Header）" class="headerlink" title="对象头（Header）"></a>对象头（Header）</h2><p>HotSpot 虚拟机的对象头包括两部分信息：Mark Word 和 类型指针；如果是数组对象的话，还有第三部分（option）信息：数组长度</p>
-<h2 id="Mark-Word"><a href="#Mark-Word" class="headerlink" title="Mark Word"></a>Mark Word</h2><p>这部分数据的长度在32位和64位的虚拟机（未开启压缩指针）中分别为32bit 和64bit。Mark Word用于存储对象自身的运行时数据，如哈希码（HashCode）、GC分代年龄、锁状态标志、线程持有的锁、偏向线程ID、偏向时间戳等。<br>对象头信息是与对象定义的数据无关的额外存储成本，考虑到虚拟机的空间效率，Mark Word被设计成一个非固定的数据结构以便在极小的空间内存存储尽量多的信息，它会根据对象的状态复用自己的存储空间。</p>
-<h3 id="类型指针（Class-Pointer）"><a href="#类型指针（Class-Pointer）" class="headerlink" title="类型指针（Class Pointer）"></a>类型指针（Class Pointer）</h3><p>是对象指向它的类元数据的指针，虚拟机通过这个指针来确定这个对象是哪个类的实例。</p>
-<h3 id="数组长度（Length）-option"><a href="#数组长度（Length）-option" class="headerlink" title="数组长度（Length）[option]"></a>数组长度（Length）[option]</h3><p>如果对象时一个Java数组，那在对象头中还必须有一块用于记录数组长度的数据。因为虚拟机可以通过普通Java对象的元数据信息确定Java对象的大小，但是从数组的元数据中无法确定数组的大小。</p>
-<h2 id="实例数据（Instance-Data）"><a href="#实例数据（Instance-Data）" class="headerlink" title="实例数据（Instance Data）"></a>实例数据（Instance Data）</h2><p>实例数据部分是对象真正存储的有效信息，也是在程序代码中所定义的各种类型的字段内容，无论是从父类继承下来的，还是在子类中定义的，都需要记录起来。</p>
-<p>HotSpot虚拟机默认的分配策略为longs/doubles、ints、shorts/chars、bytes/booleans、oops（Ordinary Object Pointers），从分配策略中可以看出，相同宽度的字段总是被分配到一起。在满足这个前提条件的情况下，在父类中定义的变量会出现在子类之前。如果CompactFields参数值为true（默认为true），那子类之中较窄的变量也可能会插入到父类变量的空隙之中。</p>
-<h2 id="对齐填充-（Padding）"><a href="#对齐填充-（Padding）" class="headerlink" title="对齐填充 （Padding）"></a>对齐填充 （Padding）</h2><p>对齐填充并不是必然存在的，也没有特别的含义，它仅仅起着占位符的作用。由于HotSpot VM的自动内存管理系统要求对象起始地址必须是8字节的整数倍，换句话说就是对象的大小必须是8字节的整数倍。</p>
-<h2 id="占用空间"><a href="#占用空间" class="headerlink" title="占用空间"></a>占用空间</h2><p>普通对象占用内存情况：</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left"></th>
-<th style="text-align:left">32 位系统</th>
-<th style="text-align:left">64 位系统(+UseCompressedOops)</th>
-<th style="text-align:left">64 位系统(-UseCompressedOops)</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">Mark Word</td>
-<td style="text-align:left">4 bytes</td>
-<td style="text-align:left">8 bytes</td>
-<td style="text-align:left">8 bytes</td>
-</tr>
-<tr>
-<td style="text-align:left">Class Pointer</td>
-<td style="text-align:left">4 bytes</td>
-<td style="text-align:left">4 bytes</td>
-<td style="text-align:left">8 bytes</td>
-</tr>
-<tr>
-<td style="text-align:left">对象头</td>
-<td style="text-align:left">8 bytes</td>
-<td style="text-align:left">12 bytes</td>
-<td style="text-align:left">16 bytes</td>
-</tr>
-</tbody>
-</table>
-<p>数组对象占用内存情况：</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left"></th>
-<th style="text-align:left">32 位系统</th>
-<th style="text-align:left">64 位系统(+UseCompressedOops)</th>
-<th style="text-align:left">64 位系统(-UseCompressedOops)</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">Mark Word</td>
-<td style="text-align:left">4 bytes</td>
-<td style="text-align:left">8 bytes</td>
-<td style="text-align:left">8 bytes</td>
-</tr>
-<tr>
-<td style="text-align:left">Class Pointer</td>
-<td style="text-align:left">4 bytes</td>
-<td style="text-align:left">4 bytes</td>
-<td style="text-align:left">8 bytes</td>
-</tr>
-<tr>
-<td style="text-align:left">Length</td>
-<td style="text-align:left">4 bytes</td>
-<td style="text-align:left">4 bytes</td>
-<td style="text-align:left">4 bytes</td>
-</tr>
-<tr>
-<td style="text-align:left">对象头</td>
-<td style="text-align:left">12 bytes</td>
-<td style="text-align:left">16 bytes</td>
-<td style="text-align:left">20 bytes</td>
-</tr>
-</tbody>
-</table>
-<h1 id="基本类型"><a href="#基本类型" class="headerlink" title="基本类型"></a>基本类型</h1><table>
-<thead>
-<tr>
-<th style="text-align:left">Type</th>
-<th style="text-align:left">32 位系统</th>
-<th style="text-align:left">64 位系统(+UseCompressedOops)</th>
-<th style="text-align:left">64 位系统(-UseCompressedOops)</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">double</td>
-<td style="text-align:left">8 bytes</td>
-<td style="text-align:left">8 bytes</td>
-<td style="text-align:left">8 bytes</td>
-</tr>
-<tr>
-<td style="text-align:left">long</td>
-<td style="text-align:left">8 bytes</td>
-<td style="text-align:left">8 bytes</td>
-<td style="text-align:left">8 bytes</td>
-</tr>
-<tr>
-<td style="text-align:left">float</td>
-<td style="text-align:left">4 bytes</td>
-<td style="text-align:left">4 bytes</td>
-<td style="text-align:left">4 bytes</td>
-</tr>
-<tr>
-<td style="text-align:left">int</td>
-<td style="text-align:left">4 bytes</td>
-<td style="text-align:left">4 bytes</td>
-<td style="text-align:left">4 bytes</td>
-</tr>
-<tr>
-<td style="text-align:left">char</td>
-<td style="text-align:left">2 bytes</td>
-<td style="text-align:left">2 bytes</td>
-<td style="text-align:left">2 bytes</td>
-</tr>
-<tr>
-<td style="text-align:left">short</td>
-<td style="text-align:left">2 bytes</td>
-<td style="text-align:left">2 bytes</td>
-<td style="text-align:left">2 bytes</td>
-</tr>
-<tr>
-<td style="text-align:left">byte</td>
-<td style="text-align:left">1 bytes</td>
-<td style="text-align:left">1 bytes</td>
-<td style="text-align:left">1 bytes</td>
-</tr>
-<tr>
-<td style="text-align:left">boolean</td>
-<td style="text-align:left">1 bytes</td>
-<td style="text-align:left">1 bytes</td>
-<td style="text-align:left">1 bytes</td>
-</tr>
-<tr>
-<td style="text-align:left">oops(ordinary object pointers)</td>
-<td style="text-align:left">4 bytes</td>
-<td style="text-align:left">4 bytes</td>
-<td style="text-align:left">8 bytes</td>
-</tr>
-</tbody>
-</table>
-<p>注意：JVM默认是开启压缩参数的-XX:+UseCompressedOops</p>
-<p>计算对象本身占用大小和对象总空间占用大小的区别：</p>
-<p>1.本身占用大小，对象中除了基本类型之外，其他类型都按照引用来计算，不要计算引用中对象的大小。</p>
-<p>2.总空间占用大小，要计算对象中每一个对象的大小，引用中的对象也要计算，再累加获得总空间。</p>
-<h1 id="包装类型"><a href="#包装类型" class="headerlink" title="包装类型"></a>包装类型</h1><table>
-<thead>
-<tr>
-<th style="text-align:left"></th>
-<th style="text-align:left">+useCompressedOops</th>
-<th style="text-align:left">-useCompressedOops</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">Byte, Boolean</td>
-<td style="text-align:left">16 bytes</td>
-<td style="text-align:left">24 bytes</td>
-</tr>
-<tr>
-<td style="text-align:left">Short, Character</td>
-<td style="text-align:left">16 bytes</td>
-<td style="text-align:left">24 bytes</td>
-</tr>
-<tr>
-<td style="text-align:left">Integer, Float</td>
-<td style="text-align:left">16 bytes</td>
-<td style="text-align:left">24 bytes</td>
-</tr>
-<tr>
-<td style="text-align:left">Long, Double</td>
-<td style="text-align:left">24 bytes</td>
-<td style="text-align:left">24 bytes</td>
-</tr>
-</tbody>
-</table>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2393,6 +2166,10 @@
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
+              <img class="site-author-image" itemprop="image"
+                src="/images/tennis.jpg"
+                alt="Victor" />
+            
               <p class="site-author-name" itemprop="name">Victor</p>
               <p class="site-description motion-element" itemprop="description">victor的个人博客,作为一枚后端开发工程师,写本博客目的,旨在记录自己在工作生活中的点点滴滴,形成自己的知识体系</p>
           </div>
@@ -2404,7 +2181,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">197</span>
+                  <span class="site-state-item-count">199</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -2438,6 +2215,20 @@
 
           <div class="links-of-author motion-element">
             
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/victorsheng" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="psychovitor@gmail.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            
           </div>
 
           
@@ -2453,6 +2244,13 @@
 
       
 
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
       
 
     </div>
@@ -2505,11 +2303,6 @@
       </div>
     </footer>
 
-    
-      <div class="back-to-top">
-        <i class="fa fa-arrow-up"></i>
-        
-      </div>
     
 
     

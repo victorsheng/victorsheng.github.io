@@ -98,7 +98,7 @@
     root: '/',
     scheme: 'Muse',
     version: '5.1.3',
-    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
     fancybox: true,
     tabs: true,
     motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
@@ -326,12 +326,12 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/05/java-file-linux/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/07/charset/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -345,7 +345,393 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/07/05/java-file-linux/" itemprop="url">通过lsof命令观察,java文件不关闭的情况</a></h1>
+                <a class="post-title-link" href="/2018/07/07/charset/" itemprop="url">字符集-学习总结</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-07T07:32:30+08:00">
+                2018-07-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/07/07/charset/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/07/07/charset/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/07/07/charset/" class="leancloud_visitors" data-flag-title="字符集-学习总结">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><p>“字节”是一个8位的物理存贮单元，而“字符”则是一个文化相关的符号。</p>
+<h1 id="ASCII-1字节"><a href="#ASCII-1字节" class="headerlink" title="ASCII(1字节)"></a>ASCII(1字节)</h1><p>（American Standard Code for Information Interchange，美国信息互换标准代码）。当时世界上所有的计算机都用同样的ASCII方案来保存英文文字。</p>
+<p>最早:ASCII编码:7位的<br>后来用 127号之后的空位来表示这些新的字母、符号，还加入了很多画表格时需要用下到的横线、竖线、交叉等形状，一直把序号编到了最后一个状态255。从128 到255这一页的字符集被称”扩展字符集“。</p>
+<h1 id="iso-8859-1"><a href="#iso-8859-1" class="headerlink" title="iso 8859-1"></a>iso 8859-1</h1><p>编码是单字节编码，向下兼容ASCII，是许多欧洲国家使用的编码标准。其编码范围是0x00-0xFF，0x00-0x7F之间完全和ASCII一致，0x80-0x9F之间是控制字符，0xA0-0xFF之间是文字符号。</p>
+<h1 id="GBK-中文2字节-英文1字节"><a href="#GBK-中文2字节-英文1字节" class="headerlink" title="GBK(中文2字节,英文1字节)"></a>GBK(中文2字节,英文1字节)</h1><p>GBK是国家标准GB2312基础上扩容后兼容GB2312的标准。GBK的文字编码是用<strong>双字节</strong>来表示的，即不论中、英文字符均使用双字节来表示，为了区分中文，将其最高位都设定成1。GBK包含全部中文字符，是国家编码，通用性比UTF8差，不过UTF8占用的数据库比GBD大。<br>简体中文</p>
+<p>从ASCII、GB2312到GBK，这些编码方法是向下兼容的，即同一个字符在这些方案中总是有相同的编码，后面的标准支持更多的字符。在这些编码中，英文和中文可以统一地处理。区分中文编码的方法是高字节的最高位不为0。按照程序员的称呼，GB2312、GBK都属于双字节字符集 (DBCS)。</p>
+<p><strong>如果这个值是大于127的，那么就认为一个双字节字符集里的字符出现了。</strong></p>
+<h1 id="Unicode-”Universal-Multiple-Octet-Coded-Character-Set”，简称-UCS"><a href="#Unicode-”Universal-Multiple-Octet-Coded-Character-Set”，简称-UCS" class="headerlink" title="Unicode(”Universal Multiple-Octet Coded Character Set”，简称 UCS)"></a>Unicode(”Universal Multiple-Octet Coded Character Set”，简称 UCS)</h1><p>Unicode也是一种字符编码方法，不过它是由国际组织设计，可以容纳全世界所有语言文字的编码方案。</p>
+<p>Unicode只与ASCII兼容（更准确地说，是与ISO-8859-1兼容）</p>
+<p>由于”半角”英文符号只需要用到低8位，所以其高8位永远是0，因此这种大气的方案在保存英文文本时会多浪费一倍的空间。</p>
+<p>Unicode 当然是一个很大的集合，现在的规模可以容纳100多万个符号。每个符号的编码都不一样，比如，U+0639表示阿拉伯字母Ain，U+0041表示英语的大写字母A，U+4E25表示汉字严。具体的符号对应表，可以查询unicode.org，或者专门的汉字对应表。</p>
+<p><a href="http://www.chi2ko.com/tool/CJK.htm" target="_blank" rel="noopener">http://www.chi2ko.com/tool/CJK.htm</a></p>
+<p><strong>需要注意的是，Unicode 只是一个符号集，它只规定了符号的二进制代码，却没有规定这个二进制代码应该如何存储。</strong></p>
+<h2 id="Unicode-的问题"><a href="#Unicode-的问题" class="headerlink" title="Unicode 的问题"></a>Unicode 的问题</h2><p>需要注意的是，Unicode 只是一个符号集，它只规定了符号的二进制代码，却没有规定这个二进制代码应该如何存储。</p>
+<p>比如，汉字严的 Unicode 是十六进制数4E25，转换成二进制数足足有15位（100111000100101），也就是说，这个符号的表示至少需要2个字节。表示其他更大的符号，可能需要3个字节或者4个字节，甚至更多。</p>
+<p>这里就有两个严重的问题，第一个问题是，如何才能区别 Unicode 和 ASCII ？计算机怎么知道三个字节表示一个符号，而不是分别表示三个符号呢？第二个问题是，我们已经知道，英文字母只用一个字节表示就够了，如果 Unicode 统一规定，每个符号用三个或四个字节表示，那么每个英文字母前都必然有二到三个字节是0，这对于存储来说是极大的浪费，文本文件的大小会因此大出二三倍，这是无法接受的。</p>
+<p><strong>utf-8,utf-16,utf-32是unicode码一种实现形式，都是属于unicode编码。</strong></p>
+<h1 id="UTF-8-1-4个字节表示一个符号"><a href="#UTF-8-1-4个字节表示一个符号" class="headerlink" title="UTF-8(1~4个字节表示一个符号)"></a>UTF-8(1~4个字节表示一个符号)</h1><p>（8-bit Unicode Transformation Format）的简称</p>
+<p>UTF-8 最大的一个特点，就是它是一种变长的编码方式。它可以使用1~4个字节表示一个符号，根据不同的符号而变化字节长度。</p>
+<p>UTF-8 的编码规则很简单，只有二条：</p>
+<p>1）对于单字节的符号，字节的第一位设为0，后面7位为这个符号的 Unicode 码。因此对于英语字母，UTF-8 编码和 ASCII 码是相同的。</p>
+<p>2）对于n字节的符号（n &gt; 1），第一个字节的前n位都设为1，第n + 1位设为0，后面字节的前两位一律设为10。剩下的没有提及的二进制位，全部为这个符号的 Unicode 码。</p>
+<p>下表总结了编码规则，字母x表示可用编码的位。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Unicode符号范围     |        UTF-8编码方式</span><br><span class="line">(十六进制)        |              （二进制）</span><br><span class="line">----------------------+---------------------------------------------</span><br><span class="line">0000 0000-0000 007F | 0xxxxxxx</span><br><span class="line">0000 0080-0000 07FF | 110xxxxx 10xxxxxx</span><br><span class="line">0000 0800-0000 FFFF | 1110xxxx 10xxxxxx 10xxxxxx</span><br><span class="line">0001 0000-0010 FFFF | 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx</span><br></pre></td></tr></table></figure>
+<p>跟据上表，解读 UTF-8 编码非常简单。如果一个字节的第一位是0，则这个字节单独就是一个字符；如果第一位是1，则连续有多少个1，就表示当前字符占用多少个字节。</p>
+<p>下面，还是以汉字严为例，演示如何实现 UTF-8 编码。</p>
+<p>严的 Unicode 是4E25（100111000100101），根据上表，可以发现4E25处在第三行的范围内（0000 0800 - 0000 FFFF），因此严的 UTF-8 编码需要三个字节，即格式是1110xxxx 10xxxxxx 10xxxxxx。然后，从严的最后一个二进制位开始，依次从后向前填入格式中的x，多出的位补0。这样就得到了，严的 UTF-8 编码是11100100 10111000 10100101，转换成十六进制就是E4B8A5。</p>
+<hr>
+<p>UTF-8：Unicode TransformationFormat-8bit，允许含BOM，但通常不含BOM。是用以解决国际上字符的一种多字节编码，<strong>它对英文使用8位（即一个字节），中文使用24为（三个字节）来编码</strong>。<br>UTF-8包含全世界所有国家需要用到的字符，是国际编码，通用性强。UTF-8编码的文字可以在各国支持UTF8字符集的浏览器上显示。如，如果是UTF8编码，则在外国人的英文IE上也能显示中文，他们无需下载IE的中文语言支持包。 </p>
+<p><a href="https://zh.wikipedia.org/wiki/UTF-8" target="_blank" rel="noopener">https://zh.wikipedia.org/wiki/UTF-8</a></p>
+<h1 id="bom-Byte-Order-Mark"><a href="#bom-Byte-Order-Mark" class="headerlink" title="bom(Byte Order Mark)"></a>bom(Byte Order Mark)</h1><p>大端法（Big endian）:高位在前<br>小端法（Little endian）:低位在前</p>
+<p>BOM=Byte Order Mark，翻译过来就是“字节顺序标识”<br>自然地，这里所谓的字节顺序其实就是指使用了哪种端法。</p>
+<ul>
+<li>UTF-16 BE（Big Endian）的BOM是：FE FF</li>
+<li>UTF-16 LE（Little Endian）的BOM是：FF FE</li>
+<li>UTF-8的BOM是：EF BB BF</li>
+</ul>
+<p>UTF-8也不存在所谓的大小端两种情况，统一为大端法</p>
+<p><a href="https://my.oschina.net/goldenshaw/blog/323248" target="_blank" rel="noopener">https://my.oschina.net/goldenshaw/blog/323248</a></p>
+<h1 id="GBK和UTF-8互转尾部乱码问题分析"><a href="#GBK和UTF-8互转尾部乱码问题分析" class="headerlink" title="GBK和UTF-8互转尾部乱码问题分析"></a>GBK和UTF-8互转尾部乱码问题分析</h1><p><a href="https://blog.csdn.net/54powerman/article/details/77575656" target="_blank" rel="noopener">https://blog.csdn.net/54powerman/article/details/77575656</a></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://frontenddev.org/link/ascii-unicode-gbk-and-utf-8-character-encoding-is-the-difference-between-contact.html" target="_blank" rel="noopener">http://frontenddev.org/link/ascii-unicode-gbk-and-utf-8-character-encoding-is-the-difference-between-contact.html</a></p>
+<p><a href="http://www.ruanyifeng.com/blog/2007/10/ascii_unicode_and_utf-8.html" target="_blank" rel="noopener">http://www.ruanyifeng.com/blog/2007/10/ascii_unicode_and_utf-8.html</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/06/linux-proc-folder/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/tennis.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/07/06/linux-proc-folder/" itemprop="url">linux-proc-folder</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-06T06:03:46+08:00">
+                2018-07-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/07/06/linux-proc-folder/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/07/06/linux-proc-folder/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/07/06/linux-proc-folder/" class="leancloud_visitors" data-flag-title="linux-proc-folder">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="proc目录"><a href="#proc目录" class="headerlink" title="/proc目录"></a>/proc目录</h1><ul>
+<li>Linux 内核提供了一种通过 /proc 文件系统，在运行时访问内核内部数据结构、改变内核设置的机制。</li>
+<li>proc文件系统是一个伪文件系统，<strong>它只存在内存当中</strong>，而不占用外存空间。</li>
+<li>它以文件系统的方式为访问系统内核数据的操作提供接口。</li>
+</ul>
+<h2 id="子文件或子文件夹"><a href="#子文件或子文件夹" class="headerlink" title="子文件或子文件夹"></a>子文件或子文件夹</h2><p>/proc/buddyinfo 每个内存区中的每个order有多少块可用，和内存碎片问题有关</p>
+<p>/proc/cmdline 启动时传递给kernel的参数信息</p>
+<p>/proc/cpuinfo cpu的信息</p>
+<p>/proc/crypto 内核使用的所有已安装的加密密码及细节</p>
+<p>/proc/devices 已经加载的设备并分类</p>
+<p>/proc/dma 已注册使用的ISA DMA频道列表</p>
+<p>/proc/execdomains Linux内核当前支持的execution domains</p>
+<p>/proc/fb 帧缓冲设备列表，包括数量和控制它的驱动</p>
+<p>/proc/filesystems 内核当前支持的文件系统类型</p>
+<p>/proc/interrupts x86架构中的每个IRQ中断数</p>
+<p>/proc/iomem 每个物理设备当前在系统内存中的映射</p>
+<p>/proc/ioports 一个设备的输入输出所使用的注册端口范围</p>
+<p>/proc/kcore 代表系统的物理内存，存储为核心文件格式，里边显示的是字节数，等于RAM大小加上4kb</p>
+<p>/proc/kmsg 记录内核生成的信息，可以通过/sbin/klogd或/bin/dmesg来处理</p>
+<p>/proc/loadavg 根据过去一段时间内CPU和IO的状态得出的负载状态，与uptime命令有关</p>
+<p>/proc/locks 内核锁住的文件列表</p>
+<p>/proc/mdstat 多硬盘，RAID配置信息(md=multiple disks)</p>
+<p>/proc/meminfo RAM使用的相关信息</p>
+<p>/proc/misc 其他的主要设备(设备号为10)上注册的驱动</p>
+<p>/proc/modules 所有加载到内核的模块列表</p>
+<p>/proc/mounts 系统中使用的所有挂载</p>
+<p>/proc/mtrr 系统使用的Memory Type Range Registers (MTRRs)</p>
+<p>/proc/partitions 分区中的块分配信息</p>
+<p>/proc/pci 系统中的PCI设备列表</p>
+<p>/proc/slabinfo 系统中所有活动的 slab 缓存信息</p>
+<p>/proc/stat 所有的CPU活动信息</p>
+<p>/proc/sysrq-trigger 使用echo命令来写这个文件的时候，远程root用户可以执行大多数的系统请求关键命令，就好像在本地终端执行一样。要写入这个文件，需要把/proc/sys/kernel/sysrq不能设置为0。这个文件对root也是不可读的</p>
+<p>/proc/uptime 系统已经运行了多久</p>
+<p>/proc/swaps 交换空间的使用情况</p>
+<p>/proc/version Linux内核版本和gcc版本</p>
+<p>/proc/bus 系统总线(Bus)信息，例如pci/usb等</p>
+<p>/proc/driver 驱动信息</p>
+<p>/proc/fs 文件系统信息</p>
+<p>/proc/ide ide设备信息</p>
+<p>/proc/irq 中断请求设备信息</p>
+<p>/proc/net 网卡设备信息</p>
+<p>/proc/scsi scsi设备信息</p>
+<p>/proc/tty tty设备信息</p>
+<p>/proc/net/dev 显示网络适配器及统计信息</p>
+<p>/proc/vmstat 虚拟内存统计信息</p>
+<p>/proc/vmcore 内核panic时的内存映像</p>
+<p>/proc/diskstats 取得磁盘信息</p>
+<p>/proc/schedstat kernel调度器的统计信息</p>
+<p>/proc/zoneinfo 显示内存空间的统计信息，对分析虚拟内存行为很有用</p>
+<h2 id="proc目录中进程N的信息"><a href="#proc目录中进程N的信息" class="headerlink" title="/proc目录中进程N的信息"></a>/proc目录中进程N的信息</h2><p>/proc/N pid为N的进程信息</p>
+<p>/proc/N/cmdline 进程启动命令</p>
+<p>/proc/N/cwd 链接到进程当前工作目录</p>
+<p>/proc/N/environ 进程环境变量列表</p>
+<p>/proc/N/exe 链接到进程的执行命令文件</p>
+<p><strong>/proc/N/fd 包含进程相关的所有的文件描述符</strong></p>
+<p>/proc/N/maps 与进程相关的内存映射信息</p>
+<p>/proc/N/mem 指代进程持有的内存，不可读</p>
+<p>/proc/N/root 链接到进程的根目录</p>
+<p>/proc/N/stat 进程的状态</p>
+<p>/proc/N/statm 进程使用的内存的状态</p>
+<p>/proc/N/status 进程状态信息，比stat/statm更具可读性</p>
+<p>/proc/self 链接到当前正在运行的进程</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/05/java-file-linux/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/tennis.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/07/05/java-file-linux/" itemprop="url">文件句柄泄漏</a></h1>
         
 
         <div class="post-meta">
@@ -386,7 +772,7 @@
 
           
           
-             <span id="/2018/07/05/java-file-linux/" class="leancloud_visitors" data-flag-title="通过lsof命令观察,java文件不关闭的情况">
+             <span id="/2018/07/05/java-file-linux/" class="leancloud_visitors" data-flag-title="文件句柄泄漏">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -431,8 +817,12 @@
 <h2 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h2><p>lsof abc.txt 显示开启文件abc.txt的进程<br>lsof -c abc 显示abc进程现在打开的文件<br>lsof -c -p 1234 列出进程号为1234的进程所打开的文件<br>lsof -g gid 显示归属gid的进程情况<br>lsof +d /usr/local/ 显示目录下被进程开启的文件<br>lsof +D /usr/local/ 同上，但是会搜索目录下的目录，时间较长<br>lsof -d 4 显示使用fd为4的进程<br>lsof -i 用以显示符合条件的进程情况<br>lsof -i[46] [protocol][@hostname|hostaddr][:service|port]<br>  46 –&gt; IPv4 or IPv6<br>  protocol –&gt; TCP or UDP<br>  hostname –&gt; Internet host name<br>  hostaddr –&gt; IPv4地址<br>  service –&gt; /etc/service中的 service name (可以不止一个)<br>  port –&gt; 端口号 (可以不止一个)</p>
 <h2 id="说明："><a href="#说明：" class="headerlink" title="说明："></a>说明：</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line">lsof输出各列信息的意义如下：</span><br><span class="line"></span><br><span class="line">COMMAND：进程的名称</span><br><span class="line"></span><br><span class="line">PID：进程标识符</span><br><span class="line"></span><br><span class="line">PPID：父进程标识符（需要指定-R参数）</span><br><span class="line"></span><br><span class="line">USER：进程所有者</span><br><span class="line"></span><br><span class="line">PGID：进程所属组</span><br><span class="line"></span><br><span class="line">FD：文件描述符，应用程序通过文件描述符识别该文件。如cwd、txt等</span><br><span class="line"></span><br><span class="line">（1）cwd：表示current work dirctory，即：应用程序的当前工作目录，这是该应用程序启动的目录，除非它本身对这个目录进行更改</span><br><span class="line">（2）txt ：该类型的文件是程序代码，如应用程序二进制文件本身或共享库，如上列表中显示的 /sbin/init 程序</span><br><span class="line">（3）lnn：library references (AIX);</span><br><span class="line">（4）er：FD information error (see NAME column);</span><br><span class="line">（5）jld：jail directory (FreeBSD);</span><br><span class="line">（6）ltx：shared library text (code and data);</span><br><span class="line">（7）mxx ：hex memory-mapped type number xx.</span><br><span class="line">（8）m86：DOS Merge mapped file;</span><br><span class="line">（9）mem：memory-mapped file;</span><br><span class="line">（10）mmap：memory-mapped device;</span><br><span class="line">（11）pd：parent directory;</span><br><span class="line">（12）rtd：root directory;</span><br><span class="line">（13）tr：kernel trace file (OpenBSD);</span><br><span class="line">（14）v86  VP/ix mapped file;</span><br><span class="line">（15）0：表示标准输出</span><br><span class="line">（16）1：表示标准输入</span><br><span class="line">（17）2：表示标准错误</span><br><span class="line"></span><br><span class="line">一般在标准输出、标准错误、标准输入后还跟着文件状态模式：r、w、u等</span><br><span class="line"></span><br><span class="line">（1）u：表示该文件被打开并处于读取/写入模式</span><br><span class="line">（2）r：表示该文件被打开并处于只读模式</span><br><span class="line">（3）w：表示该文件被打开并处于</span><br><span class="line">（4）空格：表示该文件的状态模式为unknow，且没有锁定</span><br><span class="line">（5）-：表示该文件的状态模式为unknow，且被锁定</span><br><span class="line"></span><br><span class="line">同时在文件状态模式后面，还跟着相关的锁</span><br><span class="line"></span><br><span class="line">（1）N：for a Solaris NFS lock of unknown type;</span><br><span class="line">（2）r：for read lock on part of the file;</span><br><span class="line">（3）R：for a read lock on the entire file;</span><br><span class="line">（4）w：for a write lock on part of the file;（文件的部分写锁）</span><br><span class="line">（5）W：for a write lock on the entire file;（整个文件的写锁）</span><br><span class="line">（6）u：for a read and write lock of any length;</span><br><span class="line">（7）U：for a lock of unknown type;</span><br><span class="line">（8）x：for an SCO OpenServer Xenix lock on part      of the file;</span><br><span class="line">（9）X：for an SCO OpenServer Xenix lock on the      entire file;</span><br><span class="line">（10）space：if there is no lock.</span><br><span class="line"></span><br><span class="line">TYPE：文件类型，如DIR、REG等，常见的文件类型</span><br><span class="line"></span><br><span class="line">（1）DIR：表示目录</span><br><span class="line">（2）CHR：表示字符类型</span><br><span class="line">（3）BLK：块设备类型</span><br><span class="line">（4）UNIX： UNIX 域套接字</span><br><span class="line">（5）FIFO：先进先出 (FIFO) 队列</span><br><span class="line">（6）IPv4：网际协议 (IP) 套接字</span><br><span class="line"></span><br><span class="line">DEVICE：指定磁盘的名称</span><br><span class="line"></span><br><span class="line">SIZE：文件的大小</span><br><span class="line"></span><br><span class="line">NODE：索引节点（文件在磁盘上的标识）</span><br><span class="line"></span><br><span class="line">NAME：打开文件的确切名称</span><br></pre></td></tr></table></figure>
 <h2 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h2><h3 id="查找谁在使用文件系统"><a href="#查找谁在使用文件系统" class="headerlink" title="查找谁在使用文件系统"></a>查找谁在使用文件系统</h3><p>在卸载文件系统时，如果该文件系统中有任何打开的文件，操作通常将会失败。那么通过lsof可以找出那些进程在使用当前要卸载的文件系统，如下：<br> lsof /GTES11/<br>COMMAND PID USER FD TYPE DEVICE SIZE NODE NAME<br>bash 4208 root cwd DIR 3,1 4096 2 /GTES11/<br>vim 4230 root cwd DIR 3,1 4096 2 /GTES11/<br>在这个示例中，用户root正在其/GTES11目录中进行一些操作。一个 bash是实例正在运行，并且它当前的目录为/GTES11，另一个则显示的是vim正在编辑/GTES11下的文件。要成功地卸载/GTES11，应该在通知用户以确保情况正常之后，中止这些进程。 这个示例说明了应用程序的当前工作目录非常重要，因为它仍保持着文件资源，并且可以防止文件系统被卸载。这就是为什么大部分守护进程（后台进程）将它们的目录更改为根目录、或服务特定的目录（如 sendmail 示例中的 /var/spool/mqueue）的原因，以避免该守护进程阻止卸载不相关的文件系统。</p>
-<h3 id="恢复删除的文件"><a href="#恢复删除的文件" class="headerlink" title="恢复删除的文件"></a>恢复删除的文件</h3><p>当Linux计算机受到入侵时，常见的情况是日志文件被删除，以掩盖攻击者的踪迹。管理错误也可能导致意外删除重要的文件，比如在清理旧日志时，意外地删除了数据库的活动事务日志。有时可以通过lsof来恢复这些文件。<br>当进程打开了某个文件时，<em>只要该进程保持打开该文件，即使将其删除，它依然存在于磁盘中</em>。这意味着，进程并不知道文件已经被删除，它仍然可以向打开该文件时提供给它的文件描述符进行读取和写入。除了该进程之外，这个文件是不可见的，因为已经删除了其相应的目录索引节点。<br>在/proc 目录下，其中包含了反映内核和进程树的各种文件。/proc目录挂载的是在内存中所映射的一块区域，所以这些文件和目录并不存在于磁盘中，因此当我们对这些文件进行读取和写入时，实际上是在从内存中获取相关信息。大多数与 lsof 相关的信息都存储于以进程的 PID 命名的目录中，即 /proc/1234 中包含的是 PID 为 1234 的进程的信息。每个进程目录中存在着各种文件，它们可以使得应用程序简单地了解进程的内存空间、文件描述符列表、指向磁盘上的文件的符号链接和其他系统信息。lsof 程序使用该信息和其他关于内核内部状态的信息来产生其输出。所以lsof 可以显示进程的文件描述符和相关的文件名等信息。也就是我们通过访问进程的文件描述符可以找到该文件的相关信息。<br>当系统中的某个文件被意外地删除了，只要这个时候系统中还有进程正在访问该文件，那么我们就可以通过lsof从/proc目录下恢复该文件的内容。 假如由于误操作将/var/log/messages文件删除掉了，那么这时要将/var/log/messages文件恢复的方法如下：<br>首先使用lsof来查看当前是否有进程打开/var/logmessages文件，如下：<br><code>lsof |grep /var/log/messages</code><br>syslogd 1283 root 2w REG 3,3 5381017 1773647 /var/log/messages (deleted)<br>从上面的信息可以看到 PID 1283（syslogd）打开文件的文件描述符为 2。同时还可以看到/var/log/messages已经标记被删除了。因此我们可以在 /proc/1283/fd/2 （fd下的每个以数字命名的文件表示进程对应的文件描述符）中查看相应的信息，如下：<br><code>head -n 10 /proc/1283/fd/2</code><br>Aug 4 13:50:15 holmes86 syslogd 1.4.1: restart.<br>Aug 4 13:50:15 holmes86 kernel: klogd 1.4.1, log source = /proc/kmsg started.<br>Aug 4 13:50:15 holmes86 kernel: Linux version 2.6.22.1-8 (<a href="mailto:root@everestbuilder.linux-ren.org" target="_blank" rel="noopener">root@everestbuilder.linux-ren.org</a>) (gcc version 4.2.0) #1 SMP Wed Jul 18 11:18:32 EDT 2007 Aug 4 13:50:15 holmes86 kernel: BIOS-provided physical RAM map: Aug 4 13:50:15 holmes86 kernel: BIOS-e820: 0000000000000000 - 000000000009f000 (usable) Aug 4 13:50:15 holmes86 kernel: BIOS-e820: 000000000009f000 - 00000000000a0000 (reserved) Aug 4 13:50:15 holmes86 kernel: BIOS-e820: 0000000000100000 - 000000001f7d3800 (usable) Aug 4 13:50:15 holmes86 kernel: BIOS-e820: 000000001f7d3800 - 0000000020000000 (reserved) Aug 4 13:50:15 holmes86 kernel: BIOS-e820: 00000000e0000000 - 00000000f0007000 (reserved) Aug 4 13:50:15 holmes86 kernel: BIOS-e820: 00000000f0008000 - 00000000f000c000 (reserved)<br>从上面的信息可以看出，查看 /proc/8663/fd/15 就可以得到所要恢复的数据。如果可以通过文件描述符查看相应的数据，那么就可以使用 I/O 重定向将其复制到文件中，如:<br>cat /proc/1283/fd/2 &gt; /var/log/messages<br>对于许多应用程序，尤其是日志文件和数据库，这种恢复删除文件的方法非常有用。</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://www.cnblogs.com/peida/archive/2013/02/26/2932972.html" target="_blank" rel="noopener">http://www.cnblogs.com/peida/archive/2013/02/26/2932972.html</a><br><a href="https://www.cnblogs.com/ggjucheng/archive/2012/01/08/2316599.html" target="_blank" rel="noopener">https://www.cnblogs.com/ggjucheng/archive/2012/01/08/2316599.html</a></p>
+<h3 id="恢复删除的文件"><a href="#恢复删除的文件" class="headerlink" title="恢复删除的文件"></a>恢复删除的文件</h3><p>当Linux计算机受到入侵时，常见的情况是日志文件被删除，以掩盖攻击者的踪迹。管理错误也可能导致意外删除重要的文件，比如在清理旧日志时，意外地删除了数据库的活动事务日志。有时可以通过lsof来恢复这些文件。<br>当进程打开了某个文件时，<em>只要该进程保持打开该文件，即使将其删除，它依然存在于磁盘中</em>。这意味着，进程并不知道文件已经被删除，它仍然可以向打开该文件时提供给它的文件描述符进行读取和写入。除了该进程之外，这个文件是不可见的，因为已经删除了其相应的目录索引节点。<br>在/proc 目录下，其中包含了反映内核和进程树的各种文件。/proc目录挂载的是在内存中所映射的一块区域，所以这些文件和目录并不存在于磁盘中，因此当我们对这些文件进行读取和写入时，实际上是在从内存中获取相关信息。大多数与 lsof 相关的信息都存储于以进程的 PID 命名的目录中，即 /proc/1234 中包含的是 PID 为 1234 的进程的信息。每个进程目录中存在着各种文件，它们可以使得应用程序简单地了解进程的内存空间、文件描述符列表、指向磁盘上的文件的符号链接和其他系统信息。lsof 程序使用该信息和其他关于内核内部状态的信息来产生其输出。所以lsof 可以显示进程的文件描述符和相关的文件名等信息。也就是我们通过访问进程的文件描述符可以找到该文件的相关信息。<br>当系统中的某个文件被意外地删除了，只要这个时候系统中还有进程正在访问该文件，那么我们就可以通过lsof从/proc目录下恢复该文件的内容。 假如由于误操作将/var/log/messages文件删除掉了，那么这时要将/var/log/messages文件恢复的方法如下：<br>首先使用lsof来查看当前是否有进程打开/var/logmessages文件，如下：<br><code>lsof |grep /var/log/messages</code><br>syslogd 1283 root 2w REG 3,3 5381017 1773647 /var/log/messages (deleted)<br>从上面的信息可以看到 PID 1283（syslogd）打开文件的文件描述符为 2。同时还可以看到/var/log/messages已经标记被删除了。因此我们可以在 /proc/1283/fd/2 （fd下的每个以数字命名的文件表示进程对应的文件描述符）中查看相应的信息，如下：<br><code>head -n 10 /proc/1283/fd/2</code><br>Aug 4 13:50:15 holmes86 syslogd 1.4.1: restart.<br>Aug 4 13:50:15 holmes86 kernel: klogd 1.4.1, log source = /proc/kmsg started.<br>Aug 4 13:50:15 holmes86 kernel: Linux version 2.6.22.1-8 (<a href="mailto:root@everestbuilder.linux-ren.org" target="_blank" rel="noopener">root@everestbuilder.linux-ren.org</a>) (gcc version 4.2.0) #1 SMP Wed Jul 18 11:18:32 EDT 2007 Aug 4 13:50:15 holmes86 kernel: BIOS-provided physical RAM map: Aug 4 13:50:15 holmes86 kernel: BIOS-e820: 0000000000000000 - 000000000009f000 (usable) Aug 4 13:50:15 holmes86 kernel: BIOS-e820: 000000000009f000 - 00000000000a0000 (reserved) Aug 4 13:50:15 holmes86 kernel: BIOS-e820: 0000000000100000 - 000000001f7d3800 (usable) Aug 4 13:50:15 holmes86 kernel: BIOS-e820: 000000001f7d3800 - 0000000020000000 (reserved) Aug 4 13:50:15 holmes86 kernel: BIOS-e820: 00000000e0000000 - 00000000f0007000 (reserved) Aug 4 13:50:15 holmes86 kernel: BIOS-e820: 00000000f0008000 - 00000000f000c000 (reserved)<br>从上面的信息可以看出，查看 /proc/8663/fd/15 就可以得到所要恢复的数据。如果可以通过文件描述符查看相应的数据，那么就可以使用 I/O 重定向将其复制到文件中，如:<br><code>cat /proc/1283/fd/2 &gt; /var/log/messages</code><br>对于许多应用程序，尤其是日志文件和数据库，这种恢复删除文件的方法非常有用。</p>
+<h1 id="lsof对多线程的影响"><a href="#lsof对多线程的影响" class="headerlink" title="lsof对多线程的影响"></a>lsof对多线程的影响</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mcu 13810 server1 7176r REG 8,1 1984229 2001190 /home/box/storage/kvdb/001125.ldb</span><br><span class="line">mcu 13810 server1 7177r REG 8,1 1984229 2001190 /home/box/storage/kvdb/001125.ldb</span><br><span class="line">mcu 13810 server1 7178r REG 8,1 1984229 2001190 /home/box/storage/kvdb/001125.ldb</span><br><span class="line">mcu 13810 server1 7179r REG 8,1 1984229 2001190 /home/box/storage/kvdb/001125.ldb</span><br><span class="line">mcu 13810 server1 7180r REG 8,1 1984229 2001190 /home/box/storage/kvdb/001125.ldb</span><br><span class="line">mcu 13810 server1 7181r REG 8,1 1984229 2001190 /home/box/storage/kvdb/001125.ldb</span><br><span class="line">mcu 13810 server1 7182r REG 8,1 1984229 2001190 /home/box/storage/kvdb/001125.ldb</span><br></pre></td></tr></table></figure>
+<p>lsof列出的多个线程并不代表每个线程占用了一个句柄，而是代表这些线程对这个文件有访问权限，实际上只要这个进程打开了这个文件，lsof都会列出所有子线程。</p>
+<p><a href="https://github.com/Tencent/phxpaxos/issues/15" target="_blank" rel="noopener">https://github.com/Tencent/phxpaxos/issues/15</a></p>
+<h2 id="so-通过lsof观察如何数量过多-并不一定是文件句柄泄漏-可能是多线程进行访问"><a href="#so-通过lsof观察如何数量过多-并不一定是文件句柄泄漏-可能是多线程进行访问" class="headerlink" title="so 通过lsof观察如何数量过多,并不一定是文件句柄泄漏,可能是多线程进行访问"></a>so 通过lsof观察如何数量过多,并不一定是文件句柄泄漏,可能是多线程进行访问</h2><h1 id="file-leak-detector-待测试"><a href="#file-leak-detector-待测试" class="headerlink" title="file-leak-detector(待测试)"></a>file-leak-detector(待测试)</h1><p>官网:<br><a href="http://file-leak-detector.kohsuke.org/" target="_blank" rel="noopener">http://file-leak-detector.kohsuke.org/</a></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://www.cnblogs.com/peida/archive/2013/02/26/2932972.html" target="_blank" rel="noopener">http://www.cnblogs.com/peida/archive/2013/02/26/2932972.html</a><br><a href="https://www.cnblogs.com/ggjucheng/archive/2012/01/08/2316599.html" target="_blank" rel="noopener">https://www.cnblogs.com/ggjucheng/archive/2012/01/08/2316599.html</a><br><a href="https://blog.coding.net/blog/java-file-leaks" target="_blank" rel="noopener">https://blog.coding.net/blog/java-file-leaks</a></p>
 
           
         
@@ -486,7 +876,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -629,7 +1019,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -771,7 +1161,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -943,7 +1333,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -1097,7 +1487,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -1245,7 +1635,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -1388,7 +1778,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -1402,7 +1792,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/07/03/java/java_common/charset-string/" itemprop="url">字符与string</a></h1>
+                <a class="post-title-link" href="/2018/07/03/java/java_common/charset-string/" itemprop="url">字符集与string</a></h1>
         
 
         <div class="post-meta">
@@ -1443,7 +1833,7 @@
 
           
           
-             <span id="/2018/07/03/java/java_common/charset-string/" class="leancloud_visitors" data-flag-title="字符与string">
+             <span id="/2018/07/03/java/java_common/charset-string/" class="leancloud_visitors" data-flag-title="字符集与string">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -2523,331 +2913,7 @@
 </tr>
 </tbody>
 </table>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://blog.csdn.net/darxin/article/details/5079242" target="_blank" rel="noopener">https://blog.csdn.net/darxin/article/details/5079242</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/03/java/java_common/java-basic-type/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/07/03/java/java_common/java-basic-type/" itemprop="url">java基本数据类型</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-03T07:21:33+08:00">
-                2018-07-03
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/07/03/java/java_common/java-basic-type/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/07/03/java/java_common/java-basic-type/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/07/03/java/java_common/java-basic-type/" class="leancloud_visitors" data-flag-title="java基本数据类型">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>Java语言提供了八种基本类型。六种数字类型（四个整数型，两个浮点型），一种字符类型，还有一种布尔型。</p>
-<h2 id="byte："><a href="#byte：" class="headerlink" title="byte："></a>byte：</h2><p>byte 数据类型是8位、有符号的，以二进制补码表示的整数；<br>最小值是 -128（-2^7）；<br>最大值是 127（2^7-1）；<br>默认值是 0；<br>byte 类型用在大型数组中节约空间，主要代替整数，因为 byte 变量占用的空间只有 int 类型的四分之一；<br>例子：byte a = 100，byte b = -50。</p>
-<h2 id="short："><a href="#short：" class="headerlink" title="short："></a>short：</h2><p>short 数据类型是 16 位、有符号的以二进制补码表示的整数<br>最小值是 -32768（-2^15）；<br>最大值是 32767（2^15 - 1）；<br>Short 数据类型也可以像 byte 那样节省空间。一个short变量是int型变量所占空间的二分之一；<br>默认值是 0；<br>例子：short s = 1000，short r = -20000。</p>
-<h2 id="int："><a href="#int：" class="headerlink" title="int："></a>int：</h2><p>int 数据类型是32位、有符号的以二进制补码表示的整数；<br>最小值是 -2,147,483,648（-2^31）；<br>最大值是 2,147,483,647（2^31 - 1）；<br>一般地整型变量默认为 int 类型；<br>默认值是 0 ；<br>例子：int a = 100000, int b = -200000。</p>
-<h2 id="long："><a href="#long：" class="headerlink" title="long："></a>long：</h2><p>long 数据类型是 64 位、有符号的以二进制补码表示的整数；<br>最小值是 -9,223,372,036,854,775,808（-2^63）；<br>最大值是 9,223,372,036,854,775,807（2^63 -1）；<br>这种类型主要使用在需要比较大整数的系统上；<br>默认值是 0L；<br>例子： long a = 100000L，Long b = -200000L。<br>“L”理论上不分大小写，但是若写成”l”容易与数字”1”混淆，不容易分辩。所以最好大写。</p>
-<h2 id="float："><a href="#float：" class="headerlink" title="float："></a>float：</h2><p>float 数据类型是单精度、32位、符合IEEE 754标准的浮点数；<br>float 在储存大型浮点数组的时候可节省内存空间；<br>默认值是 0.0f；<br>浮点数不能用来表示精确的值，如货币；<br>例子：float f1 = 234.5f。</p>
-<h2 id="double："><a href="#double：" class="headerlink" title="double："></a>double：</h2><p>double 数据类型是双精度、64 位、符合IEEE 754标准的浮点数；<br>浮点数的默认类型为double类型；<br>double类型同样不能表示精确的值，如货币；<br>默认值是 0.0d；<br>例子：double d1 = 123.4。</p>
-<h2 id="boolean："><a href="#boolean：" class="headerlink" title="boolean："></a>boolean：</h2><p>boolean数据类型表示一位的信息；<br>只有两个取值：true 和 false；<br>这种类型只作为一种标志来记录 true/false 情况；<br>默认值是 false；<br>例子：boolean one = true。<br>char：</p>
-<h2 id="char类型是一个单一的-16-位-Unicode-字符；"><a href="#char类型是一个单一的-16-位-Unicode-字符；" class="headerlink" title="char类型是一个单一的 16 位 Unicode 字符；"></a>char类型是一个单一的 16 位 Unicode 字符；</h2><p>最小值是 \u0000（即为0）；<br>最大值是 \uffff（即为65,535）；<br>char 数据类型可以储存任何字符；<br>例子：char letter = ‘A’;。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/27/linux-socket/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/27/linux-socket/" itemprop="url">linux-socket挥手</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-27T05:58:36+08:00">
-                2018-06-27
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/06/27/linux-socket/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/06/27/linux-socket/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/06/27/linux-socket/" class="leancloud_visitors" data-flag-title="linux-socket挥手">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Socket是什么"><a href="#Socket是什么" class="headerlink" title="Socket是什么"></a>Socket是什么</h1><p>socket起源于Unix，而Unix/Linux基本哲学之一就是“一切皆文件”，都可以用“打开open –&gt; 读写write/read –&gt; 关闭close”模式来操作。Socket就是该模式的一个实现，        socket即是一种特殊的文件，一些socket函数就是对其进行的操作（读/写IO、打开、关闭）.     说白了Socket是应用层与TCP/IP协议族通信的中间软件抽象层，它是一组接口。在设计模式中，Socket其实就是一个门面模式，它把复杂的TCP/IP协议族隐藏在Socket接口后面，对用户来说，一组简单的接口就是全部，让Socket去组织数据，以符合指定的协议。</p>
-<p><em>注意：其实socket也没有层的概念，它只是一个facade设计模式的应用，让编程变的更简单。是一个软件抽象层。在网络编程中，我们大量用的都是通过socket实现的。</em></p>
-<h1 id="四次挥手流程"><a href="#四次挥手流程" class="headerlink" title="四次挥手流程"></a>四次挥手流程</h1><p>连接正常关闭时双方会发送FIN，经历4次挥手过程</p>
-<p>java中，调用Socket#close()可以关闭Socket，该方法类似Unix网络编程中的close方法，将Socket的 读写 都关闭，已经排队等待发送的数据会被尝试发送，最后（默认）发送FIN。考虑一个典型的网络事务，A向B发送数据，A发送完毕后close()，FIN发送出去；B一直read直到返回了-1，也通过close()发送FIN，4次挥手，连接关闭，一切都很和谐。</p>
-<h2 id="服务端发起流程"><a href="#服务端发起流程" class="headerlink" title="服务端发起流程"></a>服务端发起流程</h2><h3 id="1-服务端发起关闭"><a href="#1-服务端发起关闭" class="headerlink" title="1.服务端发起关闭"></a>1.服务端发起关闭</h3><p><img src="/images/pasted-194.png" alt="upload successful"></p>
-<h3 id="2-中间状态"><a href="#2-中间状态" class="headerlink" title="2.中间状态"></a>2.中间状态</h3><p>客户端socket为close_waite状态<br>服务端socket释放</p>
-<p><img src="/images/pasted-196.png" alt="upload successful"></p>
-<h3 id="3-客户端关闭"><a href="#3-客户端关闭" class="headerlink" title="3.客户端关闭"></a>3.客户端关闭</h3><p><img src="/images/pasted-195.png" alt="upload successful"></p>
-<h2 id="客户端发起流程"><a href="#客户端发起流程" class="headerlink" title="客户端发起流程"></a>客户端发起流程</h2><h3 id="1-客户端发起关闭"><a href="#1-客户端发起关闭" class="headerlink" title="1.客户端发起关闭"></a>1.客户端发起关闭</h3><p><img src="/images/pasted-197.png" alt="upload successful"></p>
-<h3 id="2-中间状态-1"><a href="#2-中间状态-1" class="headerlink" title="2.中间状态"></a>2.中间状态</h3><p>服务端socket为close_waite状态<br>客户端socket释放</p>
-<p><img src="/images/pasted-198.png" alt="upload successful"></p>
-<h3 id="3-服务端关闭"><a href="#3-服务端关闭" class="headerlink" title="3.服务端关闭"></a>3.服务端关闭</h3><p><img src="/images/pasted-199.png" alt="upload successful"></p>
-<h1 id="RST关闭流程-一次通讯"><a href="#RST关闭流程-一次通讯" class="headerlink" title="RST关闭流程(一次通讯)"></a>RST关闭流程(一次通讯)</h1><p>通过RST包异常退出，此时会丢弃缓冲区内的数据，也不会对RST响应ACK。</p>
-<ul>
-<li>Socket#setSoLinger(true,0)，则close时会发送RST</li>
-<li>如果主动关闭方缓冲区还有数据没有被应用层消费掉，close会发送RST并忽略这些数据</li>
-<li>A向B发送数据，B已经通过close()方法关闭了Socket，虽然TCP规定半关闭状态下B仍然可以接收数据，但close动作关闭了该socket上的任何数据操作，如果此时A继续write，B将返回RST，A的该次write无法立即通知应用层（因为write仅把数据写入发送缓冲区），只会把状态保存在tcp协议栈内，下次write时才会抛出SocketException。</li>
-</ul>
-<p>无论是客户端还是服务端的socket均可以设置soLinger参数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socket.setSoLinger(true, 0);</span><br></pre></td></tr></table></figure></p>
-<h2 id="服务端发起"><a href="#服务端发起" class="headerlink" title="服务端发起"></a>服务端发起</h2><h3 id="1-服务端发起关闭-1"><a href="#1-服务端发起关闭-1" class="headerlink" title="1.服务端发起关闭"></a>1.服务端发起关闭</h3><p><img src="/images/pasted-200.png" alt="upload successful"></p>
-<h3 id="2-客户端状态"><a href="#2-客户端状态" class="headerlink" title="2. 客户端状态"></a>2. 客户端状态</h3><p><img src="/images/pasted-201.png" alt="upload successful"></p>
-<h2 id="客户端发起"><a href="#客户端发起" class="headerlink" title="客户端发起"></a>客户端发起</h2><h3 id="客户端发起关闭"><a href="#客户端发起关闭" class="headerlink" title="客户端发起关闭"></a>客户端发起关闭</h3><p><img src="/images/pasted-202.png" alt="upload successful"></p>
-<h3 id="2-服务端状态"><a href="#2-服务端状态" class="headerlink" title="2. 服务端状态"></a>2. 服务端状态</h3><p><img src="/images/pasted-203.png" alt="upload successful"></p>
-<h1 id="对已关闭socket读写会产生的异常"><a href="#对已关闭socket读写会产生的异常" class="headerlink" title="对已关闭socket读写会产生的异常"></a>对已关闭socket读写会产生的异常</h1><h2 id="主动关闭方"><a href="#主动关闭方" class="headerlink" title="主动关闭方"></a>主动关闭方</h2><p>close()后，无论是发送FIN/RST关闭的，之后再读写均会抛java.net.SocketException:socket is closed.</p>
-<h2 id="被动关闭方"><a href="#被动关闭方" class="headerlink" title="被动关闭方"></a>被动关闭方</h2><h3 id="被FIN关闭"><a href="#被FIN关闭" class="headerlink" title="被FIN关闭"></a>被FIN关闭</h3><p>写（即向”已被对方关闭的Socket”写）<br>如上所说，第一次write得到RST响应但不抛异常，第二次write抛异常，ubuntu下是broken pipe (断开的管道)，win7下是Software caused connection abort: socket write error</p>
-<p>读 – 始终返回 -1</p>
-<h3 id="被RST关闭"><a href="#被RST关闭" class="headerlink" title="被RST关闭"></a>被RST关闭</h3><p>读写都会抛出异常：connection reset (by peer)</p>
-<h3 id="重点在于："><a href="#重点在于：" class="headerlink" title="重点在于："></a>重点在于：</h3><p>connection reset：另一端用RST主动关闭连接</p>
-<p>broken pipe / Software caused connection abort: socket write error ： 对方已调用Socket#close()关闭连接，己方还在写数据</p>
-<p>java中网络编程时很大一部分代码在做各种fail时的处理，了解各种异常发生时背后的逻辑才能正确地处理之。以上列举的只是连接关闭的异常，还有其他各种异常没有提及，以后有机会再补上。</p>
-<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>之所以由本篇文章中,是因为在工作中用到了okhttpClient,其理念就是尽可能复用之前socket连接,并通过后台线程回收空闲的socket连接,然而对于客户端意外关闭,似乎没有处理,经过试验发现,其socket的关闭方式正是rst方式.</p>
-<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>通过socket代码打断点,未发现okhttpClient 进行设置了setSoLinger</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://novoland.github.io/%E7%BD%91%E7%BB%9C/2014/07/26/RST%E5%8F%8Ajava%20socket%E5%85%B3%E9%97%AD%E5%90%8E%E8%AF%BB%E5%86%99%E7%9A%84%E5%90%84%E7%A7%8D%E5%BC%82%E5%B8%B8.html" target="_blank" rel="noopener">http://novoland.github.io/%E7%BD%91%E7%BB%9C/2014/07/26/RST%E5%8F%8Ajava%20socket%E5%85%B3%E9%97%AD%E5%90%8E%E8%AF%BB%E5%86%99%E7%9A%84%E5%90%84%E7%A7%8D%E5%BC%82%E5%B8%B8.html</a></p>
+<h1 id="各个字符集对比"><a href="#各个字符集对比" class="headerlink" title="各个字符集对比"></a>各个字符集对比</h1><h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://blog.csdn.net/darxin/article/details/5079242" target="_blank" rel="noopener">https://blog.csdn.net/darxin/article/details/5079242</a></p>
 
           
         
@@ -2922,6 +2988,10 @@
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
+              <img class="site-author-image" itemprop="image"
+                src="/images/tennis.jpg"
+                alt="Victor" />
+            
               <p class="site-author-name" itemprop="name">Victor</p>
               <p class="site-description motion-element" itemprop="description">victor的个人博客,作为一枚后端开发工程师,写本博客目的,旨在记录自己在工作生活中的点点滴滴,形成自己的知识体系</p>
           </div>
@@ -2933,7 +3003,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">197</span>
+                  <span class="site-state-item-count">199</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -2967,6 +3037,20 @@
 
           <div class="links-of-author motion-element">
             
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/victorsheng" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="psychovitor@gmail.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            
           </div>
 
           
@@ -2982,6 +3066,13 @@
 
       
 
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
       
 
     </div>
@@ -3034,11 +3125,6 @@
       </div>
     </footer>
 
-    
-      <div class="back-to-top">
-        <i class="fa fa-arrow-up"></i>
-        
-      </div>
     
 
     

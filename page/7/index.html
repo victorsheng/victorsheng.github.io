@@ -98,7 +98,7 @@
     root: '/',
     scheme: 'Muse',
     version: '5.1.3',
-    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
     fancybox: true,
     tabs: true,
     motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
@@ -326,12 +326,397 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/15/reading-notes/java-con-2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/tennis.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/15/reading-notes/java-con-2/" itemprop="url">java并发编程实战-第二章-线程安全性</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-15T23:12:07+08:00">
+                2018-04-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/15/reading-notes/java-con-2/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/04/15/reading-notes/java-con-2/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/04/15/reading-notes/java-con-2/" class="leancloud_visitors" data-flag-title="java并发编程实战-第二章-线程安全性">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="什么是线程安全型"><a href="#什么是线程安全型" class="headerlink" title="什么是线程安全型"></a>什么是线程安全型</h1><p> 首先使代码正确运行，然后再提高代码速度。【正确编写并发程序的方法】</p>
+<p>定义:当多个线程访问某个类时，不管是</p>
+<p>1）运行时环境采用何种调度方式，<br>2）或者这些线程如何交替执行，<br>3）并在在主调代码中不需要任何额外的同步或者协同，<br>这个类能<strong>始终</strong>表现出<strong>正确</strong>的行为。</p>
+<p>无状态对象一定是线程安全的</p>
+<p>Java主要用<code>synchronized</code>做同步，这是一种独占的加锁方式，其他还包括volatile、显式锁（explicit lock）等。</p>
+<ul>
+<li>如果出现线程安全问题，要怎么解决？<br>1）不在线程间共享（比如改成局部变量）<br>2）将状态改为不可变变量<br>3）访问状态变量时使用同步</li>
+</ul>
+<h1 id="原子性"><a href="#原子性" class="headerlink" title="原子性"></a>原子性</h1><h2 id="竞争条件"><a href="#竞争条件" class="headerlink" title="竞争条件"></a>竞争条件</h2><ul>
+<li>由于不恰当的执行时序而出现不正确的结果是一种重要的情况,叫做竞争条件</li>
+<li>当某个计算的正确性取决于多个线程的交替执行时序。最常见的竞态条件类型先检查后执行（Check-Then-Act）。</li>
+</ul>
+<h2 id="实例-延迟初始化中的竞争条件"><a href="#实例-延迟初始化中的竞争条件" class="headerlink" title="实例:延迟初始化中的竞争条件"></a>实例:延迟初始化中的竞争条件</h2><p>单例模式,如果不加锁,返回不同的实例</p>
+<h2 id="复合操作"><a href="#复合操作" class="headerlink" title="复合操作"></a>复合操作</h2><h1 id="加锁机制"><a href="#加锁机制" class="headerlink" title="加锁机制"></a>加锁机制</h1><p>需要同时更新两个值</p>
+<h2 id="内置锁"><a href="#内置锁" class="headerlink" title="内置锁"></a>内置锁</h2><ul>
+<li>synchronized</li>
+</ul>
+<h2 id="重入"><a href="#重入" class="headerlink" title="重入"></a>重入</h2><p>可重入意味着获取锁的操作的粒度是“线程”，而不是“调用”。重入的一种实现方法是为每一个锁关联一个获取计数值和一个所有者线程。当计数值为0时，这个锁没有被任何线程持有，当线程请求一个未被获取这个锁，计数值将递增，当线程退出同步代码块时，计数器会递减。当计数器为0时，释放该锁。</p>
+<h1 id="用锁来保护状态"><a href="#用锁来保护状态" class="headerlink" title="用锁来保护状态"></a>用锁来保护状态</h1><p>锁可以使其保护的代码路径以串行的方式来访问。</p>
+<ul>
+<li>如果用同步来协调对某个变量的访问时,那么在访问这个变量的所有位置上都需要使用同步</li>
+<li>最好注释变量是由哪个锁锁保护</li>
+</ul>
+<h1 id="活跃性与性能"><a href="#活跃性与性能" class="headerlink" title="活跃性与性能"></a>活跃性与性能</h1><p>可以将执行时间较长的操作从锁中移除</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/15/reading-notes/java-con-3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/tennis.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/15/reading-notes/java-con-3/" itemprop="url">java并发编程实战-第三章-对象的共享</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-15T23:04:18+08:00">
+                2018-04-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/15/reading-notes/java-con-3/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/04/15/reading-notes/java-con-3/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/04/15/reading-notes/java-con-3/" class="leancloud_visitors" data-flag-title="java并发编程实战-第三章-对象的共享">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="3-1可见性"><a href="#3-1可见性" class="headerlink" title="3.1可见性"></a>3.1可见性</h1><ul>
+<li>首先我们需要知道的是，java的线程都有自己独立的缓存，线程之间进行共享变量的交互是通过自身和缓存和主存的交互实现的。</li>
+<li>如果线程的每次更改缓存都刷入主存，主存每次被一个线程的缓存修改，都通知所有的线程刷新自身的缓存的话，那样就太不经济了。</li>
+<li>由于1和2，就会产生一个现象：当线程1修改了一个共享变量之后，线程2获取的共享变量还是更改前的值。即线程1更改共享变量并没有刷入主存，或者线程2并没有去主存中获取到新的共享变量，或以上两者皆有</li>
+<li>为了解决内存可见性我们可以使用volatile关键字和同步这两种方式</li>
+<li>变量的读取,指令重排序</li>
+</ul>
+<h2 id="失效数据"><a href="#失效数据" class="headerlink" title="失效数据"></a>失效数据</h2><h2 id="非原子的64位操作"><a href="#非原子的64位操作" class="headerlink" title="非原子的64位操作"></a>非原子的64位操作</h2><p>当读取一个非volatile类型的long变量时,如果对该变量的读操作和写操作在不同的线程中执行,那么很可能读取到某个值的高32位和另外一个值的低32位</p>
+<h2 id="加锁和可见性"><a href="#加锁和可见性" class="headerlink" title="加锁和可见性"></a>加锁和可见性</h2><p>加锁的含义不仅互斥,还包括内存可见性</p>
+<h2 id="volatile变量"><a href="#volatile变量" class="headerlink" title="volatile变量"></a>volatile变量</h2><ul>
+<li>用来确保变量的更新操作通知到其他线程</li>
+<li>编译器与运行时都会注意到这个变量时共享的,不会进行重排序</li>
+<li>volatile不会被缓存在寄存器或者其他处理器不可见的地方,读取变量时,总能返回最新的写入值</li>
+</ul>
+<p>满足所有条件,才应该使用volatile</p>
+<ul>
+<li>对变量的写入不依赖变量的当前值,只有单个线程更新变脸的值</li>
+<li>该变量不会与其他状态一起纳入不变形条件中</li>
+<li>在访问时不需要加锁</li>
+</ul>
+<h1 id="3-2发布与溢出"><a href="#3-2发布与溢出" class="headerlink" title="3.2发布与溢出"></a>3.2发布与溢出</h1><blockquote>
+<p>一般自定义类需要考虑发布(构造方法), juc的类已经处理过了</p>
+</blockquote>
+<h2 id="发布-是对象能够在当前作用域之外的代码中使用"><a href="#发布-是对象能够在当前作用域之外的代码中使用" class="headerlink" title="发布:是对象能够在当前作用域之外的代码中使用"></a>发布:是对象能够在当前作用域之外的代码中使用</h2><ul>
+<li>将对象的引用存储到公共静态域。</li>
+<li>在非私有方法中返回引用。</li>
+<li>在发布某对象的时候可能会间接发布本不想发布的对象，如一个private的数组，一旦被发布，其中储存的对象也会被发布</li>
+</ul>
+<h2 id="溢出-不应该发布的被发布了"><a href="#溢出-不应该发布的被发布了" class="headerlink" title="溢出:不应该发布的被发布了"></a>溢出:不应该发布的被发布了</h2><p>类对自己的内部状态进行了同步操作,如果发布出去可能会破坏封装性,并使程序难以维护不变性条件<br>一个对象在尚未准备好就将它发布出去——溢出。</p>
+<ul>
+<li>“内部类发布也会引发溢出”，因为只有当对象通过构造函数返回之后，才处于稳定状态。这种发布会导致this溢出。</li>
+<li>“即使在构造函数的最后一行发布也会有该问题”，指令重排序可能会引发一些奇怪的问题。而且该引用已经不是null了，但是内容还没有初始化完毕也有可能。</li>
+<li>“不要让this在构造期溢出！”</li>
+</ul>
+<h2 id="常见错误"><a href="#常见错误" class="headerlink" title="常见错误"></a>常见错误</h2><ul>
+<li>1.在构造函数中创建并启动线程<br>这个时候线程已经获得了this的引用（即使是隐式的，因为该Runnable或者Thread是所属对象的内部类），this引用几乎总是被新线程所共享。<br>所以在构造函数中创建线程没有错误，但是不要在构造函数中启动它。</li>
+<li>2.注册一个内部类,使用this方法<br>可以使用静态工厂和私有构造函数来解决这个问题。</li>
+</ul>
+<h1 id="3-3线程封闭"><a href="#3-3线程封闭" class="headerlink" title="3.3线程封闭"></a>3.3线程封闭</h1><p>数据仅在单线程中被访问，即数据不共享。<br>几种方式：</p>
+<h2 id="特定的方法"><a href="#特定的方法" class="headerlink" title="特定的方法"></a>特定的方法</h2><p>例如在一个线程中进行 读取修改写入,其他线程中进行读取</p>
+<h2 id="栈封闭"><a href="#栈封闭" class="headerlink" title="栈封闭"></a>栈封闭</h2><p>引用在局部变量中<br>注意不要让当前线程中的对象从所在线程溢出！</p>
+<h2 id="java的ThreadLocal"><a href="#java的ThreadLocal" class="headerlink" title="java的ThreadLocal"></a>java的ThreadLocal</h2><p>使用ThreadLocal可以做到线程隔离，每个线程都有自己单独的一个区域保存变量。</p>
+<h1 id="3-4不变性对象"><a href="#3-4不变性对象" class="headerlink" title="3.4不变性对象"></a>3.4不变性对象</h1><ul>
+<li>不可变对象满足下列条件：<ol>
+<li>所有域是final的，域内部的域也是final的</li>
+<li>所有域不可改变</li>
+<li>this没有在构造的时候逸出</li>
+</ol>
+</li>
+</ul>
+<h2 id="final域"><a href="#final域" class="headerlink" title="final域"></a>final域</h2><h2 id="使用volatile类型来发布不可变对象"><a href="#使用volatile类型来发布不可变对象" class="headerlink" title="使用volatile类型来发布不可变对象"></a>使用volatile类型来发布不可变对象</h2><h1 id="3-5安全发布"><a href="#3-5安全发布" class="headerlink" title="3.5安全发布"></a>3.5安全发布</h1><h2 id="不正确的发布-正确的对象被破坏"><a href="#不正确的发布-正确的对象被破坏" class="headerlink" title="不正确的发布:正确的对象被破坏"></a>不正确的发布:正确的对象被破坏</h2><p>导致其他县城看到尚未创建完的对象</p>
+<h2 id="不可变对象与初始化安全"><a href="#不可变对象与初始化安全" class="headerlink" title="不可变对象与初始化安全"></a>不可变对象与初始化安全</h2><h2 id="安全发布的常用模式"><a href="#安全发布的常用模式" class="headerlink" title="安全发布的常用模式"></a>安全发布的常用模式</h2><ol>
+<li>在静态初始化对象引用，因为JVM的类加载过程中是同步的</li>
+<li>对对象引用使用volatile或AtomicReference</li>
+<li>将对象引用放入final域中</li>
+<li>对对象引用加锁</li>
+</ol>
+<p>案例:</p>
+<ul>
+<li>将一个键值对放入HashTable,syhronizedMap或者ConcurrentMap中</li>
+<li>静态构造的对象<br><code>public static Holder holder= new Holder(42)</code></li>
+</ul>
+<h2 id="事实不可变对象"><a href="#事实不可变对象" class="headerlink" title="事实不可变对象"></a>事实不可变对象</h2><p>程序不会去修改,例如Date虽然是可变的,但是放入了同步的HashMap中,且不会修改,那么就认为是不可变的对象</p>
+<h2 id="可变对象"><a href="#可变对象" class="headerlink" title="可变对象"></a>可变对象</h2><ul>
+<li>不仅要保证发布时的状态可见性</li>
+<li>每次访问时同样需要使用同步来确保后需修改操作的可见性</li>
+</ul>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><ul>
+<li>不可变对象可以通过任意机制来发布()</li>
+<li>事实不可变对象必须通过安全方式来发布</li>
+<li>可变对象必须通过安全方式来发布,并且是线程安全的或者由某个所保护起来</li>
+</ul>
+<h2 id="安全的共享对象"><a href="#安全的共享对象" class="headerlink" title="安全的共享对象"></a>安全的共享对象</h2><p>在发布一个对象的时候需要明确指出该对象的多线程共享规则：</p>
+<ol>
+<li>是线程封闭？：只能由一个线程拥有</li>
+<li>是只读共享？：只能并发读</li>
+<li>是线程安全共享？：类内部实现了同步，可以随意使用</li>
+<li>是保护对象？：类内部没有实现同步，需要使用者在外部同步</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/13/http/http-ajax-compare/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -578,7 +963,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -726,7 +1111,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -872,7 +1257,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -1059,7 +1444,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -1239,7 +1624,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -1678,7 +2063,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -1997,7 +2382,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -2156,303 +2541,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/05/java/java_thread/JUC-Double-check/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/05/java/java_thread/JUC-Double-check/" itemprop="url">JUC-Double-check</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-05T21:22:46+08:00">
-                2018-04-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/04/05/java/java_thread/JUC-Double-check/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/04/05/java/java_thread/JUC-Double-check/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/04/05/java/java_thread/JUC-Double-check/" class="leancloud_visitors" data-flag-title="JUC-Double-check">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>双重检查锁定在延迟初始化的单例模式中见得比较多（单例模式实现方式很多，这里为说明双重检查锁定问题，只选取这一种方式），先来看一个版本：</p>
-<h2 id="版本1"><a href="#版本1" class="headerlink" title="版本1"></a>版本1</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">public class Singleton &#123;</span><br><span class="line"></span><br><span class="line">    private static Singleton instance = null;</span><br><span class="line"></span><br><span class="line">    private Singleton()&#123;&#125;</span><br><span class="line"></span><br><span class="line">   </span><br><span class="line"></span><br><span class="line">    public static Singleton  getInstance() &#123;</span><br><span class="line"></span><br><span class="line">       if(instance == null) &#123;</span><br><span class="line"></span><br><span class="line">           instance = new Singleton();</span><br><span class="line"></span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       return instance;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>上面是最原始的模式，一眼就可以看出，在多线程环境下，可能会产生多个Singleton实例，于是有了其同步的版本：</p>
-<h2 id="版本2"><a href="#版本2" class="headerlink" title="版本2"></a>版本2</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">public class Singleton &#123;</span><br><span class="line"></span><br><span class="line">    private static Singleton instance = null;</span><br><span class="line"></span><br><span class="line">    private Singleton()&#123;&#125;</span><br><span class="line"></span><br><span class="line">   </span><br><span class="line"></span><br><span class="line">    public synchronized static Singleton getInstance() &#123;</span><br><span class="line"></span><br><span class="line">       if(instance == null) &#123;</span><br><span class="line"></span><br><span class="line">           instance = new Singleton();</span><br><span class="line"></span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       return instance;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>在这个版本中，每次调用getInstance都需要取得Singleton.class上的锁，然而该锁只是在开始构建Singleton 对象的时候才是必要的，后续的多线程访问，效率会降低，于是有了接下来的版本：</p>
-<h2 id="版本3"><a href="#版本3" class="headerlink" title="版本3"></a>版本3</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">public class Singleton &#123;</span><br><span class="line"></span><br><span class="line">    private static Singleton instance = null;</span><br><span class="line"></span><br><span class="line">    private Singleton()&#123;&#125;</span><br><span class="line"></span><br><span class="line">   </span><br><span class="line"></span><br><span class="line">    public static Singleton getInstance() &#123;</span><br><span class="line"></span><br><span class="line">       if(instance == null) &#123;</span><br><span class="line"></span><br><span class="line">           synchronized(Singleton.class) &#123;</span><br><span class="line"></span><br><span class="line">              if(instance == null) &#123;</span><br><span class="line"></span><br><span class="line">                  instance = new Singleton();</span><br><span class="line"></span><br><span class="line">              &#125;</span><br><span class="line"></span><br><span class="line">           &#125;</span><br><span class="line"></span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       return instance;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>很好的想法！不幸的是，该方案也未能解决问题之根本：</p>
-<p>原因在于：初始化Singleton  和 将对象地址写到instance字段 的顺序是不确定的。在某个线程new Singleton()时，在构造方法被调用之前，就为该对象分配了内存空间并将对象的字段设置为默认值。此时就可以将分配的内存地址赋值给instance字段了，然而该对象可能还没有初始化；此时若另外一个线程来调用getInstance，取到的就是状态不正确的对象。</p>
-<p>鉴于以上原因，有人可能提出下列解决方案：</p>
-<h2 id="版本4"><a href="#版本4" class="headerlink" title="版本4"></a>版本4</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">public class Singleton &#123;</span><br><span class="line"></span><br><span class="line">    private static Singleton instance = null;</span><br><span class="line"></span><br><span class="line">    private Singleton()&#123;&#125;</span><br><span class="line"></span><br><span class="line">   </span><br><span class="line"></span><br><span class="line">    public static Singleton getInstance() &#123;</span><br><span class="line"></span><br><span class="line">       if(instance == null) &#123;</span><br><span class="line"></span><br><span class="line">           Singleton temp;</span><br><span class="line"></span><br><span class="line">           synchronized(Singleton.class) &#123;</span><br><span class="line"></span><br><span class="line">              temp = instance;</span><br><span class="line"></span><br><span class="line">              if(temp == null) &#123;</span><br><span class="line"></span><br><span class="line">                  synchronized(Singleton.class) &#123;</span><br><span class="line"></span><br><span class="line">                     temp = new Singleton();</span><br><span class="line"></span><br><span class="line">                  &#125;</span><br><span class="line"></span><br><span class="line">                  instance = temp;</span><br><span class="line"></span><br><span class="line">              &#125;</span><br><span class="line"></span><br><span class="line">           &#125;</span><br><span class="line"></span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       return instance;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>该方案将Singleton对象的构造置于最里面的同步块，这种思想是在退出该同步块时设置一个内存屏障，以阻止初始化Singleton  和 将对象地址写到instance字段 的重新排序。</p>
-<p>不幸的是，这种想法也是错误的，同步的规则不是这样的。退出监视器（退出同步）的规则是：所以在退出监视器前面的动作都必须在释放监视器之前完成。然而，并没有规定说退出监视器之后的动作不能放到退出监视器之前完成。<em>也就是说同步块里的代码必须在退出同步时完成，而同步块后面的代码则可以被编译器或运行时环境移到同步块中执行。</em></p>
-<p>编译器可以合法的，也是合理的，将instance = temp移动到最里层的同步块内，这样就出现了上个版本同样的问题。</p>
-<p>在JDK1.5及其后续版本中，扩充了volatile语义，系统将不允许对 写入一个volatile变量的操作与其之前的任何读写操作 重新排序，也不允许将 读取一个volatile变量的操作与其之后的任何读写操作 重新排序。</p>
-<p>在jdk1.5及其后的版本中，可以将instance 设置成volatile以让双重检查锁定生效，如下：</p>
-<h2 id="版本5-volatile"><a href="#版本5-volatile" class="headerlink" title="版本5(volatile)"></a>版本5(volatile)</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">public class Singleton &#123;</span><br><span class="line"></span><br><span class="line">    private static volatile Singleton instance = null;</span><br><span class="line"></span><br><span class="line">    private Singleton()&#123;&#125;</span><br><span class="line"></span><br><span class="line">   </span><br><span class="line"></span><br><span class="line">    public static Singleton getInstance() &#123;</span><br><span class="line"></span><br><span class="line">       if(instance == null) &#123;</span><br><span class="line"></span><br><span class="line">           synchronized(Singleton.class) &#123;</span><br><span class="line"></span><br><span class="line">              if(instance == null) &#123;</span><br><span class="line"></span><br><span class="line">                  instance = new Singleton();</span><br><span class="line"></span><br><span class="line">              &#125;</span><br><span class="line"></span><br><span class="line">           &#125;</span><br><span class="line"></span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       return instance;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/05/java/java_thread/JUC-LongAccumulator/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/05/java/java_thread/JUC-LongAccumulator/" itemprop="url">JUC-LongAccumulator</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-05T21:11:17+08:00">
-                2018-04-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/04/05/java/java_thread/JUC-LongAccumulator/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/04/05/java/java_thread/JUC-LongAccumulator/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/04/05/java/java_thread/JUC-LongAccumulator/" class="leancloud_visitors" data-flag-title="JUC-LongAccumulator">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2492,6 +2580,10 @@
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
+              <img class="site-author-image" itemprop="image"
+                src="/images/tennis.jpg"
+                alt="Victor" />
+            
               <p class="site-author-name" itemprop="name">Victor</p>
               <p class="site-description motion-element" itemprop="description">victor的个人博客,作为一枚后端开发工程师,写本博客目的,旨在记录自己在工作生活中的点点滴滴,形成自己的知识体系</p>
           </div>
@@ -2503,7 +2595,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">197</span>
+                  <span class="site-state-item-count">199</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -2537,6 +2629,20 @@
 
           <div class="links-of-author motion-element">
             
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/victorsheng" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="psychovitor@gmail.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            
           </div>
 
           
@@ -2552,6 +2658,13 @@
 
       
 
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
       
 
     </div>
@@ -2604,11 +2717,6 @@
       </div>
     </footer>
 
-    
-      <div class="back-to-top">
-        <i class="fa fa-arrow-up"></i>
-        
-      </div>
     
 
     

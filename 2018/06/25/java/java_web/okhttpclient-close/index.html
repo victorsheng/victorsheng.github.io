@@ -86,10 +86,12 @@
 <meta property="og:site_name" content="Victor的博客">
 <meta property="og:description" content="原文https://github.com/square/okhttp/issues/3372https://github.com/square/okhttp/issues/3160 作者的主张:1234567891011我们希望鼓励用户在客户端之间共享连接池和调度程序。但如果你这样做，你不能把所有东西都关闭。创建一个新的OkHttpClient是相对昂贵的，我不愿意轻易地创建和销毁客户端，因为它可">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-07-03T14:48:25.685Z">
+<meta property="og:image" content="http://yoursite.com/images/pasted-207.png">
+<meta property="og:updated_time" content="2018-07-05T23:00:05.417Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="okhttpclient-close">
 <meta name="twitter:description" content="原文https://github.com/square/okhttp/issues/3372https://github.com/square/okhttp/issues/3160 作者的主张:1234567891011我们希望鼓励用户在客户端之间共享连接池和调度程序。但如果你这样做，你不能把所有东西都关闭。创建一个新的OkHttpClient是相对昂贵的，我不愿意轻易地创建和销毁客户端，因为它可">
+<meta name="twitter:image" content="http://yoursite.com/images/pasted-207.png">
 
 
 
@@ -99,7 +101,7 @@
     root: '/',
     scheme: 'Muse',
     version: '5.1.3',
-    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
     fancybox: true,
     tabs: true,
     motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
@@ -331,7 +333,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -433,6 +435,7 @@
 <h3 id="会触发的方法"><a href="#会触发的方法" class="headerlink" title="会触发的方法"></a>会触发的方法</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Response.close()</span><br><span class="line">Response.body().close()</span><br><span class="line">Response.body().source().close()</span><br><span class="line">Response.body().charStream().close()</span><br><span class="line">Response.body().byteString().close()</span><br><span class="line">Response.body().bytes()</span><br><span class="line">Response.body().string()</span><br></pre></td></tr></table></figure>
 <h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p><a href="https://github.com/square/okhttp/issues/1240#issuecomment-329197762" target="_blank" rel="noopener">https://github.com/square/okhttp/issues/1240#issuecomment-329197762</a></p>
 <p>在实际开发中，响应主体 RessponseBody 持有的资源可能会很大，所以 OkHttp 并不会将其直接保存到内存中，只是持有数据流连接。只有当我们需要时，才会从服务器获取数据并返回。同时，考虑到应用重复读取数据的可能性很小，所以将其设计为一次性流(one-shot)，读取后即 ‘关闭并释放资源’。</p>
+<h1 id="进行被kill时-socket资源的关闭方式-RST"><a href="#进行被kill时-socket资源的关闭方式-RST" class="headerlink" title="进行被kill时 socket资源的关闭方式:RST"></a>进行被kill时 socket资源的关闭方式:RST</h1><p><img src="/images/pasted-207.png" alt="upload successful"></p>
 <h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://juejin.im/post/5a524eef518825732c536025" target="_blank" rel="noopener">https://juejin.im/post/5a524eef518825732c536025</a></p>
 
       
@@ -564,6 +567,10 @@
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
+              <img class="site-author-image" itemprop="image"
+                src="/images/tennis.jpg"
+                alt="Victor" />
+            
               <p class="site-author-name" itemprop="name">Victor</p>
               <p class="site-description motion-element" itemprop="description">victor的个人博客,作为一枚后端开发工程师,写本博客目的,旨在记录自己在工作生活中的点点滴滴,形成自己的知识体系</p>
           </div>
@@ -575,7 +582,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">197</span>
+                  <span class="site-state-item-count">199</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -609,6 +616,20 @@
 
           <div class="links-of-author motion-element">
             
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/victorsheng" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="psychovitor@gmail.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            
           </div>
 
           
@@ -632,7 +653,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#原文"><span class="nav-number">1.</span> <span class="nav-text">原文</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#自动关闭的方式"><span class="nav-number">2.</span> <span class="nav-text">自动关闭的方式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#连接级别-java-net-Socket-的资源关闭"><span class="nav-number">2.1.</span> <span class="nav-text">连接级别(java.net.Socket)的资源关闭</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#输入-输出流级别的资源关闭"><span class="nav-number">2.2.</span> <span class="nav-text">输入/输出流级别的资源关闭</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#会触发的方法"><span class="nav-number">2.2.1.</span> <span class="nav-text">会触发的方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#小结"><span class="nav-number">2.2.2.</span> <span class="nav-text">小结</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">3.</span> <span class="nav-text">参考</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#原文"><span class="nav-number">1.</span> <span class="nav-text">原文</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#自动关闭的方式"><span class="nav-number">2.</span> <span class="nav-text">自动关闭的方式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#连接级别-java-net-Socket-的资源关闭"><span class="nav-number">2.1.</span> <span class="nav-text">连接级别(java.net.Socket)的资源关闭</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#输入-输出流级别的资源关闭"><span class="nav-number">2.2.</span> <span class="nav-text">输入/输出流级别的资源关闭</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#会触发的方法"><span class="nav-number">2.2.1.</span> <span class="nav-text">会触发的方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#小结"><span class="nav-number">2.2.2.</span> <span class="nav-text">小结</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#进行被kill时-socket资源的关闭方式-RST"><span class="nav-number">3.</span> <span class="nav-text">进行被kill时 socket资源的关闭方式:RST</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
             
 
           </div>
@@ -640,6 +661,13 @@
       <!--/noindex-->
       
 
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
       
 
     </div>
@@ -692,11 +720,6 @@
       </div>
     </footer>
 
-    
-      <div class="back-to-top">
-        <i class="fa fa-arrow-up"></i>
-        
-      </div>
     
 
     

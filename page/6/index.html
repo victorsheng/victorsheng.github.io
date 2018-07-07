@@ -98,7 +98,7 @@
     root: '/',
     scheme: 'Muse',
     version: '5.1.3',
-    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
     fancybox: true,
     tabs: true,
     motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
@@ -326,12 +326,355 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/20/java/java_netty/nio-reactor-model/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/tennis.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/20/java/java_netty/nio-reactor-model/" itemprop="url">nio-reactor-model</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-20T19:52:52+08:00">
+                2018-04-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/20/java/java_netty/nio-reactor-model/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/04/20/java/java_netty/nio-reactor-model/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/04/20/java/java_netty/nio-reactor-model/" class="leancloud_visitors" data-flag-title="nio-reactor-model">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Reactor模型"><a href="#Reactor模型" class="headerlink" title="Reactor模型"></a>Reactor模型</h1><ul>
+<li>Reactor模式是处理并发I/O比较常见的一种模式，用于同步I/O，中心思想是将所有要处理的I/O事件注册到一个中心I/O多路复用器上，同时主线程/进程阻塞在多路复用器上；一旦有I/O事件到来或是准备就绪(文件描述符或socket可读、写)，多路复用器返回并将事先注册的相应I/O事件分发到对应的处理器中。</li>
+<li><p>Reactor是一种事件驱动机制，和普通函数调用的不同之处在于：应用程序不是主动的调用某个API完成处理，而是恰恰相反，Reactor逆置了事件处理流程，应用程序需要提供相应的接口并注册到Reactor上，如果相应的事件发生，Reactor将主动调用应用程序注册的接口，这些接口又称为“回调函数”。用“好莱坞原则”来形容Reactor再合适不过了：不要打电话给我们，我们会打电话通知你。</p>
+</li>
+<li><p>Reactor模式与Observer模式在某些方面极为相似：当一个主体发生改变时，所有依属体都得到通知。不过，观察者模式与单个事件源关联，而反应器模式则与多个事件源关联 。</p>
+</li>
+</ul>
+<p>在Reactor模式中，有5个关键的参与者：</p>
+<ul>
+<li>描述符（handle）：由操作系统提供的资源，用于识别每一个事件，如Socket描述符、文件描述符、信号的值等。在Linux中，它用一个整数来表示。事件可以来自外部，如来自客户端的连接请求、数据等。事件也可以来自内部，如信号、定时器事件。</li>
+<li>同步事件多路分离器（event demultiplexer）：事件的到来是随机的、异步的，无法预知程序何时收到一个客户连接请求或收到一个信号。所以程序要循环等待并处理事件，这就是事件循环。在事件循环中，等待事件一般使用I/O复用技术实现。在linux系统上一般是select、poll、epol_waitl等系统调用，用来等待一个或多个事件的发生。I/O框架库一般将各种I/O复用系统调用封装成统一的接口，称为事件多路分离器。调用者会被阻塞，直到分离器分离的描述符集上有事件发生。</li>
+<li>事件处理器（event handler）：I/O框架库提供的事件处理器通常是由一个或多个模板函数组成的接口。这些模板函数描述了和应用程序相关的对某个事件的操作，用户需要继承它来实现自己的事件处理器，即具体事件处理器。因此，事件处理器中的回调函数一般声明为虚函数，以支持用户拓展。</li>
+<li>具体的事件处理器（concrete event handler）：是事件处理器接口的实现。它实现了应用程序提供的某个服务。每个具体的事件处理器总和一个描述符相关。它使用描述符来识别事件、识别应用程序提供的服务。</li>
+<li>Reactor 管理器（reactor）：定义了一些接口，用于应用程序控制事件调度，以及应用程序注册、删除事件处理器和相关的描述符。它是事件处理器的调度核心。 Reactor管理器使用同步事件分离器来等待事件的发生。一旦事件发生，Reactor管理器先是分离每个事件，然后调度事件处理器，最后调用相关的模 板函数来处理这个事件。</li>
+</ul>
+<p>Reactor管理器并不是应用程序负责等待事件、分离事件和调度事件。Reactor并没有被具体的事件处理器调度，而是管理器调度具体的事件处理器，由事件处理器对发生的事件作出处理，这就是Hollywood原则。应用程序要做的仅仅是实现一个具体的事件处理器，然后把它注册到Reactor管理器中。接下来的工作由管理器来完成：如果有相应的事件发生，Reactor会主动调用具体的事件处理器，由事件处理器对发生的事件作出处理。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://tech.youzan.com/yi-bu-wang-luo-mo-xing/" target="_blank" rel="noopener">https://tech.youzan.com/yi-bu-wang-luo-mo-xing/</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/20/td_bugfix/bugfix-remote-ssh/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/tennis.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/20/td_bugfix/bugfix-remote-ssh/" itemprop="url">bugfix-remote-ssh</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-20T17:00:37+08:00">
+                2018-04-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/20/td_bugfix/bugfix-remote-ssh/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/04/20/td_bugfix/bugfix-remote-ssh/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/04/20/td_bugfix/bugfix-remote-ssh/" class="leancloud_visitors" data-flag-title="bugfix-remote-ssh">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>通过ssh root@地址 “命令” 无法加载.bash_profile里面的配置</p>
+<h2 id="对比1"><a href="#对比1" class="headerlink" title="对比1"></a>对比1</h2><p>远程的ssh命令<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[ip1:vic@ip1:/home/vic]$ ssh hadoop@ip2 &quot;java -version&quot;</span><br><span class="line">java version &quot;1.7.0_101&quot;</span><br><span class="line">OpenJDK Runtime Environment (rhel-2.6.6.1.el7_2-x86_64 u101-b00)</span><br><span class="line">OpenJDK 64-Bit Server VM (build 24.95-b01, mixed mode)</span><br><span class="line">ssh登陆后的</span><br><span class="line">[ip2:hadoop@ip2:/home/hadoop]$ java -version</span><br><span class="line">java version &quot;1.8.0_66&quot;</span><br><span class="line">Java(TM) SE Runtime Environment (build 1.8.0_66-b17)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 25.66-b17, mixed mode)</span><br></pre></td></tr></table></figure></p>
+<h2 id="对比2"><a href="#对比2" class="headerlink" title="对比2"></a>对比2</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[ip1:vic@ip1:/home/vic]$ ssh hadoop@ip2 &apos;echo $PATH&apos;</span><br><span class="line">/usr/local/bin:/usr/bin</span><br><span class="line"></span><br><span class="line">[ip2:hadoop@ip2:/home/hadoop]$ echo $PATH</span><br><span class="line">/usr/java/jdk1.8.0_66/bin:/usr/java/default/bin:/usr/java/default/jre/bin:/usr/local/mysql3306/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin</span><br></pre></td></tr></table></figure>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><ul>
+<li>设置BASH_ENV(没有找到设置的地方,export只会在本次登陆生效)</li>
+<li>在远端要执脚本中加载配置文件(最终采取的方案)<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line">. ~/.bash_profile</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h1 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h1><p><a href="http://feihu.me/blog/2014/env-problem-when-ssh-executing-command-on-remote" target="_blank" rel="noopener">http://feihu.me/blog/2014/env-problem-when-ssh-executing-command-on-remote</a></p>
+<h1 id="bash的四种模式"><a href="#bash的四种模式" class="headerlink" title="bash的四种模式"></a>bash的四种模式</h1><p>在man page的INVOCATION一节讲述了bash的四种模式，bash会依据这四种模式而选择加载不同的配置文件，而且加载的顺序也有所不同。本文ssh问题的答案就存在于这几种模式当中，所以在我们揭开谜底之前先来分析这些模式。</p>
+<h2 id="interactive-login-shell"><a href="#interactive-login-shell" class="headerlink" title="interactive + login shell"></a>interactive + login shell</h2><p>第一种模式是交互式的登陆shell，这里面有两个概念需要解释：interactive和login：</p>
+<p>login故名思义，即登陆，login shell是指用户以非图形化界面或者以ssh登陆到机器上时获得的第一个shell，简单些说就是需要输入用户名和密码的shell。因此通常不管以何种方式登陆机器后用户获得的第一个shell就是login shell。</p>
+<p>interactive意为交互式，这也很好理解，interactive shell会有一个输入提示符，并且它的标准输入、输出和错误输出都会显示在控制台上。所以一般来说只要是需要用户交互的，即一个命令一个命令的输入的shell都是interactive shell。而如果无需用户交互，它便是non-interactive shell。通常来说如bash script.sh此类执行脚本的命令就会启动一个non-interactive shell，它不需要与用户进行交互，执行完后它便会退出创建的shell。</p>
+<p>那么此模式最简单的两个例子为：</p>
+<p>用户直接登陆到机器获得的第一个shell<br>用户使用ssh user@remote获得的shell</p>
+<h3 id="加载配置文件"><a href="#加载配置文件" class="headerlink" title="加载配置文件"></a>加载配置文件</h3><p>这种模式下，shell首先加载/etc/profile，然后再尝试依次去加载下列三个配置文件之一，一旦找到其中一个便不再接着寻找：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">~/.bash_profile</span><br><span class="line">~/.bash_login</span><br><span class="line">~/.profile</span><br></pre></td></tr></table></figure>
+<h2 id="non-interactive-login-shell"><a href="#non-interactive-login-shell" class="headerlink" title="non-interactive + login shell"></a>non-interactive + login shell</h2><p>第二种模式的shell为non-interactive login shell，即非交互式的登陆shell，这种是不太常见的情况。一种创建此shell的方法为：bash -l script.sh，前面提到过-l参数是将shell作为一个login shell启动，而执行脚本又使它为non-interactive shell。</p>
+<p>对于这种类型的shell，配置文件的加载与第一种完全一样，在此不再赘述。</p>
+<h2 id="interactive-non-login-shell"><a href="#interactive-non-login-shell" class="headerlink" title="interactive + non-login shell"></a>interactive + non-login shell</h2><p>bash，此时会打开一个交互式的shell，而因为不再需要登陆，因此不是login shell。</p>
+<h3 id="加载配置文件-1"><a href="#加载配置文件-1" class="headerlink" title="加载配置文件"></a>加载配置文件</h3><p>对于此种情况，启动shell时会去查找并加载/etc/bash.bashrc和~/.bashrc文件。</p>
+<h3 id="bashrc-VS-profile"><a href="#bashrc-VS-profile" class="headerlink" title="bashrc VS profile"></a>bashrc VS profile</h3><p>从刚引入的两个配置文件的存放路径可以很容易的判断，第一个文件是全局性的，第二个文件属于当前用户。在前面的模式当中，已经出现了几种配置文件，多数是以profile命名的，那么为什么这里又增加两个文件呢？这样不会增加复杂度么？我们来看看此处的文件和前面模式中的文件的区别。</p>
+<p>首先看第一种模式中的profile类型文件，它是某个用户唯一的用来设置全局环境变量的地方, 因为用户可以有多个shell比如bash, sh, zsh等, 但像环境变量这种其实只需要在统一的一个地方初始化就可以, 而这个地方就是profile，所以启动一个login shell会加载此文件，后面由此shell中启动的新shell进程如bash，sh，zsh等都可以由login shell中继承环境变量等配置。</p>
+<p>接下来看bashrc，其后缀rc的意思为Run Commands，由名字可以推断出，此处存放bash需要运行的命令，但注意，这些命令一般只用于交互式的shell，通常在这里会设置交互所需要的所有信息，比如bash的补全、alias、颜色、提示符等等。</p>
+<p>所以可以看出，引入多种配置文件完全是为了更好的管理配置，每个文件各司其职，只做好自己的事情。</p>
+<h2 id="non-interactive-non-login-shell"><a href="#non-interactive-non-login-shell" class="headerlink" title="non-interactive + non-login shell"></a>non-interactive + non-login shell</h2><p>最后一种模式为非交互非登陆的shell，创建这种shell典型有两种方式：</p>
+<p>bash script.sh<br>ssh user@remote command<br>这两种都是创建一个shell，执行完脚本之后便退出，不再需要与用户交互。</p>
+<h3 id="加载配置文件-2"><a href="#加载配置文件-2" class="headerlink" title="加载配置文件"></a>加载配置文件</h3><p>对于这种模式而言，它会去寻找环境变量BASH_ENV，将变量的值作为文件名进行查找，如果找到便加载它。</p>
+<h1 id="配置文件的种类"><a href="#配置文件的种类" class="headerlink" title="配置文件的种类"></a>配置文件的种类</h1><ul>
+<li>/etc/profile</li>
+<li>~/.bash_profile</li>
+<li>~/.bash_login</li>
+<li>~/.profile</li>
+<li>/etc/bash.bashrc</li>
+<li>~/.bashrc</li>
+<li>$BASH_ENV</li>
+<li>$ENV</li>
+</ul>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><ul>
+<li>~/.bash_profile：应该尽可能的简单，通常会在最后加载.profile和.bashrc(注意顺序)</li>
+<li>~/.bash_login：在前面讨论过，别用它</li>
+<li>~/.profile：此文件用于login shell，所有你想在整个用户会话期间都有效的内容都应该放置于此，比如启动进程，环境变量等</li>
+<li>~/.bashrc：只放置与bash有关的命令，所有与交互有关的命令都应该出现在此，比如bash的补全、alias、颜色、提示符等等。特别注意：别在这里输出任何内容（我们前面只是为了演示，别学我哈）</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/20/其他/jenkins-Credentials/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -478,7 +821,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -624,7 +967,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -830,7 +1173,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -1181,7 +1524,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -1323,7 +1666,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -1493,7 +1836,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -1723,7 +2066,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/tennis.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -1858,391 +2201,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/15/reading-notes/java-con-2/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/15/reading-notes/java-con-2/" itemprop="url">java并发编程实战-第二章-线程安全性</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-15T23:12:07+08:00">
-                2018-04-15
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/04/15/reading-notes/java-con-2/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/04/15/reading-notes/java-con-2/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/04/15/reading-notes/java-con-2/" class="leancloud_visitors" data-flag-title="java并发编程实战-第二章-线程安全性">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="什么是线程安全型"><a href="#什么是线程安全型" class="headerlink" title="什么是线程安全型"></a>什么是线程安全型</h1><p> 首先使代码正确运行，然后再提高代码速度。【正确编写并发程序的方法】</p>
-<p>定义:当多个线程访问某个类时，不管是</p>
-<p>1）运行时环境采用何种调度方式，<br>2）或者这些线程如何交替执行，<br>3）并在在主调代码中不需要任何额外的同步或者协同，<br>这个类能<strong>始终</strong>表现出<strong>正确</strong>的行为。</p>
-<p>无状态对象一定是线程安全的</p>
-<p>Java主要用<code>synchronized</code>做同步，这是一种独占的加锁方式，其他还包括volatile、显式锁（explicit lock）等。</p>
-<ul>
-<li>如果出现线程安全问题，要怎么解决？<br>1）不在线程间共享（比如改成局部变量）<br>2）将状态改为不可变变量<br>3）访问状态变量时使用同步</li>
-</ul>
-<h1 id="原子性"><a href="#原子性" class="headerlink" title="原子性"></a>原子性</h1><h2 id="竞争条件"><a href="#竞争条件" class="headerlink" title="竞争条件"></a>竞争条件</h2><ul>
-<li>由于不恰当的执行时序而出现不正确的结果是一种重要的情况,叫做竞争条件</li>
-<li>当某个计算的正确性取决于多个线程的交替执行时序。最常见的竞态条件类型先检查后执行（Check-Then-Act）。</li>
-</ul>
-<h2 id="实例-延迟初始化中的竞争条件"><a href="#实例-延迟初始化中的竞争条件" class="headerlink" title="实例:延迟初始化中的竞争条件"></a>实例:延迟初始化中的竞争条件</h2><p>单例模式,如果不加锁,返回不同的实例</p>
-<h2 id="复合操作"><a href="#复合操作" class="headerlink" title="复合操作"></a>复合操作</h2><h1 id="加锁机制"><a href="#加锁机制" class="headerlink" title="加锁机制"></a>加锁机制</h1><p>需要同时更新两个值</p>
-<h2 id="内置锁"><a href="#内置锁" class="headerlink" title="内置锁"></a>内置锁</h2><ul>
-<li>synchronized</li>
-</ul>
-<h2 id="重入"><a href="#重入" class="headerlink" title="重入"></a>重入</h2><p>可重入意味着获取锁的操作的粒度是“线程”，而不是“调用”。重入的一种实现方法是为每一个锁关联一个获取计数值和一个所有者线程。当计数值为0时，这个锁没有被任何线程持有，当线程请求一个未被获取这个锁，计数值将递增，当线程退出同步代码块时，计数器会递减。当计数器为0时，释放该锁。</p>
-<h1 id="用锁来保护状态"><a href="#用锁来保护状态" class="headerlink" title="用锁来保护状态"></a>用锁来保护状态</h1><p>锁可以使其保护的代码路径以串行的方式来访问。</p>
-<ul>
-<li>如果用同步来协调对某个变量的访问时,那么在访问这个变量的所有位置上都需要使用同步</li>
-<li>最好注释变量是由哪个锁锁保护</li>
-</ul>
-<h1 id="活跃性与性能"><a href="#活跃性与性能" class="headerlink" title="活跃性与性能"></a>活跃性与性能</h1><p>可以将执行时间较长的操作从锁中移除</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/15/reading-notes/java-con-3/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/15/reading-notes/java-con-3/" itemprop="url">java并发编程实战-第三章-对象的共享</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-15T23:04:18+08:00">
-                2018-04-15
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/04/15/reading-notes/java-con-3/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/04/15/reading-notes/java-con-3/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/04/15/reading-notes/java-con-3/" class="leancloud_visitors" data-flag-title="java并发编程实战-第三章-对象的共享">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="3-1可见性"><a href="#3-1可见性" class="headerlink" title="3.1可见性"></a>3.1可见性</h1><ul>
-<li>首先我们需要知道的是，java的线程都有自己独立的缓存，线程之间进行共享变量的交互是通过自身和缓存和主存的交互实现的。</li>
-<li>如果线程的每次更改缓存都刷入主存，主存每次被一个线程的缓存修改，都通知所有的线程刷新自身的缓存的话，那样就太不经济了。</li>
-<li>由于1和2，就会产生一个现象：当线程1修改了一个共享变量之后，线程2获取的共享变量还是更改前的值。即线程1更改共享变量并没有刷入主存，或者线程2并没有去主存中获取到新的共享变量，或以上两者皆有</li>
-<li>为了解决内存可见性我们可以使用volatile关键字和同步这两种方式</li>
-<li>变量的读取,指令重排序</li>
-</ul>
-<h2 id="失效数据"><a href="#失效数据" class="headerlink" title="失效数据"></a>失效数据</h2><h2 id="非原子的64位操作"><a href="#非原子的64位操作" class="headerlink" title="非原子的64位操作"></a>非原子的64位操作</h2><p>当读取一个非volatile类型的long变量时,如果对该变量的读操作和写操作在不同的线程中执行,那么很可能读取到某个值的高32位和另外一个值的低32位</p>
-<h2 id="加锁和可见性"><a href="#加锁和可见性" class="headerlink" title="加锁和可见性"></a>加锁和可见性</h2><p>加锁的含义不仅互斥,还包括内存可见性</p>
-<h2 id="volatile变量"><a href="#volatile变量" class="headerlink" title="volatile变量"></a>volatile变量</h2><ul>
-<li>用来确保变量的更新操作通知到其他线程</li>
-<li>编译器与运行时都会注意到这个变量时共享的,不会进行重排序</li>
-<li>volatile不会被缓存在寄存器或者其他处理器不可见的地方,读取变量时,总能返回最新的写入值</li>
-</ul>
-<p>满足所有条件,才应该使用volatile</p>
-<ul>
-<li>对变量的写入不依赖变量的当前值,只有单个线程更新变脸的值</li>
-<li>该变量不会与其他状态一起纳入不变形条件中</li>
-<li>在访问时不需要加锁</li>
-</ul>
-<h1 id="3-2发布与溢出"><a href="#3-2发布与溢出" class="headerlink" title="3.2发布与溢出"></a>3.2发布与溢出</h1><blockquote>
-<p>一般自定义类需要考虑发布(构造方法), juc的类已经处理过了</p>
-</blockquote>
-<h2 id="发布-是对象能够在当前作用域之外的代码中使用"><a href="#发布-是对象能够在当前作用域之外的代码中使用" class="headerlink" title="发布:是对象能够在当前作用域之外的代码中使用"></a>发布:是对象能够在当前作用域之外的代码中使用</h2><ul>
-<li>将对象的引用存储到公共静态域。</li>
-<li>在非私有方法中返回引用。</li>
-<li>在发布某对象的时候可能会间接发布本不想发布的对象，如一个private的数组，一旦被发布，其中储存的对象也会被发布</li>
-</ul>
-<h2 id="溢出-不应该发布的被发布了"><a href="#溢出-不应该发布的被发布了" class="headerlink" title="溢出:不应该发布的被发布了"></a>溢出:不应该发布的被发布了</h2><p>类对自己的内部状态进行了同步操作,如果发布出去可能会破坏封装性,并使程序难以维护不变性条件<br>一个对象在尚未准备好就将它发布出去——溢出。</p>
-<ul>
-<li>“内部类发布也会引发溢出”，因为只有当对象通过构造函数返回之后，才处于稳定状态。这种发布会导致this溢出。</li>
-<li>“即使在构造函数的最后一行发布也会有该问题”，指令重排序可能会引发一些奇怪的问题。而且该引用已经不是null了，但是内容还没有初始化完毕也有可能。</li>
-<li>“不要让this在构造期溢出！”</li>
-</ul>
-<h2 id="常见错误"><a href="#常见错误" class="headerlink" title="常见错误"></a>常见错误</h2><ul>
-<li>1.在构造函数中创建并启动线程<br>这个时候线程已经获得了this的引用（即使是隐式的，因为该Runnable或者Thread是所属对象的内部类），this引用几乎总是被新线程所共享。<br>所以在构造函数中创建线程没有错误，但是不要在构造函数中启动它。</li>
-<li>2.注册一个内部类,使用this方法<br>可以使用静态工厂和私有构造函数来解决这个问题。</li>
-</ul>
-<h1 id="3-3线程封闭"><a href="#3-3线程封闭" class="headerlink" title="3.3线程封闭"></a>3.3线程封闭</h1><p>数据仅在单线程中被访问，即数据不共享。<br>几种方式：</p>
-<h2 id="特定的方法"><a href="#特定的方法" class="headerlink" title="特定的方法"></a>特定的方法</h2><p>例如在一个线程中进行 读取修改写入,其他线程中进行读取</p>
-<h2 id="栈封闭"><a href="#栈封闭" class="headerlink" title="栈封闭"></a>栈封闭</h2><p>引用在局部变量中<br>注意不要让当前线程中的对象从所在线程溢出！</p>
-<h2 id="java的ThreadLocal"><a href="#java的ThreadLocal" class="headerlink" title="java的ThreadLocal"></a>java的ThreadLocal</h2><p>使用ThreadLocal可以做到线程隔离，每个线程都有自己单独的一个区域保存变量。</p>
-<h1 id="3-4不变性对象"><a href="#3-4不变性对象" class="headerlink" title="3.4不变性对象"></a>3.4不变性对象</h1><ul>
-<li>不可变对象满足下列条件：<ol>
-<li>所有域是final的，域内部的域也是final的</li>
-<li>所有域不可改变</li>
-<li>this没有在构造的时候逸出</li>
-</ol>
-</li>
-</ul>
-<h2 id="final域"><a href="#final域" class="headerlink" title="final域"></a>final域</h2><h2 id="使用volatile类型来发布不可变对象"><a href="#使用volatile类型来发布不可变对象" class="headerlink" title="使用volatile类型来发布不可变对象"></a>使用volatile类型来发布不可变对象</h2><h1 id="3-5安全发布"><a href="#3-5安全发布" class="headerlink" title="3.5安全发布"></a>3.5安全发布</h1><h2 id="不正确的发布-正确的对象被破坏"><a href="#不正确的发布-正确的对象被破坏" class="headerlink" title="不正确的发布:正确的对象被破坏"></a>不正确的发布:正确的对象被破坏</h2><p>导致其他县城看到尚未创建完的对象</p>
-<h2 id="不可变对象与初始化安全"><a href="#不可变对象与初始化安全" class="headerlink" title="不可变对象与初始化安全"></a>不可变对象与初始化安全</h2><h2 id="安全发布的常用模式"><a href="#安全发布的常用模式" class="headerlink" title="安全发布的常用模式"></a>安全发布的常用模式</h2><ol>
-<li>在静态初始化对象引用，因为JVM的类加载过程中是同步的</li>
-<li>对对象引用使用volatile或AtomicReference</li>
-<li>将对象引用放入final域中</li>
-<li>对对象引用加锁</li>
-</ol>
-<p>案例:</p>
-<ul>
-<li>将一个键值对放入HashTable,syhronizedMap或者ConcurrentMap中</li>
-<li>静态构造的对象<br><code>public static Holder holder= new Holder(42)</code></li>
-</ul>
-<h2 id="事实不可变对象"><a href="#事实不可变对象" class="headerlink" title="事实不可变对象"></a>事实不可变对象</h2><p>程序不会去修改,例如Date虽然是可变的,但是放入了同步的HashMap中,且不会修改,那么就认为是不可变的对象</p>
-<h2 id="可变对象"><a href="#可变对象" class="headerlink" title="可变对象"></a>可变对象</h2><ul>
-<li>不仅要保证发布时的状态可见性</li>
-<li>每次访问时同样需要使用同步来确保后需修改操作的可见性</li>
-</ul>
-<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><ul>
-<li>不可变对象可以通过任意机制来发布()</li>
-<li>事实不可变对象必须通过安全方式来发布</li>
-<li>可变对象必须通过安全方式来发布,并且是线程安全的或者由某个所保护起来</li>
-</ul>
-<h2 id="安全的共享对象"><a href="#安全的共享对象" class="headerlink" title="安全的共享对象"></a>安全的共享对象</h2><p>在发布一个对象的时候需要明确指出该对象的多线程共享规则：</p>
-<ol>
-<li>是线程封闭？：只能由一个线程拥有</li>
-<li>是只读共享？：只能并发读</li>
-<li>是线程安全共享？：类内部实现了同步，可以随意使用</li>
-<li>是保护对象？：类内部没有实现同步，需要使用者在外部同步</li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2282,6 +2240,10 @@
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
+              <img class="site-author-image" itemprop="image"
+                src="/images/tennis.jpg"
+                alt="Victor" />
+            
               <p class="site-author-name" itemprop="name">Victor</p>
               <p class="site-description motion-element" itemprop="description">victor的个人博客,作为一枚后端开发工程师,写本博客目的,旨在记录自己在工作生活中的点点滴滴,形成自己的知识体系</p>
           </div>
@@ -2293,7 +2255,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">197</span>
+                  <span class="site-state-item-count">199</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -2327,6 +2289,20 @@
 
           <div class="links-of-author motion-element">
             
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/victorsheng" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="psychovitor@gmail.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            
           </div>
 
           
@@ -2342,6 +2318,13 @@
 
       
 
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
       
 
     </div>
@@ -2394,11 +2377,6 @@
       </div>
     </footer>
 
-    
-      <div class="back-to-top">
-        <i class="fa fa-arrow-up"></i>
-        
-      </div>
     
 
     
