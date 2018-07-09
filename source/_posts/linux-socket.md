@@ -107,6 +107,60 @@ java中网络编程时很大一部分代码在做各种fail时的处理，了解
 ## 对比
 https://docs.oracle.com/javase/8/docs/technotes/guides/net/articles/connection_release.html
 
+# 利用socket模拟http请求,然后在不关闭的情况下退出进程
+
+```
+package com.example.demo.socket;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+
+public class SelfHttpSocketClient {
+
+  public static void main(String[] args) throws InterruptedException {
+    String host = "localhost";
+    String httpStr = "GET / HTTP/1.1\r\n"
+        + "cache-control: no-cache\r\n"
+        + "Accept: */*\r\n"
+        + "Connection: keep-alive\r\n"
+        + "\r\n";
+
+    int port = 8080;
+    try {
+      System.out.println("连接到主机：" + host + " ，端口号：" + port);
+      Socket client = new Socket(host, port);
+//      client.setSoLinger(true, 0);
+      System.out.println("远程主机地址：" + client.getRemoteSocketAddress());
+      OutputStream outToServer = client.getOutputStream();
+      outToServer.write(httpStr.getBytes());
+//      client.shutdownOutput();
+      InputStream inFromServer = client.getInputStream();
+
+      BufferedReader br = new BufferedReader(
+          new InputStreamReader(inFromServer, StandardCharsets.ISO_8859_1));
+      String data;
+      while ((data = br.readLine()) != null) {
+        System.out.println("服务器响应" + data);
+      }
+
+//      client.close();
+      Thread.sleep(100000000);
+    } catch (IOException e) {
+      e.printStackTrace();
+    } finally {
+
+    }
+  }
+}
+```
+
+![upload successful](/images/pasted-209.png)
+
 
 # 参考
 http://novoland.github.io/%E7%BD%91%E7%BB%9C/2014/07/26/RST%E5%8F%8Ajava%20socket%E5%85%B3%E9%97%AD%E5%90%8E%E8%AF%BB%E5%86%99%E7%9A%84%E5%90%84%E7%A7%8D%E5%BC%82%E5%B8%B8.html

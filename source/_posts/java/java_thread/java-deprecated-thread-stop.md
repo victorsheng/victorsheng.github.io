@@ -1,11 +1,9 @@
----
 title: 为什么废弃thread类的stop方法及java中的中断概念
-date: 2018-03-28 14:27:14
 tags:
   - 多线程
+date: 2018-03-28 14:27:14
 categories:
 ---
-
 # 对比测试
 ```
 package com.example.demo.thread;
@@ -166,13 +164,50 @@ java.lang.ThreadDeath
 - 通过调用线程对象的interrupt方法将该线程的标识位设为true；可以在别的线程中调用，也可以在自己的线程中调用。
 
 ## 相关方法
-中断的相关方法public void interrupt() 将调用者线程的中断状态设为true。public boolean isInterrupted() 判断调用者线程的中断状态。public static boolean interrupted 只能通过Thread.interrupted()调用。 它会做两步操作：返回当前线程的中断状态；将当前线程的中断状态设为false；
+
+- public void interrupt() 将调用者线程的中断状态设为true。
+- public boolean isInterrupted() 判断调用者线程的中断状态。
+- public static boolean interrupted 只能通过Thread.interrupted()调用。 它会做两步操作：返回当前线程的中断状态；将当前线程的中断状态设为false；
 
 ## 正确用法
-1.设置中断监听
-2.触发中断
+### 中断处理
+#### 处理时机
+
+考虑点:
+- 数据一致性
+- 效率
+- 及时性
+
+#### 处理方式
+
+##### 1、 中断状态的管理
+
+一般说来，当可能阻塞的方法声明中有抛出InterruptedException则暗示该方法是可中断的，如BlockingQueue#put、BlockingQueue#take、Object#wait、Thread#sleep等，如果程序捕获到这些可中断的阻塞方法抛出的InterruptedException或检测到中断后，这些中断信息该如何处理？一般有以下两个通用原则：
+
+入口:
+- try catch 阻塞方法声明的 InterruptedException异常
+- 手动判断Thread.currentThread.isInterrupted()
+
+出口:
+- 如果遇到的是可中断的阻塞方法抛出InterruptedException，可以继续向方法调用栈的上层抛出该异常InterruptedException
+- 通过Thread.currentThread.interrupt()来重新设置中断状态。如果是检测并清除了中断状态，亦是如此。
+
+##### 2、 中断的响应
+程序里发现中断后该怎么响应？这就得视实际情况而定了。有些程序可能一检测到中断就立马将线程终止，有些可能是退出当前执行的任务，继续执行下一个任务……作为一种协作机制，这要与中断方协商好，当调用interrupt会发生些什么都是事先知道的，如做一些事务回滚操作，一些清理工作，一些补偿操作等。
+
+**若不确定调用某个线程的interrupt后该线程会做出什么样的响应，那就不应当中断该线程。**
+
+### 触发中断
+
+## 上层调用中断的方法
+
+- FutureTask中的cancel方法:如果传入的参数为true，它将会在正在运行异步任务的线程上调用interrupt方法，如果正在执行的异步任务中的代码没有对中断做出响应，那么cancel方法中的参数将不会起到什么效果
+- ThreadPoolExecutor中的shutdownNow方法会遍历线程池中的工作线程并调用线程的interrupt方法来中断线程，所以如果工作线程中正在执行的任务没有对中断做出响应，任务将一直执行直到正常结束。
+
 
 # 参考
+http://www.infoq.com/cn/articles/java-interrupt-mechanism#theCommentsSection
+
  http://ibruce.info/2013/12/19/how-to-stop-a-java-thread/
  https://blog.csdn.net/wei_ya_wen/article/details/8626880
  http://www.xie4ever.com/2017/03/03/java-%E7%A6%81%E6%AD%A2%E4%BD%BF%E7%94%A8thread-stop%E6%96%B9%E6%B3%95/
