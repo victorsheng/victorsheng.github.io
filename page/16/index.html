@@ -86,7 +86,7 @@
     root: '/',
     scheme: 'Muse',
     version: '6.3.0',
-    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
     fancybox: false,
     fastclick: false,
     lazyload: false,
@@ -337,6 +337,223 @@
           <div id="content" class="content">
             
   <section id="posts" class="posts-expand">
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/22/java/java_spring/study-springboot-springmvc/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="victor的个人博客,作为一枚后端开发工程师,写本博客目的,旨在记录自己在工作生活中的点点滴滴,形成自己的知识体系">
+      <meta itemprop="image" content="/images/tennis.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/22/java/java_spring/study-springboot-springmvc/" itemprop="url">
+                  springboot配置FastJsonHttpMessageConverter(原理篇)
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-01-22 17:18:00" itemprop="dateCreated datePublished" datetime="2018-01-22T17:18:00+08:00">2018-01-22</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-04-03 09:23:38" itemprop="dateModified" datetime="2018-04-03T09:23:38+08:00">2018-04-03</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/22/java/java_spring/study-springboot-springmvc/#comments" itemprop="discussionUrl">
+                
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/22/java/java_spring/study-springboot-springmvc/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/22/java/java_spring/study-springboot-springmvc/" class="leancloud_visitors" data-flag-title="springboot配置FastJsonHttpMessageConverter(原理篇)">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数：</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="springboot如何配置DispatcherServlet"><a href="#springboot如何配置DispatcherServlet" class="headerlink" title="springboot如何配置DispatcherServlet?"></a>springboot如何配置DispatcherServlet?</h1><p>org.springframework.boot.autoconfigure.web.DispatcherServletAutoConfiguration中完成的</p>
+<h1 id="在springboot项目中-进行springmvc配置的新的方式"><a href="#在springboot项目中-进行springmvc配置的新的方式" class="headerlink" title="在springboot项目中,进行springmvc配置的新的方式"></a>在springboot项目中,进行springmvc配置的新的方式</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">@Configuration</span><br><span class="line">public class SpringMvcConfigure extends WebMvcConfigurerAdapter &#123;</span><br><span class="line"></span><br><span class="line">    @Bean</span><br><span class="line">    public InternalResourceViewResolver viewResolver() &#123;</span><br><span class="line">        InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();</span><br><span class="line">        viewResolver.setPrefix(&quot;/WEB-INF/jsp/&quot;);</span><br><span class="line">        viewResolver.setSuffix(&quot;.jsp&quot;);</span><br><span class="line">        // viewResolver.setViewClass(JstlView.class); // 这个属性通常并不需要手动配置，高版本的Spring会自动检测</span><br><span class="line">        return viewResolver;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void addInterceptors(InterceptorRegistry registry) &#123;</span><br><span class="line">        registry.addInterceptor(new Interceptor1()).addPathPatterns(&quot;/**&quot;);</span><br><span class="line">        registry.addInterceptor(new Interceptor2()).addPathPatterns(&quot;/users&quot;).addPathPatterns(&quot;/users/**&quot;);</span><br><span class="line">        super.addInterceptors(registry);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void addResourceHandlers(ResourceHandlerRegistry registry) &#123;</span><br><span class="line">        // addResourceHandler指的是访问路径，addResourceLocations指的是文件放置的目录  </span><br><span class="line">        registry.addResourceHandler(&quot;/**&quot;).addResourceLocations(&quot;classpath:/res/&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="HTTP序列化-反序列化"><a href="#HTTP序列化-反序列化" class="headerlink" title="HTTP序列化/反序列化"></a>HTTP序列化/反序列化</h1><p>@RestController中有@ResponseBody，可以帮我们把User序列化到resp.body中。@RequestBody可以帮我们把req.body的内容转化为User对象。如果是开发Web应用，一般这两个注解对应的就是Json序列化和反序列化的操作。这里实际上已经体现了Http序列化/反序列化这个过程，只不过和普通的对象序列化有些不一样，Http序列化/反序列化的层次更高，属于一种Object2Object之间的转换。</p>
+<p>有过Netty使用经验的对这个应该比较了解，Netty中的Decoder和Encoder就有两种基本层次，层次低的一种是Byte <---> Message，二进制与程序内部消息对象之间的转换，就是常见的序列化/反序列化；另外一种是 Message <---> Message，程序内部对象之间的转换，比较高层次的序列化/反序列化。</---></---></p>
+<p>Http协议的处理过程，TCP字节流 <---> HttpRequest/HttpResponse <---> 内部对象，就涉及这两种序列化。在springmvc中第一步已经由Servlet容器（tomcat等等）帮我们处理了，第二步则主要由框架帮我们处理。上面所说的Http序列化/反序列化就是指的这第二个步骤，它是controller层框架的核心功能之一，有了这个功能，就能大大减少代码量，让controller的逻辑更简洁清晰，就像上面示意的代码那样，方法中只有一行代码。</---></---></p>
+<p>spirngmvc进行第二步操作，也就是Http序列化和反序列化的核心是HttpMessageConverter。用过老版本springmvc的可能有些印象，那时候需要在xml配置文件中注入MappingJackson2HttpMessageConverter这个类型的bean，告诉springmvc我们需要进行Json格式的转换，它就是HttpMessageConverter的一种实现。<br><img src="/images/pasted-39.png" alt="upload successful"></p>
+<h2 id="几种实现"><a href="#几种实现" class="headerlink" title="几种实现"></a>几种实现</h2><ul>
+<li>json:gson,fastjson,jackson</li>
+<li>Protobuf</li>
+<li>java序列化</li>
+</ul>
+<h1 id="HttpMessageConverter优先级"><a href="#HttpMessageConverter优先级" class="headerlink" title="HttpMessageConverter优先级"></a>HttpMessageConverter优先级</h1><p>另外有很重要的一点需要说明一下，springmvc可以同时配置多个Converter，根据一定的规则（主要是Content-Type、Accept、controller方法的consumes/produces、Converter.mediaType以及Converter的排列顺序这四个属性）来选择到底是使用哪一个，这使得springmvc能够一个接口支持多种报文格式。</p>
+<h1 id="默认的converters"><a href="#默认的converters" class="headerlink" title="默认的converters"></a>默认的converters</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">ByteArrayHttpMessageConverter – converts byte arrays</span><br><span class="line">StringHttpMessageConverter – converts Strings</span><br><span class="line">ResourceHttpMessageConverter – converts org.springframework.core.io.Resource for any type of octet stream</span><br><span class="line">SourceHttpMessageConverter – converts javax.xml.transform.Source</span><br><span class="line">FormHttpMessageConverter – converts form data to/from a MultiValueMap&lt;String, String&gt;.</span><br><span class="line">Jaxb2RootElementHttpMessageConverter – converts Java objects to/from XML (added only if JAXB2 is present on the classpath)</span><br><span class="line">MappingJackson2HttpMessageConverter – converts JSON (added only if Jackson 2 is present on the classpath)</span><br><span class="line">MappingJacksonHttpMessageConverter – converts JSON (added only if Jackson is present on the classpath)</span><br><span class="line">AtomFeedHttpMessageConverter – converts Atom feeds (added only if Rome is present on the classpath)</span><br><span class="line">RssChannelHttpMessageConverter – converts RSS feeds (added only if Rome is present on the classpath)</span><br></pre></td></tr></table></figure>
+<p><img src="/images/pasted-40.png" alt="upload successful"></p>
+<h1 id="源码中的调用栈"><a href="#源码中的调用栈" class="headerlink" title="源码中的调用栈"></a>源码中的调用栈</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter.write(FastJsonHttpMessageConverter.java:185)</span><br><span class="line">	  at org.springframework.web.servlet.mvc.method.annotation.AbstractMessageConverterMethodProcessor.writeWithMessageConverters(AbstractMessageConverterMethodProcessor.java:231)</span><br><span class="line">	  at org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor.handleReturnValue(HttpEntityMethodProcessor.java:203)</span><br><span class="line">	  at org.springframework.web.method.support.HandlerMethodReturnValueHandlerComposite.handleReturnValue(HandlerMethodReturnValueHandlerComposite.java:81)</span><br><span class="line">	  at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:113)</span><br><span class="line">	  at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:827)</span><br><span class="line">	  at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:738)</span><br><span class="line">	  at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:85)</span><br><span class="line">	  at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:967)</span><br><span class="line">	  at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:901)</span><br><span class="line">	  at</span><br></pre></td></tr></table></figure>
+<h1 id="常见的contentType"><a href="#常见的contentType" class="headerlink" title="常见的contentType"></a>常见的contentType</h1><ul>
+<li>1.text/html</li>
+<li>2.text/plain</li>
+<li>3.text/css</li>
+<li>4.text/javascript</li>
+<li>5.application/x-www-form-urlencoded</li>
+<li>6.multipart/form-data</li>
+<li>7.application/json</li>
+<li>8.application/xml</li>
+</ul>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
     
       
 
@@ -2168,230 +2385,6 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/15/http/advantage-api/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Victor">
-      <meta itemprop="description" content="victor的个人博客,作为一枚后端开发工程师,写本博客目的,旨在记录自己在工作生活中的点点滴滴,形成自己的知识体系">
-      <meta itemprop="image" content="/images/tennis.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Victor的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/15/http/advantage-api/" itemprop="url">
-                  RESTful-API概念学习
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2018-01-15 20:13:15" itemprop="dateCreated datePublished" datetime="2018-01-15T20:13:15+08:00">2018-01-15</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
-                <time title="修改时间：2018-04-03 09:23:38" itemprop="dateModified" datetime="2018-04-03T09:23:38+08:00">2018-04-03</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/HTTP协议/" itemprop="url" rel="index"><span itemprop="name">HTTP协议</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/01/15/http/advantage-api/#comments" itemprop="discussionUrl">
-                
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/01/15/http/advantage-api/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/01/15/http/advantage-api/" class="leancloud_visitors" data-flag-title="RESTful-API概念学习">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数：</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="RESTful-API"><a href="#RESTful-API" class="headerlink" title="RESTful API"></a>RESTful API</h1><ul>
-<li>透明性，暴露资源存在。</li>
-<li>充分利用 HTTP 协议本身语义。</li>
-<li>无状态，这点非常重要。在调用一个接口（访问、操作资源）的时候，可以不用考虑上下文，不用考虑当前状态，极大的降低了复杂度</li>
-<li>HTTP 本身提供了丰富的内容协商手段，无论是缓存，还是资源修改的乐观并发控制，都可以以业务无关的中间件来实现</li>
-</ul>
-<h1 id="理解RESTful架构"><a href="#理解RESTful架构" class="headerlink" title="理解RESTful架构"></a>理解RESTful架构</h1><ul>
-<li>Representational State Transfer</li>
-<li>REST的名称”表现层状态转化”中，省略了主语。”表现层”其实指的是”资源”（Resources）的”表现层”。<br>所谓”资源”，就是网络上的一个实体，或者说是网络上的一个具体信息。它可以是一段文本、一张图片、一首歌曲、一种服务，总之就是一个具体的实在。你可以用一个URI（统一资源定位符）指向它，每种资源对应一个特定的URI。要获取这个资源，访问它的URI就可以，因此URI就成了每一个资源的地址或独一无二的识别符。</li>
-</ul>
-<p>所谓”上网”，就是与互联网上一系列的”资源”互动，调用它的URI。</p>
-<p>互联网通信协议HTTP协议，是一个无状态协议。这意味着，所有的状态都保存在服务器端。因此，如果客户端想要操作服务器，必须通过某种手段，让服务器端发生”状态转化”（State Transfer）。而这种转化是建立在表现层之上的，所以就是”表现层状态转化”。</p>
-<p>最常见的一种设计错误，就是URI包含动词。因为”资源”表示一种实体，所以应该是名词，URI不应该有动词，动词应该放在HTTP协议中。</p>
-<p>因为不同的版本，可以理解成同一种资源的不同表现形式，所以应该采用同一个URI。版本号可以在HTTP请求头信息的Accept字段中进行区分<br><a href="http://www.ruanyifeng.com/blog/2011/09/restful.html" target="_blank" rel="noopener">http://www.ruanyifeng.com/blog/2011/09/restful.html</a></p>
-<h1 id="RESTful-API-设计指南"><a href="#RESTful-API-设计指南" class="headerlink" title="RESTful API 设计指南"></a>RESTful API 设计指南</h1><ul>
-<li>协议</li>
-<li>域名</li>
-<li>版本（Versioning）</li>
-<li>路径（Endpoint）<br>在RESTful架构中，每个网址代表一种资源（resource），所以网址中不能有动词，只能有名词，而且所用的名词往往与数据库的表格名对应。一般来说，数据库中的表都是同种记录的”集合”（collection），所以API中的名词也应该使用复数。</li>
-<li>HTTP动词</li>
-<li>过滤信息（Filtering）</li>
-<li>状态码（Status Codes）</li>
-<li>错误处理</li>
-<li>返回结果</li>
-<li>Hypermedia API<br>RESTful API最好做到Hypermedia，即返回结果中提供链接，连向其他API方法，使得用户不查文档，也知道下一步应该做什么。</li>
-<li>其他<ul>
-<li>（1）API的身份认证应该使用OAuth 2.0框架。</li>
-<li>（2）服务器返回的数据格式，应该尽量使用JSON，避免使用XML。</li>
-</ul>
-</li>
-</ul>
-<p><a href="http://www.ruanyifeng.com/blog/2014/05/restful_api.html" target="_blank" rel="noopener">http://www.ruanyifeng.com/blog/2014/05/restful_api.html</a></p>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/15/http/api-doc/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -3263,7 +3256,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">203</span>
+                    <span class="site-state-item-count">204</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -3540,6 +3533,13 @@
       
 
       
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
 
     </div>
   </aside>
@@ -3593,11 +3593,6 @@
       </div>
     </footer>
 
-    
-      <div class="back-to-top">
-        <i class="fa fa-arrow-up"></i>
-        
-      </div>
     
 
     
@@ -4135,6 +4130,9 @@
   
 
   
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=6.3.0"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=6.3.0"></script>
+
 
   
 
