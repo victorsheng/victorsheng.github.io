@@ -1,6 +1,8 @@
 title: jvm优雅停机
 date: 2018-07-07 21:18:52
 tags:
+    - java 
+    - jvm
 categories:
 ---
 

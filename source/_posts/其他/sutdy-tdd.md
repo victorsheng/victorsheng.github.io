@@ -1,7 +1,10 @@
 title: java测试驱动开发-读书笔记
 date: 2018-06-21 09:58:16
 tags:
+    - 开发测试
+    - 测试驱动
 categories:
+    - 开发测试
 ---
 # 代码地址:
 https://bitbucket.org/vfarcic/

@@ -1,6 +1,8 @@
 title: linux-socket挥手
 date: 2018-06-27 05:58:36
 tags:
+    - socket
+    - 网络协议
 categories:
 ---
 # Socket是什么

@@ -2,7 +2,9 @@
 title: linux-proc-folder
 date: 2018-07-06 06:03:46
 tags:
+    - 操作系统
 categories:
+    - 操作系统
 ---
 # /proc目录
 - Linux 内核提供了一种通过 /proc 文件系统，在运行时访问内核内部数据结构、改变内核设置的机制。

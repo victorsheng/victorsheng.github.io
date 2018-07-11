@@ -1,15 +1,14 @@
 ---
-title: 常用网址
-date: 2018-07-03 21:54:54
+title: web
+date: 2018-07-11 09:24:05
 tags:
 categories:
-sticky: 10
 ---
-
-# jdk8规范:
+# java
+## jdk8规范:
 https://docs.oracle.com/javase/specs/jls/se8/html/
 
-# web
+# web服务开发
 
 ## springmvc 文档
 https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/

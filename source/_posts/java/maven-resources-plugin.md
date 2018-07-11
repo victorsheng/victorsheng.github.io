@@ -2,6 +2,8 @@
 title: maven-resources插件
 date: 2018-07-03 15:20:38
 tags:
+    - maven
+    - springboot
 categories:
 ---
 # 官网

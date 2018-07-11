@@ -1,7 +1,10 @@
 title: JWT
 date: 2018-06-05 19:50:13
 tags:
+    - 安全
+    - 认证
 categories:
+    - 安全
 ---
 JSON Web Token（JWT）是一个非常轻巧的规范。这个规范允许我们使用JWT在用户和服务器之间传递安全可靠的信息。
 

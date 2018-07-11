@@ -2,7 +2,10 @@ title: access-token的生成策略
 author: Victor
 date: 2018-06-21 17:29:42
 tags:
+    - 安全
+    - access-token
 categories:
+    - 安全
 ---
 # oauth2.0规范中的access token
 

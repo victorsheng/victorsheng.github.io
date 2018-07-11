@@ -2,7 +2,9 @@ title: study-cap
 author: Victor
 date: 2018-03-23 23:09:04
 tags:
+    - 分布式
 categories:
+    - 分布式
 ---
 CAP（Consistency一致性、Availability可用性、Partition-tolerance分区可容忍性）理论普遍被看成是大数据技术的理论基础。同时，凭据该理论，业界有一种极度流行、极度“专业”的认识，那就是：关系型数据库设计选择了C（一致性）与A（可用性），NoSQL数据库设计则差别。其中，HBase选择了C（一致性）与P（分区可容忍性），Cassandra选择了A（可用性）与P（分区可容忍性）。
 

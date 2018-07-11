@@ -7,7 +7,7 @@ categories:
     - git
 ---
 # 找到自己代理的端口
-<img src="http://pic.victor123.cn/17-12-20/69754851.jpg">
+<img src="http://pic.victor123.cn/17-12-20/69754851.jpg"/>
 
 # 命令:
 git config --global http.https://github.com.proxy https://127.0.0.1:1087

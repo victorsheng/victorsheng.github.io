@@ -2,7 +2,9 @@ title: redis-bitmap
 author: Victor
 date: 2018-06-24 17:56:10
 tags:
+    - redis
 categories:
+    - redis
 ---
 # bitMap概念
 

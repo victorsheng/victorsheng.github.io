@@ -1,6 +1,8 @@
 title: java-io-study
 date: 2018-07-05 07:05:09
 tags:
+    - io
+    - java
 categories:
 ---
 
