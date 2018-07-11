@@ -86,7 +86,7 @@
     root: '/',
     scheme: 'Muse',
     version: '6.3.0',
-    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":true,"scrollpercent":true,"onmobile":true},
     fancybox: false,
     fastclick: false,
     lazyload: false,
@@ -269,6 +269,22 @@
         
         
           
+          <li class="menu-item menu-item-书单">
+    <a href="/book/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-book"></i> <br />书单</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-常用网站">
+    <a href="/web/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br />常用网站</a>
+  </li>
+        
+        
+        
+          
           <li class="menu-item menu-item-sitemap">
     <a href="/sitemap.xml" rel="section">
       <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />站点地图</a>
@@ -328,6 +344,17 @@
     </header>
 
     
+  
+  
+  
+    
+      
+    
+    <a href="https://github.com/victorsheng" class="github-corner" target="_blank" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#222; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg>
+    
+      </a>
+    
+
 
 
     <main id="main" class="main">
@@ -474,45 +501,16 @@
       
         
           
-            <h1 id="jersey中的interceptor"><a href="#jersey中的interceptor" class="headerlink" title="jersey中的interceptor"></a>jersey中的interceptor</h1><p><a href="https://www.igorkromin.net/index.php/2017/10/19/jersey-jax-rs-filters-and-interceptors-execution-order-for-a-simple-get-request/" target="_blank" rel="noopener">https://www.igorkromin.net/index.php/2017/10/19/jersey-jax-rs-filters-and-interceptors-execution-order-for-a-simple-get-request/</a></p>
-<p><a href="https://www.igorkromin.net/fp-content/images/programming/jersey/jerseyflow_get1.png" target="_blank" rel="noopener">https://www.igorkromin.net/fp-content/images/programming/jersey/jerseyflow_get1.png</a><br><img src="/images/pasted-204.png" alt="upload successful"><br>图中显示了从request到response ,jersey开放的可以进行拦截的地方</p>
-<p><a href="https://stackoverflow.com/questions/35727497/is-there-an-interceptor-in-jersey-similar-to-that-of-springs-handlerinterceptor" target="_blank" rel="noopener">https://stackoverflow.com/questions/35727497/is-there-an-interceptor-in-jersey-similar-to-that-of-springs-handlerinterceptor</a></p>
-<p>ReaderInterceptor - This provides just Annotations of the Class. No access to request/response.<br>ContainerRequestFilter - Provides Request Object but no Annotations/Response.<br>ContainerResponseFilter - Gives Request &amp; Response. But after the web-service/Method is invoked.</p>
-<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>ContainerRequestFilter 接口中的参数中获取的request,只能得到request相关的http请求例如方法,header等<br>对于handler级别的注解,希望在jersey框架中得到ResourceInfo界别的信息,获取method,获取method上面的注解,以判断是否需要进行业务处理</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案:"></a>解决方案:</h1><h2 id="Context"><a href="#Context" class="headerlink" title="@Context"></a>@Context</h2><p>使用@Context可以使用ServletConfig，ServletContext，HttpServletRequest和HttpServletResponse。</p>
-<h2 id="使用ContainerRequestFilter-Context来解决"><a href="#使用ContainerRequestFilter-Context来解决" class="headerlink" title="使用ContainerRequestFilter+@Context来解决"></a>使用ContainerRequestFilter+@Context来解决</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">@Provider</span><br><span class="line">@RequestSignVerify</span><br><span class="line">public class SignResourceFilter implements ContainerResponseFilter &#123;</span><br><span class="line"></span><br><span class="line">  @Context</span><br><span class="line">  private ResourceInfo resourceInfo;</span><br><span class="line"></span><br><span class="line">  @Context</span><br><span class="line">  private HttpServletRequest servletRequest;</span><br><span class="line"></span><br><span class="line">  @Autowired</span><br><span class="line">  private HttpSignature signatureVerifier;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  public void setSignatureVerifier(HttpSignature signatureVerifier) &#123;</span><br><span class="line">    this.signatureVerifier = signatureVerifier;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  @Override</span><br><span class="line">  public void filter(ContainerRequestContext requestContext,</span><br><span class="line">      ContainerResponseContext responseContext) throws IOException &#123;</span><br><span class="line"></span><br><span class="line">    Method resourceMethod = resourceInfo.getResourceMethod();</span><br><span class="line">    if (null != resourceMethod) &#123;</span><br><span class="line">      RequestSignVerify signVerify = resourceMethod.getAnnotation(RequestSignVerify.class);</span><br><span class="line">      if (signVerify != null) &#123;</span><br><span class="line">        HttpRequest httpRequest = ServletSignedRequest.from(servletRequest);</span><br><span class="line">        try &#123;</span><br><span class="line">          if (this.signatureVerifier.verify(httpRequest)) &#123;</span><br><span class="line"></span><br><span class="line">          &#125; else &#123;</span><br><span class="line">            responseContext.setStatus(HttpServletResponse.SC_UNAUTHORIZED);</span><br><span class="line">          &#125;</span><br><span class="line">        &#125; catch (GeneralSecurityException e) &#123;</span><br><span class="line">          e.printStackTrace();</span><br><span class="line">          throw new IOException(e);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h1 id="Filter-and-interceptor执行顺序"><a href="#Filter-and-interceptor执行顺序" class="headerlink" title="Filter and interceptor执行顺序"></a>Filter and interceptor执行顺序</h1><p><a href="https://jersey.github.io/documentation/latest/filters-and-interceptors.html" target="_blank" rel="noopener">https://jersey.github.io/documentation/latest/filters-and-interceptors.html</a></p>
-<ul>
-<li>Client request invoked: The POST request with attached entity is built on the client and invoked.</li>
-<li>ClientRequestFilters: client request filters are executed on the client and they manipulate the request headers.</li>
-<li>Client WriterInterceptor: As the request contains an entity, writer interceptor registered on the client is executed before a MessageBodyWriter is executed. It wraps the entity output stream with the GZipOutputStream.</li>
-<li>Client MessageBodyWriter: message body writer is executed on the client which serializes the entity into the new GZipOutput stream. This stream zips the data and sends it to the “wire”.</li>
-<li>Server: server receives a request. Data of entity is compressed which means that pure read from the entity input stream would return compressed data.</li>
-<li>Server pre-matching ContainerRequestFilters: ContainerRequestFilters are executed that can manipulate resource method matching process.</li>
-<li>Server: matching: resource method matching is done.</li>
-<li>Server: post-matching ContainerRequestFilters: ContainerRequestFilters post matching filters are executed. This include execution of all global filters (without name binding) and filters name-bound to the matched method.</li>
-<li>Server ReaderInterceptor: reader interceptors are executed on the server. The GZIPReaderInterceptor wraps the input stream (the stream from the “wire”) into the GZipInputStream and set it to context.</li>
-<li>Server MessageBodyReader: server message body reader is executed and it deserializes the entity from new GZipInputStream (get from the context). This means the reader will read unzipped data and not the compressed data from the “wire”.</li>
-<li>Server resource method is executed: the deserialized entity object is passed to the matched resource method as a parameter. The method returns this entity as a response entity.</li>
-<li>Server ContainerResponseFilters are executed: response filters are executed on the server and they manipulate the response headers. This include all global bound filters (without name binding) and all filters name-bound to the resource method.</li>
-<li>Server WriterInterceptor: is executed on the server. It wraps the original output stream with a new GZIPOuptutStream. The original stream is the stream that “goes to the wire” (output stream for response from the underlying server container).</li>
-<li>Server MessageBodyWriter: message body writer is executed on the server which serializes the entity into the GZIPOutputStream. This stream compresses the data and writes it to the original stream which sends this compressed data back to the client.</li>
-<li>Client receives the response: the response contains compressed entity data.</li>
-<li>Client ClientResponseFilters: client response filters are executed and they manipulate the response headers.</li>
-<li>Client response is returned: the javax.ws.rs.core.Response is returned from the request invocation.</li>
-<li>Client code calls response.readEntity(): read entity is executed on the client to extract the entity from the response.</li>
-<li>Client ReaderInterceptor: the client reader interceptor is executed when readEntity(Class) is called. The interceptor wraps the entity input stream with GZIPInputStream. This will decompress the data from the original input stream.</li>
-<li>Client MessageBodyReaders: client message body reader is invoked which reads decompressed data from GZIPInputStream and deserializes the entity.</li>
-<li>Client: The entity is returned from the readEntity().</li>
-</ul>
-<h1 id="类型"><a href="#类型" class="headerlink" title="类型"></a>类型</h1><h2 id="全局过滤器"><a href="#全局过滤器" class="headerlink" title="全局过滤器"></a>全局过滤器</h2><h2 id="Name-binding"><a href="#Name-binding" class="headerlink" title="Name binding"></a>Name binding</h2><p>过滤器和拦截器可以是名称绑定的。 名称绑定是一种概念，它允许向JAX-RS运行时说明仅针对特定资源方法执行特定过滤器或拦截器。 当过滤器或拦截器仅限于特定的资源方法时，我们说它是名称绑定的。 没有这种限制的过滤器和拦截器称为全局。</p>
-<p>可以使用@NameBinding批注将过滤器或拦截器分配给资源方法。 注释用作应用于提供者和资源方法的其他用户实现的注释的元注释。</p>
-<p><strong>效率高,需提前绑定</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">import java.lang.annotation.Retention;</span><br><span class="line">import java.lang.annotation.RetentionPolicy;</span><br><span class="line">import java.util.zip.GZIPInputStream;</span><br><span class="line"> </span><br><span class="line">import javax.ws.rs.GET;</span><br><span class="line">import javax.ws.rs.NameBinding;</span><br><span class="line">import javax.ws.rs.Path;</span><br><span class="line">import javax.ws.rs.Produces;</span><br><span class="line">...</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">// @Compress annotation is the name binding annotation</span><br><span class="line">@NameBinding</span><br><span class="line">@Retention(RetentionPolicy.RUNTIME)</span><br><span class="line">public @interface Compress &#123;&#125;</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">@Path(&quot;helloworld&quot;)</span><br><span class="line">public class HelloWorldResource &#123;</span><br><span class="line"> </span><br><span class="line">    @GET</span><br><span class="line">    @Produces(&quot;text/plain&quot;)</span><br><span class="line">    public String getHello() &#123;</span><br><span class="line">        return &quot;Hello World!&quot;;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    @GET</span><br><span class="line">    @Path(&quot;too-much-data&quot;)</span><br><span class="line">    @Compress</span><br><span class="line">    public String getVeryLongString() &#123;</span><br><span class="line">        String str = ... // very long string</span><br><span class="line">        return str;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">// interceptor will be executed only when resource methods</span><br><span class="line">// annotated with @Compress annotation will be executed</span><br><span class="line">@Compress</span><br><span class="line">public class GZIPWriterInterceptor implements WriterInterceptor &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void aroundWriteTo(WriterInterceptorContext context)</span><br><span class="line">                    throws IOException, WebApplicationException &#123;</span><br><span class="line">        final OutputStream outputStream = context.getOutputStream();</span><br><span class="line">        context.setOutputStream(new GZIPOutputStream(outputStream));</span><br><span class="line">        context.proceed();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="Dynamic-binding"><a href="#Dynamic-binding" class="headerlink" title="Dynamic binding"></a>Dynamic binding</h2><p>动态绑定是一种如何以动态方式将过滤器和拦截器分配给资源方法的方法。 前一章中的名称绑定使用静态方法，对绑定的更改需要更改源代码和重新编译。 使用动态绑定，您可以实现在应用程序初始化时定义绑定的代码。 以下示例显示了如何实现动态绑定。</p>
-<p><strong>效率低,实时绑定,更灵活</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">public class CompressionDynamicBinding implements DynamicFeature &#123;</span><br><span class="line"> </span><br><span class="line">    @Override</span><br><span class="line">    public void configure(ResourceInfo resourceInfo, FeatureContext context) &#123;</span><br><span class="line">        if (HelloWorldResource.class.equals(resourceInfo.getResourceClass())</span><br><span class="line">                &amp;&amp; resourceInfo.getResourceMethod()</span><br><span class="line">                    .getName().contains(&quot;VeryLongString&quot;)) &#123;</span><br><span class="line">            context.register(GZIPWriterInterceptor.class);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-          
+          jersey中的interceptorhttps://www.igorkromin.net/index.php/2017/10/19/jersey-jax-rs-filters-and-interceptors-execution-order-for-a-simple-get-request/
+ht
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/07/03/java/java_web/jersey-interceptor/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -673,21 +671,16 @@
       
         
           
-            <h1 id="java8-多继承"><a href="#java8-多继承" class="headerlink" title="java8 多继承"></a>java8 多继承</h1><p>在java 接口中出现了default方法后,如果一个类同时实现了2个接口,而两个接口都有相同的default方法,该如何处理呢?</p>
-<h2 id="多个父接口"><a href="#多个父接口" class="headerlink" title="多个父接口"></a>多个父接口</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">+---------------+         +------------+</span><br><span class="line">|  Interface A  |         |Interface B |</span><br><span class="line">+-----------^---+         +---^--------+</span><br><span class="line">            |                 |         </span><br><span class="line">            |                 |         </span><br><span class="line">            |                 |         </span><br><span class="line">            +-+------------+--+         </span><br><span class="line">              | Interface C|            </span><br><span class="line">              +------------+</span><br></pre></td></tr></table></figure>
-<p>A,B拥有相同签名的默认方法default String say(String name), 如果接口C没有override这个方法， 则编译出错。<br><code>interface C inherits unrelated defaults for say(String) from types A and B</code></p>
-<h3 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">interface C extends A,B&#123;</span><br><span class="line">	default String say(String name) &#123;</span><br><span class="line">		return &quot;greet &quot; + name;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="接口多层继承"><a href="#接口多层继承" class="headerlink" title="接口多层继承"></a>接口多层继承</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">+---------------+ </span><br><span class="line">|  Interface A1 | </span><br><span class="line">+--------+------+ </span><br><span class="line">         |        </span><br><span class="line">         |        </span><br><span class="line">         |        </span><br><span class="line">+--------+------+ </span><br><span class="line">|  Interface A2 | </span><br><span class="line">+-------+-------+ </span><br><span class="line">        |         </span><br><span class="line">        |         </span><br><span class="line">        |         </span><br><span class="line">+-------+--------+</span><br><span class="line">|   Interface C  |</span><br><span class="line">+----------------+</span><br></pre></td></tr></table></figure>
-<h2 id="多层多继承"><a href="#多层多继承" class="headerlink" title="多层多继承"></a>多层多继承</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">+---------------+                          </span><br><span class="line">|  Interface A1 |                          </span><br><span class="line">+--------+------+                          </span><br><span class="line">         |                                 </span><br><span class="line">         |                                 </span><br><span class="line">         |                                 </span><br><span class="line">+--------+------+         +---------------+</span><br><span class="line">|  Interface A2 |         |  Interface B  |</span><br><span class="line">+-------+-------+         +---------+-----+</span><br><span class="line">        |       +---------+---------^      </span><br><span class="line">        |       |                          </span><br><span class="line">        |       |                          </span><br><span class="line">+-------+-------++                         </span><br><span class="line">|   Interface C  |                         </span><br><span class="line">+----------------+</span><br></pre></td></tr></table></figure>
-<h2 id="类和接口混杂"><a href="#类和接口混杂" class="headerlink" title="类和接口混杂"></a>类和接口混杂</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">+-------------+       +-----------+</span><br><span class="line">| Interface A |       |  Class B  |</span><br><span class="line">+-----------+-+       +-----+-----+</span><br><span class="line">            ^-+    +--+-----^      </span><br><span class="line">              |    |               </span><br><span class="line">          +---+----+-+             </span><br><span class="line">          |  Class C |             </span><br><span class="line">          +----------+</span><br></pre></td></tr></table></figure>
-<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><ul>
-<li>类优先于接口。 如果一个子类继承的父类和接口有相同的方法实现。 那么子类继承父类的方法</li>
-<li>子类型中的方法优先于父类型中的方法。</li>
-<li>如果以上条件都不满足， 则必须显示覆盖/实现其方法，或者声明成abstract。</li>
-</ul>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://colobu.com/2014/11/04/Java-8-default-method-and-multiple-inheritance/" target="_blank" rel="noopener">http://colobu.com/2014/11/04/Java-8-default-method-and-multiple-inheritance/</a></p>
-
-          
+          java8 多继承在java 接口中出现了default方法后,如果一个类同时实现了2个接口,而两个接口都有相同的default方法,该如何处理呢?
+多个父接口123456789+---------------+         +------------+|  Interface A  |    
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/07/03/java/java_common/Java-8-default-method-and-multiple-inheritance/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -739,7 +732,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/03/maven-resources-plugin/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/03/java/maven-resources-plugin/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
@@ -758,7 +751,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/07/03/maven-resources-plugin/" itemprop="url">
+                <a class="post-title-link" href="/2018/07/03/java/maven-resources-plugin/" itemprop="url">
                   maven-resources插件
                 </a>
               
@@ -785,12 +778,24 @@
                 
               
 
-              <time title="创建时间：2018-07-03 15:20:38 / 修改时间：22:43:04" itemprop="dateCreated datePublished" datetime="2018-07-03T15:20:38+08:00">2018-07-03</time>
+              <time title="创建时间：2018-07-03 15:20:38" itemprop="dateCreated datePublished" datetime="2018-07-03T15:20:38+08:00">2018-07-03</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-07-10 22:27:11" itemprop="dateModified" datetime="2018-07-10T22:27:11+08:00">2018-07-10</time>
               
             
           </span>
@@ -804,10 +809,10 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/07/03/maven-resources-plugin/#comments" itemprop="discussionUrl">
+                <a href="/2018/07/03/java/maven-resources-plugin/#comments" itemprop="discussionUrl">
                 
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/07/03/maven-resources-plugin/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/07/03/java/maven-resources-plugin/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -815,7 +820,7 @@
 
           
           
-             <span id="/2018/07/03/maven-resources-plugin/" class="leancloud_visitors" data-flag-title="maven-resources插件">
+             <span id="/2018/07/03/java/maven-resources-plugin/" class="leancloud_visitors" data-flag-title="maven-resources插件">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -848,15 +853,16 @@
       
         
           
-            <h1 id="官网"><a href="#官网" class="headerlink" title="官网"></a>官网</h1><p><a href="https://maven.apache.org/plugins/maven-resources-plugin/plugin-info.html" target="_blank" rel="noopener">https://maven.apache.org/plugins/maven-resources-plugin/plugin-info.html</a></p>
-<h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>Resources Plugin将Resource元素指定的文件复制到输出目录。以下三个变体仅在指定或默认资源和输出目录元素的方式上有所不同。 Resources插件有三个目标：</p>
-<h2 id="resources：resources"><a href="#resources：resources" class="headerlink" title="resources：resources"></a>resources：resources</h2><p>将主源代码的资源复制到主输出目录。<br>此目标通常自动执行，因为它默认绑定到流程资源生命周期阶段。它始终使用project.build.resources元素指定资源，默认情况下使用project.build.outputDirectory指定复制目标。</p>
-<h2 id="resources：testResources"><a href="#resources：testResources" class="headerlink" title="resources：testResources"></a>resources：testResources</h2><p>将测试源代码的资源复制到测试输出目录。<br>此目标通常自动执行，因为它默认绑定到process-test-resources生命周期阶段。它始终使用project.build.testResources元素指定资源，默认情况下使用project.build.testOutputDirectory指定复制目标。</p>
-<h2 id="resources：copy-resources"><a href="#resources：copy-resources" class="headerlink" title="resources：copy-resources"></a>resources：copy-resources</h2><p>将资源复制到输出目录。<br>此目标要求您配置要复制的资源，并指定outputDirectory。</p>
-<h2 id="filtering"><a href="#filtering" class="headerlink" title="filtering"></a>filtering</h2><p>将变量注入到变量中:  ${…} </p>
-<h1 id="具体配置"><a href="#具体配置" class="headerlink" title="具体配置"></a>具体配置</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">&lt;resources&gt;</span><br><span class="line">  &lt;resource&gt;</span><br><span class="line">    &lt;directory&gt;src/main/resources&lt;/directory&gt;</span><br><span class="line">  &lt;/resource&gt;</span><br><span class="line">  &lt;resource&gt;</span><br><span class="line">    &lt;directory&gt;src/main/filters/$&#123;env&#125;&lt;/directory&gt;</span><br><span class="line">    &lt;includes&gt;</span><br><span class="line">      &lt;include&gt;**/*.xml&lt;/include&gt;</span><br><span class="line">      &lt;include&gt;**/*.conf&lt;/include&gt;</span><br><span class="line">    &lt;/includes&gt;</span><br><span class="line">  &lt;/resource&gt;</span><br><span class="line">&lt;/resources&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  &lt;plugin&gt;</span><br><span class="line">    &lt;artifactId&gt;maven-resources-plugin&lt;/artifactId&gt;</span><br><span class="line">    &lt;configuration&gt;</span><br><span class="line">      &lt;encoding&gt;UTF8&lt;/encoding&gt;</span><br><span class="line">    &lt;/configuration&gt;</span><br><span class="line">  &lt;/plugin&gt;</span><br></pre></td></tr></table></figure>
-
-          
+          官网https://maven.apache.org/plugins/maven-resources-plugin/plugin-info.html
+概述Resources Plugin将Resource元素指定的文件复制到输出目录。以下三个变体仅在指定或默认资源和输出目录元素的方式上有所不同。 R
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/07/03/java/maven-resources-plugin/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1017,10 +1023,17 @@
       
         
           
-            <p><a href="https://blog.csdn.net/qq_28885149/article/details/76559402" target="_blank" rel="noopener">https://blog.csdn.net/qq_28885149/article/details/76559402</a></p>
-<p><a href="https://my.oschina.net/viakiba/blog/876506" target="_blank" rel="noopener">https://my.oschina.net/viakiba/blog/876506</a></p>
+          https://blog.csdn.net/qq_28885149/article/details/76559402
+https://my.oschina.net/viakiba/blog/876506
 
           
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/07/03/java/java_web/springmvc-interceptor/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1193,1055 +1206,16 @@
       
         
           
-            <h1 id="Java字符串的内部编码"><a href="#Java字符串的内部编码" class="headerlink" title="Java字符串的内部编码"></a>Java字符串的内部编码</h1><p>String类内部管理着一个char类型的数组，Java API是这样描述char基本类型的：<br>char 数据类型（和 Character 对象封装的值）基于原始的 Unicode 规范，将字符定义为固定宽度的 16 位实体。(2倍于字节)</p>
-<h1 id="字符集对比"><a href="#字符集对比" class="headerlink" title="字符集对比"></a>字符集对比</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">@Test</span><br><span class="line">  public void chinese() &#123;</span><br><span class="line">    String str = &quot;中国&quot;;</span><br><span class="line">    printBytes(str);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  @Test</span><br><span class="line">  public void email() &#123;</span><br><span class="line">    String str = &quot;aa@qq.com&quot;;</span><br><span class="line">    printBytes(str);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  private void printBytes(String str) &#123;</span><br><span class="line">    printBytes(str + &quot;的UNICODE编码：&quot;, str.getBytes(Charset.forName(&quot;unicode&quot;)));</span><br><span class="line">    printBytes(str + &quot;的8859编码：&quot;, str.getBytes(Charset.forName(&quot;ISO-8859-1&quot;)));</span><br><span class="line">    printBytes(str + &quot;的BIG5编码：&quot;, str.getBytes(Charset.forName(&quot;BIG5&quot;)));</span><br><span class="line">    printBytes(str + &quot;的GBK编码：&quot;, str.getBytes(Charset.forName(&quot;GBK&quot;)));</span><br><span class="line">    printBytes(str + &quot;的UTF-8编码：&quot;, str.getBytes(Charset.forName(&quot;UTF-8&quot;)));</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public void printBytes(String title, byte[] data) &#123;</span><br><span class="line">    System.out.println(title);</span><br><span class="line">    for (byte b : data) &#123;</span><br><span class="line">      System.out.print(&quot;0x&quot; + toHexString(b) + &quot; &quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    System.out.println();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public String toHexString(byte value) &#123;</span><br><span class="line">    String tmp = Integer.toHexString(value &amp; 0xFF);</span><br><span class="line">    if (tmp.length() == 1) &#123;</span><br><span class="line">      tmp = &quot;0&quot; + tmp;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return tmp.toUpperCase();</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-<h2 id="中国"><a href="#中国" class="headerlink" title="中国"></a>中国</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">中国的UNICODE编码：</span><br><span class="line">0xFE 0xFF 0x4E 0x2D 0x56 0xFD </span><br><span class="line">中国的8859编码：</span><br><span class="line">0x3F 0x3F </span><br><span class="line">中国的BIG5编码：</span><br><span class="line">0xA4 0xA4 0x3F </span><br><span class="line">中国的GBK编码：</span><br><span class="line">0xD6 0xD0 0xB9 0xFA </span><br><span class="line">中国的UTF-8编码：</span><br><span class="line">0xE4 0xB8 0xAD 0xE5 0x9B 0xBD</span><br></pre></td></tr></table></figure>
-<h2 id="email"><a href="#email" class="headerlink" title="email"></a>email</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">aa@qq.com的UNICODE编码：</span><br><span class="line">0xFE 0xFF 0x00 0x61 0x00 0x61 0x00 0x40 0x00 0x71 0x00 0x71 0x00 0x2E 0x00 0x63 0x00 0x6F 0x00 0x6D </span><br><span class="line">aa@qq.com的8859编码：</span><br><span class="line">0x61 0x61 0x40 0x71 0x71 0x2E 0x63 0x6F 0x6D </span><br><span class="line">aa@qq.com的BIG5编码：</span><br><span class="line">0x61 0x61 0x40 0x71 0x71 0x2E 0x63 0x6F 0x6D </span><br><span class="line">aa@qq.com的GBK编码：</span><br><span class="line">0x61 0x61 0x40 0x71 0x71 0x2E 0x63 0x6F 0x6D </span><br><span class="line">aa@qq.com的UTF-8编码：</span><br><span class="line">0x61 0x61 0x40 0x71 0x71 0x2E 0x63 0x6F 0x6D</span><br></pre></td></tr></table></figure>
-<h2 id="特殊的字符集（ISO-8859-1）"><a href="#特殊的字符集（ISO-8859-1）" class="headerlink" title="特殊的字符集（ISO-8859-1）"></a>特殊的字符集（ISO-8859-1）</h2><p>ISO-8859-1是单字节字符集，是ASCII字符集的补充。通常情况下使用ISO-8859-1字符集进行字符串对象与字节化字符数据的互换操作与前述完全一致。</p>
-<p>利用ISO-8859-1字符集，我们可以将任何一个字节数组无损保存到字符串对象中。</p>
-<h1 id="0x代表的含义-十六进制表示法"><a href="#0x代表的含义-十六进制表示法" class="headerlink" title="0x代表的含义:十六进制表示法"></a>0x代表的含义:十六进制表示法</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">public class Test &#123;</span><br><span class="line">	</span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		</span><br><span class="line">		int a = 0x2f;//小写十六进制（等价于0x002f）</span><br><span class="line">		System.out.println(Integer.toBinaryString(a));</span><br><span class="line">		</span><br><span class="line">		int b = 0x2F;//大写十六进制</span><br><span class="line">		System.out.println(Integer.toBinaryString(b));</span><br><span class="line">		</span><br><span class="line">		int c = 10;//标准十进制</span><br><span class="line">		System.out.println(Integer.toBinaryString(c));</span><br><span class="line">		</span><br><span class="line">		int d = 010;//以零开头，表示八进制</span><br><span class="line">		System.out.println(Integer.toBinaryString(d));</span><br><span class="line">		</span><br><span class="line">		</span><br><span class="line">		</span><br><span class="line">		char e = 0xff;//char为2个字节，16位</span><br><span class="line">		byte f = 0xf;//byte为8位</span><br><span class="line">		short g = 0xff;//short为2个字节，16位</span><br><span class="line">		System.out.println(Integer.toBinaryString(e));</span><br><span class="line">		System.out.println(Integer.toBinaryString(f));</span><br><span class="line">		System.out.println(Integer.toBinaryString(g));</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">/*</span><br><span class="line">  结果如下：(都是按照int型处理)</span><br><span class="line">101111</span><br><span class="line">101111</span><br><span class="line">1010</span><br><span class="line">1000</span><br><span class="line">11111111</span><br><span class="line">1111</span><br><span class="line">11111111</span><br><span class="line">*/</span><br></pre></td></tr></table></figure>
-<h1 id="ASCII-（American-Standard-Code-for-Information-Interchange，美国信息交换标准代码）"><a href="#ASCII-（American-Standard-Code-for-Information-Interchange，美国信息交换标准代码）" class="headerlink" title="ASCII （American Standard Code for Information Interchange，美国信息交换标准代码）"></a>ASCII （American Standard Code for Information Interchange，美国信息交换标准代码）</h1><p>十进制:0-127</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">Bin(二进制)</th>
-<th style="text-align:left">Oct(八进制)</th>
-<th style="text-align:left">Dec(十进制)</th>
-<th style="text-align:left">Hex(十六进制)</th>
-<th style="text-align:left">缩写/字符</th>
-<th style="text-align:left">解释</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">0000 0000</td>
-<td style="text-align:left">0</td>
-<td style="text-align:left">0</td>
-<td style="text-align:left">00</td>
-<td style="text-align:left">NUL(null)</td>
-<td style="text-align:left">空字符</td>
-</tr>
-<tr>
-<td style="text-align:left">0000 0001</td>
-<td style="text-align:left">1</td>
-<td style="text-align:left">1</td>
-<td style="text-align:left">01</td>
-<td style="text-align:left">SOH(start of headline)</td>
-<td style="text-align:left">标题开始</td>
-</tr>
-<tr>
-<td style="text-align:left">0000 0010</td>
-<td style="text-align:left">2</td>
-<td style="text-align:left">2</td>
-<td style="text-align:left">02</td>
-<td style="text-align:left">STX (start of text)</td>
-<td style="text-align:left">正文开始</td>
-</tr>
-<tr>
-<td style="text-align:left">0000 0011</td>
-<td style="text-align:left">3</td>
-<td style="text-align:left">3</td>
-<td style="text-align:left">03</td>
-<td style="text-align:left">ETX (end of text)</td>
-<td style="text-align:left">正文结束</td>
-</tr>
-<tr>
-<td style="text-align:left">0000 0100</td>
-<td style="text-align:left">4</td>
-<td style="text-align:left">4</td>
-<td style="text-align:left">04</td>
-<td style="text-align:left">EOT (end of transmission)</td>
-<td style="text-align:left">传输结束</td>
-</tr>
-<tr>
-<td style="text-align:left">0000 0101</td>
-<td style="text-align:left">5</td>
-<td style="text-align:left">5</td>
-<td style="text-align:left">05</td>
-<td style="text-align:left">ENQ (enquiry)</td>
-<td style="text-align:left">请求</td>
-</tr>
-<tr>
-<td style="text-align:left">0000 0110</td>
-<td style="text-align:left">6</td>
-<td style="text-align:left">6</td>
-<td style="text-align:left">06</td>
-<td style="text-align:left">ACK (acknowledge)</td>
-<td style="text-align:left">收到通知</td>
-</tr>
-<tr>
-<td style="text-align:left">0000 0111</td>
-<td style="text-align:left">7</td>
-<td style="text-align:left">7</td>
-<td style="text-align:left">07</td>
-<td style="text-align:left">BEL (bell)</td>
-<td style="text-align:left">响铃</td>
-</tr>
-<tr>
-<td style="text-align:left">0000 1000</td>
-<td style="text-align:left">10</td>
-<td style="text-align:left">8</td>
-<td style="text-align:left">08</td>
-<td style="text-align:left">BS (backspace)</td>
-<td style="text-align:left">退格</td>
-</tr>
-<tr>
-<td style="text-align:left">0000 1001</td>
-<td style="text-align:left">11</td>
-<td style="text-align:left">9</td>
-<td style="text-align:left">09</td>
-<td style="text-align:left">HT (horizontal tab)</td>
-<td style="text-align:left">水平制表符</td>
-</tr>
-<tr>
-<td style="text-align:left">0000 1010</td>
-<td style="text-align:left">12</td>
-<td style="text-align:left">10</td>
-<td style="text-align:left">0A</td>
-<td style="text-align:left">LF (NL line feed, new line)</td>
-<td style="text-align:left">换行键</td>
-</tr>
-<tr>
-<td style="text-align:left">0000 1011</td>
-<td style="text-align:left">13</td>
-<td style="text-align:left">11</td>
-<td style="text-align:left">0B</td>
-<td style="text-align:left">VT (vertical tab)</td>
-<td style="text-align:left">垂直制表符</td>
-</tr>
-<tr>
-<td style="text-align:left">0000 1100</td>
-<td style="text-align:left">14</td>
-<td style="text-align:left">12</td>
-<td style="text-align:left">0C</td>
-<td style="text-align:left">FF (NP form feed, new page)</td>
-<td style="text-align:left">换页键</td>
-</tr>
-<tr>
-<td style="text-align:left">0000 1101</td>
-<td style="text-align:left">15</td>
-<td style="text-align:left">13</td>
-<td style="text-align:left">0D</td>
-<td style="text-align:left">CR (carriage return)</td>
-<td style="text-align:left">回车键</td>
-</tr>
-<tr>
-<td style="text-align:left">0000 1110</td>
-<td style="text-align:left">16</td>
-<td style="text-align:left">14</td>
-<td style="text-align:left">0E</td>
-<td style="text-align:left">SO (shift out)</td>
-<td style="text-align:left">不用切换</td>
-</tr>
-<tr>
-<td style="text-align:left">0000 1111</td>
-<td style="text-align:left">17</td>
-<td style="text-align:left">15</td>
-<td style="text-align:left">0F</td>
-<td style="text-align:left">SI (shift in)</td>
-<td style="text-align:left">启用切换</td>
-</tr>
-<tr>
-<td style="text-align:left">0001 0000</td>
-<td style="text-align:left">20</td>
-<td style="text-align:left">16</td>
-<td style="text-align:left">10</td>
-<td style="text-align:left">DLE (data link escape)</td>
-<td style="text-align:left">数据链路转义</td>
-</tr>
-<tr>
-<td style="text-align:left">0001 0001</td>
-<td style="text-align:left">21</td>
-<td style="text-align:left">17</td>
-<td style="text-align:left">11</td>
-<td style="text-align:left">DC1 (device control 1)</td>
-<td style="text-align:left">设备控制1</td>
-</tr>
-<tr>
-<td style="text-align:left">0001 0010</td>
-<td style="text-align:left">22</td>
-<td style="text-align:left">18</td>
-<td style="text-align:left">12</td>
-<td style="text-align:left">DC2 (device control 2)</td>
-<td style="text-align:left">设备控制2</td>
-</tr>
-<tr>
-<td style="text-align:left">0001 0011</td>
-<td style="text-align:left">23</td>
-<td style="text-align:left">19</td>
-<td style="text-align:left">13</td>
-<td style="text-align:left">DC3 (device control 3)</td>
-<td style="text-align:left">设备控制3</td>
-</tr>
-<tr>
-<td style="text-align:left">0001 0100</td>
-<td style="text-align:left">24</td>
-<td style="text-align:left">20</td>
-<td style="text-align:left">14</td>
-<td style="text-align:left">DC4 (device control 4)</td>
-<td style="text-align:left">设备控制4</td>
-</tr>
-<tr>
-<td style="text-align:left">0001 0101</td>
-<td style="text-align:left">25</td>
-<td style="text-align:left">21</td>
-<td style="text-align:left">15</td>
-<td style="text-align:left">NAK (negative acknowledge)</td>
-<td style="text-align:left">拒绝接收</td>
-</tr>
-<tr>
-<td style="text-align:left">0001 0110</td>
-<td style="text-align:left">26</td>
-<td style="text-align:left">22</td>
-<td style="text-align:left">16</td>
-<td style="text-align:left">SYN (synchronous idle)</td>
-<td style="text-align:left">同步空闲</td>
-</tr>
-<tr>
-<td style="text-align:left">0001 0111</td>
-<td style="text-align:left">27</td>
-<td style="text-align:left">23</td>
-<td style="text-align:left">17</td>
-<td style="text-align:left">ETB (end of trans. block)</td>
-<td style="text-align:left">结束传输块</td>
-</tr>
-<tr>
-<td style="text-align:left">0001 1000</td>
-<td style="text-align:left">30</td>
-<td style="text-align:left">24</td>
-<td style="text-align:left">18</td>
-<td style="text-align:left">CAN (cancel)</td>
-<td style="text-align:left">取消</td>
-</tr>
-<tr>
-<td style="text-align:left">0001 1001</td>
-<td style="text-align:left">31</td>
-<td style="text-align:left">25</td>
-<td style="text-align:left">19</td>
-<td style="text-align:left">EM (end of medium)</td>
-<td style="text-align:left">媒介结束</td>
-</tr>
-<tr>
-<td style="text-align:left">0001 1010</td>
-<td style="text-align:left">32</td>
-<td style="text-align:left">26</td>
-<td style="text-align:left">1A</td>
-<td style="text-align:left">SUB (substitute)</td>
-<td style="text-align:left">代替</td>
-</tr>
-<tr>
-<td style="text-align:left">0001 1011</td>
-<td style="text-align:left">33</td>
-<td style="text-align:left">27</td>
-<td style="text-align:left">1B</td>
-<td style="text-align:left">ESC (escape)</td>
-<td style="text-align:left">换码(溢出)</td>
-</tr>
-<tr>
-<td style="text-align:left">0001 1100</td>
-<td style="text-align:left">34</td>
-<td style="text-align:left">28</td>
-<td style="text-align:left">1C</td>
-<td style="text-align:left">FS (file separator)</td>
-<td style="text-align:left">文件分隔符</td>
-</tr>
-<tr>
-<td style="text-align:left">0001 1101</td>
-<td style="text-align:left">35</td>
-<td style="text-align:left">29</td>
-<td style="text-align:left">1D</td>
-<td style="text-align:left">GS (group separator)</td>
-<td style="text-align:left">分组符</td>
-</tr>
-<tr>
-<td style="text-align:left">0001 1110</td>
-<td style="text-align:left">36</td>
-<td style="text-align:left">30</td>
-<td style="text-align:left">1E</td>
-<td style="text-align:left">RS (record separator)</td>
-<td style="text-align:left">记录分隔符</td>
-</tr>
-<tr>
-<td style="text-align:left">0001 1111</td>
-<td style="text-align:left">37</td>
-<td style="text-align:left">31</td>
-<td style="text-align:left">1F</td>
-<td style="text-align:left">US (unit separator)</td>
-<td style="text-align:left">单元分隔符</td>
-</tr>
-<tr>
-<td style="text-align:left">0010 0000</td>
-<td style="text-align:left">40</td>
-<td style="text-align:left">32</td>
-<td style="text-align:left">20</td>
-<td style="text-align:left">(space)</td>
-<td style="text-align:left">空格</td>
-</tr>
-<tr>
-<td style="text-align:left">0010 0001</td>
-<td style="text-align:left">41</td>
-<td style="text-align:left">33</td>
-<td style="text-align:left">21</td>
-<td style="text-align:left">!</td>
-<td style="text-align:left">叹号</td>
-</tr>
-<tr>
-<td style="text-align:left">0010 0010</td>
-<td style="text-align:left">42</td>
-<td style="text-align:left">34</td>
-<td style="text-align:left">22</td>
-<td style="text-align:left">“</td>
-<td style="text-align:left">双引号</td>
-</tr>
-<tr>
-<td style="text-align:left">0010 0011</td>
-<td style="text-align:left">43</td>
-<td style="text-align:left">35</td>
-<td style="text-align:left">23</td>
-<td style="text-align:left">#</td>
-<td style="text-align:left">井号</td>
-</tr>
-<tr>
-<td style="text-align:left">0010 0100</td>
-<td style="text-align:left">44</td>
-<td style="text-align:left">36</td>
-<td style="text-align:left">24</td>
-<td style="text-align:left">$</td>
-<td style="text-align:left">美元符</td>
-</tr>
-<tr>
-<td style="text-align:left">0010 0101</td>
-<td style="text-align:left">45</td>
-<td style="text-align:left">37</td>
-<td style="text-align:left">25</td>
-<td style="text-align:left">%</td>
-<td style="text-align:left">百分号</td>
-</tr>
-<tr>
-<td style="text-align:left">0010 0110</td>
-<td style="text-align:left">46</td>
-<td style="text-align:left">38</td>
-<td style="text-align:left">26</td>
-<td style="text-align:left">&amp;</td>
-<td style="text-align:left">和号</td>
-</tr>
-<tr>
-<td style="text-align:left">0010 0111</td>
-<td style="text-align:left">47</td>
-<td style="text-align:left">39</td>
-<td style="text-align:left">27</td>
-<td style="text-align:left">‘</td>
-<td style="text-align:left">闭单引号</td>
-</tr>
-<tr>
-<td style="text-align:left">0010 1000</td>
-<td style="text-align:left">50</td>
-<td style="text-align:left">40</td>
-<td style="text-align:left">28</td>
-<td style="text-align:left">(</td>
-<td style="text-align:left">开括号</td>
-</tr>
-<tr>
-<td style="text-align:left">0010 1001</td>
-<td style="text-align:left">51</td>
-<td style="text-align:left">41</td>
-<td style="text-align:left">29</td>
-<td style="text-align:left">)</td>
-<td style="text-align:left">闭括号</td>
-</tr>
-<tr>
-<td style="text-align:left">0010 1010</td>
-<td style="text-align:left">52</td>
-<td style="text-align:left">42</td>
-<td style="text-align:left">2A</td>
-<td style="text-align:left">*</td>
-<td style="text-align:left">星号</td>
-</tr>
-<tr>
-<td style="text-align:left">0010 1011</td>
-<td style="text-align:left">53</td>
-<td style="text-align:left">43</td>
-<td style="text-align:left">2B</td>
-<td style="text-align:left">+</td>
-<td style="text-align:left">加号</td>
-</tr>
-<tr>
-<td style="text-align:left">0010 1100</td>
-<td style="text-align:left">54</td>
-<td style="text-align:left">44</td>
-<td style="text-align:left">2C</td>
-<td style="text-align:left">,</td>
-<td style="text-align:left">逗号</td>
-</tr>
-<tr>
-<td style="text-align:left">0010 1101</td>
-<td style="text-align:left">55</td>
-<td style="text-align:left">45</td>
-<td style="text-align:left">2D</td>
-<td style="text-align:left">-</td>
-<td style="text-align:left">减号/破折号</td>
-</tr>
-<tr>
-<td style="text-align:left">0010 1110</td>
-<td style="text-align:left">56</td>
-<td style="text-align:left">46</td>
-<td style="text-align:left">2E</td>
-<td style="text-align:left">.</td>
-<td style="text-align:left">句号</td>
-</tr>
-<tr>
-<td style="text-align:left">00101111</td>
-<td style="text-align:left">57</td>
-<td style="text-align:left">47</td>
-<td style="text-align:left">2F</td>
-<td style="text-align:left">/</td>
-<td style="text-align:left">斜杠</td>
-</tr>
-<tr>
-<td style="text-align:left">00110000</td>
-<td style="text-align:left">60</td>
-<td style="text-align:left">48</td>
-<td style="text-align:left">30</td>
-<td style="text-align:left">0</td>
-<td style="text-align:left">数字0</td>
-</tr>
-<tr>
-<td style="text-align:left">00110001</td>
-<td style="text-align:left">61</td>
-<td style="text-align:left">49</td>
-<td style="text-align:left">31</td>
-<td style="text-align:left">1</td>
-<td style="text-align:left">数字1</td>
-</tr>
-<tr>
-<td style="text-align:left">00110010</td>
-<td style="text-align:left">62</td>
-<td style="text-align:left">50</td>
-<td style="text-align:left">32</td>
-<td style="text-align:left">2</td>
-<td style="text-align:left">数字2</td>
-</tr>
-<tr>
-<td style="text-align:left">00110011</td>
-<td style="text-align:left">63</td>
-<td style="text-align:left">51</td>
-<td style="text-align:left">33</td>
-<td style="text-align:left">3</td>
-<td style="text-align:left">数字3</td>
-</tr>
-<tr>
-<td style="text-align:left">00110100</td>
-<td style="text-align:left">64</td>
-<td style="text-align:left">52</td>
-<td style="text-align:left">34</td>
-<td style="text-align:left">4</td>
-<td style="text-align:left">数字4</td>
-</tr>
-<tr>
-<td style="text-align:left">00110101</td>
-<td style="text-align:left">65</td>
-<td style="text-align:left">53</td>
-<td style="text-align:left">35</td>
-<td style="text-align:left">5</td>
-<td style="text-align:left">数字5</td>
-</tr>
-<tr>
-<td style="text-align:left">00110110</td>
-<td style="text-align:left">66</td>
-<td style="text-align:left">54</td>
-<td style="text-align:left">36</td>
-<td style="text-align:left">6</td>
-<td style="text-align:left">数字6</td>
-</tr>
-<tr>
-<td style="text-align:left">00110111</td>
-<td style="text-align:left">67</td>
-<td style="text-align:left">55</td>
-<td style="text-align:left">37</td>
-<td style="text-align:left">7</td>
-<td style="text-align:left">数字7</td>
-</tr>
-<tr>
-<td style="text-align:left">00111000</td>
-<td style="text-align:left">70</td>
-<td style="text-align:left">56</td>
-<td style="text-align:left">38</td>
-<td style="text-align:left">8</td>
-<td style="text-align:left">数字8</td>
-</tr>
-<tr>
-<td style="text-align:left">00111001</td>
-<td style="text-align:left">71</td>
-<td style="text-align:left">57</td>
-<td style="text-align:left">39</td>
-<td style="text-align:left">9</td>
-<td style="text-align:left">数字9</td>
-</tr>
-<tr>
-<td style="text-align:left">00111010</td>
-<td style="text-align:left">72</td>
-<td style="text-align:left">58</td>
-<td style="text-align:left">3A</td>
-<td style="text-align:left">:</td>
-<td style="text-align:left">冒号</td>
-</tr>
-<tr>
-<td style="text-align:left">00111011</td>
-<td style="text-align:left">73</td>
-<td style="text-align:left">59</td>
-<td style="text-align:left">3B</td>
-<td style="text-align:left">;</td>
-<td style="text-align:left">分号</td>
-</tr>
-<tr>
-<td style="text-align:left">00111100</td>
-<td style="text-align:left">74</td>
-<td style="text-align:left">60</td>
-<td style="text-align:left">3C</td>
-<td style="text-align:left">&lt;</td>
-<td style="text-align:left">小于</td>
-</tr>
-<tr>
-<td style="text-align:left">00111101</td>
-<td style="text-align:left">75</td>
-<td style="text-align:left">61</td>
-<td style="text-align:left">3D</td>
-<td style="text-align:left">=</td>
-<td style="text-align:left">等号</td>
-</tr>
-<tr>
-<td style="text-align:left">00111110</td>
-<td style="text-align:left">76</td>
-<td style="text-align:left">62</td>
-<td style="text-align:left">3E</td>
-<td style="text-align:left">&gt;</td>
-<td style="text-align:left">大于</td>
-</tr>
-<tr>
-<td style="text-align:left">00111111</td>
-<td style="text-align:left">77</td>
-<td style="text-align:left">63</td>
-<td style="text-align:left">3F</td>
-<td style="text-align:left">?</td>
-<td style="text-align:left">问号</td>
-</tr>
-<tr>
-<td style="text-align:left">01000000</td>
-<td style="text-align:left">100</td>
-<td style="text-align:left">64</td>
-<td style="text-align:left">40</td>
-<td style="text-align:left">@</td>
-<td style="text-align:left">电子邮件符号</td>
-</tr>
-<tr>
-<td style="text-align:left">01000001</td>
-<td style="text-align:left">101</td>
-<td style="text-align:left">65</td>
-<td style="text-align:left">41</td>
-<td style="text-align:left">A</td>
-<td style="text-align:left">大写字母A</td>
-</tr>
-<tr>
-<td style="text-align:left">01000010</td>
-<td style="text-align:left">102</td>
-<td style="text-align:left">66</td>
-<td style="text-align:left">42</td>
-<td style="text-align:left">B</td>
-<td style="text-align:left">大写字母B</td>
-</tr>
-<tr>
-<td style="text-align:left">01000011</td>
-<td style="text-align:left">103</td>
-<td style="text-align:left">67</td>
-<td style="text-align:left">43</td>
-<td style="text-align:left">C</td>
-<td style="text-align:left">大写字母C</td>
-</tr>
-<tr>
-<td style="text-align:left">01000100</td>
-<td style="text-align:left">104</td>
-<td style="text-align:left">68</td>
-<td style="text-align:left">44</td>
-<td style="text-align:left">D</td>
-<td style="text-align:left">大写字母D</td>
-</tr>
-<tr>
-<td style="text-align:left">01000101</td>
-<td style="text-align:left">105</td>
-<td style="text-align:left">69</td>
-<td style="text-align:left">45</td>
-<td style="text-align:left">E</td>
-<td style="text-align:left">大写字母E</td>
-</tr>
-<tr>
-<td style="text-align:left">01000110</td>
-<td style="text-align:left">106</td>
-<td style="text-align:left">70</td>
-<td style="text-align:left">46</td>
-<td style="text-align:left">F</td>
-<td style="text-align:left">大写字母F</td>
-</tr>
-<tr>
-<td style="text-align:left">01000111</td>
-<td style="text-align:left">107</td>
-<td style="text-align:left">71</td>
-<td style="text-align:left">47</td>
-<td style="text-align:left">G</td>
-<td style="text-align:left">大写字母G</td>
-</tr>
-<tr>
-<td style="text-align:left">01001000</td>
-<td style="text-align:left">110</td>
-<td style="text-align:left">72</td>
-<td style="text-align:left">48</td>
-<td style="text-align:left">H</td>
-<td style="text-align:left">大写字母H</td>
-</tr>
-<tr>
-<td style="text-align:left">01001001</td>
-<td style="text-align:left">111</td>
-<td style="text-align:left">73</td>
-<td style="text-align:left">49</td>
-<td style="text-align:left">I</td>
-<td style="text-align:left">大写字母I</td>
-</tr>
-<tr>
-<td style="text-align:left">01001010</td>
-<td style="text-align:left">112</td>
-<td style="text-align:left">74</td>
-<td style="text-align:left">4A</td>
-<td style="text-align:left">J</td>
-<td style="text-align:left">大写字母J</td>
-</tr>
-<tr>
-<td style="text-align:left">01001011</td>
-<td style="text-align:left">113</td>
-<td style="text-align:left">75</td>
-<td style="text-align:left">4B</td>
-<td style="text-align:left">K</td>
-<td style="text-align:left">大写字母K</td>
-</tr>
-<tr>
-<td style="text-align:left">01001100</td>
-<td style="text-align:left">114</td>
-<td style="text-align:left">76</td>
-<td style="text-align:left">4C</td>
-<td style="text-align:left">L</td>
-<td style="text-align:left">大写字母L</td>
-</tr>
-<tr>
-<td style="text-align:left">01001101</td>
-<td style="text-align:left">115</td>
-<td style="text-align:left">77</td>
-<td style="text-align:left">4D</td>
-<td style="text-align:left">M</td>
-<td style="text-align:left">大写字母M</td>
-</tr>
-<tr>
-<td style="text-align:left">01001110</td>
-<td style="text-align:left">116</td>
-<td style="text-align:left">78</td>
-<td style="text-align:left">4E</td>
-<td style="text-align:left">N</td>
-<td style="text-align:left">大写字母N</td>
-</tr>
-<tr>
-<td style="text-align:left">01001111</td>
-<td style="text-align:left">117</td>
-<td style="text-align:left">79</td>
-<td style="text-align:left">4F</td>
-<td style="text-align:left">O</td>
-<td style="text-align:left">大写字母O</td>
-</tr>
-<tr>
-<td style="text-align:left">01010000</td>
-<td style="text-align:left">120</td>
-<td style="text-align:left">80</td>
-<td style="text-align:left">50</td>
-<td style="text-align:left">P</td>
-<td style="text-align:left">大写字母P</td>
-</tr>
-<tr>
-<td style="text-align:left">01010001</td>
-<td style="text-align:left">121</td>
-<td style="text-align:left">81</td>
-<td style="text-align:left">51</td>
-<td style="text-align:left">Q</td>
-<td style="text-align:left">大写字母Q</td>
-</tr>
-<tr>
-<td style="text-align:left">01010010</td>
-<td style="text-align:left">122</td>
-<td style="text-align:left">82</td>
-<td style="text-align:left">52</td>
-<td style="text-align:left">R</td>
-<td style="text-align:left">大写字母R</td>
-</tr>
-<tr>
-<td style="text-align:left">01010011</td>
-<td style="text-align:left">123</td>
-<td style="text-align:left">83</td>
-<td style="text-align:left">53</td>
-<td style="text-align:left">S</td>
-<td style="text-align:left">大写字母S</td>
-</tr>
-<tr>
-<td style="text-align:left">01010100</td>
-<td style="text-align:left">124</td>
-<td style="text-align:left">84</td>
-<td style="text-align:left">54</td>
-<td style="text-align:left">T</td>
-<td style="text-align:left">大写字母T</td>
-</tr>
-<tr>
-<td style="text-align:left">01010101</td>
-<td style="text-align:left">125</td>
-<td style="text-align:left">85</td>
-<td style="text-align:left">55</td>
-<td style="text-align:left">U</td>
-<td style="text-align:left">大写字母U</td>
-</tr>
-<tr>
-<td style="text-align:left">01010110</td>
-<td style="text-align:left">126</td>
-<td style="text-align:left">86</td>
-<td style="text-align:left">56</td>
-<td style="text-align:left">V</td>
-<td style="text-align:left">大写字母V</td>
-</tr>
-<tr>
-<td style="text-align:left">01010111</td>
-<td style="text-align:left">127</td>
-<td style="text-align:left">87</td>
-<td style="text-align:left">57</td>
-<td style="text-align:left">W</td>
-<td style="text-align:left">大写字母W</td>
-</tr>
-<tr>
-<td style="text-align:left">01011000</td>
-<td style="text-align:left">130</td>
-<td style="text-align:left">88</td>
-<td style="text-align:left">58</td>
-<td style="text-align:left">X</td>
-<td style="text-align:left">大写字母X</td>
-</tr>
-<tr>
-<td style="text-align:left">01011001</td>
-<td style="text-align:left">131</td>
-<td style="text-align:left">89</td>
-<td style="text-align:left">59</td>
-<td style="text-align:left">Y</td>
-<td style="text-align:left">大写字母Y</td>
-</tr>
-<tr>
-<td style="text-align:left">01011010</td>
-<td style="text-align:left">132</td>
-<td style="text-align:left">90</td>
-<td style="text-align:left">5A</td>
-<td style="text-align:left">Z</td>
-<td style="text-align:left">大写字母Z</td>
-</tr>
-<tr>
-<td style="text-align:left">01011011</td>
-<td style="text-align:left">133</td>
-<td style="text-align:left">91</td>
-<td style="text-align:left">5B</td>
-<td style="text-align:left">[</td>
-<td style="text-align:left">开方括号</td>
-</tr>
-<tr>
-<td style="text-align:left">01011100</td>
-<td style="text-align:left">134</td>
-<td style="text-align:left">92</td>
-<td style="text-align:left">5C</td>
-<td style="text-align:left">\</td>
-<td style="text-align:left">反斜杠</td>
-</tr>
-<tr>
-<td style="text-align:left">01011101</td>
-<td style="text-align:left">135</td>
-<td style="text-align:left">93</td>
-<td style="text-align:left">5D</td>
-<td style="text-align:left">]</td>
-<td style="text-align:left">闭方括号</td>
-</tr>
-<tr>
-<td style="text-align:left">01011110</td>
-<td style="text-align:left">136</td>
-<td style="text-align:left">94</td>
-<td style="text-align:left">5E</td>
-<td style="text-align:left">^</td>
-<td style="text-align:left">脱字符</td>
-</tr>
-<tr>
-<td style="text-align:left">01011111</td>
-<td style="text-align:left">137</td>
-<td style="text-align:left">95</td>
-<td style="text-align:left">5F</td>
-<td style="text-align:left">_</td>
-<td style="text-align:left">下划线</td>
-</tr>
-<tr>
-<td style="text-align:left">01100000</td>
-<td style="text-align:left">140</td>
-<td style="text-align:left">96</td>
-<td style="text-align:left">60</td>
-<td style="text-align:left">`</td>
-<td style="text-align:left">开单引号</td>
-</tr>
-<tr>
-<td style="text-align:left">01100001</td>
-<td style="text-align:left">141</td>
-<td style="text-align:left">97</td>
-<td style="text-align:left">61</td>
-<td style="text-align:left">a</td>
-<td style="text-align:left">小写字母a</td>
-</tr>
-<tr>
-<td style="text-align:left">01100010</td>
-<td style="text-align:left">142</td>
-<td style="text-align:left">98</td>
-<td style="text-align:left">62</td>
-<td style="text-align:left">b</td>
-<td style="text-align:left">小写字母b</td>
-</tr>
-<tr>
-<td style="text-align:left">01100011</td>
-<td style="text-align:left">143</td>
-<td style="text-align:left">99</td>
-<td style="text-align:left">63</td>
-<td style="text-align:left">c</td>
-<td style="text-align:left">小写字母c</td>
-</tr>
-<tr>
-<td style="text-align:left">01100100</td>
-<td style="text-align:left">144</td>
-<td style="text-align:left">100</td>
-<td style="text-align:left">64</td>
-<td style="text-align:left">d</td>
-<td style="text-align:left">小写字母d</td>
-</tr>
-<tr>
-<td style="text-align:left">01100101</td>
-<td style="text-align:left">145</td>
-<td style="text-align:left">101</td>
-<td style="text-align:left">65</td>
-<td style="text-align:left">e</td>
-<td style="text-align:left">小写字母e</td>
-</tr>
-<tr>
-<td style="text-align:left">01100110</td>
-<td style="text-align:left">146</td>
-<td style="text-align:left">102</td>
-<td style="text-align:left">66</td>
-<td style="text-align:left">f</td>
-<td style="text-align:left">小写字母f</td>
-</tr>
-<tr>
-<td style="text-align:left">01100111</td>
-<td style="text-align:left">147</td>
-<td style="text-align:left">103</td>
-<td style="text-align:left">67</td>
-<td style="text-align:left">g</td>
-<td style="text-align:left">小写字母g</td>
-</tr>
-<tr>
-<td style="text-align:left">01101000</td>
-<td style="text-align:left">150</td>
-<td style="text-align:left">104</td>
-<td style="text-align:left">68</td>
-<td style="text-align:left">h</td>
-<td style="text-align:left">小写字母h</td>
-</tr>
-<tr>
-<td style="text-align:left">01101001</td>
-<td style="text-align:left">151</td>
-<td style="text-align:left">105</td>
-<td style="text-align:left">69</td>
-<td style="text-align:left">i</td>
-<td style="text-align:left">小写字母i</td>
-</tr>
-<tr>
-<td style="text-align:left">01101010</td>
-<td style="text-align:left">152</td>
-<td style="text-align:left">106</td>
-<td style="text-align:left">6A</td>
-<td style="text-align:left">j</td>
-<td style="text-align:left">小写字母j</td>
-</tr>
-<tr>
-<td style="text-align:left">01101011</td>
-<td style="text-align:left">153</td>
-<td style="text-align:left">107</td>
-<td style="text-align:left">6B</td>
-<td style="text-align:left">k</td>
-<td style="text-align:left">小写字母k</td>
-</tr>
-<tr>
-<td style="text-align:left">01101100</td>
-<td style="text-align:left">154</td>
-<td style="text-align:left">108</td>
-<td style="text-align:left">6C</td>
-<td style="text-align:left">l</td>
-<td style="text-align:left">小写字母l</td>
-</tr>
-<tr>
-<td style="text-align:left">01101101</td>
-<td style="text-align:left">155</td>
-<td style="text-align:left">109</td>
-<td style="text-align:left">6D</td>
-<td style="text-align:left">m</td>
-<td style="text-align:left">小写字母m</td>
-</tr>
-<tr>
-<td style="text-align:left">01101110</td>
-<td style="text-align:left">156</td>
-<td style="text-align:left">110</td>
-<td style="text-align:left">6E</td>
-<td style="text-align:left">n</td>
-<td style="text-align:left">小写字母n</td>
-</tr>
-<tr>
-<td style="text-align:left">01101111</td>
-<td style="text-align:left">157</td>
-<td style="text-align:left">111</td>
-<td style="text-align:left">6F</td>
-<td style="text-align:left">o</td>
-<td style="text-align:left">小写字母o</td>
-</tr>
-<tr>
-<td style="text-align:left">01110000</td>
-<td style="text-align:left">160</td>
-<td style="text-align:left">112</td>
-<td style="text-align:left">70</td>
-<td style="text-align:left">p</td>
-<td style="text-align:left">小写字母p</td>
-</tr>
-<tr>
-<td style="text-align:left">01110001</td>
-<td style="text-align:left">161</td>
-<td style="text-align:left">113</td>
-<td style="text-align:left">71</td>
-<td style="text-align:left">q</td>
-<td style="text-align:left">小写字母q</td>
-</tr>
-<tr>
-<td style="text-align:left">01110010</td>
-<td style="text-align:left">162</td>
-<td style="text-align:left">114</td>
-<td style="text-align:left">72</td>
-<td style="text-align:left">r</td>
-<td style="text-align:left">小写字母r</td>
-</tr>
-<tr>
-<td style="text-align:left">01110011</td>
-<td style="text-align:left">163</td>
-<td style="text-align:left">115</td>
-<td style="text-align:left">73</td>
-<td style="text-align:left">s</td>
-<td style="text-align:left">小写字母s</td>
-</tr>
-<tr>
-<td style="text-align:left">01110100</td>
-<td style="text-align:left">164</td>
-<td style="text-align:left">116</td>
-<td style="text-align:left">74</td>
-<td style="text-align:left">t</td>
-<td style="text-align:left">小写字母t</td>
-</tr>
-<tr>
-<td style="text-align:left">01110101</td>
-<td style="text-align:left">165</td>
-<td style="text-align:left">117</td>
-<td style="text-align:left">75</td>
-<td style="text-align:left">u</td>
-<td style="text-align:left">小写字母u</td>
-</tr>
-<tr>
-<td style="text-align:left">01110110</td>
-<td style="text-align:left">166</td>
-<td style="text-align:left">118</td>
-<td style="text-align:left">76</td>
-<td style="text-align:left">v</td>
-<td style="text-align:left">小写字母v</td>
-</tr>
-<tr>
-<td style="text-align:left">01110111</td>
-<td style="text-align:left">167</td>
-<td style="text-align:left">119</td>
-<td style="text-align:left">77</td>
-<td style="text-align:left">w</td>
-<td style="text-align:left">小写字母w</td>
-</tr>
-<tr>
-<td style="text-align:left">01111000</td>
-<td style="text-align:left">170</td>
-<td style="text-align:left">120</td>
-<td style="text-align:left">78</td>
-<td style="text-align:left">x</td>
-<td style="text-align:left">小写字母x</td>
-</tr>
-<tr>
-<td style="text-align:left">01111001</td>
-<td style="text-align:left">171</td>
-<td style="text-align:left">121</td>
-<td style="text-align:left">79</td>
-<td style="text-align:left">y</td>
-<td style="text-align:left">小写字母y</td>
-</tr>
-<tr>
-<td style="text-align:left">01111010</td>
-<td style="text-align:left">172</td>
-<td style="text-align:left">122</td>
-<td style="text-align:left">7A</td>
-<td style="text-align:left">z</td>
-<td style="text-align:left">小写字母z</td>
-</tr>
-<tr>
-<td style="text-align:left">01111011</td>
-<td style="text-align:left">173</td>
-<td style="text-align:left">123</td>
-<td style="text-align:left">7B</td>
-<td style="text-align:left">{</td>
-<td style="text-align:left">开花括号</td>
-</tr>
-<tr>
-<td style="text-align:left">01111100</td>
-<td style="text-align:left">174</td>
-<td style="text-align:left">124</td>
-<td style="text-align:left">7C</td>
-<td style="text-align:left"></td>
-<td style="text-align:left">垂线</td>
-</tr>
-<tr>
-<td style="text-align:left">01111101</td>
-<td style="text-align:left">175</td>
-<td style="text-align:left">125</td>
-<td style="text-align:left">7D</td>
-<td style="text-align:left">}</td>
-<td style="text-align:left">闭花括号</td>
-</tr>
-<tr>
-<td style="text-align:left">01111110</td>
-<td style="text-align:left">176</td>
-<td style="text-align:left">126</td>
-<td style="text-align:left">7E</td>
-<td style="text-align:left">~</td>
-<td style="text-align:left">波浪号</td>
-</tr>
-<tr>
-<td style="text-align:left">01111111</td>
-<td style="text-align:left">177</td>
-<td style="text-align:left">127</td>
-<td style="text-align:left">7F</td>
-<td style="text-align:left">DEL (delete)</td>
-<td style="text-align:left">删除</td>
-</tr>
-</tbody>
-</table>
-<h1 id="各个字符集对比"><a href="#各个字符集对比" class="headerlink" title="各个字符集对比"></a>各个字符集对比</h1><h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://blog.csdn.net/darxin/article/details/5079242" target="_blank" rel="noopener">https://blog.csdn.net/darxin/article/details/5079242</a></p>
-
-          
+          Java字符串的内部编码String类内部管理着一个char类型的数组，Java API是这样描述char基本类型的：char 数据类型（和 Character 对象封装的值）基于原始的 Unicode 规范，将字符定义为固定宽度的 16 位实体。(2倍于字节)
+字符集对比1234567891011
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/07/03/java/java_common/charset-string/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -2402,17 +1376,16 @@
       
         
           
-            <h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>Java语言提供了八种基本类型。六种数字类型（四个整数型，两个浮点型），一种字符类型，还有一种布尔型。</p>
-<h2 id="byte："><a href="#byte：" class="headerlink" title="byte："></a>byte：</h2><p>byte 数据类型是8位、有符号的，以二进制补码表示的整数；<br>最小值是 -128（-2^7）；<br>最大值是 127（2^7-1）；<br>默认值是 0；<br>byte 类型用在大型数组中节约空间，主要代替整数，因为 byte 变量占用的空间只有 int 类型的四分之一；<br>例子：byte a = 100，byte b = -50。</p>
-<h2 id="short："><a href="#short：" class="headerlink" title="short："></a>short：</h2><p>short 数据类型是 16 位、有符号的以二进制补码表示的整数<br>最小值是 -32768（-2^15）；<br>最大值是 32767（2^15 - 1）；<br>Short 数据类型也可以像 byte 那样节省空间。一个short变量是int型变量所占空间的二分之一；<br>默认值是 0；<br>例子：short s = 1000，short r = -20000。</p>
-<h2 id="int："><a href="#int：" class="headerlink" title="int："></a>int：</h2><p>int 数据类型是32位、有符号的以二进制补码表示的整数；<br>最小值是 -2,147,483,648（-2^31）；<br>最大值是 2,147,483,647（2^31 - 1）；<br>一般地整型变量默认为 int 类型；<br>默认值是 0 ；<br>例子：int a = 100000, int b = -200000。</p>
-<h2 id="long："><a href="#long：" class="headerlink" title="long："></a>long：</h2><p>long 数据类型是 64 位、有符号的以二进制补码表示的整数；<br>最小值是 -9,223,372,036,854,775,808（-2^63）；<br>最大值是 9,223,372,036,854,775,807（2^63 -1）；<br>这种类型主要使用在需要比较大整数的系统上；<br>默认值是 0L；<br>例子： long a = 100000L，Long b = -200000L。<br>“L”理论上不分大小写，但是若写成”l”容易与数字”1”混淆，不容易分辩。所以最好大写。</p>
-<h2 id="float："><a href="#float：" class="headerlink" title="float："></a>float：</h2><p>float 数据类型是单精度、32位、符合IEEE 754标准的浮点数；<br>float 在储存大型浮点数组的时候可节省内存空间；<br>默认值是 0.0f；<br>浮点数不能用来表示精确的值，如货币；<br>例子：float f1 = 234.5f。</p>
-<h2 id="double："><a href="#double：" class="headerlink" title="double："></a>double：</h2><p>double 数据类型是双精度、64 位、符合IEEE 754标准的浮点数；<br>浮点数的默认类型为double类型；<br>double类型同样不能表示精确的值，如货币；<br>默认值是 0.0d；<br>例子：double d1 = 123.4。</p>
-<h2 id="boolean："><a href="#boolean：" class="headerlink" title="boolean："></a>boolean：</h2><p>boolean数据类型表示一位的信息；<br>只有两个取值：true 和 false；<br>这种类型只作为一种标志来记录 true/false 情况；<br>默认值是 false；<br>例子：boolean one = true。<br>char：</p>
-<h2 id="char类型是一个单一的-16-位-Unicode-字符；"><a href="#char类型是一个单一的-16-位-Unicode-字符；" class="headerlink" title="char类型是一个单一的 16 位 Unicode 字符；"></a>char类型是一个单一的 16 位 Unicode 字符；</h2><p>最小值是 \u0000（即为0）；<br>最大值是 \uffff（即为65,535）；<br>char 数据类型可以储存任何字符；<br>例子：char letter = ‘A’;。</p>
-
-          
+          介绍Java语言提供了八种基本类型。六种数字类型（四个整数型，两个浮点型），一种字符类型，还有一种布尔型。
+byte：byte 数据类型是8位、有符号的，以二进制补码表示的整数；最小值是 -128（-2^7）；最大值是 127（2^7-1）；默认值是 0；byte 类型用在大型数组中节约空间，主要代
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/07/03/java/java_common/java-basic-type/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -2464,7 +1437,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/27/linux-socket/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/27/shell命令/linux-socket/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
@@ -2483,7 +1456,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/06/27/linux-socket/" itemprop="url">
+                <a class="post-title-link" href="/2018/06/27/shell命令/linux-socket/" itemprop="url">
                   linux-socket挥手
                 </a>
               
@@ -2527,7 +1500,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2018-07-06 20:39:21" itemprop="dateModified" datetime="2018-07-06T20:39:21+08:00">2018-07-06</time>
+                <time title="修改时间：2018-07-10 22:27:26" itemprop="dateModified" datetime="2018-07-10T22:27:26+08:00">2018-07-10</time>
               
             
           </span>
@@ -2541,10 +1514,10 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/06/27/linux-socket/#comments" itemprop="discussionUrl">
+                <a href="/2018/06/27/shell命令/linux-socket/#comments" itemprop="discussionUrl">
                 
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/06/27/linux-socket/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/06/27/shell命令/linux-socket/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -2552,7 +1525,7 @@
 
           
           
-             <span id="/2018/06/27/linux-socket/" class="leancloud_visitors" data-flag-title="linux-socket挥手">
+             <span id="/2018/06/27/shell命令/linux-socket/" class="leancloud_visitors" data-flag-title="linux-socket挥手">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -2585,44 +1558,15 @@
       
         
           
-            <h1 id="Socket是什么"><a href="#Socket是什么" class="headerlink" title="Socket是什么"></a>Socket是什么</h1><p>socket起源于Unix，而Unix/Linux基本哲学之一就是“一切皆文件”，都可以用“打开open –&gt; 读写write/read –&gt; 关闭close”模式来操作。Socket就是该模式的一个实现，        socket即是一种特殊的文件，一些socket函数就是对其进行的操作（读/写IO、打开、关闭）.     说白了Socket是应用层与TCP/IP协议族通信的中间软件抽象层，它是一组接口。在设计模式中，Socket其实就是一个门面模式，它把复杂的TCP/IP协议族隐藏在Socket接口后面，对用户来说，一组简单的接口就是全部，让Socket去组织数据，以符合指定的协议。</p>
-<p><em>注意：其实socket也没有层的概念，它只是一个facade设计模式的应用，让编程变的更简单。是一个软件抽象层。在网络编程中，我们大量用的都是通过socket实现的。</em></p>
-<h1 id="四次挥手流程"><a href="#四次挥手流程" class="headerlink" title="四次挥手流程"></a>四次挥手流程</h1><p>连接正常关闭时双方会发送FIN，经历4次挥手过程</p>
-<p>java中，调用Socket#close()可以关闭Socket，该方法类似Unix网络编程中的close方法，将Socket的 读写 都关闭，已经排队等待发送的数据会被尝试发送，最后（默认）发送FIN。考虑一个典型的网络事务，A向B发送数据，A发送完毕后close()，FIN发送出去；B一直read直到返回了-1，也通过close()发送FIN，4次挥手，连接关闭，一切都很和谐。</p>
-<h2 id="服务端发起流程"><a href="#服务端发起流程" class="headerlink" title="服务端发起流程"></a>服务端发起流程</h2><h3 id="1-服务端发起关闭"><a href="#1-服务端发起关闭" class="headerlink" title="1.服务端发起关闭"></a>1.服务端发起关闭</h3><p><img src="/images/pasted-194.png" alt="upload successful"></p>
-<h3 id="2-中间状态"><a href="#2-中间状态" class="headerlink" title="2.中间状态"></a>2.中间状态</h3><p>客户端socket为close_waite状态<br>服务端socket释放</p>
-<p><img src="/images/pasted-196.png" alt="upload successful"></p>
-<h3 id="3-客户端关闭"><a href="#3-客户端关闭" class="headerlink" title="3.客户端关闭"></a>3.客户端关闭</h3><p><img src="/images/pasted-195.png" alt="upload successful"></p>
-<h2 id="客户端发起流程"><a href="#客户端发起流程" class="headerlink" title="客户端发起流程"></a>客户端发起流程</h2><h3 id="1-客户端发起关闭"><a href="#1-客户端发起关闭" class="headerlink" title="1.客户端发起关闭"></a>1.客户端发起关闭</h3><p><img src="/images/pasted-197.png" alt="upload successful"></p>
-<h3 id="2-中间状态-1"><a href="#2-中间状态-1" class="headerlink" title="2.中间状态"></a>2.中间状态</h3><p>服务端socket为close_waite状态<br>客户端socket释放</p>
-<p><img src="/images/pasted-198.png" alt="upload successful"></p>
-<h3 id="3-服务端关闭"><a href="#3-服务端关闭" class="headerlink" title="3.服务端关闭"></a>3.服务端关闭</h3><p><img src="/images/pasted-199.png" alt="upload successful"></p>
-<h1 id="RST关闭流程-一次通讯"><a href="#RST关闭流程-一次通讯" class="headerlink" title="RST关闭流程(一次通讯)"></a>RST关闭流程(一次通讯)</h1><p>通过RST包异常退出，此时会丢弃缓冲区内的数据，也不会对RST响应ACK。</p>
-<ul>
-<li>Socket#setSoLinger(true,0)，则close时会发送RST</li>
-<li>如果主动关闭方缓冲区还有数据没有被应用层消费掉，close会发送RST并忽略这些数据</li>
-<li>A向B发送数据，B已经通过close()方法关闭了Socket，虽然TCP规定半关闭状态下B仍然可以接收数据，但close动作关闭了该socket上的任何数据操作，如果此时A继续write，B将返回RST，A的该次write无法立即通知应用层（因为write仅把数据写入发送缓冲区），只会把状态保存在tcp协议栈内，下次write时才会抛出SocketException。</li>
-</ul>
-<p>无论是客户端还是服务端的socket均可以设置soLinger参数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socket.setSoLinger(true, 0);</span><br></pre></td></tr></table></figure></p>
-<h2 id="服务端发起"><a href="#服务端发起" class="headerlink" title="服务端发起"></a>服务端发起</h2><h3 id="1-服务端发起关闭-1"><a href="#1-服务端发起关闭-1" class="headerlink" title="1.服务端发起关闭"></a>1.服务端发起关闭</h3><p><img src="/images/pasted-200.png" alt="upload successful"></p>
-<h3 id="2-客户端状态"><a href="#2-客户端状态" class="headerlink" title="2. 客户端状态"></a>2. 客户端状态</h3><p><img src="/images/pasted-201.png" alt="upload successful"></p>
-<h2 id="客户端发起"><a href="#客户端发起" class="headerlink" title="客户端发起"></a>客户端发起</h2><h3 id="客户端发起关闭"><a href="#客户端发起关闭" class="headerlink" title="客户端发起关闭"></a>客户端发起关闭</h3><p><img src="/images/pasted-202.png" alt="upload successful"></p>
-<h3 id="2-服务端状态"><a href="#2-服务端状态" class="headerlink" title="2. 服务端状态"></a>2. 服务端状态</h3><p><img src="/images/pasted-203.png" alt="upload successful"></p>
-<h1 id="对已关闭socket读写会产生的异常"><a href="#对已关闭socket读写会产生的异常" class="headerlink" title="对已关闭socket读写会产生的异常"></a>对已关闭socket读写会产生的异常</h1><h2 id="主动关闭方"><a href="#主动关闭方" class="headerlink" title="主动关闭方"></a>主动关闭方</h2><p>close()后，无论是发送FIN/RST关闭的，之后再读写均会抛java.net.SocketException:socket is closed.</p>
-<h2 id="被动关闭方"><a href="#被动关闭方" class="headerlink" title="被动关闭方"></a>被动关闭方</h2><h3 id="被FIN关闭"><a href="#被FIN关闭" class="headerlink" title="被FIN关闭"></a>被FIN关闭</h3><p>写（即向”已被对方关闭的Socket”写）<br>如上所说，第一次write得到RST响应但不抛异常，第二次write抛异常，ubuntu下是broken pipe (断开的管道)，win7下是Software caused connection abort: socket write error</p>
-<p>读 – 始终返回 -1</p>
-<h3 id="被RST关闭"><a href="#被RST关闭" class="headerlink" title="被RST关闭"></a>被RST关闭</h3><p>读写都会抛出异常：connection reset (by peer)</p>
-<h3 id="重点在于："><a href="#重点在于：" class="headerlink" title="重点在于："></a>重点在于：</h3><p>connection reset：另一端用RST主动关闭连接</p>
-<p>broken pipe / Software caused connection abort: socket write error ： 对方已调用Socket#close()关闭连接，己方还在写数据</p>
-<p>java中网络编程时很大一部分代码在做各种fail时的处理，了解各种异常发生时背后的逻辑才能正确地处理之。以上列举的只是连接关闭的异常，还有其他各种异常没有提及，以后有机会再补上。</p>
-<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>之所以由本篇文章中,是因为在工作中用到了okhttpClient,其理念就是尽可能复用之前socket连接,并通过后台线程回收空闲的socket连接,然而对于客户端意外关闭,似乎没有处理,经过试验发现,其socket的关闭方式正是rst方式.</p>
-<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>通过socket代码打断点,未发现okhttpClient 进行设置了setSoLinger</p>
-<h2 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h2><p><a href="https://docs.oracle.com/javase/8/docs/technotes/guides/net/articles/connection_release.html" target="_blank" rel="noopener">https://docs.oracle.com/javase/8/docs/technotes/guides/net/articles/connection_release.html</a></p>
-<h1 id="利用socket模拟http请求-然后在不关闭的情况下退出进程"><a href="#利用socket模拟http请求-然后在不关闭的情况下退出进程" class="headerlink" title="利用socket模拟http请求,然后在不关闭的情况下退出进程"></a>利用socket模拟http请求,然后在不关闭的情况下退出进程</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">package com.example.demo.socket;</span><br><span class="line"></span><br><span class="line">import java.io.BufferedReader;</span><br><span class="line">import java.io.IOException;</span><br><span class="line">import java.io.InputStream;</span><br><span class="line">import java.io.InputStreamReader;</span><br><span class="line">import java.io.OutputStream;</span><br><span class="line">import java.net.Socket;</span><br><span class="line">import java.nio.charset.StandardCharsets;</span><br><span class="line"></span><br><span class="line">public class SelfHttpSocketClient &#123;</span><br><span class="line"></span><br><span class="line">  public static void main(String[] args) throws InterruptedException &#123;</span><br><span class="line">    String host = &quot;localhost&quot;;</span><br><span class="line">    String httpStr = &quot;GET / HTTP/1.1\r\n&quot;</span><br><span class="line">        + &quot;cache-control: no-cache\r\n&quot;</span><br><span class="line">        + &quot;Accept: */*\r\n&quot;</span><br><span class="line">        + &quot;Connection: keep-alive\r\n&quot;</span><br><span class="line">        + &quot;\r\n&quot;;</span><br><span class="line"></span><br><span class="line">    int port = 8080;</span><br><span class="line">    try &#123;</span><br><span class="line">      System.out.println(&quot;连接到主机：&quot; + host + &quot; ，端口号：&quot; + port);</span><br><span class="line">      Socket client = new Socket(host, port);</span><br><span class="line">//      client.setSoLinger(true, 0);</span><br><span class="line">      System.out.println(&quot;远程主机地址：&quot; + client.getRemoteSocketAddress());</span><br><span class="line">      OutputStream outToServer = client.getOutputStream();</span><br><span class="line">      outToServer.write(httpStr.getBytes());</span><br><span class="line">//      client.shutdownOutput();</span><br><span class="line">      InputStream inFromServer = client.getInputStream();</span><br><span class="line"></span><br><span class="line">      BufferedReader br = new BufferedReader(</span><br><span class="line">          new InputStreamReader(inFromServer, StandardCharsets.ISO_8859_1));</span><br><span class="line">      String data;</span><br><span class="line">      while ((data = br.readLine()) != null) &#123;</span><br><span class="line">        System.out.println(&quot;服务器响应&quot; + data);</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">//      client.close();</span><br><span class="line">      Thread.sleep(100000000);</span><br><span class="line">    &#125; catch (IOException e) &#123;</span><br><span class="line">      e.printStackTrace();</span><br><span class="line">    &#125; finally &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><img src="/images/pasted-209.png" alt="upload successful"></p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://novoland.github.io/%E7%BD%91%E7%BB%9C/2014/07/26/RST%E5%8F%8Ajava%20socket%E5%85%B3%E9%97%AD%E5%90%8E%E8%AF%BB%E5%86%99%E7%9A%84%E5%90%84%E7%A7%8D%E5%BC%82%E5%B8%B8.html" target="_blank" rel="noopener">http://novoland.github.io/%E7%BD%91%E7%BB%9C/2014/07/26/RST%E5%8F%8Ajava%20socket%E5%85%B3%E9%97%AD%E5%90%8E%E8%AF%BB%E5%86%99%E7%9A%84%E5%90%84%E7%A7%8D%E5%BC%82%E5%B8%B8.html</a></p>
-
-          
+          Socket是什么socket起源于Unix，而Unix/Linux基本哲学之一就是“一切皆文件”，都可以用“打开open –&gt; 读写write/read –&gt; 关闭close”模式来操作。Socket就是该模式的一个实现，        socket即是一种特殊的文件，一些socket
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/06/27/shell命令/linux-socket/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -2674,7 +1618,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/26/okhttpclient-intercepter/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/26/java/okhttpclient-intercepter/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
@@ -2693,7 +1637,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/06/26/okhttpclient-intercepter/" itemprop="url">
+                <a class="post-title-link" href="/2018/06/26/java/okhttpclient-intercepter/" itemprop="url">
                   okhttpclient拦截器
                 </a>
               
@@ -2737,7 +1681,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2018-07-03 22:51:47" itemprop="dateModified" datetime="2018-07-03T22:51:47+08:00">2018-07-03</time>
+                <time title="修改时间：2018-07-10 22:28:15" itemprop="dateModified" datetime="2018-07-10T22:28:15+08:00">2018-07-10</time>
               
             
           </span>
@@ -2751,10 +1695,10 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/06/26/okhttpclient-intercepter/#comments" itemprop="discussionUrl">
+                <a href="/2018/06/26/java/okhttpclient-intercepter/#comments" itemprop="discussionUrl">
                 
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/06/26/okhttpclient-intercepter/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/06/26/java/okhttpclient-intercepter/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -2762,7 +1706,7 @@
 
           
           
-             <span id="/2018/06/26/okhttpclient-intercepter/" class="leancloud_visitors" data-flag-title="okhttpclient拦截器">
+             <span id="/2018/06/26/java/okhttpclient-intercepter/" class="leancloud_visitors" data-flag-title="okhttpclient拦截器">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -2795,22 +1739,23 @@
       
         
           
-            <p><img src="/images/pasted-193.png" alt="upload successful"></p>
-<h1 id="应用拦截器"><a href="#应用拦截器" class="headerlink" title="应用拦截器"></a>应用拦截器</h1><ul>
-<li>不需要关心像重定向和重试这样的中间响应。</li>
-<li>总是调用一次，即使HTTP响应从缓存中获取服务。</li>
-<li>监视应用原始意图。不关心OkHttp注入的像If-None-Match头。</li>
-<li>允许短路并不调用Chain.proceed()。</li>
-<li><p>允许重试并执行多个Chain.proceed()调用。</p>
-<h1 id="网络拦截器"><a href="#网络拦截器" class="headerlink" title="网络拦截器"></a>网络拦截器</h1></li>
-<li><p>可以操作像重定向和重试这样的中间响应。</p>
-</li>
-<li>对于短路网络的缓存响应不会调用。</li>
-<li>监视即将要通过网络传输的数据。</li>
-<li>访问运输请求的Connection。</li>
-</ul>
-
           
+应用拦截器
+不需要关心像重定向和重试这样的中间响应。
+总是调用一次，即使HTTP响应从缓存中获取服务。
+监视应用原始意图。不关心OkHttp注入的像If-None-Match头。
+允许短路并不调用Chain.proceed()。
+允许重试并执行多个Chain.proceed()调用。
+网络拦截器
+
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/06/26/java/okhttpclient-intercepter/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -2983,28 +1928,16 @@
       
         
           
-            <h1 id="原文"><a href="#原文" class="headerlink" title="原文"></a>原文</h1><p><a href="https://github.com/square/okhttp/issues/3372" target="_blank" rel="noopener">https://github.com/square/okhttp/issues/3372</a><br><a href="https://github.com/square/okhttp/issues/3160" target="_blank" rel="noopener">https://github.com/square/okhttp/issues/3160</a></p>
-<p>作者的主张:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">我们希望鼓励用户在客户端之间共享连接池和调度程序。但如果你这样做，你不能把所有东西都关闭。</span><br><span class="line"></span><br><span class="line">创建一个新的OkHttpClient是相对昂贵的，我不愿意轻易地创建和销毁客户端，因为它可能会鼓励低效的用例。 您可以自由地为每个测试创建和销毁客户端，但是我希望您编写代码以进行设置和拆卸，以便您可以承担该性能成本的责任。</span><br><span class="line"></span><br><span class="line">性能成本基本上是为连接池创建ExecutorService的成本，另一个是为Dispatcher创建的成本。我在自己的服务器应用程序中发现，创建和销毁线程池的成本在运行测试的总体成本中相当可观。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">对于大多数效率来说，您的流程中将有一个ConnectionPool和一个Dispatcher。 这些可以被许多OkHttpClient实例共享。</span><br><span class="line">如果关闭分派器，那么使用它的OkHttpClient实例都不会起作用。 类似的关闭ConnectionPool。</span><br><span class="line">一个比喻：想象一下，当你使用Firefox时，拔掉你的住宅调制解调器和WiFi路由器。 当你需要它们时很容易将它们插回去。 如果你不打算再次使用Firefox，那么知道该关闭什么是方便的。</span><br><span class="line">但我仍然认为，Firefox在退出时会关闭这些设备，或者甚至提供一个选项来关闭这些设备。</span><br></pre></td></tr></table></figure></p>
-<h1 id="自动关闭的方式"><a href="#自动关闭的方式" class="headerlink" title="自动关闭的方式"></a>自动关闭的方式</h1><h2 id="连接级别-java-net-Socket-的资源关闭"><a href="#连接级别-java-net-Socket-的资源关闭" class="headerlink" title="连接级别(java.net.Socket)的资源关闭"></a>连接级别(java.net.Socket)的资源关闭</h2><p>如果保持空闲状态，保持的线程和连接将自动释放</p>
-<p>最多可容纳5个闲置连接，闲置5分钟后将被驱逐。<br>默认设置:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">public ConnectionPool() &#123;</span><br><span class="line">  this(5, 5, TimeUnit.MINUTES);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public ConnectionPool(int maxIdleConnections, long keepAliveDuration, TimeUnit timeUnit) &#123;</span><br><span class="line">  this.maxIdleConnections = maxIdleConnections;</span><br><span class="line">  this.keepAliveDurationNs = timeUnit.toNanos(keepAliveDuration);</span><br><span class="line"></span><br><span class="line">  // Put a floor on the keep alive duration, otherwise cleanup will spin loop.</span><br><span class="line">  if (keepAliveDuration &lt;= 0) &#123;</span><br><span class="line">    throw new IllegalArgumentException(&quot;keepAliveDuration &lt;= 0: &quot; + keepAliveDuration);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>ConnectionPool内部维护了一个清理线程<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">private final Runnable cleanupRunnable = new Runnable() &#123;</span><br><span class="line">  @Override public void run() &#123;</span><br><span class="line">    while (true) &#123;</span><br><span class="line">      long waitNanos = cleanup(System.nanoTime());</span><br><span class="line">      if (waitNanos == -1) return;</span><br><span class="line">      if (waitNanos &gt; 0) &#123;</span><br><span class="line">        long waitMillis = waitNanos / 1000000L;</span><br><span class="line">        waitNanos -= (waitMillis * 1000000L);</span><br><span class="line">        synchronized (ConnectionPool.this) &#123;</span><br><span class="line">          try &#123;</span><br><span class="line">            ConnectionPool.this.wait(waitMillis, (int) waitNanos);</span><br><span class="line">          &#125; catch (InterruptedException ignored) &#123;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
-<p>实际清理:</p>
-<ul>
-<li>如果空闲醉酒的socket它超出了保持活动时间限制或空闲连接数限制，则驱逐空闲时间最长的连接,并返回0,再次检查</li>
-<li>如果有空闲状态的,返回下次检查的时间:keepAliveDurationNs - longestIdleDurationNs;</li>
-<li>如果没有空闲状态的,返回下次检查的时间:keepAliveDurationNs<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">long cleanup(long now) &#123;</span><br><span class="line">    int inUseConnectionCount = 0;</span><br><span class="line">    int idleConnectionCount = 0;</span><br><span class="line">    RealConnection longestIdleConnection = null;</span><br><span class="line">    long longestIdleDurationNs = Long.MIN_VALUE;</span><br><span class="line"></span><br><span class="line">    // Find either a connection to evict, or the time that the next eviction is due.</span><br><span class="line">    synchronized (this) &#123;</span><br><span class="line">      for (Iterator&lt;RealConnection&gt; i = connections.iterator(); i.hasNext(); ) &#123;</span><br><span class="line">        RealConnection connection = i.next();</span><br><span class="line"></span><br><span class="line">        // If the connection is in use, keep searching.</span><br><span class="line">        if (pruneAndGetAllocationCount(connection, now) &gt; 0) &#123;</span><br><span class="line">          inUseConnectionCount++;</span><br><span class="line">          continue;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        idleConnectionCount++;</span><br><span class="line"></span><br><span class="line">        // If the connection is ready to be evicted, we&apos;re done.</span><br><span class="line">        long idleDurationNs = now - connection.idleAtNanos;</span><br><span class="line">        if (idleDurationNs &gt; longestIdleDurationNs) &#123;</span><br><span class="line">          longestIdleDurationNs = idleDurationNs;</span><br><span class="line">          longestIdleConnection = connection;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      if (longestIdleDurationNs &gt;= this.keepAliveDurationNs</span><br><span class="line">          || idleConnectionCount &gt; this.maxIdleConnections) &#123;</span><br><span class="line">        // We&apos;ve found a connection to evict. Remove it from the list, then close it below (outside</span><br><span class="line">        // of the synchronized block).</span><br><span class="line">        connections.remove(longestIdleConnection);</span><br><span class="line">      &#125; else if (idleConnectionCount &gt; 0) &#123;</span><br><span class="line">        // A connection will be ready to evict soon.</span><br><span class="line">        return keepAliveDurationNs - longestIdleDurationNs;</span><br><span class="line">      &#125; else if (inUseConnectionCount &gt; 0) &#123;</span><br><span class="line">        // All connections are in use. It&apos;ll be at least the keep alive duration &apos;til we run again.</span><br><span class="line">        return keepAliveDurationNs;</span><br><span class="line">      &#125; else &#123;</span><br><span class="line">        // No connections, idle or in use.</span><br><span class="line">        cleanupRunning = false;</span><br><span class="line">        return -1;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    closeQuietly(longestIdleConnection.socket());</span><br><span class="line"></span><br><span class="line">    // Cleanup again immediately.</span><br><span class="line">    return 0;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h2 id="输入-输出流级别的资源关闭"><a href="#输入-输出流级别的资源关闭" class="headerlink" title="输入/输出流级别的资源关闭"></a>输入/输出流级别的资源关闭</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">response.close();</span><br><span class="line">response.body().close();</span><br></pre></td></tr></table></figure>
-<p>然而不需要,因为已经自动调用了</p>
-<p>当我们第一次调用 response.body().string() 时，OkHttp 将响应体的缓冲资源返回的同时，调用 closeQuietly() 方法默默释放了资源。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">public final String string() throws IOException &#123;</span><br><span class="line">  return new String(bytes(), charset().name());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public final byte[] bytes() throws IOException &#123;</span><br><span class="line">  //...</span><br><span class="line">  BufferedSource source = source();</span><br><span class="line">  byte[] bytes;</span><br><span class="line">  try &#123;</span><br><span class="line">    bytes = source.readByteArray();</span><br><span class="line">  &#125; finally &#123;</span><br><span class="line">    Util.closeQuietly(source);</span><br><span class="line">  &#125;</span><br><span class="line">  //...</span><br><span class="line">  return bytes;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public static void closeQuietly(Closeable closeable) &#123;</span><br><span class="line">  if (closeable != null) &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">      closeable.close();</span><br><span class="line">    &#125; catch (RuntimeException rethrown) &#123;</span><br><span class="line">      throw rethrown;</span><br><span class="line">    &#125; catch (Exception ignored) &#123;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//持有的 Source 对象</span><br><span class="line">public final Source source;</span><br><span class="line"></span><br><span class="line">@Override</span><br><span class="line">public void close() throws IOException &#123;</span><br><span class="line">  if (closed) return;</span><br><span class="line">  closed = true;</span><br><span class="line">  source.close();</span><br><span class="line">  buffer.clear();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h3 id="会触发的方法"><a href="#会触发的方法" class="headerlink" title="会触发的方法"></a>会触发的方法</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Response.close()</span><br><span class="line">Response.body().close()</span><br><span class="line">Response.body().source().close()</span><br><span class="line">Response.body().charStream().close()</span><br><span class="line">Response.body().byteString().close()</span><br><span class="line">Response.body().bytes()</span><br><span class="line">Response.body().string()</span><br></pre></td></tr></table></figure>
-<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p><a href="https://github.com/square/okhttp/issues/1240#issuecomment-329197762" target="_blank" rel="noopener">https://github.com/square/okhttp/issues/1240#issuecomment-329197762</a></p>
-<p>在实际开发中，响应主体 RessponseBody 持有的资源可能会很大，所以 OkHttp 并不会将其直接保存到内存中，只是持有数据流连接。只有当我们需要时，才会从服务器获取数据并返回。同时，考虑到应用重复读取数据的可能性很小，所以将其设计为一次性流(one-shot)，读取后即 ‘关闭并释放资源’。</p>
-<h1 id="进行被kill时-socket资源的关闭方式-RST"><a href="#进行被kill时-socket资源的关闭方式-RST" class="headerlink" title="进行被kill时 socket资源的关闭方式:RST"></a>进行被kill时 socket资源的关闭方式:RST</h1><p><img src="/images/pasted-207.png" alt="upload successful"></p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://juejin.im/post/5a524eef518825732c536025" target="_blank" rel="noopener">https://juejin.im/post/5a524eef518825732c536025</a></p>
-
-          
+          原文https://github.com/square/okhttp/issues/3372https://github.com/square/okhttp/issues/3160
+作者的主张:1234567891011我们希望鼓励用户在客户端之间共享连接池和调度程序。但如果你这样做，你不能把所有东
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/06/25/java/java_web/okhttpclient-close/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -3177,9 +2110,16 @@
       
         
           
-            <p><a href="http://hibernate.org/validator/documentation/getting-started/" target="_blank" rel="noopener">http://hibernate.org/validator/documentation/getting-started/</a></p>
+          http://hibernate.org/validator/documentation/getting-started/
 
           
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/06/25/java/java_web/javax-validate/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -3241,6 +2181,8 @@
   </div>
 
   <aside id="sidebar" class="sidebar">
+    
+      <div id="sidebar-dimmer"></div>
     
     <div class="sidebar-inner">
 
@@ -3334,7 +2276,15 @@
                     
                       
                     
-                    <span class="site-state-item-count">27</span>
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -3501,7 +2451,39 @@
                     
                       
                     
-                    <span class="site-state-item-count">77</span>
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">92</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -3631,6 +2613,8 @@
 
 
 
+  
+
 
 
 
@@ -3656,6 +2640,11 @@
   
   
     <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
   
 
 

@@ -86,7 +86,7 @@
     root: '/',
     scheme: 'Muse',
     version: '6.3.0',
-    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":true,"scrollpercent":true,"onmobile":true},
     fancybox: false,
     fastclick: false,
     lazyload: false,
@@ -269,6 +269,22 @@
         
         
           
+          <li class="menu-item menu-item-书单">
+    <a href="/book/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-book"></i> <br />书单</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-常用网站">
+    <a href="/web/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br />常用网站</a>
+  </li>
+        
+        
+        
+          
           <li class="menu-item menu-item-sitemap">
     <a href="/sitemap.xml" rel="section">
       <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />站点地图</a>
@@ -328,6 +344,17 @@
     </header>
 
     
+  
+  
+  
+    
+      
+    
+    <a href="https://github.com/victorsheng" class="github-corner" target="_blank" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#222; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg>
+    
+      </a>
+    
+
 
 
     <main id="main" class="main">
@@ -474,24 +501,15 @@
       
         
           
-            <h1 id="泛型"><a href="#泛型" class="headerlink" title="泛型"></a>泛型</h1><p>Java 在 1.5 引入了泛型机制，泛型本质是参数化类型，也就是说变量的类型是一个参数，在使用时再指定为具体类型。泛型可以用于类、接口、方法，通过使用泛型可以使代码更简单、安全。然而 Java 中的泛型使用了类型擦除，所以只是伪泛型。这篇文章对泛型的使用以及存在的问题做个总结，主要参考自 《Java 编程思想》。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">public class Holder1 &#123;</span><br><span class="line">    private Object a;</span><br><span class="line"></span><br><span class="line">    public Holder1(Object a) &#123;</span><br><span class="line">        this.a = a;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void set(Object a) &#123;</span><br><span class="line">        this.a = a;</span><br><span class="line">    &#125;</span><br><span class="line">    public Object get()&#123;</span><br><span class="line">        return a;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        Holder1 holder1 = new Holder1(&quot;not Generic&quot;);</span><br><span class="line">        String s = (String) holder1.get();</span><br><span class="line">        holder1.set(1);</span><br><span class="line">        Integer x = (Integer) holder1.get();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<p>在 Holder1 中，有一个用 Object 引用的变量。因为任何类型都可以向上转型为 Object，所以这个 Holder 可以接受任何类型。在取出的时候 Holder 只知道它保存的是一个 Object 对象，所以要强制转换为对应的类型。在 main 方法中， holder1 先是保存了一个字符串，也就是 String 对象，接着又变为保存一个 Integer 对象(参数 1 会自动装箱)。从 Holder 中取出变量时强制转换已经比较麻烦，这里还要记住不同的类型，要是转错了就会出现运行时异常。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">public class Holder2&lt;T&gt; &#123;</span><br><span class="line"></span><br><span class="line">    private T a;</span><br><span class="line">    public Holder2(T a) &#123;</span><br><span class="line">        this.a = a;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public T get() &#123;</span><br><span class="line">        return a;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void set(T a) &#123;</span><br><span class="line">        this.a = a;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        Holder2&lt;String&gt; holder2 = new Holder2&lt;&gt;(&quot;Generic&quot;);</span><br><span class="line">        String s = holder2.get();</span><br><span class="line"></span><br><span class="line">        holder2.set(&quot;test&quot;);</span><br><span class="line">        holder2.set(1);//无法编译   参数 1 不是 String 类型</span><br><span class="line"></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<p>在 Holder2 中， 变量 a 是一个参数化类型 T，T 只是一个标识，用其它字母也是可以的。创建 Holder2 对象的时候，在尖括号中传入了参数 T 的类型，那么在这个对象中，所有出现 T 的地方相当于都用 String 替换了。现在的 get 的取出来的不是 Object ，而是 String 对象，因此不需要类型转换。另外，当调用 set 时，只能传入 String 类型，否则编译无法通过。这就保证了 holder2 中的类型安全，避免由于不小心传入错误的类型。</p>
-<p>通过上面的例子可以看出泛使得代码更简便、安全。引入泛型之后，Java 库的一些类，比如常用的容器类也被改写为支持泛型，我们使用的时候都会传入参数类型，如：ArrayList<integer> list = ArrayList&lt;&gt;();。</integer></p>
-<h1 id="类型擦除"><a href="#类型擦除" class="headerlink" title="类型擦除"></a>类型擦除</h1><p>Java 的泛型使用了类型擦除机制，这个引来了很大的争议，以至于 Java 的泛型功能受到限制，只能说是”伪泛型“。什么叫类型擦除呢？简单的说就是，类型参数只存在于编译期，在运行时，Java 的虚拟机 ( JVM ) 并不知道泛型的存在。</p>
-<h1 id="型参数“”-声明一个泛型类或泛型方法"><a href="#型参数“”-声明一个泛型类或泛型方法" class="headerlink" title="型参数“”(声明一个泛型类或泛型方法)"></a>型参数“<t>”(声明一个泛型类或泛型方法)</t></h1><h2 id="声明泛型类的类型参数"><a href="#声明泛型类的类型参数" class="headerlink" title="声明泛型类的类型参数"></a>声明泛型类的类型参数</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">class Box&lt;T&gt;&#123;</span><br><span class="line">    private T item1;</span><br><span class="line">    private T item2;   </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class Box&lt;T&gt;&#123;</span><br><span class="line">    private T item1;</span><br><span class="line">    private T item2;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="声明泛型方法"><a href="#声明泛型方法" class="headerlink" title="声明泛型方法"></a>声明泛型方法</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public &lt;T&gt; void print(T t) &#123;</span><br><span class="line">  System.out.println(t);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h1 id="通配符“-lt-gt-”-使用泛型类或泛型方法"><a href="#通配符“-lt-gt-”-使用泛型类或泛型方法" class="headerlink" title="通配符“&lt;?&gt;”(使用泛型类或泛型方法)"></a>通配符“&lt;?&gt;”(使用泛型类或泛型方法)</h1><h2 id="上边界限定通配符"><a href="#上边界限定通配符" class="headerlink" title="上边界限定通配符"></a>上边界限定通配符</h2><p>使用 List&lt;? extends C&gt; list 这种形式，表示 list 可以引用一个 ArrayList ( 或者其它 List 的 子类 ) 的对象，这个对象包含的元素类型是 C 的子类型 ( 包含 C 本身）的一种。</p>
-<h2 id="下边界限定通配符"><a href="#下边界限定通配符" class="headerlink" title="下边界限定通配符"></a>下边界限定通配符</h2><p>使用 List&lt;? super C&gt; list 这种形式，表示 list 可以引用一个 ArrayList ( 或者其它 List 的 子类 ) 的对象，这个对象包含的元素就类型是 C 的超类型 ( 包含 C 本身 ) 的一种。</p>
-<h2 id="无边界通配符"><a href="#无边界通配符" class="headerlink" title="无边界通配符"></a>无边界通配符</h2><h1 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h1><ul>
-<li>“?”不能添加元素</li>
-<li>“? extends T”也不能添加元素</li>
-<li>“? super T”能添加元素</li>
-</ul>
-
-          
+          泛型Java 在 1.5 引入了泛型机制，泛型本质是参数化类型，也就是说变量的类型是一个参数，在使用时再指定为具体类型。泛型可以用于类、接口、方法，通过使用泛型可以使代码更简单、安全。然而 Java 中的泛型使用了类型擦除，所以只是伪泛型。这篇文章对泛型的使用以及存在的问题做个总结，主要参考自 《J
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/04/26/java/java_common/java-genercity/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -664,21 +682,15 @@
       
         
           
-            <h1 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h1><p>The OPAL platform aims to unlock the potential of private data for public good in a privacy-conscientious, scalable, socially and economically sustainable manner.</p>
-<p>OPAL is a collaborative project being developed by a group of partners committed to leveraging the power of platforms, big data, and advanced analytics for the public good in a privacy-preserving, commercially sensible, stable, scalable, and sustainable manner.</p>
-<p>OPAL’s core will consist of an open suite of softwares and algorithms providing access to statistical information extracted from anonymized, secured, and formatted data. These algorithms, accessed by an API, will be run on OPAL servers of partner companies behind their firewalls. The vision is to strengthen the accuracy, timeliness, and reliability of key development indicators and statistics of relevance for an array of users. The project will start with APIs to access indicators such as population density, mobility, approximations of poverty indices, or literacy rate based on mobile data from telecom operators as well as a library of certified open algorithms to extract these indicators in a governed and trustworthy manner.</p>
-<p>The OPAL Project will also engage with data providers, users and analysts at all stages of its development, build local capacities and connections, and set-up local Data Governance and Advisory Boards for oversight and support of its operations.</p>
-<p>Two pilots will be undertaken in the form of public-private-people partnerships in Senegal with Orange Sonatel and in Colombia with Telefónica. The aim during the pilot phase is to develop a Beta platform and a suite of open algorithms, all accessible as open source. These pilots will also assess the quality of the statistical indicators that are obtained from the platform. If the first two pilots are considered successful, the project could be extended to other developing countries.</p>
-<p><img src="/images/pasted-165.png" alt="upload successful"></p>
-<p><img src="/images/pasted-166.png" alt="upload successful"></p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><ul>
-<li>dataset 可能只有因素,而没有指标,如何进行关联?? </li>
-<li>可能需要把两部分数据 关联在一起才更加有效</li>
-<li>拉取和订阅,这样就没有办法做到实时</li>
-<li>不再换新统计指标,而是关心个体</li>
-</ul>
-
-          
+          定义The OPAL platform aims to unlock the potential of private data for public good in a privacy-conscientious, scalable, socially and economically susta
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/04/23/td_business/opal-overivew/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -839,23 +851,21 @@
       
         
           
-            <h1 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h1><h2 id="前端"><a href="#前端" class="headerlink" title="前端:"></a>前端:</h2><p><a href="https://taobaofed.org/blog/2012/10/11/fsm-based-component-design-and-implementation/" target="_blank" rel="noopener">https://taobaofed.org/blog/2012/10/11/fsm-based-component-design-and-implementation/</a> </p>
-<p><img src="/images/pasted-160.png" alt="upload successful"></p>
-<p><img src="/images/pasted-161.png" alt="upload successful"></p>
-<p><img src="/images/pasted-162.png" alt="upload successful"></p>
-<p>流程图:<br><img src="/images/pasted-159.png" alt="upload successful"></p>
-<h2 id="游戏"><a href="#游戏" class="headerlink" title="游戏"></a>游戏</h2><p><img src="/images/pasted-163.png" alt="upload successful"></p>
-<h2 id="转门"><a href="#转门" class="headerlink" title="转门"></a>转门</h2><p>以一个转门为例，这种专门在一些会展、博物馆、公园的门口很常见，顾客可以投币或者刷卡刷票进入，我们下面以投币(Coin)统称这个触发事件。如果你不投币，闸门是锁着的，你推不动它的转臂，而且投一次币只能进去一个人，过去之后闸门又是锁着的</p>
-<p><img src="/images/pasted-164.png" alt="upload successful"></p>
-<p>它有两个状态：Locked、Unlocked。有两个输入（input）会影响它的状态，投币(coin)和推动转臂（push）。</p>
-<ul>
-<li>在Locked状态， push没有作用。不管比push多少次闸门的状态还是lock</li>
-<li>在Locked状态，投币会让闸门开锁，闸门可以让一个人通过</li>
-<li>在Unlocked状态，投币不起作用，闸门还是开着</li>
-<li>在Unlocked状态，如果有人push通过，人通过后闸门会由Unlocked状态转变成Locked状态。<br>这是一个简单的闸门的状态转换，却是一个很好的理解状态的典型例子。</li>
-</ul>
+          应用前端:https://taobaofed.org/blog/2012/10/11/fsm-based-component-design-and-implementation/ 
 
-          
+
+
+流程图:
+游戏
+转门以一个转门为例，这种专门在一些会展、博物馆、公园的门口很常见，顾客可以投币或者刷卡刷票进入，
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/04/21/其他/finite-state-machine/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1028,27 +1038,18 @@
       
         
           
-            <h1 id="代码覆盖率工具"><a href="#代码覆盖率工具" class="headerlink" title="代码覆盖率工具"></a>代码覆盖率工具</h1><p>目前Java常用覆盖率工具Jacoco、Emma和Cobertura</p>
-<h1 id="两种模式"><a href="#两种模式" class="headerlink" title="两种模式"></a>两种模式</h1><p>主流代码覆盖率工具都采用字节码插桩模式，通过钩子的方式来记录代码执行轨迹信息。其中字节码插桩又分为两种模式On-The-Fly和Offine</p>
-<ul>
-<li>On-The-Fly模式优点在于无需修改源代码，可以在系统不停机的情况下，实时收集代码覆盖率信息。</li>
-<li>Offine模式优点在于系统启动不需要额外开启代理，但是只能在系统停机的情况下才能获取代码覆盖率。 </li>
-</ul>
-<h1 id="情景"><a href="#情景" class="headerlink" title="情景"></a>情景</h1><h2 id="单元测试覆盖率"><a href="#单元测试覆盖率" class="headerlink" title="单元测试覆盖率"></a>单元测试覆盖率</h2><p>选取了Sonar+Cobertura来获取单元测试覆盖率。 </p>
-<h2 id="集成测试覆盖率"><a href="#集成测试覆盖率" class="headerlink" title="集成测试覆盖率"></a>集成测试覆盖率</h2><h2 id="自动化集成流程"><a href="#自动化集成流程" class="headerlink" title="自动化集成流程"></a>自动化集成流程</h2><p><img src="/images/pasted-158.png" alt="upload successful"></p>
-<ol>
-<li>业务开发完成之后，开发人员做单元测试，单元测试完成之后，保证单元测试全部通过同时单元测试代码覆盖率达到一定程度（这个需要开发和测试约定，理论上越高越好），开发提测。 </li>
-<li>测试人员根据测试用例进行测试（包括手工测试和自动化测试），结合git获取本次变动代码的覆盖率信息。行覆盖率需达到100%，分支达到50%以上，这个需要具体场景具体分析。 </li>
-<li>测试通过之后，代码合并至主干，进行自动化回归。 </li>
-<li>回归测试通过之后，代码可以上线。</li>
-</ol>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ul>
-<li>代码覆盖率统计是用来发现没有被测试覆盖的代码</li>
-<li>代码覆盖率统计不能完全用来衡量代码质量</li>
-</ul>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://tech.youzan.com/code-coverage/" target="_blank" rel="noopener">https://tech.youzan.com/code-coverage/</a></p>
+          代码覆盖率工具目前Java常用覆盖率工具Jacoco、Emma和Cobertura
+两种模式主流代码覆盖率工具都采用字节码插桩模式，通过钩子的方式来记录代码执行轨迹信息。其中字节码插桩又分为两种模式On-The-Fly和Offine
 
-          
+On-The-Fly模式优点在于无需修改源代码，可以在系统不停机
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/04/21/运维-测试/code-coverage/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1221,29 +1222,15 @@
       
         
           
-            <h1 id="mock和stub的差异"><a href="#mock和stub的差异" class="headerlink" title="mock和stub的差异"></a>mock和stub的差异</h1><h2 id="1、相同点"><a href="#1、相同点" class="headerlink" title="1、相同点"></a>1、相同点</h2><p>先看看两者的相同点吧，非常明确的是，mock和stub都可以用来对系统(或者将粒度放小为模块，单元)进行隔离。<br>在测试，尤其是单元测试中，我们通常关注的是主要测试对象的功能和行为，对于主要测试对象涉及到的次要对象尤其是一些依赖，我们仅仅关注主要测试对象和次要测试对象的交互，比如是否调用，何时调用，调用的参数，调用的次数和顺序等，以及返回的结果或发生的异常。但次要对象是如何执行这次调用的具体细节，我们并不关注，因此常见的技巧就是用mock对象或者stub对象来替代真实的次要对象，模拟真实场景来进行对主要测试对象的测试工作。<br>因此从实现上看，mock和stub都是通过创建自己的对象来替代次要测试对象，然后按照测试的需要控制这个对象的行为。</p>
-<h2 id="2、不同点"><a href="#2、不同点" class="headerlink" title="2、不同点"></a>2、不同点</h2><h3 id="1）-类实现的方式"><a href="#1）-类实现的方式" class="headerlink" title="1） 类实现的方式"></a>1） 类实现的方式</h3><p>从类的实现方式上看，stub有一个显式的类实现，按照stub类的复用层次可以实现为普通类(被多个测试案例复用)，内部类(被同一个测试案例的多个测试方法复用)乃至内部匿名类(只用于当前测试方法)。对于stub的方法也会有具体的实现，哪怕简单到只有一个简单的return语句。<br>而mock则不同，mock的实现类通常是有mock的工具包如easymock, jmock来隐式实现，具体mock的方法的行为则通过record方式来指定。</p>
-<ul>
-<li>stub的标准实现，需要自己实现一个类并实现方法</li>
-<li>mock的实现，以easymock为例，只要指定mock的类并record期望的行为，并没有显式的构造新类</li>
-</ul>
-<p>对比可以看出，mock编写相对简单，只需要关注被使用的函数，所谓”just enough”。stub要复杂一些，需要实现逻辑，即使是不需要关注的方法也至少要给出空实现。</p>
-<h3 id="2-测试逻辑的可读性"><a href="#2-测试逻辑的可读性" class="headerlink" title="2)测试逻辑的可读性"></a>2)测试逻辑的可读性</h3><p>从上面的代码可以看出，在形式上，mock通常是在测试代码中直接mock类和定义mock方法的行为，测试代码和mock的代码通常是放在一起的，因此测试代码的逻辑也容易从测试案例的代码上看出来。Easymock.expect(dao.getById(“1001”)).andReturn(user); 直截了当的指明了当前测试案例对UserDao这个依赖的预期: getById需要被调用，调用的参数应该是”1001”，调用次数为1(不明确指定调用次数时easymock默认为1)。<br>而stub的测试案例的代码中只有简单的UserDao userDao = new UserDaoStub ();构造语句和service.setUserDao(userDao);设置语句，我们无法直接从测试案例的代码中看出对依赖的预期，只能进入具体的UserServiceImpl类的query()方法，看到具体的实现是调用userDao.getById(userId)，这个时候才能明白完整的测试逻辑。因此当测试逻辑复杂，stub数量多并且某些stub需要传入一些标记比如true，false之类的来制定不同的行为时，测试逻辑的可读性就会下降。</p>
-<h3 id="3-可复用性"><a href="#3-可复用性" class="headerlink" title="3)可复用性"></a>3)可复用性</h3><p>Mock通常很少考虑复用，每个mock对象通过都是遵循”just enough”原则，一般只适用于当前测试方法。因此每个测试方法都必须实现自己的mock逻辑，当然在同一个测试类中还是可以有一些简单的初始化逻辑可以复用。<br>stub则通常比较方便复用，尤其是一些通用的stub，比如jdbc连接之类。spring框架就为此提供了大量的stub来方便测试，不过很遗憾的是，它的名字用错了：spring-mock！</p>
-<h3 id="4-设计和使用"><a href="#4-设计和使用" class="headerlink" title="4)设计和使用"></a>4)设计和使用</h3><p>接着我们从mock和stub的设计和使用上来比较两者，这里需要引入两个概念：interaction-based和state-based。</p>
-<ul>
-<li>stub是state-based，关注的是输入和输出。</li>
-<li>mock是interaction-based，关注的是交互过程。</li>
-</ul>
-<h3 id="5-expectiation-期望"><a href="#5-expectiation-期望" class="headerlink" title="5)expectiation/期望"></a>5)expectiation/期望</h3><p>这个才是mock和stub的最重要的区别：expectiation/期望。<br>对于mock来说，exception是重中之重：我们期待方法有没有被调用，期待适当的参数，期待调用的次数，甚至期待多个mock之间的调用顺序。所有的一切期待都是事先准备好，在测试过程中和测试结束后验证是否和预期的一致。</p>
-<p>而对于stub，通常都不会关注exception，就像上面给出的UserDaoStub的例子，没有任何代码来帮助判断这个stub类是否被调用。虽然理论上某些stub实现也可以通过自己编码的方式增加对expectiation的内容，比如增加一个计数器，每次调用+1之类，但是实际上极少这样做。    </p>
-<h3 id="6-总结"><a href="#6-总结" class="headerlink" title="6)总结"></a>6)总结</h3><p>关于mock和stub的不同，在Martin Fowler的”Mocks Aren’t Stubs”一文中，有以下结束，我将它列出来作为总结：<br>(1) Dummy<br>对象被四处传递，但是从不被真正使用。通常他们只是用来填充参数列表。<br>(2) Fake<br>有实际可工作的实现，但是通常有一些缺点导致不适合用于产品(基于内存的数据库就是一个好例子)。<br>(3) Stubs<br>在测试过程中产生的调用提供预备好的应答，通常不应答计划之外的任何事。stubs可能记录关于调用的信息，比如 邮件网关的stub 会记录它发送的消息，或者可能仅仅是发送了多少信息。<br>(4) Mocks<br>如我们在这里说的那样：预先计划好的对象，带有各种期待，他们组成了一个关于他们期待接受的调用的详细说明。</p>
-<h1 id="不同情境下的使用"><a href="#不同情境下的使用" class="headerlink" title="不同情境下的使用"></a>不同情境下的使用</h1><h2 id="stub"><a href="#stub" class="headerlink" title="stub"></a>stub</h2><p>Stubs一般用来stub out那些难于创建或操纵的对象。一个经典的例子就是一个database connection。因此，一般的stub都被发现于系统边界，或者围绕着系统中复杂的对象群。为了建立一个stub，你建立了一个接口的另一种实现，利用简单的数据替换了真实的方法。</p>
-<p>大多数团队一般编写custom stubs来stub任何需要的服务，毕竟数目并不多，而且它们经常可以在test cases之间复用。因此，你不需要构建一个通用的stub定义库。而利用mock库是可以很好地创建stub的。</p>
-<h2 id="mock"><a href="#mock" class="headerlink" title="mock"></a>mock</h2><p>在mock社区看来，最本质的区别就在于mock所具有的expectation setting机制，利用此机制可以测试mock上哪些方法被调用了。Mockists通常把一个刚刚返回值的mock object叫做’just a stub’。所以，一种观察mocks和stubs的区别的方法就是在使用mock的时候人们是把建立并且测试expectations当作测试的一部分的。似乎太简单了点 - 我也曾经编写过做一些简单形式expectation检查的stub（这些检查可能是设置一个布尔值来代表某个method是否被调用）。但是我想我们有理由认为expectations对于stubs来说是一种稀有的特性，而对于mocks来说是主要的特性。</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://hongyitong.github.io/2016/12/23/%E6%B5%85%E8%B0%88mock%E5%92%8Cstub/" target="_blank" rel="noopener">http://hongyitong.github.io/2016/12/23/%E6%B5%85%E8%B0%88mock%E5%92%8Cstub/</a></p>
-
-          
+          mock和stub的差异1、相同点先看看两者的相同点吧，非常明确的是，mock和stub都可以用来对系统(或者将粒度放小为模块，单元)进行隔离。在测试，尤其是单元测试中，我们通常关注的是主要测试对象的功能和行为，对于主要测试对象涉及到的次要对象尤其是一些依赖，我们仅仅关注主要测试对象和次要测试对象的
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/04/21/运维-测试/mock-and-stub/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1404,25 +1391,16 @@
       
         
           
-            <h1 id="Reactor模型"><a href="#Reactor模型" class="headerlink" title="Reactor模型"></a>Reactor模型</h1><ul>
-<li>Reactor模式是处理并发I/O比较常见的一种模式，用于同步I/O，中心思想是将所有要处理的I/O事件注册到一个中心I/O多路复用器上，同时主线程/进程阻塞在多路复用器上；一旦有I/O事件到来或是准备就绪(文件描述符或socket可读、写)，多路复用器返回并将事先注册的相应I/O事件分发到对应的处理器中。</li>
-<li><p>Reactor是一种事件驱动机制，和普通函数调用的不同之处在于：应用程序不是主动的调用某个API完成处理，而是恰恰相反，Reactor逆置了事件处理流程，应用程序需要提供相应的接口并注册到Reactor上，如果相应的事件发生，Reactor将主动调用应用程序注册的接口，这些接口又称为“回调函数”。用“好莱坞原则”来形容Reactor再合适不过了：不要打电话给我们，我们会打电话通知你。</p>
-</li>
-<li><p>Reactor模式与Observer模式在某些方面极为相似：当一个主体发生改变时，所有依属体都得到通知。不过，观察者模式与单个事件源关联，而反应器模式则与多个事件源关联 。</p>
-</li>
-</ul>
-<p>在Reactor模式中，有5个关键的参与者：</p>
-<ul>
-<li>描述符（handle）：由操作系统提供的资源，用于识别每一个事件，如Socket描述符、文件描述符、信号的值等。在Linux中，它用一个整数来表示。事件可以来自外部，如来自客户端的连接请求、数据等。事件也可以来自内部，如信号、定时器事件。</li>
-<li>同步事件多路分离器（event demultiplexer）：事件的到来是随机的、异步的，无法预知程序何时收到一个客户连接请求或收到一个信号。所以程序要循环等待并处理事件，这就是事件循环。在事件循环中，等待事件一般使用I/O复用技术实现。在linux系统上一般是select、poll、epol_waitl等系统调用，用来等待一个或多个事件的发生。I/O框架库一般将各种I/O复用系统调用封装成统一的接口，称为事件多路分离器。调用者会被阻塞，直到分离器分离的描述符集上有事件发生。</li>
-<li>事件处理器（event handler）：I/O框架库提供的事件处理器通常是由一个或多个模板函数组成的接口。这些模板函数描述了和应用程序相关的对某个事件的操作，用户需要继承它来实现自己的事件处理器，即具体事件处理器。因此，事件处理器中的回调函数一般声明为虚函数，以支持用户拓展。</li>
-<li>具体的事件处理器（concrete event handler）：是事件处理器接口的实现。它实现了应用程序提供的某个服务。每个具体的事件处理器总和一个描述符相关。它使用描述符来识别事件、识别应用程序提供的服务。</li>
-<li>Reactor 管理器（reactor）：定义了一些接口，用于应用程序控制事件调度，以及应用程序注册、删除事件处理器和相关的描述符。它是事件处理器的调度核心。 Reactor管理器使用同步事件分离器来等待事件的发生。一旦事件发生，Reactor管理器先是分离每个事件，然后调度事件处理器，最后调用相关的模 板函数来处理这个事件。</li>
-</ul>
-<p>Reactor管理器并不是应用程序负责等待事件、分离事件和调度事件。Reactor并没有被具体的事件处理器调度，而是管理器调度具体的事件处理器，由事件处理器对发生的事件作出处理，这就是Hollywood原则。应用程序要做的仅仅是实现一个具体的事件处理器，然后把它注册到Reactor管理器中。接下来的工作由管理器来完成：如果有相应的事件发生，Reactor会主动调用具体的事件处理器，由事件处理器对发生的事件作出处理。</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://tech.youzan.com/yi-bu-wang-luo-mo-xing/" target="_blank" rel="noopener">https://tech.youzan.com/yi-bu-wang-luo-mo-xing/</a></p>
-
-          
+          Reactor模型
+Reactor模式是处理并发I/O比较常见的一种模式，用于同步I/O，中心思想是将所有要处理的I/O事件注册到一个中心I/O多路复用器上，同时主线程/进程阻塞在多路复用器上；一旦有I/O事件到来或是准备就绪(文件描述符或socket可读、写)，多路复用器返回并将事先注册的相应I/
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/04/20/java/java_netty/nio-reactor-model/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1583,52 +1561,16 @@
       
         
           
-            <h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>通过ssh root@地址 “命令” 无法加载.bash_profile里面的配置</p>
-<h2 id="对比1"><a href="#对比1" class="headerlink" title="对比1"></a>对比1</h2><p>远程的ssh命令<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[ip1:vic@ip1:/home/vic]$ ssh hadoop@ip2 &quot;java -version&quot;</span><br><span class="line">java version &quot;1.7.0_101&quot;</span><br><span class="line">OpenJDK Runtime Environment (rhel-2.6.6.1.el7_2-x86_64 u101-b00)</span><br><span class="line">OpenJDK 64-Bit Server VM (build 24.95-b01, mixed mode)</span><br><span class="line">ssh登陆后的</span><br><span class="line">[ip2:hadoop@ip2:/home/hadoop]$ java -version</span><br><span class="line">java version &quot;1.8.0_66&quot;</span><br><span class="line">Java(TM) SE Runtime Environment (build 1.8.0_66-b17)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 25.66-b17, mixed mode)</span><br></pre></td></tr></table></figure></p>
-<h2 id="对比2"><a href="#对比2" class="headerlink" title="对比2"></a>对比2</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[ip1:vic@ip1:/home/vic]$ ssh hadoop@ip2 &apos;echo $PATH&apos;</span><br><span class="line">/usr/local/bin:/usr/bin</span><br><span class="line"></span><br><span class="line">[ip2:hadoop@ip2:/home/hadoop]$ echo $PATH</span><br><span class="line">/usr/java/jdk1.8.0_66/bin:/usr/java/default/bin:/usr/java/default/jre/bin:/usr/local/mysql3306/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin</span><br></pre></td></tr></table></figure>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><ul>
-<li>设置BASH_ENV(没有找到设置的地方,export只会在本次登陆生效)</li>
-<li>在远端要执脚本中加载配置文件(最终采取的方案)<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line">. ~/.bash_profile</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h1 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h1><p><a href="http://feihu.me/blog/2014/env-problem-when-ssh-executing-command-on-remote" target="_blank" rel="noopener">http://feihu.me/blog/2014/env-problem-when-ssh-executing-command-on-remote</a></p>
-<h1 id="bash的四种模式"><a href="#bash的四种模式" class="headerlink" title="bash的四种模式"></a>bash的四种模式</h1><p>在man page的INVOCATION一节讲述了bash的四种模式，bash会依据这四种模式而选择加载不同的配置文件，而且加载的顺序也有所不同。本文ssh问题的答案就存在于这几种模式当中，所以在我们揭开谜底之前先来分析这些模式。</p>
-<h2 id="interactive-login-shell"><a href="#interactive-login-shell" class="headerlink" title="interactive + login shell"></a>interactive + login shell</h2><p>第一种模式是交互式的登陆shell，这里面有两个概念需要解释：interactive和login：</p>
-<p>login故名思义，即登陆，login shell是指用户以非图形化界面或者以ssh登陆到机器上时获得的第一个shell，简单些说就是需要输入用户名和密码的shell。因此通常不管以何种方式登陆机器后用户获得的第一个shell就是login shell。</p>
-<p>interactive意为交互式，这也很好理解，interactive shell会有一个输入提示符，并且它的标准输入、输出和错误输出都会显示在控制台上。所以一般来说只要是需要用户交互的，即一个命令一个命令的输入的shell都是interactive shell。而如果无需用户交互，它便是non-interactive shell。通常来说如bash script.sh此类执行脚本的命令就会启动一个non-interactive shell，它不需要与用户进行交互，执行完后它便会退出创建的shell。</p>
-<p>那么此模式最简单的两个例子为：</p>
-<p>用户直接登陆到机器获得的第一个shell<br>用户使用ssh user@remote获得的shell</p>
-<h3 id="加载配置文件"><a href="#加载配置文件" class="headerlink" title="加载配置文件"></a>加载配置文件</h3><p>这种模式下，shell首先加载/etc/profile，然后再尝试依次去加载下列三个配置文件之一，一旦找到其中一个便不再接着寻找：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">~/.bash_profile</span><br><span class="line">~/.bash_login</span><br><span class="line">~/.profile</span><br></pre></td></tr></table></figure>
-<h2 id="non-interactive-login-shell"><a href="#non-interactive-login-shell" class="headerlink" title="non-interactive + login shell"></a>non-interactive + login shell</h2><p>第二种模式的shell为non-interactive login shell，即非交互式的登陆shell，这种是不太常见的情况。一种创建此shell的方法为：bash -l script.sh，前面提到过-l参数是将shell作为一个login shell启动，而执行脚本又使它为non-interactive shell。</p>
-<p>对于这种类型的shell，配置文件的加载与第一种完全一样，在此不再赘述。</p>
-<h2 id="interactive-non-login-shell"><a href="#interactive-non-login-shell" class="headerlink" title="interactive + non-login shell"></a>interactive + non-login shell</h2><p>bash，此时会打开一个交互式的shell，而因为不再需要登陆，因此不是login shell。</p>
-<h3 id="加载配置文件-1"><a href="#加载配置文件-1" class="headerlink" title="加载配置文件"></a>加载配置文件</h3><p>对于此种情况，启动shell时会去查找并加载/etc/bash.bashrc和~/.bashrc文件。</p>
-<h3 id="bashrc-VS-profile"><a href="#bashrc-VS-profile" class="headerlink" title="bashrc VS profile"></a>bashrc VS profile</h3><p>从刚引入的两个配置文件的存放路径可以很容易的判断，第一个文件是全局性的，第二个文件属于当前用户。在前面的模式当中，已经出现了几种配置文件，多数是以profile命名的，那么为什么这里又增加两个文件呢？这样不会增加复杂度么？我们来看看此处的文件和前面模式中的文件的区别。</p>
-<p>首先看第一种模式中的profile类型文件，它是某个用户唯一的用来设置全局环境变量的地方, 因为用户可以有多个shell比如bash, sh, zsh等, 但像环境变量这种其实只需要在统一的一个地方初始化就可以, 而这个地方就是profile，所以启动一个login shell会加载此文件，后面由此shell中启动的新shell进程如bash，sh，zsh等都可以由login shell中继承环境变量等配置。</p>
-<p>接下来看bashrc，其后缀rc的意思为Run Commands，由名字可以推断出，此处存放bash需要运行的命令，但注意，这些命令一般只用于交互式的shell，通常在这里会设置交互所需要的所有信息，比如bash的补全、alias、颜色、提示符等等。</p>
-<p>所以可以看出，引入多种配置文件完全是为了更好的管理配置，每个文件各司其职，只做好自己的事情。</p>
-<h2 id="non-interactive-non-login-shell"><a href="#non-interactive-non-login-shell" class="headerlink" title="non-interactive + non-login shell"></a>non-interactive + non-login shell</h2><p>最后一种模式为非交互非登陆的shell，创建这种shell典型有两种方式：</p>
-<p>bash script.sh<br>ssh user@remote command<br>这两种都是创建一个shell，执行完脚本之后便退出，不再需要与用户交互。</p>
-<h3 id="加载配置文件-2"><a href="#加载配置文件-2" class="headerlink" title="加载配置文件"></a>加载配置文件</h3><p>对于这种模式而言，它会去寻找环境变量BASH_ENV，将变量的值作为文件名进行查找，如果找到便加载它。</p>
-<h1 id="配置文件的种类"><a href="#配置文件的种类" class="headerlink" title="配置文件的种类"></a>配置文件的种类</h1><ul>
-<li>/etc/profile</li>
-<li>~/.bash_profile</li>
-<li>~/.bash_login</li>
-<li>~/.profile</li>
-<li>/etc/bash.bashrc</li>
-<li>~/.bashrc</li>
-<li>$BASH_ENV</li>
-<li>$ENV</li>
-</ul>
-<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><ul>
-<li>~/.bash_profile：应该尽可能的简单，通常会在最后加载.profile和.bashrc(注意顺序)</li>
-<li>~/.bash_login：在前面讨论过，别用它</li>
-<li>~/.profile：此文件用于login shell，所有你想在整个用户会话期间都有效的内容都应该放置于此，比如启动进程，环境变量等</li>
-<li>~/.bashrc：只放置与bash有关的命令，所有与交互有关的命令都应该出现在此，比如bash的补全、alias、颜色、提示符等等。特别注意：别在这里输出任何内容（我们前面只是为了演示，别学我哈）</li>
-</ul>
-
-          
+          问题通过ssh root@地址 “命令” 无法加载.bash_profile里面的配置
+对比1远程的ssh命令123456789[ip1:vic@ip1:/home/vic]$ ssh hadoop@ip2 &quot;java -version&quot;java version &quot;1.
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/04/20/td_bugfix/bugfix-remote-ssh/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1789,14 +1731,16 @@
       
         
           
-            <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>之前一直是运维部署的Jenkins,今天自己部署也遇到了些问题</p>
-<h1 id="Credentials"><a href="#Credentials" class="headerlink" title="Credentials"></a>Credentials</h1><p>  Jenkins的“Credentials”直译为“证书”，“文凭”在这里，尽管说Jenkins界面中有相当一部分的文字经过了官方汉化，但是对于这个“Credentials”却仍然没有被汉化，可见对于其汉化之后对应的中文翻译，官方也是一脸懵逼的状态，在这里，我们可以把它直译为“证书”，如果通过意译，那它的理解就是“钥匙”，这个翻译对于我们而言是最为容易理解的。</p>
-<p>  如果要是把它理解为“钥匙”，那就不需要我进行过多的解释了，我们以SVN（版本控制器）为例来进行说明，当我们在访问SVN时，其实SVN是需要我们提供相应的账号与密码进行登录的，假如说我们把要访问的URL地址理解为锁，那么所提供的账号与密码就对应于开这把锁的钥匙，所以说“Credentials”中所记录的就是各种各样的这种钥匙，而这里的钥匙对应的锁是有多种可能的，可能是SVN，也可能是Git等，而“Credentials”就是对于这些钥匙所进行的统一管理。</p>
-<p><img src="/images/pasted-157.png" alt="upload successful"></p>
-<h1 id="Credentials-ID"><a href="#Credentials-ID" class="headerlink" title="Credentials ID"></a>Credentials ID</h1><p>Jenkins自动帮我们生成了一条“ID”信息,这个id就是用来在pipeline中对git项目进行登陆认证.</p>
-<p>例如:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">stage &apos;Build&apos;</span><br><span class="line">dir(&apos;gim&apos;) &#123;</span><br><span class="line">  git branch: BRANCH_NAME,credentialsId: &apos;fe65e7e9-2c93-48a9-81f8-db19ec174adc&apos;, url: &apos;http://xxx.git&apos;</span><br><span class="line">  sh &quot;mvn  clean package -Dmaven.test.skip=true -U&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-
-          
+          背景之前一直是运维部署的Jenkins,今天自己部署也遇到了些问题
+Credentials  Jenkins的“Credentials”直译为“证书”，“文凭”在这里，尽管说Jenkins界面中有相当一部分的文字经过了官方汉化，但是对于这个“Credentials”却仍然没有被汉化，可见对于其汉化之
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/04/20/其他/jenkins-Credentials/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1957,13 +1901,20 @@
       
         
           
-            <h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ul>
-<li><a href="https://github.com/alipay/sofa-rpc" target="_blank" rel="noopener">https://github.com/alipay/sofa-rpc</a></li>
-<li><a href="https://github.com/alipay/sofa-rpc/wiki/DeveloperGuide" target="_blank" rel="noopener">https://github.com/alipay/sofa-rpc/wiki/DeveloperGuide</a></li>
-<li><a href="https://github.com/alipay/sofa-rpc/wiki/Programming" target="_blank" rel="noopener">https://github.com/alipay/sofa-rpc/wiki/Programming</a></li>
-</ul>
+          参考
+https://github.com/alipay/sofa-rpc
+https://github.com/alipay/sofa-rpc/wiki/DeveloperGuide
+https://github.com/alipay/sofa-rpc/wiki/Programming
+
 
           
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/04/19/分布式/sofa-overview/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -2015,7 +1966,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/19/http/restful-result-status/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/19/http协议/restful-result-status/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Victor">
@@ -2034,7 +1985,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/04/19/http/restful-result-status/" itemprop="url">
+                <a class="post-title-link" href="/2018/04/19/http协议/restful-result-status/" itemprop="url">
                   restfule-result-status
                 </a>
               
@@ -2080,10 +2031,10 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/04/19/http/restful-result-status/#comments" itemprop="discussionUrl">
+                <a href="/2018/04/19/http协议/restful-result-status/#comments" itemprop="discussionUrl">
                 
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/04/19/http/restful-result-status/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/04/19/http协议/restful-result-status/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -2091,7 +2042,7 @@
 
           
           
-             <span id="/2018/04/19/http/restful-result-status/" class="leancloud_visitors" data-flag-title="restfule-result-status">
+             <span id="/2018/04/19/http协议/restful-result-status/" class="leancloud_visitors" data-flag-title="restfule-result-status">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -2124,73 +2075,16 @@
       
         
           
-            <h1 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h1><p><a href="http://xiaochutian.github.io/2017/08/01/design-of-server-status-code-1/" target="_blank" rel="noopener">http://xiaochutian.github.io/2017/08/01/design-of-server-status-code-1/</a><br><a href="http://xiaochutian.github.io/2017/08/03/design-of-server-status-code-2/" target="_blank" rel="noopener">http://xiaochutian.github.io/2017/08/03/design-of-server-status-code-2/</a></p>
-<h1 id="作者的设计"><a href="#作者的设计" class="headerlink" title="作者的设计"></a>作者的设计</h1><p>自定义错误代码，HTTP状态码统一为200。<br>为什么我不复用HTTP状态码？</p>
-<ul>
-<li>HTTP状态码可能不够用。跟项目业务相关的错误细节无法反应出来。</li>
-<li>HTTP状态码应该属于HTTP协议的定义之中。项目中服务器与客户端的协议，应该是HTTP的上层协议。上层协议不应该知道和依赖底层协议的细节。</li>
-</ul>
-<h2 id="协议设计"><a href="#协议设计" class="headerlink" title="协议设计"></a>协议设计</h2><p>HTTP状态码统一为200。Result对象里面的code为0表示正常返回，非0表示异常返回。<br>异常详情如下：</p>
-<p>4XXXX，表示客户端错误（参数问题等）<br>5XXXX，表示服务器错误（服务器的bug导致的异常）<br>6XXXX，表示业务逻辑上的异常逻辑的状态码（用于客户端执行异常逻辑流）</p>
-<blockquote>
-<p>注：五位的状态码分为三个部分。X-XX-XX表示：错误类别-项目或模块编号-具体错误编号</p>
-</blockquote>
-<p>这可以理解为，需求分析的时候，会有一个『主要成功场景』和一些『备选事件流』。<br>主要成功场景 的返回code为0，而 备选事件流 的返回code为6XXXX。</p>
-<blockquote>
-<p>举个栗子：有一个叫做『练耳大师』的产品，音乐爱好者可以在里面做乐感训练。<br>产品里面有一个功能叫做『练习分析』。产品规定某一种练习，需要练习超过30道题才能进行分析。<br>所以，在用户没有做满30道题，并且点了『练习分析』按钮的时候。服务器逻辑是完全正确执行的，发现用户没有做满30道题，这个时候就返回6XXXX给客户端。<br>客户端在获取到这个状态码就知道该执行『备选事件流』：提示用户『必须要做满30道题才能分析哦~』。</p>
-</blockquote>
-<h3 id="3-2-1-客户端错误"><a href="#3-2-1-客户端错误" class="headerlink" title="3.2.1 客户端错误"></a>3.2.1 客户端错误</h3><table>
-<thead>
-<tr>
-<th style="text-align:left">code</th>
-<th style="text-align:left">说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">40000</td>
-<td style="text-align:left">客户端错误，通用</td>
-</tr>
-<tr>
-<td style="text-align:left">40001</td>
-<td style="text-align:left">客户端参数非法</td>
-</tr>
-<tr>
-<td style="text-align:left">40002</td>
-<td style="text-align:left">客户端参数json不符合格式要求</td>
-</tr>
-</tbody>
-</table>
-<h3 id="3-2-2-服务器（api）错误"><a href="#3-2-2-服务器（api）错误" class="headerlink" title="3.2.2 服务器（api）错误"></a>3.2.2 服务器（api）错误</h3><table>
-<thead>
-<tr>
-<th style="text-align:left">code</th>
-<th style="text-align:left">说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">50000</td>
-<td style="text-align:left">服务器（api）错误，通用</td>
-</tr>
-</tbody>
-</table>
-<h3 id="3-2-3-服务器（dubbo）错误"><a href="#3-2-3-服务器（dubbo）错误" class="headerlink" title="3.2.3 服务器（dubbo）错误"></a>3.2.3 服务器（dubbo）错误</h3><table>
-<thead>
-<tr>
-<th style="text-align:left">code</th>
-<th style="text-align:left">说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">60000</td>
-<td style="text-align:left">服务器（dubbo）错误，通用</td>
-</tr>
-</tbody>
-</table>
-
-          
+          参考文档http://xiaochutian.github.io/2017/08/01/design-of-server-status-code-1/http://xiaochutian.github.io/2017/08/03/design-of-server-status-code-2/
+作者的
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/04/19/http协议/restful-result-status/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -2252,6 +2146,8 @@
   </div>
 
   <aside id="sidebar" class="sidebar">
+    
+      <div id="sidebar-dimmer"></div>
     
     <div class="sidebar-inner">
 
@@ -2345,7 +2241,15 @@
                     
                       
                     
-                    <span class="site-state-item-count">27</span>
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -2512,7 +2416,39 @@
                     
                       
                     
-                    <span class="site-state-item-count">77</span>
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">92</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -2642,6 +2578,8 @@
 
 
 
+  
+
 
 
 
@@ -2667,6 +2605,11 @@
   
   
     <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
   
 
 
