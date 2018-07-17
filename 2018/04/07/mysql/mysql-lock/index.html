@@ -726,7 +726,7 @@
 <p>从图中可以看出，在Repeatable Read隔离级别下，由Index Key所确定的范围，被加上了GAP锁；Index Filter锁给定的条件 (userid = ‘hdc’)何时过滤，视MySQL的版本而定，在MySQL 5.6版本之前，不支持Index Condition Pushdown(ICP)，因此Index Filter在MySQL Server层过滤，在5.6后支持了Index Condition Pushdown，则在index上过滤。若不支持ICP，不满足Index Filter的记录，也需要加上记录X锁，若支持ICP，则不满足Index Filter的记录，无需加记录X锁 (图中，用红色箭头标出的X锁，是否要加，视是否支持ICP而定)；而Table Filter对应的过滤条件，则在聚簇索引中读取后，在MySQL Server层面过滤，因此聚簇索引上也需要X锁。最后，选取出了一条满足条件的记录[8,hdc,d,5,good]，但是加锁的数量，要远远大于满足条件的记录数量。</p>
 <p>结论：在Repeatable Read隔离级别下，针对一个复杂的SQL，首先需要提取其where条件。Index Key确定的范围，需要加上GAP锁；Index Filter过滤条件，视MySQL版本是否支持ICP，若支持ICP，则不满足Index Filter的记录，不加X锁，否则需要X锁；Table Filter过滤条件，无论是否满足，都需要加X锁。</p>
 <h1 id="mysql死锁"><a href="#mysql死锁" class="headerlink" title="mysql死锁"></a>mysql死锁</h1><h2 id="死锁成因-amp-amp-检测方法"><a href="#死锁成因-amp-amp-检测方法" class="headerlink" title="死锁成因&amp;&amp;检测方法"></a>死锁成因&amp;&amp;检测方法</h2><p>我们mysql用的存储引擎是innodb，从日志来看，innodb主动探知到死锁，并回滚了某一苦苦等待的事务。问题来了，innodb是怎么探知死锁的？</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">直观方法是在两个事务相互等待时，当一个等待时间超过设置的某一阀值时，对其中一个事务进行回滚，另一个事务就能继续执行。这种方法简单有效，在innodb中，参数innodb\_lock\_wait\_timeout用来设置超时时间。</span><br><span class="line"></span><br><span class="line">仅用上述方法来检测死锁太过被动，innodb还提供了wait-for graph算法来主动进行死锁检测，每当加锁请求无法立即满足需要并进入等待时，wait-for graph算法都会被触发。</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">直观方法是在两个事务相互等待时，当一个等待时间超过设置的某一阀值时，对其中一个事务进行回滚，另一个事务就能继续执行。这种方法简单有效，在innodb中，参数innodb\_lock\_wait\_timeout用来设置超时时间。</span><br><span class="line"></span><br><span class="line">仅用上述方法来检测死锁太过被动，innodb还提供了wait-for graph算法来主动进行死锁检测，每当加锁请求无法立即满足需要并进入等待时，wait-for graph算法都会被触发。</span><br></pre></td></tr></table></figure>
 <h2 id="innodb隔离级别、索引与锁-提交读-RC"><a href="#innodb隔离级别、索引与锁-提交读-RC" class="headerlink" title="innodb隔离级别、索引与锁(提交读(RC))"></a>innodb隔离级别、索引与锁(提交读(RC))</h2><p>假设我们有一张消息表（msg），里面有3个字段。假设id是主键，token是非唯一索引，message没有索引。</p>
 <table>
 <thead>
@@ -742,17 +742,17 @@
 </tr>
 </tbody>
 </table>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">innodb对于主键使用了聚簇索引，这是一种数据存储方式，表数据是和主键一起存储，主键索引的叶结点存储行数据。对于普通索引，其叶子节点存储的是主键值。</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">innodb对于主键使用了聚簇索引，这是一种数据存储方式，表数据是和主键一起存储，主键索引的叶结点存储行数据。对于普通索引，其叶子节点存储的是主键值。</span><br></pre></td></tr></table></figure>
 <p><img src="http://img4.tbcdn.cn/L1/461/1/bdc940fef6f0c3bf2c7277f2614bd0d2e5563124.png" alt=""></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">图4 聚簇索引和二级索引</span><br><span class="line">下面分析下索引和锁的关系。</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">图4 聚簇索引和二级索引</span><br><span class="line">下面分析下索引和锁的关系。</span><br></pre></td></tr></table></figure>
 <p>1）delete from msg where id=2；</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">由于id是主键，因此直接锁住整行记录即可。</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">由于id是主键，因此直接锁住整行记录即可。</span><br></pre></td></tr></table></figure>
 <p><img src="http://img4.tbcdn.cn/L1/461/1/2f67547e0caa0d1ea9bc7cb53966eedf70d49db3.png" alt=""> 图5<br>2）delete from msg where token=’ cvs’;</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">由于token是二级索引，因此首先锁住二级索引（两行），接着会锁住相应主键所对应的记录；</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">由于token是二级索引，因此首先锁住二级索引（两行），接着会锁住相应主键所对应的记录；</span><br></pre></td></tr></table></figure>
 <p><img src="http://img1.tbcdn.cn/L1/461/1/e0ac34fd99404ccdee4ab1ec4889f47754ffcd82.png" alt=""> 图6<br>3）delete from msg where message=订单号是多少’；</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">message没有索引，所以走的是全表扫描过滤。这时表上的各个记录都将添加上X锁。</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">message没有索引，所以走的是全表扫描过滤。这时表上的各个记录都将添加上X锁。</span><br></pre></td></tr></table></figure>
 <p><img src="http://img1.tbcdn.cn/L1/461/1/aa9a94c735ec35cfe92cd5eca1015893aad8de58.png" alt=""> 图7</p>
-<h3 id="锁与隔离级别的关系"><a href="#锁与隔离级别的关系" class="headerlink" title="锁与隔离级别的关系"></a>锁与隔离级别的关系</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">大学数据库原理都学过，为了保证并发操作数据的正确性，数据库都会有事务隔离级别的概念：1）未提交读（Read uncommitted）；2）已提交读（Read committed（RC））；3）可重复读（Repeatable read（RR））；4）可串行化（Serializable）。我们较常使用的是RC和RR。</span><br><span class="line"></span><br><span class="line">提交读\(RC\)：只能读取到已经提交的数据。</span><br><span class="line"></span><br><span class="line">可重复读\(RR\)：在同一个事务内的查询都是事务开始时刻一致的，InnoDB默认级别。</span><br><span class="line"></span><br><span class="line">我们在1.2.1节谈论的其实是RC隔离级别下的锁，它可以防止不同事务版本的数据修改提交时造成数据冲突的情况，但当别的事务插入数据时可能会出现问题。</span><br><span class="line"></span><br><span class="line">如下图所示，事务A在第一次查询时得到1条记录，在第二次执行相同查询时却得到两条记录。从事务A角度上看是见鬼了！这就是幻读，RC级别下尽管加了行锁，但还是避免不了幻读。</span><br></pre></td></tr></table></figure>
+<h3 id="锁与隔离级别的关系"><a href="#锁与隔离级别的关系" class="headerlink" title="锁与隔离级别的关系"></a>锁与隔离级别的关系</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">大学数据库原理都学过，为了保证并发操作数据的正确性，数据库都会有事务隔离级别的概念：1）未提交读（Read uncommitted）；2）已提交读（Read committed（RC））；3）可重复读（Repeatable read（RR））；4）可串行化（Serializable）。我们较常使用的是RC和RR。</span><br><span class="line"></span><br><span class="line">提交读\(RC\)：只能读取到已经提交的数据。</span><br><span class="line"></span><br><span class="line">可重复读\(RR\)：在同一个事务内的查询都是事务开始时刻一致的，InnoDB默认级别。</span><br><span class="line"></span><br><span class="line">我们在1.2.1节谈论的其实是RC隔离级别下的锁，它可以防止不同事务版本的数据修改提交时造成数据冲突的情况，但当别的事务插入数据时可能会出现问题。</span><br><span class="line"></span><br><span class="line">如下图所示，事务A在第一次查询时得到1条记录，在第二次执行相同查询时却得到两条记录。从事务A角度上看是见鬼了！这就是幻读，RC级别下尽管加了行锁，但还是避免不了幻读。</span><br></pre></td></tr></table></figure>
 <p><img src="http://img4.tbcdn.cn/L1/461/1/166dde181aaa60227c726e653bf6d6d91e1594c5.png" alt=""> 图8</p>
 <p>innodb的RR隔离级别可以避免幻读发生，怎么实现？当然需要借助于锁了！</p>
 <p>为了解决幻读问题，innodb引入了<strong>gap锁</strong>。</p>
@@ -760,14 +760,14 @@
 <p>innodb首先会和RC级别一样，给索引上的记录添加上X锁，此外，还在非唯一索引’asd’与相邻两个索引的区间加上锁。</p>
 <p>这样，当事务B在执行insert into msg values (null,‘asd’,’hello’); commit;时，会首先检查这个区间是否被锁上，如果被锁上，则不能立即执行，需要等待该gap锁被释放。这样就能避免幻读问题。</p>
 <p><img src="http://img3.tbcdn.cn/L1/461/1/444bfa6765ac730264c68489e0a52395088900f8.png" alt=""> 图9</p>
-<h2 id="死锁成因"><a href="#死锁成因" class="headerlink" title="死锁成因"></a>死锁成因</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">了解了innodb锁的基本原理后，下面分析下死锁的成因。如前面所说，死锁一般是事务相互等待对方资源，最后形成环路造成的。下面简单讲下造成相互等待最后形成环路的例子。</span><br></pre></td></tr></table></figure>
-<h3 id="不同表相同记录行锁冲突"><a href="#不同表相同记录行锁冲突" class="headerlink" title="不同表相同记录行锁冲突"></a>不同表相同记录行锁冲突</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">这种情况很好理解，事务A和事务B操作两张表，但出现循环等待锁情况。</span><br></pre></td></tr></table></figure>
+<h2 id="死锁成因"><a href="#死锁成因" class="headerlink" title="死锁成因"></a>死锁成因</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">了解了innodb锁的基本原理后，下面分析下死锁的成因。如前面所说，死锁一般是事务相互等待对方资源，最后形成环路造成的。下面简单讲下造成相互等待最后形成环路的例子。</span><br></pre></td></tr></table></figure>
+<h3 id="不同表相同记录行锁冲突"><a href="#不同表相同记录行锁冲突" class="headerlink" title="不同表相同记录行锁冲突"></a>不同表相同记录行锁冲突</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">这种情况很好理解，事务A和事务B操作两张表，但出现循环等待锁情况。</span><br></pre></td></tr></table></figure>
 <p><img src="http://img2.tbcdn.cn/L1/461/1/da89a5774d02b974b63bf08bf47f146c94e75909.png" alt=""><br>图10</p>
-<h3 id="相同表记录行锁冲突"><a href="#相同表记录行锁冲突" class="headerlink" title="相同表记录行锁冲突"></a>相同表记录行锁冲突</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">这种情况比较常见，之前遇到两个job在执行数据批量更新时，jobA处理的的id列表为\[1,2,3,4\]，而job处理的id列表为\[8,9,10,4,2\]，这样就造成了死锁。</span><br></pre></td></tr></table></figure>
+<h3 id="相同表记录行锁冲突"><a href="#相同表记录行锁冲突" class="headerlink" title="相同表记录行锁冲突"></a>相同表记录行锁冲突</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">这种情况比较常见，之前遇到两个job在执行数据批量更新时，jobA处理的的id列表为\[1,2,3,4\]，而job处理的id列表为\[8,9,10,4,2\]，这样就造成了死锁。</span><br></pre></td></tr></table></figure>
 <p><img src="http://img1.tbcdn.cn/L1/461/1/e470063b82bb3d005f6935cb51ec656c2c1a3d1e.png" alt=""><br>图11</p>
-<h3 id="不同索引锁冲突"><a href="#不同索引锁冲突" class="headerlink" title="不同索引锁冲突"></a>不同索引锁冲突</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">这种情况比较隐晦，事务A在执行时，除了在二级索引加锁外，还会在聚簇索引上加锁，在聚簇索引上加锁的顺序是\[1,4,2,3,5\]，而事务B执行时，只在聚簇索引上加锁，加锁顺序是\[1,2,3,4,5\]，这样就造成了死锁的可能性。</span><br></pre></td></tr></table></figure>
+<h3 id="不同索引锁冲突"><a href="#不同索引锁冲突" class="headerlink" title="不同索引锁冲突"></a>不同索引锁冲突</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">这种情况比较隐晦，事务A在执行时，除了在二级索引加锁外，还会在聚簇索引上加锁，在聚簇索引上加锁的顺序是\[1,4,2,3,5\]，而事务B执行时，只在聚簇索引上加锁，加锁顺序是\[1,2,3,4,5\]，这样就造成了死锁的可能性。</span><br></pre></td></tr></table></figure>
 <p><img src="http://img2.tbcdn.cn/L1/461/1/39f0c70708ebb31acaea725bb9b712f780298bdd.png" alt=""> 图12</p>
-<h3 id="3-4-锁冲突"><a href="#3-4-锁冲突" class="headerlink" title="3.4 锁冲突"></a>3.4 锁冲突</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">innodb在RR级别下，如下的情况也会产生死锁，比较隐晦。不清楚的同学可以自行根据上节的gap锁原理分析下。</span><br></pre></td></tr></table></figure>
+<h3 id="3-4-锁冲突"><a href="#3-4-锁冲突" class="headerlink" title="3.4 锁冲突"></a>3.4 锁冲突</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">innodb在RR级别下，如下的情况也会产生死锁，比较隐晦。不清楚的同学可以自行根据上节的gap锁原理分析下。</span><br></pre></td></tr></table></figure>
 <p><img src="http://img4.tbcdn.cn/L1/461/1/cedf457ff5099ef54643ab17d21d041333e74943.png" alt=""> 图13</p>
 <h2 id="如何尽可能避免死锁"><a href="#如何尽可能避免死锁" class="headerlink" title="如何尽可能避免死锁"></a>如何尽可能避免死锁</h2><p>1）以固定的顺序访问表和行。比如对第2节两个job批量更新的情形，简单方法是对id列表先排序，后执行，这样就避免了交叉等待锁的情形；又比如对于3.1节的情形，将两个事务的sql顺序调整为一致，也能避免死锁。</p>
 <p>2）大事务拆小。大事务更倾向于死锁，如果业务允许，将大事务拆小。</p>
@@ -790,10 +790,10 @@
 <p><strong>对于这个问题的改进很简单，直接把所有分配到的借款人直接一次锁住就行了。</strong></p>
 <p><strong>Select * from xxx where id in (xx,xx,xx) for update</strong></p>
 <p><strong>在in里面的列表值mysql是会自动从小到大排序，加锁也是一条条从小到大加的锁</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line">例如（以下会话id为主键）：</span><br><span class="line"></span><br><span class="line">Session1:</span><br><span class="line"></span><br><span class="line">mysql&gt; select * from t3 where id in (8,9) for update;</span><br><span class="line"></span><br><span class="line">+----+--------+------+---------------------+</span><br><span class="line"></span><br><span class="line">| id | course | name | ctime |</span><br><span class="line"></span><br><span class="line">+----+--------+------+---------------------+</span><br><span class="line"></span><br><span class="line">| 8 | WA | f | 2016-03-02 11:36:30 |</span><br><span class="line"></span><br><span class="line">| 9 | JX | f | 2016-03-01 11:36:30 |</span><br><span class="line"></span><br><span class="line">+----+--------+------+---------------------+</span><br><span class="line"></span><br><span class="line">2 rows in set (0.04 sec)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Session2:</span><br><span class="line"></span><br><span class="line">select * from t3 where id in (10,8,5) for update;</span><br><span class="line"></span><br><span class="line">锁等待中……</span><br><span class="line"></span><br><span class="line">其实这个时候id=10这条记录没有被锁住的，但id=5的记录已经被锁住了，锁的等待在id=8的这里。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">不信请看</span><br><span class="line"></span><br><span class="line">Session3:</span><br><span class="line"></span><br><span class="line">mysql&gt; select * from t3 where id=5 for update;</span><br><span class="line"></span><br><span class="line">锁等待中</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Session4:</span><br><span class="line"></span><br><span class="line">mysql&gt; select * from t3 where id=10 for update;</span><br><span class="line"></span><br><span class="line">+----+--------+------+---------------------+</span><br><span class="line"></span><br><span class="line">| id | course | name | ctime |</span><br><span class="line"></span><br><span class="line">+----+--------+------+---------------------+</span><br><span class="line"></span><br><span class="line">| 10 | JB | g | 2016-03-10 11:45:05 |</span><br><span class="line"></span><br><span class="line">+----+--------+------+---------------------+</span><br><span class="line"></span><br><span class="line">1 row in set (0.00 sec)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">在其它session中id=5是加不了锁的，但是id=10是可以加上锁的。</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">例如（以下会话id为主键）：</span><br><span class="line"></span><br><span class="line">Session1:</span><br><span class="line"></span><br><span class="line">mysql&gt; select * from t3 where id in (8,9) for update;</span><br><span class="line"></span><br><span class="line">+----+--------+------+---------------------+</span><br><span class="line"></span><br><span class="line">| id | course | name | ctime |</span><br><span class="line"></span><br><span class="line">+----+--------+------+---------------------+</span><br><span class="line"></span><br><span class="line">| 8 | WA | f | 2016-03-02 11:36:30 |</span><br><span class="line"></span><br><span class="line">| 9 | JX | f | 2016-03-01 11:36:30 |</span><br><span class="line"></span><br><span class="line">+----+--------+------+---------------------+</span><br><span class="line"></span><br><span class="line">2 rows in set (0.04 sec)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Session2:</span><br><span class="line"></span><br><span class="line">select * from t3 where id in (10,8,5) for update;</span><br><span class="line"></span><br><span class="line">锁等待中……</span><br><span class="line"></span><br><span class="line">其实这个时候id=10这条记录没有被锁住的，但id=5的记录已经被锁住了，锁的等待在id=8的这里。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">不信请看</span><br><span class="line"></span><br><span class="line">Session3:</span><br><span class="line"></span><br><span class="line">mysql&gt; select * from t3 where id=5 for update;</span><br><span class="line"></span><br><span class="line">锁等待中</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Session4:</span><br><span class="line"></span><br><span class="line">mysql&gt; select * from t3 where id=10 for update;</span><br><span class="line"></span><br><span class="line">+----+--------+------+---------------------+</span><br><span class="line"></span><br><span class="line">| id | course | name | ctime |</span><br><span class="line"></span><br><span class="line">+----+--------+------+---------------------+</span><br><span class="line"></span><br><span class="line">| 10 | JB | g | 2016-03-10 11:45:05 |</span><br><span class="line"></span><br><span class="line">+----+--------+------+---------------------+</span><br><span class="line"></span><br><span class="line">1 row in set (0.00 sec)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">在其它session中id=5是加不了锁的，但是id=10是可以加上锁的。</span><br></pre></td></tr></table></figure>
 <p><strong>案例2：</strong></p>
 <p>在开发中，经常会做这类的判断需求：根据字段值查询（有索引），如果不存在，则插入；否则更新。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">以id为主键为例，目前还没有id=22的行</span><br><span class="line"></span><br><span class="line">Session1:</span><br><span class="line"></span><br><span class="line">select * from t3 where id=22 for update;</span><br><span class="line"></span><br><span class="line">Empty set (0.00 sec)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">session2:</span><br><span class="line"></span><br><span class="line">select * from t3 where id=23 for update;</span><br><span class="line"></span><br><span class="line">Empty set (0.00 sec)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Session1:</span><br><span class="line"></span><br><span class="line">insert into t3 values(22,&apos;ac&apos;,&apos;a&apos;,now());</span><br><span class="line"></span><br><span class="line">锁等待中……</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Session2:</span><br><span class="line"></span><br><span class="line">insert into t3 values(23,&apos;bc&apos;,&apos;b&apos;,now());</span><br><span class="line"></span><br><span class="line">ERROR 1213 (40001): Deadlock found when trying to get lock; try restarting transaction</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">以id为主键为例，目前还没有id=22的行</span><br><span class="line"></span><br><span class="line">Session1:</span><br><span class="line"></span><br><span class="line">select * from t3 where id=22 for update;</span><br><span class="line"></span><br><span class="line">Empty set (0.00 sec)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">session2:</span><br><span class="line"></span><br><span class="line">select * from t3 where id=23 for update;</span><br><span class="line"></span><br><span class="line">Empty set (0.00 sec)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Session1:</span><br><span class="line"></span><br><span class="line">insert into t3 values(22,&apos;ac&apos;,&apos;a&apos;,now());</span><br><span class="line"></span><br><span class="line">锁等待中……</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Session2:</span><br><span class="line"></span><br><span class="line">insert into t3 values(23,&apos;bc&apos;,&apos;b&apos;,now());</span><br><span class="line"></span><br><span class="line">ERROR 1213 (40001): Deadlock found when trying to get lock; try restarting transaction</span><br></pre></td></tr></table></figure>
 <p>当对存在的行进行锁的时候(主键)，mysql就只有行锁。</p>
 <p>当对未存在的行进行锁的时候(即使条件为主键)，mysql是会锁住一段范围（有gap锁）</p>
 <p>锁住的范围为：</p>
@@ -807,7 +807,7 @@
 <p>用mysql特有的语法来解决此问题。因为insert语句对于主键来说，插入的行不管有没有存在，都会只有行锁。</p>
 <p><strong>案例3：</strong></p>
 <p>直接上情景：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; select * from t3 where id=9 for update;</span><br><span class="line"></span><br><span class="line">+----+--------+------+---------------------+</span><br><span class="line"></span><br><span class="line">| id | course | name | ctime |</span><br><span class="line"></span><br><span class="line">+----+--------+------+---------------------+</span><br><span class="line"></span><br><span class="line">| 9 | JX | f | 2016-03-01 11:36:30 |</span><br><span class="line"></span><br><span class="line">+----+--------+------+---------------------+</span><br><span class="line"></span><br><span class="line">1 row in set (0.00 sec)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Session2:</span><br><span class="line"></span><br><span class="line">mysql&gt; select * from t3 where id&lt;20 for update;</span><br><span class="line"></span><br><span class="line">锁等待中</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Session1:</span><br><span class="line"></span><br><span class="line">mysql&gt; insert into t3 values(7,&apos;ae&apos;,&apos;a&apos;,now());</span><br><span class="line"></span><br><span class="line">ERROR 1213 (40001): Deadlock found when trying to get lock; try restarting transaction</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">mysql&gt; select * from t3 where id=9 for update;</span><br><span class="line"></span><br><span class="line">+----+--------+------+---------------------+</span><br><span class="line"></span><br><span class="line">| id | course | name | ctime |</span><br><span class="line"></span><br><span class="line">+----+--------+------+---------------------+</span><br><span class="line"></span><br><span class="line">| 9 | JX | f | 2016-03-01 11:36:30 |</span><br><span class="line"></span><br><span class="line">+----+--------+------+---------------------+</span><br><span class="line"></span><br><span class="line">1 row in set (0.00 sec)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Session2:</span><br><span class="line"></span><br><span class="line">mysql&gt; select * from t3 where id&lt;20 for update;</span><br><span class="line"></span><br><span class="line">锁等待中</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Session1:</span><br><span class="line"></span><br><span class="line">mysql&gt; insert into t3 values(7,&apos;ae&apos;,&apos;a&apos;,now());</span><br><span class="line"></span><br><span class="line">ERROR 1213 (40001): Deadlock found when trying to get lock; try restarting transaction</span><br></pre></td></tr></table></figure>
 <p>这个跟案例一其它是差不多的情况，只是session1不按常理出牌了，</p>
 <p>Session2在等待Session1的id=9的锁，session2又持了1到8的锁（注意9到19的范围并没有被session2锁住），最后，session1在插入新行时又得等待session2,故死锁发生了。</p>
 <p>这种一般是在业务需求中基本不会出现，因为你锁住了id=9，却又想插入id=7的行，这就有点跳了，当然肯定也有解决的方法，那就是重理业务需求，避免这样的写法。</p>
@@ -816,6 +816,50 @@
 
       
     </div>
+
+    
+      
+
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2018/03/10/egenie_bugfix/bugfix-mysql-lock-timeout/" rel="bookmark">mysql锁超时处理</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2018/01/06/egenie_bugfix/error-sql-update-lock/" rel="bookmark">error-sql-update-lock</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2017/12/13/egenie_bugfix/optime-156/" rel="bookmark">156服务器优化2:定位io高的原因mysql</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2018/01/24/mysql/mysql-debug/" rel="bookmark">mysql下划线关键字</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2018/03/29/mysql/mysql-master-slave/" rel="bookmark">mysql-master-slave</a></div>
+      
+    </li>
+  
+  </ul>
+
 
     
 
@@ -962,7 +1006,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">204</span>
+                    <span class="site-state-item-count">211</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -1037,7 +1081,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">31</span>
+                      
+                    
+                    <span class="site-state-item-count">32</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -1049,8 +1095,6 @@
                 <div class="site-state-item site-state-tags">
                   <a href="/tags/index.html">
                     
-                    
-                      
                     
                       
                     
@@ -1251,11 +1295,6 @@
               
                 <span class="links-of-author-item">
                   <a href="https://github.com/victorsheng" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
-                  
-                </span>
-              
-                <span class="links-of-author-item">
-                  <a href="psychovitor@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
                   
                 </span>
               

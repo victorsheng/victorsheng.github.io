@@ -108,17 +108,17 @@
 
 
 
-  <meta name="description" content="泛型Java 在 1.5 引入了泛型机制，泛型本质是参数化类型，也就是说变量的类型是一个参数，在使用时再指定为具体类型。泛型可以用于类、接口、方法，通过使用泛型可以使代码更简单、安全。然而 Java 中的泛型使用了类型擦除，所以只是伪泛型。这篇文章对泛型的使用以及存在的问题做个总结，主要参考自 《Java 编程思想》。 问题1234567891011121314151617181920public">
+  <meta name="description" content="泛型Java 在 1.5 引入了泛型机制，泛型本质是参数化类型，也就是说变量的类型是一个参数，在使用时再指定为具体类型。泛型可以用于类、接口、方法，通过使用泛型可以使代码更简单、安全。然而 Java 中的泛型使用了类型擦除，所以只是伪泛型。这篇文章对泛型的使用以及存在的问题做个总结，主要参考自 《Java 编程思想》。 问题public class Holder1 &amp;#123;    privat">
 <meta property="og:type" content="article">
 <meta property="og:title" content="java-genercity">
 <meta property="og:url" content="http://yoursite.com/2018/04/26/java/java_common/java-genercity/index.html">
 <meta property="og:site_name" content="Victor的博客">
-<meta property="og:description" content="泛型Java 在 1.5 引入了泛型机制，泛型本质是参数化类型，也就是说变量的类型是一个参数，在使用时再指定为具体类型。泛型可以用于类、接口、方法，通过使用泛型可以使代码更简单、安全。然而 Java 中的泛型使用了类型擦除，所以只是伪泛型。这篇文章对泛型的使用以及存在的问题做个总结，主要参考自 《Java 编程思想》。 问题1234567891011121314151617181920public">
+<meta property="og:description" content="泛型Java 在 1.5 引入了泛型机制，泛型本质是参数化类型，也就是说变量的类型是一个参数，在使用时再指定为具体类型。泛型可以用于类、接口、方法，通过使用泛型可以使代码更简单、安全。然而 Java 中的泛型使用了类型擦除，所以只是伪泛型。这篇文章对泛型的使用以及存在的问题做个总结，主要参考自 《Java 编程思想》。 问题public class Holder1 &amp;#123;    privat">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:updated_time" content="2018-07-03T14:45:33.763Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="java-genercity">
-<meta name="twitter:description" content="泛型Java 在 1.5 引入了泛型机制，泛型本质是参数化类型，也就是说变量的类型是一个参数，在使用时再指定为具体类型。泛型可以用于类、接口、方法，通过使用泛型可以使代码更简单、安全。然而 Java 中的泛型使用了类型擦除，所以只是伪泛型。这篇文章对泛型的使用以及存在的问题做个总结，主要参考自 《Java 编程思想》。 问题1234567891011121314151617181920public">
+<meta name="twitter:description" content="泛型Java 在 1.5 引入了泛型机制，泛型本质是参数化类型，也就是说变量的类型是一个参数，在使用时再指定为具体类型。泛型可以用于类、接口、方法，通过使用泛型可以使代码更简单、安全。然而 Java 中的泛型使用了类型擦除，所以只是伪泛型。这篇文章对泛型的使用以及存在的问题做个总结，主要参考自 《Java 编程思想》。 问题public class Holder1 &amp;#123;    privat">
 
 
 
@@ -496,14 +496,14 @@
 
       
         <h1 id="泛型"><a href="#泛型" class="headerlink" title="泛型"></a>泛型</h1><p>Java 在 1.5 引入了泛型机制，泛型本质是参数化类型，也就是说变量的类型是一个参数，在使用时再指定为具体类型。泛型可以用于类、接口、方法，通过使用泛型可以使代码更简单、安全。然而 Java 中的泛型使用了类型擦除，所以只是伪泛型。这篇文章对泛型的使用以及存在的问题做个总结，主要参考自 《Java 编程思想》。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">public class Holder1 &#123;</span><br><span class="line">    private Object a;</span><br><span class="line"></span><br><span class="line">    public Holder1(Object a) &#123;</span><br><span class="line">        this.a = a;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void set(Object a) &#123;</span><br><span class="line">        this.a = a;</span><br><span class="line">    &#125;</span><br><span class="line">    public Object get()&#123;</span><br><span class="line">        return a;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        Holder1 holder1 = new Holder1(&quot;not Generic&quot;);</span><br><span class="line">        String s = (String) holder1.get();</span><br><span class="line">        holder1.set(1);</span><br><span class="line">        Integer x = (Integer) holder1.get();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public class Holder1 &#123;</span><br><span class="line">    private Object a;</span><br><span class="line"></span><br><span class="line">    public Holder1(Object a) &#123;</span><br><span class="line">        this.a = a;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void set(Object a) &#123;</span><br><span class="line">        this.a = a;</span><br><span class="line">    &#125;</span><br><span class="line">    public Object get()&#123;</span><br><span class="line">        return a;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        Holder1 holder1 = new Holder1(&quot;not Generic&quot;);</span><br><span class="line">        String s = (String) holder1.get();</span><br><span class="line">        holder1.set(1);</span><br><span class="line">        Integer x = (Integer) holder1.get();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 <p>在 Holder1 中，有一个用 Object 引用的变量。因为任何类型都可以向上转型为 Object，所以这个 Holder 可以接受任何类型。在取出的时候 Holder 只知道它保存的是一个 Object 对象，所以要强制转换为对应的类型。在 main 方法中， holder1 先是保存了一个字符串，也就是 String 对象，接着又变为保存一个 Integer 对象(参数 1 会自动装箱)。从 Holder 中取出变量时强制转换已经比较麻烦，这里还要记住不同的类型，要是转错了就会出现运行时异常。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">public class Holder2&lt;T&gt; &#123;</span><br><span class="line"></span><br><span class="line">    private T a;</span><br><span class="line">    public Holder2(T a) &#123;</span><br><span class="line">        this.a = a;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public T get() &#123;</span><br><span class="line">        return a;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void set(T a) &#123;</span><br><span class="line">        this.a = a;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        Holder2&lt;String&gt; holder2 = new Holder2&lt;&gt;(&quot;Generic&quot;);</span><br><span class="line">        String s = holder2.get();</span><br><span class="line"></span><br><span class="line">        holder2.set(&quot;test&quot;);</span><br><span class="line">        holder2.set(1);//无法编译   参数 1 不是 String 类型</span><br><span class="line"></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public class Holder2&lt;T&gt; &#123;</span><br><span class="line"></span><br><span class="line">    private T a;</span><br><span class="line">    public Holder2(T a) &#123;</span><br><span class="line">        this.a = a;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public T get() &#123;</span><br><span class="line">        return a;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void set(T a) &#123;</span><br><span class="line">        this.a = a;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        Holder2&lt;String&gt; holder2 = new Holder2&lt;&gt;(&quot;Generic&quot;);</span><br><span class="line">        String s = holder2.get();</span><br><span class="line"></span><br><span class="line">        holder2.set(&quot;test&quot;);</span><br><span class="line">        holder2.set(1);//无法编译   参数 1 不是 String 类型</span><br><span class="line"></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 <p>在 Holder2 中， 变量 a 是一个参数化类型 T，T 只是一个标识，用其它字母也是可以的。创建 Holder2 对象的时候，在尖括号中传入了参数 T 的类型，那么在这个对象中，所有出现 T 的地方相当于都用 String 替换了。现在的 get 的取出来的不是 Object ，而是 String 对象，因此不需要类型转换。另外，当调用 set 时，只能传入 String 类型，否则编译无法通过。这就保证了 holder2 中的类型安全，避免由于不小心传入错误的类型。</p>
 <p>通过上面的例子可以看出泛使得代码更简便、安全。引入泛型之后，Java 库的一些类，比如常用的容器类也被改写为支持泛型，我们使用的时候都会传入参数类型，如：ArrayList<integer> list = ArrayList&lt;&gt;();。</integer></p>
 <h1 id="类型擦除"><a href="#类型擦除" class="headerlink" title="类型擦除"></a>类型擦除</h1><p>Java 的泛型使用了类型擦除机制，这个引来了很大的争议，以至于 Java 的泛型功能受到限制，只能说是”伪泛型“。什么叫类型擦除呢？简单的说就是，类型参数只存在于编译期，在运行时，Java 的虚拟机 ( JVM ) 并不知道泛型的存在。</p>
-<h1 id="型参数“”-声明一个泛型类或泛型方法"><a href="#型参数“”-声明一个泛型类或泛型方法" class="headerlink" title="型参数“”(声明一个泛型类或泛型方法)"></a>型参数“<t>”(声明一个泛型类或泛型方法)</t></h1><h2 id="声明泛型类的类型参数"><a href="#声明泛型类的类型参数" class="headerlink" title="声明泛型类的类型参数"></a>声明泛型类的类型参数</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">class Box&lt;T&gt;&#123;</span><br><span class="line">    private T item1;</span><br><span class="line">    private T item2;   </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class Box&lt;T&gt;&#123;</span><br><span class="line">    private T item1;</span><br><span class="line">    private T item2;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="声明泛型方法"><a href="#声明泛型方法" class="headerlink" title="声明泛型方法"></a>声明泛型方法</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public &lt;T&gt; void print(T t) &#123;</span><br><span class="line">  System.out.println(t);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="型参数“”-声明一个泛型类或泛型方法"><a href="#型参数“”-声明一个泛型类或泛型方法" class="headerlink" title="型参数“”(声明一个泛型类或泛型方法)"></a>型参数“<t>”(声明一个泛型类或泛型方法)</t></h1><h2 id="声明泛型类的类型参数"><a href="#声明泛型类的类型参数" class="headerlink" title="声明泛型类的类型参数"></a>声明泛型类的类型参数</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">class Box&lt;T&gt;&#123;</span><br><span class="line">    private T item1;</span><br><span class="line">    private T item2;   </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class Box&lt;T&gt;&#123;</span><br><span class="line">    private T item1;</span><br><span class="line">    private T item2;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="声明泛型方法"><a href="#声明泛型方法" class="headerlink" title="声明泛型方法"></a>声明泛型方法</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public &lt;T&gt; void print(T t) &#123;</span><br><span class="line">  System.out.println(t);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h1 id="通配符“-lt-gt-”-使用泛型类或泛型方法"><a href="#通配符“-lt-gt-”-使用泛型类或泛型方法" class="headerlink" title="通配符“&lt;?&gt;”(使用泛型类或泛型方法)"></a>通配符“&lt;?&gt;”(使用泛型类或泛型方法)</h1><h2 id="上边界限定通配符"><a href="#上边界限定通配符" class="headerlink" title="上边界限定通配符"></a>上边界限定通配符</h2><p>使用 List&lt;? extends C&gt; list 这种形式，表示 list 可以引用一个 ArrayList ( 或者其它 List 的 子类 ) 的对象，这个对象包含的元素类型是 C 的子类型 ( 包含 C 本身）的一种。</p>
 <h2 id="下边界限定通配符"><a href="#下边界限定通配符" class="headerlink" title="下边界限定通配符"></a>下边界限定通配符</h2><p>使用 List&lt;? super C&gt; list 这种形式，表示 list 可以引用一个 ArrayList ( 或者其它 List 的 子类 ) 的对象，这个对象包含的元素就类型是 C 的超类型 ( 包含 C 本身 ) 的一种。</p>
 <h2 id="无边界通配符"><a href="#无边界通配符" class="headerlink" title="无边界通配符"></a>无边界通配符</h2><h1 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h1><ul>
@@ -514,6 +514,10 @@
 
       
     </div>
+
+    
+      
+
 
     
 
@@ -654,7 +658,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">204</span>
+                    <span class="site-state-item-count">211</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -729,7 +733,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">31</span>
+                      
+                    
+                    <span class="site-state-item-count">32</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -741,8 +747,6 @@
                 <div class="site-state-item site-state-tags">
                   <a href="/tags/index.html">
                     
-                    
-                      
                     
                       
                     
@@ -943,11 +947,6 @@
               
                 <span class="links-of-author-item">
                   <a href="https://github.com/victorsheng" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
-                  
-                </span>
-              
-                <span class="links-of-author-item">
-                  <a href="psychovitor@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
                   
                 </span>
               

@@ -497,12 +497,16 @@
       
         <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>Semaphore 可以很轻松完成信号量控制，Semaphore可以控制某个资源可被同时访问的个数，通过 acquire() 获取一个许可，如果没有就等待，而 release() 释放一个许可。</p>
 <p>Semaphore 有两个构造函数，参数为许可的个数 permits 和是否公平竞争 fair。通过 acquire 方法能够获得的许可个数为 permits，如果超过了这个个数，就需要等待。当一个线程 release 释放了一个许可后，fair 决定了正在等待的线程该由谁获取许可，如果是公平竞争则等待时间最长的线程获取，如果是非公平竞争则随机选择一个线程获取许可。不传 fair 的构造函数默认采用非公开竞争。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Semaphore(int permits)</span><br><span class="line">Semaphore(int permits, boolean fair)</span><br></pre></td></tr></table></figure>
-<h1 id="使用案例"><a href="#使用案例" class="headerlink" title="使用案例"></a>使用案例</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">public class SemaphoreTest &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line"></span><br><span class="line">        ExecutorService service = Executors.newCachedThreadPool();//使用并发库，创建缓存的线程池</span><br><span class="line">        final Semaphore sp = new Semaphore(3);//创建一个Semaphore信号量，并设置最大并发数为3</span><br><span class="line"></span><br><span class="line">        //availablePermits() //用来获取当前可用的访问次数</span><br><span class="line">        System.out.println(&quot;初始化：当前有&quot; + (3 - sp.availablePermits() + &quot;个并发&quot;));</span><br><span class="line"></span><br><span class="line">        //创建10个任务，上面的缓存线程池就会创建10个对应的线程去执行</span><br><span class="line">        for (int index = 0; index &lt; 10; index++) &#123;</span><br><span class="line">            final int NO = index;  //记录第几个任务</span><br><span class="line">            Runnable run = new Runnable() &#123;  //具体任务</span><br><span class="line">                public void run() &#123;</span><br><span class="line">                    try &#123;</span><br><span class="line">                        sp.acquire();  // 获取许可</span><br><span class="line">                        System.out.println(Thread.currentThread().getName()</span><br><span class="line">                                + &quot;获取许可&quot; + &quot;(&quot;+NO+&quot;)，&quot; + &quot;剩余：&quot; + sp.availablePermits());</span><br><span class="line">                        Thread.sleep(1000);</span><br><span class="line">                        // 访问完后记得释放 ，否则在控制台只能打印3条记录，之后线程一直阻塞</span><br><span class="line">                        sp.release();  //释放许可</span><br><span class="line">                        System.out.println(Thread.currentThread().getName()</span><br><span class="line">                                + &quot;释放许可&quot; + &quot;(&quot;+NO+&quot;)，&quot; + &quot;剩余：&quot; + sp.availablePermits());</span><br><span class="line">                    &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;;</span><br><span class="line">            service.execute(run);  //执行任务</span><br><span class="line">        &#125;</span><br><span class="line">        service.shutdown(); //关闭线程池</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Semaphore(int permits)</span><br><span class="line">Semaphore(int permits, boolean fair)</span><br></pre></td></tr></table></figure>
+<h1 id="使用案例"><a href="#使用案例" class="headerlink" title="使用案例"></a>使用案例</h1><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public class SemaphoreTest &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line"></span><br><span class="line">        ExecutorService service = Executors.newCachedThreadPool();//使用并发库，创建缓存的线程池</span><br><span class="line">        final Semaphore sp = new Semaphore(3);//创建一个Semaphore信号量，并设置最大并发数为3</span><br><span class="line"></span><br><span class="line">        //availablePermits() //用来获取当前可用的访问次数</span><br><span class="line">        System.out.println(&quot;初始化：当前有&quot; + (3 - sp.availablePermits() + &quot;个并发&quot;));</span><br><span class="line"></span><br><span class="line">        //创建10个任务，上面的缓存线程池就会创建10个对应的线程去执行</span><br><span class="line">        for (int index = 0; index &lt; 10; index++) &#123;</span><br><span class="line">            final int NO = index;  //记录第几个任务</span><br><span class="line">            Runnable run = new Runnable() &#123;  //具体任务</span><br><span class="line">                public void run() &#123;</span><br><span class="line">                    try &#123;</span><br><span class="line">                        sp.acquire();  // 获取许可</span><br><span class="line">                        System.out.println(Thread.currentThread().getName()</span><br><span class="line">                                + &quot;获取许可&quot; + &quot;(&quot;+NO+&quot;)，&quot; + &quot;剩余：&quot; + sp.availablePermits());</span><br><span class="line">                        Thread.sleep(1000);</span><br><span class="line">                        // 访问完后记得释放 ，否则在控制台只能打印3条记录，之后线程一直阻塞</span><br><span class="line">                        sp.release();  //释放许可</span><br><span class="line">                        System.out.println(Thread.currentThread().getName()</span><br><span class="line">                                + &quot;释放许可&quot; + &quot;(&quot;+NO+&quot;)，&quot; + &quot;剩余：&quot; + sp.availablePermits());</span><br><span class="line">                    &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;;</span><br><span class="line">            service.execute(run);  //执行任务</span><br><span class="line">        &#125;</span><br><span class="line">        service.shutdown(); //关闭线程池</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h1 id="源码解析"><a href="#源码解析" class="headerlink" title="源码解析"></a>源码解析</h1><p>Semaphore 通过 AQS中的 state 来进行控制 permit 的获取控制, 其实它就是一个限制数量的 ReadLock</p>
 
       
     </div>
+
+    
+      
+
 
     
 
@@ -643,7 +647,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">204</span>
+                    <span class="site-state-item-count">211</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -718,7 +722,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">31</span>
+                      
+                    
+                    <span class="site-state-item-count">32</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -730,8 +736,6 @@
                 <div class="site-state-item site-state-tags">
                   <a href="/tags/index.html">
                     
-                    
-                      
                     
                       
                     
@@ -932,11 +936,6 @@
               
                 <span class="links-of-author-item">
                   <a href="https://github.com/victorsheng" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
-                  
-                </span>
-              
-                <span class="links-of-author-item">
-                  <a href="psychovitor@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
                   
                 </span>
               

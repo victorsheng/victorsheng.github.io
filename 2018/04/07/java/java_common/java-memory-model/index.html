@@ -592,7 +592,7 @@
 <p>注意，这里所说的数据依赖性仅针对单个处理器中执行的指令序列和单个线程中执行的操作，不同处理器之间和不同线程之间的数据依赖性不被编译器和处理器考虑。</p>
 <h2 id="as-if-serial语义"><a href="#as-if-serial语义" class="headerlink" title="as-if-serial语义"></a>as-if-serial语义</h2><p>as-if-serial语义的意思指：不管怎么重排序（编译器和处理器为了提高并行度），（单线程）程序的执行结果不能被改变。编译器，runtime 和处理器都必须遵守as-if-serial语义。</p>
 <p>为了遵守as-if-serial语义，编译器和处理器不会对存在数据依赖关系的操作做重排序，因为这种重排序会改变执行结果。但是，如果操作之间不存在数据依赖关系，这些操作可能被编译器和处理器重排序。为了具体说明，请看下面计算圆面积的代码示例：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">double pi  = 3.14;    //A</span><br><span class="line">double r   = 1.0;     //B</span><br><span class="line">double area = pi * r * r; //C</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">double pi  = 3.14;    //A</span><br><span class="line">double r   = 1.0;     //B</span><br><span class="line">double area = pi * r * r; //C</span><br></pre></td></tr></table></figure>
 <p>上面三个操作的数据依赖关系如下图所示：<br><img src="/images/pasted-125.png" alt="upload successful"></p>
 <p>如上图所示，A和C之间存在数据依赖关系，同时B和C之间也存在数据依赖关系。因此在最终执行的指令序列中，C不能被重排序到A和B的前面（C排到A和B的前面，程序的结果将会被改变）。但A和B之间没有数据依赖关系，编译器和处理器可以重排序A和B之间的执行顺序。下图是该程序的两种执行顺序：</p>
 <p><img src="/images/pasted-126.png" alt="upload successful"><br>as-if-serial语义把单线程程序保护了起来，遵守as-if-serial语义的编译器，runtime 和处理器共同为编写单线程程序的程序员创建了一个幻觉：单线程程序是按程序的顺序来执行的。as-if-serial语义使单线程程序员无需担心重排序会干扰他们，也无需担心内存可见性问题。</p>
@@ -604,7 +604,7 @@
 </ol>
 <p>这里A happens- before B，但实际执行时B却可以排在A之前执行（看上面的重排序后的执行顺序）。在第一章提到过，如果A happens- before B，JMM并不要求A一定要在B之前执行。JMM仅仅要求前一个操作（执行的结果）对后一个操作可见，且前一个操作按顺序排在第二个操作之前。这里操作A的执行结果不需要对操作B可见；而且重排序操作A和操作B后的执行结果，与操作A和操作B按happens- before顺序执行的结果一致。在这种情况下，JMM会认为这种重排序并不非法（not illegal），JMM允许这种重排序。</p>
 <p>在计算机中，软件技术和硬件技术有一个共同的目标：在不改变程序执行结果的前提下，尽可能的开发并行度。编译器和处理器遵从这一目标，从happens- before的定义我们可以看出，JMM同样遵从这一目标。</p>
-<h2 id="重排序对多线程的影响"><a href="#重排序对多线程的影响" class="headerlink" title="重排序对多线程的影响"></a>重排序对多线程的影响</h2><p>现在让我们来看看，重排序是否会改变多线程程序的执行结果。请看下面的示例代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">class ReorderExample &#123;</span><br><span class="line">int a = 0;</span><br><span class="line">boolean flag = false;</span><br><span class="line"></span><br><span class="line">public void writer() &#123;</span><br><span class="line">    a = 1;                   //1</span><br><span class="line">    flag = true;             //2</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Public void reader() &#123;</span><br><span class="line">    if (flag) &#123;                //3</span><br><span class="line">        int i =  a * a;        //4</span><br><span class="line">        ……</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="重排序对多线程的影响"><a href="#重排序对多线程的影响" class="headerlink" title="重排序对多线程的影响"></a>重排序对多线程的影响</h2><p>现在让我们来看看，重排序是否会改变多线程程序的执行结果。请看下面的示例代码：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">class ReorderExample &#123;</span><br><span class="line">int a = 0;</span><br><span class="line">boolean flag = false;</span><br><span class="line"></span><br><span class="line">public void writer() &#123;</span><br><span class="line">    a = 1;                   //1</span><br><span class="line">    flag = true;             //2</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Public void reader() &#123;</span><br><span class="line">    if (flag) &#123;                //3</span><br><span class="line">        int i =  a * a;        //4</span><br><span class="line">        ……</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>flag变量是个标记，用来标识变量a是否已被写入。这里假设有两个线程A和B，A首先执行writer()方法，随后B线程接着执行reader()方法。线程B在执行操作4时，能否看到线程A在操作1对共享变量a的写入？</p>
 <p>答案是：不一定能看到。</p>
 <p>由于操作1和操作2没有数据依赖关系，编译器和处理器可以对这两个操作重排序；同样，操作3和操作4没有数据依赖关系，编译器和处理器也可以对这两个操作重排序。让我们先来看看，当操作1和操作2重排序时，可能会产生什么效果？请看下面的程序执行时序图：</p>
@@ -631,7 +631,7 @@
 <p>未同步程序在顺序一致性模型中虽然整体执行顺序是无序的，但所有线程都只能看到一个一致的整体执行顺序。以上图为例，线程A和B看到的执行顺序都是：B1-&gt;A1-&gt;A2-&gt;B2-&gt;A3-&gt;B3。之所以能得到这个保证是因为顺序一致性内存模型中的每个操作必须立即对任意线程可见。</p>
 <p>但是，在JMM中就没有这个保证。未同步程序在JMM中不但整体的执行顺序是无序的，而且所有线程看到的操作执行顺序也可能不一致。比如，在当前线程把写过的数据缓存在本地内存中，且还没有刷新到主内存之前，这个写操作仅对当前线程可见；从其他线程的角度来观察，会认为这个写操作根本还没有被当前线程执行。只有当前线程把本地内存中写过的数据刷新到主内存之后，这个写操作才能对其他线程可见。在这种情况下，当前线程和其它线程看到的操作执行顺序将不一致。</p>
 <h2 id="同步程序的顺序一致性效果"><a href="#同步程序的顺序一致性效果" class="headerlink" title="同步程序的顺序一致性效果"></a>同步程序的顺序一致性效果</h2><p>下面我们对前面的示例程序ReorderExample用监视器来同步，看看正确同步的程序如何具有顺序一致性。</p>
-<p>请看下面的示例代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">class SynchronizedExample &#123;</span><br><span class="line">int a = 0;</span><br><span class="line">boolean flag = false;</span><br><span class="line"></span><br><span class="line">public synchronized void writer() &#123;</span><br><span class="line">    a = 1;</span><br><span class="line">    flag = true;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public synchronized void reader() &#123;</span><br><span class="line">    if (flag) &#123;</span><br><span class="line">        int i = a;</span><br><span class="line">        ……</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>请看下面的示例代码：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">class SynchronizedExample &#123;</span><br><span class="line">int a = 0;</span><br><span class="line">boolean flag = false;</span><br><span class="line"></span><br><span class="line">public synchronized void writer() &#123;</span><br><span class="line">    a = 1;</span><br><span class="line">    flag = true;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public synchronized void reader() &#123;</span><br><span class="line">    if (flag) &#123;</span><br><span class="line">        int i = a;</span><br><span class="line">        ……</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>上面示例代码中，假设A线程执行writer()方法后，B线程执行reader()方法。这是一个正确同步的多线程程序。根据JMM规范，该程序的执行结果将与该程序在顺序一致性模型中的执行结果相同。下面是该程序在两个内存模型中的执行时序对比图：</p>
 <p><img src="/images/pasted-132.png" alt="upload successful"><br>在顺序一致性模型中，所有操作完全按程序的顺序串行执行。而在JMM中，临界区内的代码可以重排序（但JMM不允许临界区内的代码“逸出”到临界区之外，那样会破坏监视器的语义）。JMM会在退出监视器和进入监视器这两个关键时间点做一些特别处理，使得线程在这两个时间点具有与顺序一致性模型相同的内存视图（具体细节后文会说明）。虽然线程A在临界区内做了重排序，但由于监视器的互斥执行的特性，这里的线程B根本无法“观察”到线程A在临界区内的重排序。这种重排序既提高了执行效率，又没有改变程序的执行结果。</p>
 <p>从这里我们可以看到JMM在具体实现上的基本方针：在不改变（正确同步的）程序执行结果的前提下，尽可能的为编译器和处理器的优化打开方便之门。</p>
@@ -683,6 +683,10 @@
 
       
     </div>
+
+    
+      
+
 
     
 
@@ -823,7 +827,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">204</span>
+                    <span class="site-state-item-count">211</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -898,7 +902,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">31</span>
+                      
+                    
+                    <span class="site-state-item-count">32</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -910,8 +916,6 @@
                 <div class="site-state-item site-state-tags">
                   <a href="/tags/index.html">
                     
-                    
-                      
                     
                       
                     
@@ -1112,11 +1116,6 @@
               
                 <span class="links-of-author-item">
                   <a href="https://github.com/victorsheng" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
-                  
-                </span>
-              
-                <span class="links-of-author-item">
-                  <a href="psychovitor@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
                   
                 </span>
               

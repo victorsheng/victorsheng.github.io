@@ -506,9 +506,9 @@
 <p>还有另外一个例子，就是经常使用的Servlet的输入输出流，根据这个原则，也是不应该在代码中进行关闭的，这个工作是由Web容器负责的。</p>
 <h1 id="关闭的是什么"><a href="#关闭的是什么" class="headerlink" title="关闭的是什么?"></a>关闭的是什么?</h1><p>java本身是带GC的，所以对象在消除引用之后，按正常是能够被回收的，那么为什么会有关闭操作?</p>
 <p>这是为了回收系统资源，主要是端口(网络IO),文件句柄(输入输出)等，通常涉及的场景也是操作文件，网络操作、数据库应用等。对于类unix系统，所有东西都是抽象成文件的，所以可以通过lsof来观察。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">lsof -p 25945 |grep /tmp/data | wc -l</span><br><span class="line">88</span><br><span class="line"></span><br><span class="line">ls  /proc/25945/fd | wc -l</span><br><span class="line">93</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">lsof -p 25945 |grep /tmp/data | wc -l</span><br><span class="line">88</span><br><span class="line"></span><br><span class="line">ls  /proc/25945/fd | wc -l</span><br><span class="line">93</span><br></pre></td></tr></table></figure>
 <p>如果有关闭操作的话，就会发现打开文件数一直都处于很低的位置。如果持续出现未关闭的情况，积累到一定程度就可能超过系统限制，出现too many open files的错误。</p>
-<h1 id="文件句柄"><a href="#文件句柄" class="headerlink" title="文件句柄"></a>文件句柄</h1><p>在linux中, 一切皆句柄, 比如file, socket都是, 每个进程都有自己的上限, 一旦超过这个上限,系统就会限制并拒绝相应的资源请求.<br>查询命令<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ulimit -a  </span><br><span class="line">ulimit -a -H</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">cd /proc/9082/fd</span><br><span class="line">lsof -p 9082</span><br></pre></td></tr></table></figure></p>
+<h1 id="文件句柄"><a href="#文件句柄" class="headerlink" title="文件句柄"></a>文件句柄</h1><p>在linux中, 一切皆句柄, 比如file, socket都是, 每个进程都有自己的上限, 一旦超过这个上限,系统就会限制并拒绝相应的资源请求.<br>查询命令<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ulimit -a  </span><br><span class="line">ulimit -a -H</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">cd /proc/9082/fd</span><br><span class="line">lsof -p 9082</span><br></pre></td></tr></table></figure></p>
 <h1 id="资源包装程序和可用资源可关闭"><a href="#资源包装程序和可用资源可关闭" class="headerlink" title="资源包装程序和可用资源可关闭"></a>资源包装程序和可用资源可关闭</h1><p>JDK 定义实现可关闭的一些类，而不是直接在操作系统级别代表资源。</p>
 <p>java.io.StringReader 是一个不需要调用 close() 的可关闭示例，因为，不保留需要清理的任何操作系统资源。该分析使用白色列表从归到此类别的 java.io 检测类。没有针对这些类发出任何资源泄漏警告。</p>
 <p>类似 java.io.BufferedInputStream 的类的实例是围绕另一资源的包装程序（在此可在多个级别应用包装程序）。另外，这些对象不直接代表操作系统资源。如果关闭了合并的资源，那么不需要关闭包装程序。相反，如果关闭了包装程序，那么这将包括合并资源的关闭。该分析具有用于检测包装程序资源的第二个白色列表，并将识别底层实际资源是否将通过包装程序直接或间接关闭。任何一个都满足针对资源泄漏的静默警告。白列表包含来自 java.io、java.util.zip、java.security、java.beans 和 java.sound.sampled 的类。</p>
@@ -516,6 +516,10 @@
 
       
     </div>
+
+    
+      
+
 
     
 
@@ -656,7 +660,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">204</span>
+                    <span class="site-state-item-count">211</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -731,7 +735,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">31</span>
+                      
+                    
+                    <span class="site-state-item-count">32</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -743,8 +749,6 @@
                 <div class="site-state-item site-state-tags">
                   <a href="/tags/index.html">
                     
-                    
-                      
                     
                       
                     
@@ -945,11 +949,6 @@
               
                 <span class="links-of-author-item">
                   <a href="https://github.com/victorsheng" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
-                  
-                </span>
-              
-                <span class="links-of-author-item">
-                  <a href="psychovitor@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
                   
                 </span>
               

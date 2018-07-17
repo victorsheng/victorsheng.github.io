@@ -108,18 +108,18 @@
 
 
 
-  <meta name="description" content="问题生成采购单逻辑,一直报错,锁等待超时手动删除这个记录也是报错,应该是锁了pms_daily_group的id为101958的记录 解决123select l.* from ( select &amp;apos;Blocker&amp;apos; role, p.id, p.user, left(p.host, locate(&amp;apos;:&amp;apos;, p.host) - 1) host, tx.trx_id">
+  <meta name="description" content="问题生成采购单逻辑,一直报错,锁等待超时手动删除这个记录也是报错,应该是锁了pms_daily_group的id为101958的记录 解决select l.* from ( select &amp;apos;Blocker&amp;apos; role, p.id, p.user, left(p.host, locate(&amp;apos;:&amp;apos;, p.host) - 1) host, tx.trx_id, t">
 <meta name="keywords" content="mysql">
 <meta property="og:type" content="article">
 <meta property="og:title" content="mysql锁超时处理">
 <meta property="og:url" content="http://yoursite.com/2018/03/10/egenie_bugfix/bugfix-mysql-lock-timeout/index.html">
 <meta property="og:site_name" content="Victor的博客">
-<meta property="og:description" content="问题生成采购单逻辑,一直报错,锁等待超时手动删除这个记录也是报错,应该是锁了pms_daily_group的id为101958的记录 解决123select l.* from ( select &amp;apos;Blocker&amp;apos; role, p.id, p.user, left(p.host, locate(&amp;apos;:&amp;apos;, p.host) - 1) host, tx.trx_id">
+<meta property="og:description" content="问题生成采购单逻辑,一直报错,锁等待超时手动删除这个记录也是报错,应该是锁了pms_daily_group的id为101958的记录 解决select l.* from ( select &amp;apos;Blocker&amp;apos; role, p.id, p.user, left(p.host, locate(&amp;apos;:&amp;apos;, p.host) - 1) host, tx.trx_id, t">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:updated_time" content="2018-04-03T01:23:38.135Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="mysql锁超时处理">
-<meta name="twitter:description" content="问题生成采购单逻辑,一直报错,锁等待超时手动删除这个记录也是报错,应该是锁了pms_daily_group的id为101958的记录 解决123select l.* from ( select &amp;apos;Blocker&amp;apos; role, p.id, p.user, left(p.host, locate(&amp;apos;:&amp;apos;, p.host) - 1) host, tx.trx_id">
+<meta name="twitter:description" content="问题生成采购单逻辑,一直报错,锁等待超时手动删除这个记录也是报错,应该是锁了pms_daily_group的id为101958的记录 解决select l.* from ( select &amp;apos;Blocker&amp;apos; role, p.id, p.user, left(p.host, locate(&amp;apos;:&amp;apos;, p.host) - 1) host, tx.trx_id, t">
 
 
 
@@ -497,11 +497,55 @@
 
       
         <h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>生成采购单逻辑,一直报错,锁等待超时<br>手动删除这个记录也是报错,应该是锁了pms_daily_group的id为101958的记录</p>
-<h1 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">select l.* from ( select &apos;Blocker&apos; role, p.id, p.user, left(p.host, locate(&apos;:&apos;, p.host) - 1) host, tx.trx_id, tx.trx_state, tx.trx_started, timestampdiff(second, tx.trx_started, now()) duration, lo.lock_mode, lo.lock_type, lo.lock_table, lo.lock_index, tx.trx_query, lw.requesting_thd_id Blockee_id, lw.requesting_trx_id Blockee_trx from information_schema.innodb_trx tx, information_schema.innodb_lock_waits lw, information_schema.innodb_locks lo, information_schema.processlist p where lw.blocking_trx_id = tx.trx_id and p.id = tx.trx_mysql_thread_id and lo.lock_id = lw.blocking_lock_id union select &apos;Blockee&apos; role, p.id, p.user, left(p.host, locate(&apos;:&apos;, p.host) - 1) host, tx.trx_id, tx.trx_state, tx.trx_started, timestampdiff(second, tx.trx_started, now()) duration, lo.lock_mode, lo.lock_type, lo.lock_table, lo.lock_index, tx.trx_query, null, null from information_schema.innodb_trx tx, information_schema.innodb_lock_waits lw, information_schema.innodb_locks lo, information_schema.processlist p where lw.requesting_trx_id = tx.trx_id and p.id = tx.trx_mysql_thread_id and lo.lock_id = lw.requested_lock_id) l order by role desc, trx_state desc;</span><br><span class="line"></span><br><span class="line">kill 184631781</span><br></pre></td></tr></table></figure>
+<h1 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h1><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">select l.* from ( select &apos;Blocker&apos; role, p.id, p.user, left(p.host, locate(&apos;:&apos;, p.host) - 1) host, tx.trx_id, tx.trx_state, tx.trx_started, timestampdiff(second, tx.trx_started, now()) duration, lo.lock_mode, lo.lock_type, lo.lock_table, lo.lock_index, tx.trx_query, lw.requesting_thd_id Blockee_id, lw.requesting_trx_id Blockee_trx from information_schema.innodb_trx tx, information_schema.innodb_lock_waits lw, information_schema.innodb_locks lo, information_schema.processlist p where lw.blocking_trx_id = tx.trx_id and p.id = tx.trx_mysql_thread_id and lo.lock_id = lw.blocking_lock_id union select &apos;Blockee&apos; role, p.id, p.user, left(p.host, locate(&apos;:&apos;, p.host) - 1) host, tx.trx_id, tx.trx_state, tx.trx_started, timestampdiff(second, tx.trx_started, now()) duration, lo.lock_mode, lo.lock_type, lo.lock_table, lo.lock_index, tx.trx_query, null, null from information_schema.innodb_trx tx, information_schema.innodb_lock_waits lw, information_schema.innodb_locks lo, information_schema.processlist p where lw.requesting_trx_id = tx.trx_id and p.id = tx.trx_mysql_thread_id and lo.lock_id = lw.requested_lock_id) l order by role desc, trx_state desc;</span><br><span class="line"></span><br><span class="line">kill 184631781</span><br></pre></td></tr></table></figure>
 <p>发现了未提交的事务</p>
 <table border="1" style="border-collapse:collapse"><br><tr><th>role</th><th>id</th><th>user</th><th>host</th><th>trx_id</th><th>trx_state</th><th>trx_started</th><th>duration</th><th>lock_mode</th><th>lock_type</th><th>lock_table</th><th>lock_index</th><th>trx_query</th><th>Blockee_id</th><th>Blockee_trx</th></tr><br><tr><td>Blocker</td><td>184631781</td><td>egeniekn</td><td>10.26.109.140</td><td>4994407160</td><td>RUNNING</td><td>2018-03-10 10:39:22</td><td>4996</td><td>X</td><td>RECORD</td><td><code>egenie_kn</code>.<code>pms_daily_group</code></td><td>PRIMARY</td><td>NULL</td><td>184600424</td><td>4996523486</td></tr><br><tr><td>Blockee</td><td>184600424</td><td>egeniekn</td><td>10.25.241.203</td><td>4996523486</td><td>LOCK WAIT</td><td>2018-03-10 12:02:32</td><td>6</td><td>X</td><td>RECORD</td><td><code>egenie_kn</code>.<code>pms_daily_group</code></td><td>PRIMARY</td><td>/<em> ApplicationName=DataGrip 2017.3 </em>/ UPDATE <code>egenie_kn</code>.<code>pms_daily_group</code> t SET t.<code>is_usable</code> = 0 WHERE t.<code>pms_daily_group_id</code> = 101958</td><td>NULL</td><td>NULL</td></tr></table>
       
     </div>
+
+    
+      
+
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2018/01/06/egenie_bugfix/error-sql-update-lock/" rel="bookmark">error-sql-update-lock</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2017/12/13/egenie_bugfix/optime-156/" rel="bookmark">156服务器优化2:定位io高的原因mysql</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2018/01/24/mysql/mysql-debug/" rel="bookmark">mysql下划线关键字</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2018/03/29/mysql/mysql-master-slave/" rel="bookmark">mysql-master-slave</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2018/04/08/mysql/mysql-where/" rel="bookmark">mysql-where</a></div>
+      
+    </li>
+  
+  </ul>
+
 
     
 
@@ -648,7 +692,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">204</span>
+                    <span class="site-state-item-count">211</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -723,7 +767,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">31</span>
+                      
+                    
+                    <span class="site-state-item-count">32</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -735,8 +781,6 @@
                 <div class="site-state-item site-state-tags">
                   <a href="/tags/index.html">
                     
-                    
-                      
                     
                       
                     
@@ -937,11 +981,6 @@
               
                 <span class="links-of-author-item">
                   <a href="https://github.com/victorsheng" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
-                  
-                </span>
-              
-                <span class="links-of-author-item">
-                  <a href="psychovitor@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
                   
                 </span>
               

@@ -108,17 +108,17 @@
 
 
 
-  <meta name="description" content="java8 多继承在java 接口中出现了default方法后,如果一个类同时实现了2个接口,而两个接口都有相同的default方法,该如何处理呢? 多个父接口123456789+---------------+         +------------+|  Interface A  |         |Interface B |+-----------^---+         +---^">
+  <meta name="description" content="java8 多继承在java 接口中出现了default方法后,如果一个类同时实现了2个接口,而两个接口都有相同的default方法,该如何处理呢? 多个父接口+---------------+         +------------+|  Interface A  |         |Interface B |+-----------^---+         +---^--------+">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Java-8-default-method-and-multiple-inheritance">
 <meta property="og:url" content="http://yoursite.com/2018/07/03/java/java_common/Java-8-default-method-and-multiple-inheritance/index.html">
 <meta property="og:site_name" content="Victor的博客">
-<meta property="og:description" content="java8 多继承在java 接口中出现了default方法后,如果一个类同时实现了2个接口,而两个接口都有相同的default方法,该如何处理呢? 多个父接口123456789+---------------+         +------------+|  Interface A  |         |Interface B |+-----------^---+         +---^">
+<meta property="og:description" content="java8 多继承在java 接口中出现了default方法后,如果一个类同时实现了2个接口,而两个接口都有相同的default方法,该如何处理呢? 多个父接口+---------------+         +------------+|  Interface A  |         |Interface B |+-----------^---+         +---^--------+">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:updated_time" content="2018-07-03T14:46:54.258Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java-8-default-method-and-multiple-inheritance">
-<meta name="twitter:description" content="java8 多继承在java 接口中出现了default方法后,如果一个类同时实现了2个接口,而两个接口都有相同的default方法,该如何处理呢? 多个父接口123456789+---------------+         +------------+|  Interface A  |         |Interface B |+-----------^---+         +---^">
+<meta name="twitter:description" content="java8 多继承在java 接口中出现了default方法后,如果一个类同时实现了2个接口,而两个接口都有相同的default方法,该如何处理呢? 多个父接口+---------------+         +------------+|  Interface A  |         |Interface B |+-----------^---+         +---^--------+">
 
 
 
@@ -484,12 +484,12 @@
 
       
         <h1 id="java8-多继承"><a href="#java8-多继承" class="headerlink" title="java8 多继承"></a>java8 多继承</h1><p>在java 接口中出现了default方法后,如果一个类同时实现了2个接口,而两个接口都有相同的default方法,该如何处理呢?</p>
-<h2 id="多个父接口"><a href="#多个父接口" class="headerlink" title="多个父接口"></a>多个父接口</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">+---------------+         +------------+</span><br><span class="line">|  Interface A  |         |Interface B |</span><br><span class="line">+-----------^---+         +---^--------+</span><br><span class="line">            |                 |         </span><br><span class="line">            |                 |         </span><br><span class="line">            |                 |         </span><br><span class="line">            +-+------------+--+         </span><br><span class="line">              | Interface C|            </span><br><span class="line">              +------------+</span><br></pre></td></tr></table></figure>
+<h2 id="多个父接口"><a href="#多个父接口" class="headerlink" title="多个父接口"></a>多个父接口</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">+---------------+         +------------+</span><br><span class="line">|  Interface A  |         |Interface B |</span><br><span class="line">+-----------^---+         +---^--------+</span><br><span class="line">            |                 |         </span><br><span class="line">            |                 |         </span><br><span class="line">            |                 |         </span><br><span class="line">            +-+------------+--+         </span><br><span class="line">              | Interface C|            </span><br><span class="line">              +------------+</span><br></pre></td></tr></table></figure>
 <p>A,B拥有相同签名的默认方法default String say(String name), 如果接口C没有override这个方法， 则编译出错。<br><code>interface C inherits unrelated defaults for say(String) from types A and B</code></p>
-<h3 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">interface C extends A,B&#123;</span><br><span class="line">	default String say(String name) &#123;</span><br><span class="line">		return &quot;greet &quot; + name;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="接口多层继承"><a href="#接口多层继承" class="headerlink" title="接口多层继承"></a>接口多层继承</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">+---------------+ </span><br><span class="line">|  Interface A1 | </span><br><span class="line">+--------+------+ </span><br><span class="line">         |        </span><br><span class="line">         |        </span><br><span class="line">         |        </span><br><span class="line">+--------+------+ </span><br><span class="line">|  Interface A2 | </span><br><span class="line">+-------+-------+ </span><br><span class="line">        |         </span><br><span class="line">        |         </span><br><span class="line">        |         </span><br><span class="line">+-------+--------+</span><br><span class="line">|   Interface C  |</span><br><span class="line">+----------------+</span><br></pre></td></tr></table></figure>
-<h2 id="多层多继承"><a href="#多层多继承" class="headerlink" title="多层多继承"></a>多层多继承</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">+---------------+                          </span><br><span class="line">|  Interface A1 |                          </span><br><span class="line">+--------+------+                          </span><br><span class="line">         |                                 </span><br><span class="line">         |                                 </span><br><span class="line">         |                                 </span><br><span class="line">+--------+------+         +---------------+</span><br><span class="line">|  Interface A2 |         |  Interface B  |</span><br><span class="line">+-------+-------+         +---------+-----+</span><br><span class="line">        |       +---------+---------^      </span><br><span class="line">        |       |                          </span><br><span class="line">        |       |                          </span><br><span class="line">+-------+-------++                         </span><br><span class="line">|   Interface C  |                         </span><br><span class="line">+----------------+</span><br></pre></td></tr></table></figure>
-<h2 id="类和接口混杂"><a href="#类和接口混杂" class="headerlink" title="类和接口混杂"></a>类和接口混杂</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">+-------------+       +-----------+</span><br><span class="line">| Interface A |       |  Class B  |</span><br><span class="line">+-----------+-+       +-----+-----+</span><br><span class="line">            ^-+    +--+-----^      </span><br><span class="line">              |    |               </span><br><span class="line">          +---+----+-+             </span><br><span class="line">          |  Class C |             </span><br><span class="line">          +----------+</span><br></pre></td></tr></table></figure>
+<h3 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">interface C extends A,B&#123;</span><br><span class="line">	default String say(String name) &#123;</span><br><span class="line">		return &quot;greet &quot; + name;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="接口多层继承"><a href="#接口多层继承" class="headerlink" title="接口多层继承"></a>接口多层继承</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">+---------------+ </span><br><span class="line">|  Interface A1 | </span><br><span class="line">+--------+------+ </span><br><span class="line">         |        </span><br><span class="line">         |        </span><br><span class="line">         |        </span><br><span class="line">+--------+------+ </span><br><span class="line">|  Interface A2 | </span><br><span class="line">+-------+-------+ </span><br><span class="line">        |         </span><br><span class="line">        |         </span><br><span class="line">        |         </span><br><span class="line">+-------+--------+</span><br><span class="line">|   Interface C  |</span><br><span class="line">+----------------+</span><br></pre></td></tr></table></figure>
+<h2 id="多层多继承"><a href="#多层多继承" class="headerlink" title="多层多继承"></a>多层多继承</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">+---------------+                          </span><br><span class="line">|  Interface A1 |                          </span><br><span class="line">+--------+------+                          </span><br><span class="line">         |                                 </span><br><span class="line">         |                                 </span><br><span class="line">         |                                 </span><br><span class="line">+--------+------+         +---------------+</span><br><span class="line">|  Interface A2 |         |  Interface B  |</span><br><span class="line">+-------+-------+         +---------+-----+</span><br><span class="line">        |       +---------+---------^      </span><br><span class="line">        |       |                          </span><br><span class="line">        |       |                          </span><br><span class="line">+-------+-------++                         </span><br><span class="line">|   Interface C  |                         </span><br><span class="line">+----------------+</span><br></pre></td></tr></table></figure>
+<h2 id="类和接口混杂"><a href="#类和接口混杂" class="headerlink" title="类和接口混杂"></a>类和接口混杂</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">+-------------+       +-----------+</span><br><span class="line">| Interface A |       |  Class B  |</span><br><span class="line">+-----------+-+       +-----+-----+</span><br><span class="line">            ^-+    +--+-----^      </span><br><span class="line">              |    |               </span><br><span class="line">          +---+----+-+             </span><br><span class="line">          |  Class C |             </span><br><span class="line">          +----------+</span><br></pre></td></tr></table></figure>
 <h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><ul>
 <li>类优先于接口。 如果一个子类继承的父类和接口有相同的方法实现。 那么子类继承父类的方法</li>
 <li>子类型中的方法优先于父类型中的方法。</li>
@@ -499,6 +499,10 @@
 
       
     </div>
+
+    
+      
+
 
     
 
@@ -639,7 +643,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">204</span>
+                    <span class="site-state-item-count">211</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -714,7 +718,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">31</span>
+                      
+                    
+                    <span class="site-state-item-count">32</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -726,8 +732,6 @@
                 <div class="site-state-item site-state-tags">
                   <a href="/tags/index.html">
                     
-                    
-                      
                     
                       
                     
@@ -928,11 +932,6 @@
               
                 <span class="links-of-author-item">
                   <a href="https://github.com/victorsheng" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
-                  
-                </span>
-              
-                <span class="links-of-author-item">
-                  <a href="psychovitor@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
                   
                 </span>
               

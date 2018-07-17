@@ -546,12 +546,16 @@
 </ul>
 </li>
 </ul>
-<h2 id="String类的hashCode方法如下（JDK-1-8）："><a href="#String类的hashCode方法如下（JDK-1-8）：" class="headerlink" title="String类的hashCode方法如下（JDK 1.8）："></a>String类的hashCode方法如下（JDK 1.8）：</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">public int hashCode() &#123;</span><br><span class="line">        int h = hash;</span><br><span class="line">        if (h == 0 &amp;&amp; value.length &gt; 0) &#123;</span><br><span class="line">            char val[] = value;</span><br><span class="line">            for (int i = 0; i &lt; value.length; i++) &#123;</span><br><span class="line">                h = 31 * h + val[i];</span><br><span class="line">            &#125;</span><br><span class="line">            hash = h;</span><br><span class="line">        &#125;</span><br><span class="line">        return h;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<h2 id="举个自定义类的hashCode例子："><a href="#举个自定义类的hashCode例子：" class="headerlink" title="举个自定义类的hashCode例子："></a>举个自定义类的hashCode例子：</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">class Duck &#123;</span><br><span class="line">    private int id;</span><br><span class="line">    private String name;</span><br><span class="line">    private double weight;</span><br><span class="line">    private float height;</span><br><span class="line">    private String note;</span><br><span class="line">    @Override</span><br><span class="line">    public boolean equals(Object o) &#123;</span><br><span class="line">        if (this == o) return true;</span><br><span class="line">        if (o == null || getClass() != o.getClass()) return false;</span><br><span class="line">        Duck duck = (Duck) o;</span><br><span class="line">        if (id != duck.id) return false;</span><br><span class="line">        if (Double.compare(duck.weight, weight) != 0) return false;</span><br><span class="line">        if (Float.compare(duck.height, height) != 0) return false;</span><br><span class="line">        if (name != null ? !name.equals(duck.name) : duck.name != null) return false;</span><br><span class="line">        return !(note != null ? !note.equals(duck.note) : duck.note != null);</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public int hashCode() &#123;</span><br><span class="line">        int result;</span><br><span class="line">        long temp;</span><br><span class="line">        result = id;</span><br><span class="line">        result = 31 * result + (name != null ? name.hashCode() : 0);</span><br><span class="line">        temp = Double.doubleToLongBits(weight);</span><br><span class="line">        result = 31 * result + (int) (temp ^ (temp &gt;&gt;&gt; 32));</span><br><span class="line">        result = 31 * result + (height != +0.0f ? Float.floatToIntBits(height) : 0);</span><br><span class="line">        result = 31 * result + (note != null ? note.hashCode() : 0);</span><br><span class="line">        return result;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="String类的hashCode方法如下（JDK-1-8）："><a href="#String类的hashCode方法如下（JDK-1-8）：" class="headerlink" title="String类的hashCode方法如下（JDK 1.8）："></a>String类的hashCode方法如下（JDK 1.8）：</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public int hashCode() &#123;</span><br><span class="line">        int h = hash;</span><br><span class="line">        if (h == 0 &amp;&amp; value.length &gt; 0) &#123;</span><br><span class="line">            char val[] = value;</span><br><span class="line">            for (int i = 0; i &lt; value.length; i++) &#123;</span><br><span class="line">                h = 31 * h + val[i];</span><br><span class="line">            &#125;</span><br><span class="line">            hash = h;</span><br><span class="line">        &#125;</span><br><span class="line">        return h;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="举个自定义类的hashCode例子："><a href="#举个自定义类的hashCode例子：" class="headerlink" title="举个自定义类的hashCode例子："></a>举个自定义类的hashCode例子：</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">class Duck &#123;</span><br><span class="line">    private int id;</span><br><span class="line">    private String name;</span><br><span class="line">    private double weight;</span><br><span class="line">    private float height;</span><br><span class="line">    private String note;</span><br><span class="line">    @Override</span><br><span class="line">    public boolean equals(Object o) &#123;</span><br><span class="line">        if (this == o) return true;</span><br><span class="line">        if (o == null || getClass() != o.getClass()) return false;</span><br><span class="line">        Duck duck = (Duck) o;</span><br><span class="line">        if (id != duck.id) return false;</span><br><span class="line">        if (Double.compare(duck.weight, weight) != 0) return false;</span><br><span class="line">        if (Float.compare(duck.height, height) != 0) return false;</span><br><span class="line">        if (name != null ? !name.equals(duck.name) : duck.name != null) return false;</span><br><span class="line">        return !(note != null ? !note.equals(duck.note) : duck.note != null);</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public int hashCode() &#123;</span><br><span class="line">        int result;</span><br><span class="line">        long temp;</span><br><span class="line">        result = id;</span><br><span class="line">        result = 31 * result + (name != null ? name.hashCode() : 0);</span><br><span class="line">        temp = Double.doubleToLongBits(weight);</span><br><span class="line">        result = 31 * result + (int) (temp ^ (temp &gt;&gt;&gt; 32));</span><br><span class="line">        result = 31 * result + (height != +0.0f ? Float.floatToIntBits(height) : 0);</span><br><span class="line">        result = 31 * result + (note != null ? note.hashCode() : 0);</span><br><span class="line">        return result;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h1 id="BTW-回顾一下-hashmap内部的实现"><a href="#BTW-回顾一下-hashmap内部的实现" class="headerlink" title="BTW 回顾一下 hashmap内部的实现"></a>BTW 回顾一下 hashmap内部的实现</h1><p>e.hash == hash &amp;&amp; ((k = e.key) == key || (key != null &amp;&amp; key.equals(k)))</p>
 
       
     </div>
+
+    
+      
+
 
     
 
@@ -692,7 +696,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">204</span>
+                    <span class="site-state-item-count">211</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -767,7 +771,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">31</span>
+                      
+                    
+                    <span class="site-state-item-count">32</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -779,8 +785,6 @@
                 <div class="site-state-item site-state-tags">
                   <a href="/tags/index.html">
                     
-                    
-                      
                     
                       
                     
@@ -981,11 +985,6 @@
               
                 <span class="links-of-author-item">
                   <a href="https://github.com/victorsheng" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
-                  
-                </span>
-              
-                <span class="links-of-author-item">
-                  <a href="psychovitor@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
                   
                 </span>
               

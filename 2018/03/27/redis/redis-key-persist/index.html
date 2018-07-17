@@ -108,18 +108,18 @@
 
 
 
-  <meta name="description" content="PERSIST mykey123起始版本：2.2.0时间复杂度：O(1) 移除给定key的生存时间，将这个 key 从『易失的』(带生存时间 key )转换成『持久的』(一个不带生存时间、永不过期的 key )。 ##返回值 integer-reply, 只有以下两种值: 当生存时间移除成功时，返回 1 .如果 key 不存在或 key 没有设置生存时间，返回 0 . ##例子 123456789">
+  <meta name="description" content="PERSIST mykey起始版本：2.2.0时间复杂度：O(1) 移除给定key的生存时间，将这个 key 从『易失的』(带生存时间 key )转换成『持久的』(一个不带生存时间、永不过期的 key )。 ##返回值 integer-reply, 只有以下两种值: 当生存时间移除成功时，返回 1 .如果 key 不存在或 key 没有设置生存时间，返回 0 . ##例子 redis&amp;gt; SE">
 <meta name="keywords" content="redis">
 <meta property="og:type" content="article">
 <meta property="og:title" content="redis移除过期时间的命令">
 <meta property="og:url" content="http://yoursite.com/2018/03/27/redis/redis-key-persist/index.html">
 <meta property="og:site_name" content="Victor的博客">
-<meta property="og:description" content="PERSIST mykey123起始版本：2.2.0时间复杂度：O(1) 移除给定key的生存时间，将这个 key 从『易失的』(带生存时间 key )转换成『持久的』(一个不带生存时间、永不过期的 key )。 ##返回值 integer-reply, 只有以下两种值: 当生存时间移除成功时，返回 1 .如果 key 不存在或 key 没有设置生存时间，返回 0 . ##例子 123456789">
+<meta property="og:description" content="PERSIST mykey起始版本：2.2.0时间复杂度：O(1) 移除给定key的生存时间，将这个 key 从『易失的』(带生存时间 key )转换成『持久的』(一个不带生存时间、永不过期的 key )。 ##返回值 integer-reply, 只有以下两种值: 当生存时间移除成功时，返回 1 .如果 key 不存在或 key 没有设置生存时间，返回 0 . ##例子 redis&amp;gt; SE">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:updated_time" content="2018-04-03T01:23:38.176Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="redis移除过期时间的命令">
-<meta name="twitter:description" content="PERSIST mykey123起始版本：2.2.0时间复杂度：O(1) 移除给定key的生存时间，将这个 key 从『易失的』(带生存时间 key )转换成『持久的』(一个不带生存时间、永不过期的 key )。 ##返回值 integer-reply, 只有以下两种值: 当生存时间移除成功时，返回 1 .如果 key 不存在或 key 没有设置生存时间，返回 0 . ##例子 123456789">
+<meta name="twitter:description" content="PERSIST mykey起始版本：2.2.0时间复杂度：O(1) 移除给定key的生存时间，将这个 key 从『易失的』(带生存时间 key )转换成『持久的』(一个不带生存时间、永不过期的 key )。 ##返回值 integer-reply, 只有以下两种值: 当生存时间移除成功时，返回 1 .如果 key 不存在或 key 没有设置生存时间，返回 0 . ##例子 redis&amp;gt; SE">
 
 
 
@@ -514,15 +514,59 @@
       
 
       
-        <h1 id="PERSIST-mykey"><a href="#PERSIST-mykey" class="headerlink" title="PERSIST mykey"></a>PERSIST mykey</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">起始版本：2.2.0</span><br><span class="line"></span><br><span class="line">时间复杂度：O(1)</span><br></pre></td></tr></table></figure>
+        <h1 id="PERSIST-mykey"><a href="#PERSIST-mykey" class="headerlink" title="PERSIST mykey"></a>PERSIST mykey</h1><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">起始版本：2.2.0</span><br><span class="line"></span><br><span class="line">时间复杂度：O(1)</span><br></pre></td></tr></table></figure>
 <p>移除给定key的生存时间，将这个 key 从『易失的』(带生存时间 key )转换成『持久的』(一个不带生存时间、永不过期的 key )。</p>
 <p>##返回值</p>
 <p>integer-reply, 只有以下两种值:</p>
 <p>当生存时间移除成功时，返回 1 .<br>如果 key 不存在或 key 没有设置生存时间，返回 0 .</p>
 <p>##例子</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; SET mykey &quot;Hello&quot;</span><br><span class="line">OK</span><br><span class="line">redis&gt; EXPIRE mykey 10</span><br><span class="line">(integer) 1</span><br><span class="line">redis&gt; TTL mykey</span><br><span class="line">(integer) 10</span><br><span class="line">redis&gt; PERSIST mykey</span><br><span class="line">(integer) 1</span><br><span class="line">redis&gt; TTL mykey</span><br><span class="line">(integer) -1</span><br><span class="line">redis&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">redis&gt; SET mykey &quot;Hello&quot;</span><br><span class="line">OK</span><br><span class="line">redis&gt; EXPIRE mykey 10</span><br><span class="line">(integer) 1</span><br><span class="line">redis&gt; TTL mykey</span><br><span class="line">(integer) 10</span><br><span class="line">redis&gt; PERSIST mykey</span><br><span class="line">(integer) 1</span><br><span class="line">redis&gt; TTL mykey</span><br><span class="line">(integer) -1</span><br><span class="line">redis&gt;</span><br></pre></td></tr></table></figure>
       
     </div>
+
+    
+      
+
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2017/12/14/egenie_bugfix/bugfix-2-1213/" rel="bookmark">bugfix总结-12.13</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2017/12/14/redis/operation-redis/" rel="bookmark">线上redis崩溃记录</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2018/06/24/redis/redis-bitmap/" rel="bookmark">redis-bitmap</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2018/03/26/redis/redis-data-type/" rel="bookmark">redis数据类型</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2018/03/26/redis/redis-fast/" rel="bookmark">Redis 快的原因</a></div>
+      
+    </li>
+  
+  </ul>
+
 
     
 
@@ -669,7 +713,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">204</span>
+                    <span class="site-state-item-count">211</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -744,7 +788,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">31</span>
+                      
+                    
+                    <span class="site-state-item-count">32</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -756,8 +802,6 @@
                 <div class="site-state-item site-state-tags">
                   <a href="/tags/index.html">
                     
-                    
-                      
                     
                       
                     
@@ -958,11 +1002,6 @@
               
                 <span class="links-of-author-item">
                   <a href="https://github.com/victorsheng" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
-                  
-                </span>
-              
-                <span class="links-of-author-item">
-                  <a href="psychovitor@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
                   
                 </span>
               

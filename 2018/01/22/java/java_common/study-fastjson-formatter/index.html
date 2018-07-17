@@ -108,18 +108,18 @@
 
 
 
-  <meta name="description" content="背景老的方式:controller的参数与返回值123456public JsonResult queryDrillDetail(@RequestBody String body) &amp;#123;List&amp;lt;Map&amp;lt;String, Object&amp;gt;&amp;gt; detailMapList = new ArrayList&amp;lt;&amp;gt;();.......return new JsonRes">
+  <meta name="description" content="背景老的方式:controller的参数与返回值public JsonResult queryDrillDetail(@RequestBody String body) &amp;#123;List&amp;lt;Map&amp;lt;String, Object&amp;gt;&amp;gt; detailMapList = new ArrayList&amp;lt;&amp;gt;();.......return new JsonResult(Js">
 <meta name="keywords" content="springboot,fastjson,http,springMVC">
 <meta property="og:type" content="article">
 <meta property="og:title" content="springboot配置FastJsonHttpMessageConverter(实战篇)">
 <meta property="og:url" content="http://yoursite.com/2018/01/22/java/java_common/study-fastjson-formatter/index.html">
 <meta property="og:site_name" content="Victor的博客">
-<meta property="og:description" content="背景老的方式:controller的参数与返回值123456public JsonResult queryDrillDetail(@RequestBody String body) &amp;#123;List&amp;lt;Map&amp;lt;String, Object&amp;gt;&amp;gt; detailMapList = new ArrayList&amp;lt;&amp;gt;();.......return new JsonRes">
+<meta property="og:description" content="背景老的方式:controller的参数与返回值public JsonResult queryDrillDetail(@RequestBody String body) &amp;#123;List&amp;lt;Map&amp;lt;String, Object&amp;gt;&amp;gt; detailMapList = new ArrayList&amp;lt;&amp;gt;();.......return new JsonResult(Js">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:updated_time" content="2018-04-03T01:23:38.144Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="springboot配置FastJsonHttpMessageConverter(实战篇)">
-<meta name="twitter:description" content="背景老的方式:controller的参数与返回值123456public JsonResult queryDrillDetail(@RequestBody String body) &amp;#123;List&amp;lt;Map&amp;lt;String, Object&amp;gt;&amp;gt; detailMapList = new ArrayList&amp;lt;&amp;gt;();.......return new JsonRes">
+<meta name="twitter:description" content="背景老的方式:controller的参数与返回值public JsonResult queryDrillDetail(@RequestBody String body) &amp;#123;List&amp;lt;Map&amp;lt;String, Object&amp;gt;&amp;gt; detailMapList = new ArrayList&amp;lt;&amp;gt;();.......return new JsonResult(Js">
 
 
 
@@ -514,25 +514,48 @@
       
 
       
-        <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><h2 id="老的方式-controller的参数与返回值"><a href="#老的方式-controller的参数与返回值" class="headerlink" title="老的方式:controller的参数与返回值"></a>老的方式:controller的参数与返回值</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public JsonResult queryDrillDetail(@RequestBody String body) &#123;</span><br><span class="line">List&lt;Map&lt;String, Object&gt;&gt; detailMapList = new ArrayList&lt;&gt;();</span><br><span class="line">.......</span><br><span class="line">return new JsonResult(JsonResult.SUCCESSFUL, new PagedList&lt;&gt;(query.getPage() + 1, pageable.getPageSize(),</span><br><span class="line">                query.getTotalCount(), detailMapList));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+        <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><h2 id="老的方式-controller的参数与返回值"><a href="#老的方式-controller的参数与返回值" class="headerlink" title="老的方式:controller的参数与返回值"></a>老的方式:controller的参数与返回值</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public JsonResult queryDrillDetail(@RequestBody String body) &#123;</span><br><span class="line">List&lt;Map&lt;String, Object&gt;&gt; detailMapList = new ArrayList&lt;&gt;();</span><br><span class="line">.......</span><br><span class="line">return new JsonResult(JsonResult.SUCCESSFUL, new PagedList&lt;&gt;(query.getPage() + 1, pageable.getPageSize(),</span><br><span class="line">                query.getTotalCount(), detailMapList));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h2 id="老的方式-问题"><a href="#老的方式-问题" class="headerlink" title="老的方式:问题"></a>老的方式:问题</h2><ul>
 <li>入参不明确</li>
 <li>返回值类型不明确</li>
 <li>Map的key只有在运行时,才会知道,且不知道类型</li>
 </ul>
 <h2 id="期望的方式-使用vo"><a href="#期望的方式-使用vo" class="headerlink" title="期望的方式:使用vo"></a>期望的方式:使用vo</h2><h1 id="改造步骤"><a href="#改造步骤" class="headerlink" title="改造步骤:"></a>改造步骤:</h1><p>1.在使用converters的最后一个优先级,添加FastJsonHttpMessageConverter</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">@Component</span><br><span class="line">public class MyWebAppConfigurer extends WebMvcConfigurerAdapter &#123;</span><br><span class="line"></span><br><span class="line">    // 添加converter的第三种方式</span><br><span class="line">    // 同一个WebMvcConfigurerAdapter中的configureMessageConverters方法先于extendMessageConverters方法执行</span><br><span class="line">    // 可以理解为是三种方式中最后执行的一种，不过这里可以通过add指定顺序来调整优先级，也可以使用remove/clear来删除converter，功能强大</span><br><span class="line">    // 使用converters.add(xxx)会放在最低优先级（List的尾部）</span><br><span class="line">    // 使用converters.add(0,xxx)会放在最高优先级（List的头部）</span><br><span class="line">    @Override</span><br><span class="line">    public void extendMessageConverters(List&lt;HttpMessageConverter&lt;?&gt;&gt; converters) &#123;</span><br><span class="line">        converters.add(new FastJsonHttpMessageConverter());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@Component</span><br><span class="line">public class MyWebAppConfigurer extends WebMvcConfigurerAdapter &#123;</span><br><span class="line"></span><br><span class="line">    // 添加converter的第三种方式</span><br><span class="line">    // 同一个WebMvcConfigurerAdapter中的configureMessageConverters方法先于extendMessageConverters方法执行</span><br><span class="line">    // 可以理解为是三种方式中最后执行的一种，不过这里可以通过add指定顺序来调整优先级，也可以使用remove/clear来删除converter，功能强大</span><br><span class="line">    // 使用converters.add(xxx)会放在最低优先级（List的尾部）</span><br><span class="line">    // 使用converters.add(0,xxx)会放在最高优先级（List的头部）</span><br><span class="line">    @Override</span><br><span class="line">    public void extendMessageConverters(List&lt;HttpMessageConverter&lt;?&gt;&gt; converters) &#123;</span><br><span class="line">        converters.add(new FastJsonHttpMessageConverter());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>2.model遵循老的接口原则,转为下划线分割的</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">@JSONType(naming = PropertyNamingStrategy.SnakeCase)</span><br><span class="line">public class PurchaseDetailDrillVo &#123;</span><br><span class="line"></span><br><span class="line">    private Long pmsPurchaseOrderId;</span><br><span class="line">    private Long pmsPurchaseOrderDetailId;</span><br><span class="line">    private String pmsPurchaseOrderNo;</span><br><span class="line">    private Integer productType;</span><br><span class="line">    private String deliverAddress;</span><br><span class="line">    private Long provinceId;</span><br><span class="line">    ....</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@JSONType(naming = PropertyNamingStrategy.SnakeCase)</span><br><span class="line">public class PurchaseDetailDrillVo &#123;</span><br><span class="line"></span><br><span class="line">    private Long pmsPurchaseOrderId;</span><br><span class="line">    private Long pmsPurchaseOrderDetailId;</span><br><span class="line">    private String pmsPurchaseOrderNo;</span><br><span class="line">    private Integer productType;</span><br><span class="line">    private String deliverAddress;</span><br><span class="line">    private Long provinceId;</span><br><span class="line">    ....</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>3.使用@RequestBody注解,类型改为vo</p>
 <p>测试,接受参数和返回参数都是vo,而接口的字段映射依然为下划线,</p>
 <hr>
-<p>以下为项目本身的问题<br>4.pom文件中排除jackson的依赖<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;com.ejlerp&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;ejlerp-common&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;3.2.0-SNAPSHOT&lt;/version&gt;</span><br><span class="line">    &lt;exclusions&gt;</span><br><span class="line">        &lt;exclusion&gt;</span><br><span class="line">            &lt;artifactId&gt;jackson-core&lt;/artifactId&gt;</span><br><span class="line">            &lt;groupId&gt;com.fasterxml.jackson.core&lt;/groupId&gt;</span><br><span class="line">        &lt;/exclusion&gt;</span><br><span class="line">    &lt;/exclusions&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure></p>
-<p>5.fastjason默认支持所有的contentType,及*, 与springmvc校验相冲突,so需要声明fastjason能支持的contentType,在初始化FastJsonHttpMessageConverter,注入参数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">public void extendMessageConverters(List&lt;HttpMessageConverter&lt;?&gt;&gt; converters) &#123;</span><br><span class="line">    FastJsonHttpMessageConverter fastJsonHttpMessageConverter = new FastJsonHttpMessageConverter();</span><br><span class="line">    ArrayList&lt;MediaType&gt; supportedMediaTypes = Lists.newArrayList();</span><br><span class="line">    supportedMediaTypes.add(MediaType.APPLICATION_FORM_URLENCODED);</span><br><span class="line">    supportedMediaTypes.add(MediaType.APPLICATION_JSON);</span><br><span class="line">    supportedMediaTypes.add(MediaType.TEXT_HTML);</span><br><span class="line">    supportedMediaTypes.add(MediaType.TEXT_PLAIN);</span><br><span class="line">    fastJsonHttpMessageConverter.setSupportedMediaTypes(supportedMediaTypes);</span><br><span class="line">    converters.add(fastJsonHttpMessageConverter);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>以下为项目本身的问题<br>4.pom文件中排除jackson的依赖<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;com.ejlerp&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;ejlerp-common&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;3.2.0-SNAPSHOT&lt;/version&gt;</span><br><span class="line">    &lt;exclusions&gt;</span><br><span class="line">        &lt;exclusion&gt;</span><br><span class="line">            &lt;artifactId&gt;jackson-core&lt;/artifactId&gt;</span><br><span class="line">            &lt;groupId&gt;com.fasterxml.jackson.core&lt;/groupId&gt;</span><br><span class="line">        &lt;/exclusion&gt;</span><br><span class="line">    &lt;/exclusions&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure></p>
+<p>5.fastjason默认支持所有的contentType,及*, 与springmvc校验相冲突,so需要声明fastjason能支持的contentType,在初始化FastJsonHttpMessageConverter,注入参数<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@Override</span><br><span class="line">public void extendMessageConverters(List&lt;HttpMessageConverter&lt;?&gt;&gt; converters) &#123;</span><br><span class="line">    FastJsonHttpMessageConverter fastJsonHttpMessageConverter = new FastJsonHttpMessageConverter();</span><br><span class="line">    ArrayList&lt;MediaType&gt; supportedMediaTypes = Lists.newArrayList();</span><br><span class="line">    supportedMediaTypes.add(MediaType.APPLICATION_FORM_URLENCODED);</span><br><span class="line">    supportedMediaTypes.add(MediaType.APPLICATION_JSON);</span><br><span class="line">    supportedMediaTypes.add(MediaType.TEXT_HTML);</span><br><span class="line">    supportedMediaTypes.add(MediaType.TEXT_PLAIN);</span><br><span class="line">    fastJsonHttpMessageConverter.setSupportedMediaTypes(supportedMediaTypes);</span><br><span class="line">    converters.add(fastJsonHttpMessageConverter);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <h1 id="fastjson官网"><a href="#fastjson官网" class="headerlink" title="fastjson官网"></a>fastjson官网</h1><p><a href="https://github.com/alibaba/fastjson/issues/1555" target="_blank" rel="noopener">https://github.com/alibaba/fastjson/issues/1555</a><br><a href="https://github.com/alibaba/fastjson/wiki/PropertyNamingStrategy_cn" target="_blank" rel="noopener">https://github.com/alibaba/fastjson/wiki/PropertyNamingStrategy_cn</a></p>
 
       
     </div>
+
+    
+      
+
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2018/01/22/java/java_spring/study-springboot-springmvc/" rel="bookmark">springboot配置FastJsonHttpMessageConverter(原理篇)</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2018/07/03/java/maven-resources-plugin/" rel="bookmark">maven-resources插件</a></div>
+      
+    </li>
+  
+  </ul>
+
 
     
 
@@ -685,7 +708,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">204</span>
+                    <span class="site-state-item-count">211</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -760,7 +783,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">31</span>
+                      
+                    
+                    <span class="site-state-item-count">32</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -772,8 +797,6 @@
                 <div class="site-state-item site-state-tags">
                   <a href="/tags/index.html">
                     
-                    
-                      
                     
                       
                     
@@ -974,11 +997,6 @@
               
                 <span class="links-of-author-item">
                   <a href="https://github.com/victorsheng" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
-                  
-                </span>
-              
-                <span class="links-of-author-item">
-                  <a href="psychovitor@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
                   
                 </span>
               

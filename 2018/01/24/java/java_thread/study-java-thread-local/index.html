@@ -108,19 +108,19 @@
 
 
 
-  <meta name="description" content="Thread Local的作用提供了一种将实例绑定到当前线程的机制，类似于隔离的效果. SoftReference、Weak Reference和PhantomRefrence强引用默认1234Object o=new Object();   Object o1=o;o=null;o1=null; 如果显式地设置o和o1为null，或超出范围，则gc认为该对象不存在引用，这时就可以收集它了。可以收">
+  <meta name="description" content="Thread Local的作用提供了一种将实例绑定到当前线程的机制，类似于隔离的效果. SoftReference、Weak Reference和PhantomRefrence强引用默认Object o=new Object();   Object o1=o;o=null;o1=null; 如果显式地设置o和o1为null，或超出范围，则gc认为该对象不存在引用，这时就可以收集它了。可以收集并不等">
 <meta name="keywords" content="多线程,引用">
 <meta property="og:type" content="article">
 <meta property="og:title" content="study-java-thread-local">
 <meta property="og:url" content="http://yoursite.com/2018/01/24/java/java_thread/study-java-thread-local/index.html">
 <meta property="og:site_name" content="Victor的博客">
-<meta property="og:description" content="Thread Local的作用提供了一种将实例绑定到当前线程的机制，类似于隔离的效果. SoftReference、Weak Reference和PhantomRefrence强引用默认1234Object o=new Object();   Object o1=o;o=null;o1=null; 如果显式地设置o和o1为null，或超出范围，则gc认为该对象不存在引用，这时就可以收集它了。可以收">
+<meta property="og:description" content="Thread Local的作用提供了一种将实例绑定到当前线程的机制，类似于隔离的效果. SoftReference、Weak Reference和PhantomRefrence强引用默认Object o=new Object();   Object o1=o;o=null;o1=null; 如果显式地设置o和o1为null，或超出范围，则gc认为该对象不存在引用，这时就可以收集它了。可以收集并不等">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://yoursite.com/images/pasted-44.png">
 <meta property="og:updated_time" content="2018-04-03T01:23:38.166Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="study-java-thread-local">
-<meta name="twitter:description" content="Thread Local的作用提供了一种将实例绑定到当前线程的机制，类似于隔离的效果. SoftReference、Weak Reference和PhantomRefrence强引用默认1234Object o=new Object();   Object o1=o;o=null;o1=null; 如果显式地设置o和o1为null，或超出范围，则gc认为该对象不存在引用，这时就可以收集它了。可以收">
+<meta name="twitter:description" content="Thread Local的作用提供了一种将实例绑定到当前线程的机制，类似于隔离的效果. SoftReference、Weak Reference和PhantomRefrence强引用默认Object o=new Object();   Object o1=o;o=null;o1=null; 如果显式地设置o和o1为null，或超出范围，则gc认为该对象不存在引用，这时就可以收集它了。可以收集并不等">
 <meta name="twitter:image" content="http://yoursite.com/images/pasted-44.png">
 
 
@@ -517,9 +517,9 @@
 
       
         <h1 id="Thread-Local的作用"><a href="#Thread-Local的作用" class="headerlink" title="Thread Local的作用"></a>Thread Local的作用</h1><p>提供了一种将实例绑定到当前线程的机制，类似于隔离的效果.</p>
-<h1 id="SoftReference、Weak-Reference和PhantomRefrence"><a href="#SoftReference、Weak-Reference和PhantomRefrence" class="headerlink" title="SoftReference、Weak Reference和PhantomRefrence"></a>SoftReference、Weak Reference和PhantomRefrence</h1><h2 id="强引用"><a href="#强引用" class="headerlink" title="强引用"></a>强引用</h2><p>默认<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Object o=new Object();   </span><br><span class="line">Object o1=o;</span><br><span class="line">o=null;</span><br><span class="line">o1=null;</span><br></pre></td></tr></table></figure></p>
+<h1 id="SoftReference、Weak-Reference和PhantomRefrence"><a href="#SoftReference、Weak-Reference和PhantomRefrence" class="headerlink" title="SoftReference、Weak Reference和PhantomRefrence"></a>SoftReference、Weak Reference和PhantomRefrence</h1><h2 id="强引用"><a href="#强引用" class="headerlink" title="强引用"></a>强引用</h2><p>默认<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Object o=new Object();   </span><br><span class="line">Object o1=o;</span><br><span class="line">o=null;</span><br><span class="line">o1=null;</span><br></pre></td></tr></table></figure></p>
 <p>如果显式地设置o和o1为null，或超出范围，则gc认为该对象不存在引用，这时就可以收集它了。可以收集并不等于就一会被收集，什么时候收集这要取决于gc的算法，这要就带来很多不确定性。</p>
-<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">String abc=new String(&quot;abc&quot;);  //1   </span><br><span class="line">SoftReference&lt;String&gt; abcSoftRef=new SoftReference&lt;String&gt;(abc);  //2   </span><br><span class="line">WeakReference&lt;String&gt; abcWeakRef = new WeakReference&lt;String&gt;(abc); //3   </span><br><span class="line">abc=null; //4   </span><br><span class="line">abcSoftRef.clear();//5</span><br></pre></td></tr></table></figure>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">String abc=new String(&quot;abc&quot;);  //1   </span><br><span class="line">SoftReference&lt;String&gt; abcSoftRef=new SoftReference&lt;String&gt;(abc);  //2   </span><br><span class="line">WeakReference&lt;String&gt; abcWeakRef = new WeakReference&lt;String&gt;(abc); //3   </span><br><span class="line">abc=null; //4   </span><br><span class="line">abcSoftRef.clear();//5</span><br></pre></td></tr></table></figure>
 <p>上面的代码中：<br>    第一行在heap对中创建内容为“abc”的对象，并建立abc到该对象的强引用,该对象是强可及的。<br>    第二行和第三行分别建立对heap中对象的软引用和弱引用，此时heap中的对象仍是强可及的。<br>    第四行之后heap中对象不再是强可及的，变成软可及的。同样第五行执行之后变成弱可及的。</p>
 <h2 id="软引用"><a href="#软引用" class="headerlink" title="软引用"></a>软引用</h2><p>被 Soft Reference 指到的对象，即使没有任何 Direct Reference，也不会被清除。一直要到 JVM 内存不足且 没有 Direct Reference 时才会清除</p>
 <p>SoftReference 是用来设计 object-cache 之用的。如此一来 SoftReference 不但可以把对象 cache 起来，也不会造成内存不足的错误 （OutOfMemoryError）。我觉得 Soft Reference 也适合拿来实作 pooling 的技巧。</p>
@@ -534,11 +534,11 @@
 <p>如果一个对象只具有弱引用，那就类似于可有可物的生活用品。弱引用与软引用的区别在于：只具有弱引用的对象拥有更短暂的生命周期。<b>在垃圾回收器线程扫描它 所管辖的内存区域的过程中，一旦发现了只具有弱引用的对象，不管当前内存空间足够与否，都会回收它的内存。</b>不过，由于垃圾回收器是一个优先级很低的线程， 因此不一定会很快发现那些只具有弱引用的对象。</p>
 <p>弱引用可以和一个引用队列（ReferenceQueue）联合使用，如果弱引用所引用的对象被垃圾回收，Java虚拟机就会把这个弱引用加入到与之关联的引用队列中。</p>
 <hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">C c = new C(b);</span><br><span class="line">b = null;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">C c = new C(b);</span><br><span class="line">b = null;</span><br></pre></td></tr></table></figure>
 <p>当 b 被设置成null时，那么是否意味这一段时间后GC工作可以回收 b 所分配的内存空间呢？答案是否定的，因为即使 b 被设置成null，但 c 仍然持有对 b 的引用，而且还是强引用，所以GC不会回收 b 原先所分配的空间，既不能回收，又不能使用，这就造成了 内存泄露。<br>可以通过c = null;，也可以使用弱引用WeakReference w = new WeakReference(b);。因为使用了弱引用WeakReference，GC是可以回收 b 原先所分配的空间的。<br>如果是强引用,且thread依旧存活, Thread Ref -&gt; Thread -&gt; ThreaLocalMap -&gt; Entry -&gt; value 永远无法回收，造成内存泄漏。<br>ThreadLocalMap的设计中已经考虑到这种情况，也加上了一些防护措施：在ThreadLocal的get(),set(),remove()的时候都会清除线程ThreadLocalMap里所有key为null的value。</p>
 <h2 id="虚引用"><a href="#虚引用" class="headerlink" title="虚引用"></a>虚引用</h2><p> “虚引用”顾名思义，就是形同虚设，与其他几种引用都不同，虚引用并不会决定对象的生命周期。如果一个对象仅持有虚引用，那么它就和没有任何引用一样，在任何时候都可能被垃圾回收。<br>    虚引用主要用来跟踪对象被垃圾回收的活动。虚引用与软引用和弱引用的一个区别在于：虚引用必须和引用队列（ReferenceQueue）联合使用。当垃 圾回收器准备回收一个对象时，如果发现它还有虚引用，就会在回收对象的内存之前，把这个虚引用加入到与之关联的引用队列中。程序可以通过判断引用队列中是 否已经加入了虚引用，来了解</p>
 <pre><code>被引用的对象是否将要被垃圾回收。程序如果发现某个虚引用已经被加入到引用队列，那么就可以在所引用的对象的内存被回收之前采取必要的行动。
-</code></pre><h1 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">public T get() &#123;</span><br><span class="line">    Thread t = Thread.currentThread();</span><br><span class="line">    ThreadLocalMap map = getMap(t);</span><br><span class="line">    if (map != null) &#123;</span><br><span class="line">        ThreadLocalMap.Entry e = map.getEntry(this);</span><br><span class="line">        if (e != null) &#123;</span><br><span class="line">            @SuppressWarnings(&quot;unchecked&quot;)</span><br><span class="line">            T result = (T)e.value;</span><br><span class="line">            return result;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return setInitialValue();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public void set(T value) &#123;</span><br><span class="line">    Thread t = Thread.currentThread();</span><br><span class="line">    ThreadLocalMap map = getMap(t);</span><br><span class="line">    if (map != null)</span><br><span class="line">        map.set(this, value);</span><br><span class="line">    else</span><br><span class="line">        createMap(t, value);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"> public void remove() &#123;</span><br><span class="line">     ThreadLocalMap m = getMap(Thread.currentThread());</span><br><span class="line">     if (m != null)</span><br><span class="line">         m.remove(this);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+</code></pre><h1 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h1><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public T get() &#123;</span><br><span class="line">    Thread t = Thread.currentThread();</span><br><span class="line">    ThreadLocalMap map = getMap(t);</span><br><span class="line">    if (map != null) &#123;</span><br><span class="line">        ThreadLocalMap.Entry e = map.getEntry(this);</span><br><span class="line">        if (e != null) &#123;</span><br><span class="line">            @SuppressWarnings(&quot;unchecked&quot;)</span><br><span class="line">            T result = (T)e.value;</span><br><span class="line">            return result;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return setInitialValue();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public void set(T value) &#123;</span><br><span class="line">    Thread t = Thread.currentThread();</span><br><span class="line">    ThreadLocalMap map = getMap(t);</span><br><span class="line">    if (map != null)</span><br><span class="line">        map.set(this, value);</span><br><span class="line">    else</span><br><span class="line">        createMap(t, value);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"> public void remove() &#123;</span><br><span class="line">     ThreadLocalMap m = getMap(Thread.currentThread());</span><br><span class="line">     if (m != null)</span><br><span class="line">         m.remove(this);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
 <h1 id="内部结构"><a href="#内部结构" class="headerlink" title="内部结构"></a>内部结构</h1><p>存储在Thread中的 java.lang.ThreadLocal.ThreadLocalMap类型的内部成员变量<br>其中 的Entry是弱引用:</p>
 <p>static class Entry extends WeakReference&lt;ThreadLocal&lt;?&gt;&gt;</p>
 <h1 id="ThreadLocal为什么使用WeakReference"><a href="#ThreadLocal为什么使用WeakReference" class="headerlink" title="ThreadLocal为什么使用WeakReference"></a>ThreadLocal为什么使用WeakReference</h1><p><img src="/images/pasted-44.png" alt="upload successful"></p>
@@ -566,6 +566,50 @@
 
       
     </div>
+
+    
+      
+
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2018/04/02/java/java_thread/JUC-ReentrantReadWriteLock/" rel="bookmark">AQS-ReentrantReadWriteLock</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2018/03/30/java/java_thread/JUC-1-overview/" rel="bookmark">juc概览</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2018/04/02/java/java_thread/JUC-3-AQS/" rel="bookmark">AbstractQueuedSynchronizer学习</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2018/02/28/java/java_thread/JUC-4-cas-unsafe/" rel="bookmark">CAS和Unsafe</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2018/04/03/java/java_thread/JUC-CyclicBarrier/" rel="bookmark">CyclicBarrier循环屏障</a></div>
+      
+    </li>
+  
+  </ul>
+
 
     
 
@@ -714,7 +758,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">204</span>
+                    <span class="site-state-item-count">211</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -789,7 +833,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">31</span>
+                      
+                    
+                    <span class="site-state-item-count">32</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -801,8 +847,6 @@
                 <div class="site-state-item site-state-tags">
                   <a href="/tags/index.html">
                     
-                    
-                      
                     
                       
                     
@@ -1003,11 +1047,6 @@
               
                 <span class="links-of-author-item">
                   <a href="https://github.com/victorsheng" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
-                  
-                </span>
-              
-                <span class="links-of-author-item">
-                  <a href="psychovitor@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
                   
                 </span>
               

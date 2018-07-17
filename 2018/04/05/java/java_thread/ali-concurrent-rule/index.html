@@ -496,7 +496,7 @@
 <li>【推荐】避免 Random 实例被多线程使用，虽然共享该实例是线程安全的，但会因竞争同一 seed 导致的性能下降。<br>说明:Random 实例包括 java.util.Random 的实例或者 Math.random()实例。<br>正例:在 JDK7 之后，可以直接使用 API ThreadLocalRandom，在 JDK7 之前，可以做到每个 线程一个实例。</li>
 <li>【推荐】在并发场景下，通过双重检查锁(double-checked locking)实现延迟初始化的优化问题隐患(可参考 The “Double-Checked Locking is Broken” Declaration)，推荐问题解决方案中较为简单一种(适用于 JDK5 及以上版本)，将目标属性声明为 volatile 型。 反例:</li>
 </ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">class Foo &#123;</span><br><span class="line">private Helper helper = null; public Helper getHelper() &#123;</span><br><span class="line">if (helper == null) synchronized(this) &#123; if (helper == null)</span><br><span class="line">helper = new Helper();</span><br><span class="line">&#125;</span><br><span class="line">return helper; &#125;</span><br><span class="line">// other functions and members...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">class Foo &#123;</span><br><span class="line">private Helper helper = null; public Helper getHelper() &#123;</span><br><span class="line">if (helper == null) synchronized(this) &#123; if (helper == null)</span><br><span class="line">helper = new Helper();</span><br><span class="line">&#125;</span><br><span class="line">return helper; &#125;</span><br><span class="line">// other functions and members...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>13.【参考】volatile 解决多线程内存不可见问题。对于一写多读，是可以解决变量同步问题， 但是如果多写，同样无法解决线程安全问题。如果是 count++操作，使用如下类实现: AtomicInteger count = new AtomicInteger(); count.addAndGet(1); 如果是 JDK8，推 荐使用 LongAdder 对象，比 AtomicLong 性能更好(减少乐观锁的重试次数)。</p>
 <ol start="14">
 <li>【参考】 HashMap 在容量不够进行 resize 时由于高并发可能出现死链，导致 CPU 飙升，在 开发过程中注意规避此风险。</li>
@@ -505,6 +505,10 @@
 
       
     </div>
+
+    
+      
+
 
     
 
@@ -636,7 +640,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">204</span>
+                    <span class="site-state-item-count">211</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -711,7 +715,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">31</span>
+                      
+                    
+                    <span class="site-state-item-count">32</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -723,8 +729,6 @@
                 <div class="site-state-item site-state-tags">
                   <a href="/tags/index.html">
                     
-                    
-                      
                     
                       
                     
@@ -925,11 +929,6 @@
               
                 <span class="links-of-author-item">
                   <a href="https://github.com/victorsheng" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
-                  
-                </span>
-              
-                <span class="links-of-author-item">
-                  <a href="psychovitor@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
                   
                 </span>
               

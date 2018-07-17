@@ -607,11 +607,11 @@
 <li>virtualBox安装</li>
 <li>minikube安装</li>
 <li>kubectl安装</li>
-<li>需要ss的的代理,否则google的镜像无法下载<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">minikube delete</span><br><span class="line"></span><br><span class="line">minikube start --docker-env HTTP_PROXY=http://192.168.99.1:1087 --docker-env HTTPS_PROXY=http://192.168.99.1:1087 --docker-env NO_PROXY=192.168.99.0/24</span><br><span class="line"></span><br><span class="line">kubectl get pods --all-namespaces</span><br><span class="line"></span><br><span class="line">等待ready</span><br><span class="line"></span><br><span class="line">kubectl get nodes</span><br></pre></td></tr></table></figure>
+<li>需要ss的的代理,否则google的镜像无法下载<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">minikube delete</span><br><span class="line"></span><br><span class="line">minikube start --docker-env HTTP_PROXY=http://192.168.99.1:1087 --docker-env HTTPS_PROXY=http://192.168.99.1:1087 --docker-env NO_PROXY=192.168.99.0/24</span><br><span class="line"></span><br><span class="line">kubectl get pods --all-namespaces</span><br><span class="line"></span><br><span class="line">等待ready</span><br><span class="line"></span><br><span class="line">kubectl get nodes</span><br></pre></td></tr></table></figure>
 </li>
 </ul>
 <p><img src="http://pic.victor123.cn/17-12-21/46187591.jpg"></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">victordeMacBook-Pro:~ victor$ kubectl run nginx --image=nginx --port=80</span><br><span class="line">deployment &quot;nginx&quot; created</span><br><span class="line">victordeMacBook-Pro:~ victor$ kubectl expose deployment nginx --port=80 --type=NodePort --name=nginx-http</span><br><span class="line">service &quot;nginx-http&quot; exposed</span><br><span class="line">victordeMacBook-Pro:~ victor$ kubectl get pods</span><br><span class="line">NAME                     READY     STATUS              RESTARTS   AGE</span><br><span class="line">nginx-85dfb4bc54-72fbk   0/1       ContainerCreating   0          17s</span><br><span class="line">victordeMacBook-Pro:~ victor$ kubectl get services</span><br><span class="line">NAME         TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)        AGE</span><br><span class="line">kubernetes   ClusterIP   10.96.0.1     &lt;none&gt;        443/TCP        20m</span><br><span class="line">nginx-http   NodePort    10.99.7.195   &lt;none&gt;        80:32562/TCP   12s</span><br><span class="line">victordeMacBook-Pro:~ victor$ minikube service nginx-http --url</span><br><span class="line">Waiting, endpoint for service is not ready yet...</span><br><span class="line">Waiting, endpoint for service is not ready yet...</span><br><span class="line">Waiting, endpoint for service is not ready yet...</span><br><span class="line">Waiting, endpoint for service is not ready yet...</span><br><span class="line">^C</span><br><span class="line">victordeMacBook-Pro:~ victor$ kubectl get nodes</span><br><span class="line">NAME       STATUS    ROLES     AGE       VERSION</span><br><span class="line">minikube   Ready     &lt;none&gt;    22m       v1.8.0</span><br><span class="line">victordeMacBook-Pro:~ victor$ kubectl get pods</span><br><span class="line">NAME                     READY     STATUS    RESTARTS   AGE</span><br><span class="line">nginx-85dfb4bc54-72fbk   1/1       Running   0          2m</span><br><span class="line">victordeMacBook-Pro:~ victor$ minikube service nginx-http --url</span><br><span class="line">http://192.168.99.100:32562</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">victordeMacBook-Pro:~ victor$ kubectl run nginx --image=nginx --port=80</span><br><span class="line">deployment &quot;nginx&quot; created</span><br><span class="line">victordeMacBook-Pro:~ victor$ kubectl expose deployment nginx --port=80 --type=NodePort --name=nginx-http</span><br><span class="line">service &quot;nginx-http&quot; exposed</span><br><span class="line">victordeMacBook-Pro:~ victor$ kubectl get pods</span><br><span class="line">NAME                     READY     STATUS              RESTARTS   AGE</span><br><span class="line">nginx-85dfb4bc54-72fbk   0/1       ContainerCreating   0          17s</span><br><span class="line">victordeMacBook-Pro:~ victor$ kubectl get services</span><br><span class="line">NAME         TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)        AGE</span><br><span class="line">kubernetes   ClusterIP   10.96.0.1     &lt;none&gt;        443/TCP        20m</span><br><span class="line">nginx-http   NodePort    10.99.7.195   &lt;none&gt;        80:32562/TCP   12s</span><br><span class="line">victordeMacBook-Pro:~ victor$ minikube service nginx-http --url</span><br><span class="line">Waiting, endpoint for service is not ready yet...</span><br><span class="line">Waiting, endpoint for service is not ready yet...</span><br><span class="line">Waiting, endpoint for service is not ready yet...</span><br><span class="line">Waiting, endpoint for service is not ready yet...</span><br><span class="line">^C</span><br><span class="line">victordeMacBook-Pro:~ victor$ kubectl get nodes</span><br><span class="line">NAME       STATUS    ROLES     AGE       VERSION</span><br><span class="line">minikube   Ready     &lt;none&gt;    22m       v1.8.0</span><br><span class="line">victordeMacBook-Pro:~ victor$ kubectl get pods</span><br><span class="line">NAME                     READY     STATUS    RESTARTS   AGE</span><br><span class="line">nginx-85dfb4bc54-72fbk   1/1       Running   0          2m</span><br><span class="line">victordeMacBook-Pro:~ victor$ minikube service nginx-http --url</span><br><span class="line">http://192.168.99.100:32562</span><br></pre></td></tr></table></figure>
 <ul>
 <li>tips:</li>
 <li>本地的ss需要设置http代理,其中监听的地址从127.0.0.1改为0.0.0.0,这样虚拟机就可以访问到了,在这步卡了很久</li>
@@ -632,6 +632,29 @@
 
       
     </div>
+
+    
+      
+
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2017/12/20/微服务/study-service-mesh/" rel="bookmark">study-service-mesh(服务网格)</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2017/11/27/运维-测试/docker/share-docker/" rel="bookmark">docker学习分型</a></div>
+      
+    </li>
+  
+  </ul>
+
 
     
 
@@ -780,7 +803,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">204</span>
+                    <span class="site-state-item-count">211</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -855,7 +878,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">31</span>
+                      
+                    
+                    <span class="site-state-item-count">32</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -867,8 +892,6 @@
                 <div class="site-state-item site-state-tags">
                   <a href="/tags/index.html">
                     
-                    
-                      
                     
                       
                     
@@ -1069,11 +1092,6 @@
               
                 <span class="links-of-author-item">
                   <a href="https://github.com/victorsheng" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
-                  
-                </span>
-              
-                <span class="links-of-author-item">
-                  <a href="psychovitor@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
                   
                 </span>
               

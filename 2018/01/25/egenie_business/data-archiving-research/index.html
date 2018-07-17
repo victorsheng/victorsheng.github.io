@@ -523,8 +523,8 @@
 <p>我们根据数据行的创建时间，按年将数据放入到不同的分区，这里需要注意的是在2020年以后，我们还需要在表里添加新的年份，当然我们可以提前加更多的分区或者部署脚本来自动化创建新的分区。</p>
 <h3 id="通过状态进行分区"><a href="#通过状态进行分区" class="headerlink" title="通过状态进行分区"></a>通过状态进行分区</h3><p>我们也可以通过status状态列来进行分区，这种情况下，通常状态列会包含active/inactive两种状态，然后通过update进行状态列的更新（使用replace或者insert+delete也是可以的），将数据放入到正确的分区当中。请看下面的示例</p>
 <h2 id="通过ID进行分区"><a href="#通过ID进行分区" class="headerlink" title="通过ID进行分区"></a>通过ID进行分区</h2><h1 id="具体方案"><a href="#具体方案" class="headerlink" title="具体方案"></a>具体方案</h1><h2 id="复制表并且按照条件插入数据（此种方法除了主键索引不包括其他索引）–-gt-手动sql"><a href="#复制表并且按照条件插入数据（此种方法除了主键索引不包括其他索引）–-gt-手动sql" class="headerlink" title="复制表并且按照条件插入数据（此种方法除了主键索引不包括其他索引）–&gt;手动sql"></a>复制表并且按照条件插入数据（此种方法除了主键索引不包括其他索引）–&gt;手动sql</h2><p><a href="http://blog.csdn.net/bluestarf/article/details/49641047" target="_blank" rel="noopener">http://blog.csdn.net/bluestarf/article/details/49641047</a></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE lime_survey_549656_20151001 as select * from lime_survey_549656  where submitdate &lt; &quot;2015-10-01 00:00:00&quot;;  </span><br><span class="line">   </span><br><span class="line">ALTER TABLE lime_survey_549656_20151001 change id id int primary key auto_increment;</span><br></pre></td></tr></table></figure>
-<h2 id="创建一张空表，结构和索引和原表一样-–-gt-手动sql"><a href="#创建一张空表，结构和索引和原表一样-–-gt-手动sql" class="headerlink" title="创建一张空表，结构和索引和原表一样 –&gt;手动sql"></a>创建一张空表，结构和索引和原表一样 –&gt;手动sql</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">create table lime_survey_549656_20151001 like lime_survey_549656;   </span><br><span class="line">INSERT INTO lime_survey_549656_20151001 select * from lime_survey_549656  where submitdate &lt; &quot;2015-10-01 00:00:00&quot;;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">CREATE TABLE lime_survey_549656_20151001 as select * from lime_survey_549656  where submitdate &lt; &quot;2015-10-01 00:00:00&quot;;  </span><br><span class="line">   </span><br><span class="line">ALTER TABLE lime_survey_549656_20151001 change id id int primary key auto_increment;</span><br></pre></td></tr></table></figure>
+<h2 id="创建一张空表，结构和索引和原表一样-–-gt-手动sql"><a href="#创建一张空表，结构和索引和原表一样-–-gt-手动sql" class="headerlink" title="创建一张空表，结构和索引和原表一样 –&gt;手动sql"></a>创建一张空表，结构和索引和原表一样 –&gt;手动sql</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">create table lime_survey_549656_20151001 like lime_survey_549656;   </span><br><span class="line">INSERT INTO lime_survey_549656_20151001 select * from lime_survey_549656  where submitdate &lt; &quot;2015-10-01 00:00:00&quot;;</span><br></pre></td></tr></table></figure>
 <h2 id="存储过程来归档"><a href="#存储过程来归档" class="headerlink" title="存储过程来归档"></a>存储过程来归档</h2><h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>无法跨数据库备份</p>
 <h2 id="分区实现"><a href="#分区实现" class="headerlink" title="分区实现"></a>分区实现</h2><h3 id="问题-1"><a href="#问题-1" class="headerlink" title="问题"></a>问题</h3><ul>
 <li>表中有全文索引,无法分区</li>
@@ -587,6 +587,10 @@
 
       
     </div>
+
+    
+      
+
 
     
 
@@ -733,7 +737,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">204</span>
+                    <span class="site-state-item-count">211</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -808,7 +812,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">31</span>
+                      
+                    
+                    <span class="site-state-item-count">32</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -820,8 +826,6 @@
                 <div class="site-state-item site-state-tags">
                   <a href="/tags/index.html">
                     
-                    
-                      
                     
                       
                     
@@ -1022,11 +1026,6 @@
               
                 <span class="links-of-author-item">
                   <a href="https://github.com/victorsheng" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
-                  
-                </span>
-              
-                <span class="links-of-author-item">
-                  <a href="psychovitor@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
                   
                 </span>
               

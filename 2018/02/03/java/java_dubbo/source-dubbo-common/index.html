@@ -108,17 +108,17 @@
 
 
 
-  <meta name="description" content="ExtensionLoader源码扩展点是Dubbo的核心，而扩展点的核心则是ExtensionLoader，这个类有点类似ClassLoader，但是ExtensionLoader是加载Dubbo的扩展点的。下面列出ExtensionLoader几个重要的属性结构。 123456789101112public class ExtensionLoader&amp;lt;T&amp;gt; &amp;#123;privat">
+  <meta name="description" content="ExtensionLoader源码扩展点是Dubbo的核心，而扩展点的核心则是ExtensionLoader，这个类有点类似ClassLoader，但是ExtensionLoader是加载Dubbo的扩展点的。下面列出ExtensionLoader几个重要的属性结构。 public class ExtensionLoader&amp;lt;T&amp;gt; &amp;#123;private static final">
 <meta property="og:type" content="article">
 <meta property="og:title" content="source-dubbo-common">
 <meta property="og:url" content="http://yoursite.com/2018/02/03/java/java_dubbo/source-dubbo-common/index.html">
 <meta property="og:site_name" content="Victor的博客">
-<meta property="og:description" content="ExtensionLoader源码扩展点是Dubbo的核心，而扩展点的核心则是ExtensionLoader，这个类有点类似ClassLoader，但是ExtensionLoader是加载Dubbo的扩展点的。下面列出ExtensionLoader几个重要的属性结构。 123456789101112public class ExtensionLoader&amp;lt;T&amp;gt; &amp;#123;privat">
+<meta property="og:description" content="ExtensionLoader源码扩展点是Dubbo的核心，而扩展点的核心则是ExtensionLoader，这个类有点类似ClassLoader，但是ExtensionLoader是加载Dubbo的扩展点的。下面列出ExtensionLoader几个重要的属性结构。 public class ExtensionLoader&amp;lt;T&amp;gt; &amp;#123;private static final">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:updated_time" content="2018-04-03T01:23:38.149Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="source-dubbo-common">
-<meta name="twitter:description" content="ExtensionLoader源码扩展点是Dubbo的核心，而扩展点的核心则是ExtensionLoader，这个类有点类似ClassLoader，但是ExtensionLoader是加载Dubbo的扩展点的。下面列出ExtensionLoader几个重要的属性结构。 123456789101112public class ExtensionLoader&amp;lt;T&amp;gt; &amp;#123;privat">
+<meta name="twitter:description" content="ExtensionLoader源码扩展点是Dubbo的核心，而扩展点的核心则是ExtensionLoader，这个类有点类似ClassLoader，但是ExtensionLoader是加载Dubbo的扩展点的。下面列出ExtensionLoader几个重要的属性结构。 public class ExtensionLoader&amp;lt;T&amp;gt; &amp;#123;private static final">
 
 
 
@@ -496,14 +496,14 @@
 
       
         <h1 id="ExtensionLoader源码"><a href="#ExtensionLoader源码" class="headerlink" title="ExtensionLoader源码"></a>ExtensionLoader源码</h1><p>扩展点是Dubbo的核心，而扩展点的核心则是ExtensionLoader，这个类有点类似ClassLoader，但是ExtensionLoader是加载Dubbo的扩展点的。下面列出ExtensionLoader几个重要的属性结构。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">public class ExtensionLoader&lt;T&gt; &#123;</span><br><span class="line">private static final ConcurrentMap&lt;Class&lt;?&gt;, ExtensionLoader&lt;?&gt;&gt; EXTENSION_LOADERS = new ConcurrentHashMap&lt;Class&lt;?&gt;, ExtensionLoader&lt;?&gt;&gt;();</span><br><span class="line"></span><br><span class="line">private static final ConcurrentMap&lt;Class&lt;?&gt;, Object&gt; EXTENSION_INSTANCES = new ConcurrentHashMap&lt;Class&lt;?&gt;, Object&gt;();</span><br><span class="line"></span><br><span class="line">private final Class&lt;?&gt; type;</span><br><span class="line"></span><br><span class="line">private final ExtensionFactory objectFactory;</span><br><span class="line"></span><br><span class="line">private final Holder&lt;Map&lt;String, Class&lt;?&gt;&gt;&gt; cachedClasses = new Holder&lt;Map&lt;String,Class&lt;?&gt;&gt;&gt;();</span><br><span class="line">private final Holder&lt;Object&gt; cachedAdaptiveInstance = new Holder&lt;Object&gt;();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public class ExtensionLoader&lt;T&gt; &#123;</span><br><span class="line">private static final ConcurrentMap&lt;Class&lt;?&gt;, ExtensionLoader&lt;?&gt;&gt; EXTENSION_LOADERS = new ConcurrentHashMap&lt;Class&lt;?&gt;, ExtensionLoader&lt;?&gt;&gt;();</span><br><span class="line"></span><br><span class="line">private static final ConcurrentMap&lt;Class&lt;?&gt;, Object&gt; EXTENSION_INSTANCES = new ConcurrentHashMap&lt;Class&lt;?&gt;, Object&gt;();</span><br><span class="line"></span><br><span class="line">private final Class&lt;?&gt; type;</span><br><span class="line"></span><br><span class="line">private final ExtensionFactory objectFactory;</span><br><span class="line"></span><br><span class="line">private final Holder&lt;Map&lt;String, Class&lt;?&gt;&gt;&gt; cachedClasses = new Holder&lt;Map&lt;String,Class&lt;?&gt;&gt;&gt;();</span><br><span class="line">private final Holder&lt;Object&gt; cachedAdaptiveInstance = new Holder&lt;Object&gt;();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <ul>
 <li>可以看到EXTENSION_LOADERS属性是一个static final的，那么说明应该是一个常量，这个就是用来装载dubbo的所有扩展点的ExtensionLoader</li>
 <li>在Dubbo中，每种类型的扩展点都会有一个与其对应的ExtensionLoader，类似jvm中每个Class都会有一个ClassLoader,每个ExtensionLoader会包含多个该扩展点的实现，类似一个ClassLoader可以加载多个具体的类，但是不同的ExtensionLoader之间是隔离的，这点也和ClassLoader类似。那么理解dubbo的ExtensionLoader可以拿ClassLoader来进行类比，这样会加快自己对它的理解。</li>
 <li>另一个常量属性是EXTENSION_INSTANCES，他是一个具体扩展类的实体，用于缓存，防止由于扩展点比较重，导致会浪费没必要的资源，所以在实现扩展点的时候，一定要确保扩展点可单例化，否则可能会出现问题。</li>
 <li>另一个重要的属性是type，这里的type一般是接口，用于制定扩展点的类型，因为dubbo的扩展点申明是SPI的方式，所以某一个类型扩展点，就需要申明一个扩展点接口。</li>
 </ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">private ExtensionLoader(Class&lt;?&gt; type) &#123;</span><br><span class="line">    this.type = type;</span><br><span class="line">    objectFactory = (type == ExtensionFactory.class ? null : ExtensionLoader.getExtensionLoader(ExtensionFactory.class).getAdaptiveExtension());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">private ExtensionLoader(Class&lt;?&gt; type) &#123;</span><br><span class="line">    this.type = type;</span><br><span class="line">    objectFactory = (type == ExtensionFactory.class ? null : ExtensionLoader.getExtensionLoader(ExtensionFactory.class).getAdaptiveExtension());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <ul>
 <li>在ExtensionLoader.getExtensionLoader(ExtensionFactory.class)之后，不是直接返回某个扩展点，而是调用getAdaptiveExtension来获取一个扩展的适配器，这是为什么呢？因为一个扩展点有多个具体扩展的实现，那么直接通过ExtensionLoader直接返回一个扩展是不可靠的，需要一个适配器来根据实际情况返回具体的扩展实现。所以这里就有了cachedAdaptiveInstance属性的存在，dubbo里面的每个扩展的ExtensionLoader都有一个cachedAdaptiveInstance，这个属性的类型必须实现ExtensionLoader.type接口，这就是设计模式中的适配器模式。比如ExtensionFactory扩展点就有AdaptiveExtensionFactory适配器。扩展点的适配器可以是自己通过@Adaptive，也可以不提供实现，由dubbo通过动态生成Adaptive来提供一个适配器类。此处需要注意：Adaptive也是扩展点的某个实现，下面例举出ExtensionFactory扩展点的适配器</li>
 <li>cachedClasses,这个就是存储当前ExtensionLoader有哪些扩展点实现，从而可以实例化出某个具体的扩展点实体，cachedClasses声明为Holder&lt;Map&lt;String, Class&lt;?&gt;&gt;&gt;类型，其实可以理解为是Map&lt;String, Class&lt;?&gt;&gt;类型，Map的key是在type.getName文件中的=之前的内容，value这是这个扩展点实现的类对象了。</li>
@@ -518,6 +518,10 @@
 
       
     </div>
+
+    
+      
+
 
     
 
@@ -658,7 +662,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">204</span>
+                    <span class="site-state-item-count">211</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -733,7 +737,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">31</span>
+                      
+                    
+                    <span class="site-state-item-count">32</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -745,8 +751,6 @@
                 <div class="site-state-item site-state-tags">
                   <a href="/tags/index.html">
                     
-                    
-                      
                     
                       
                     
@@ -947,11 +951,6 @@
               
                 <span class="links-of-author-item">
                   <a href="https://github.com/victorsheng" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
-                  
-                </span>
-              
-                <span class="links-of-author-item">
-                  <a href="psychovitor@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
                   
                 </span>
               

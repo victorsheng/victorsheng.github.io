@@ -511,7 +511,7 @@
 <li>将取到两个值相加后存入c</li>
 <li>在上面5个动作中，动作1可能会和动作2、4重排序，动作2可能会和动作1、3重排序，动作3可能会和动作2、4重排序，动作4可能会和1、3重排序。但动作1和动作3、5不能重排序。动作2和动作4、5不能重排序。因为它们之间存在数据依赖关系，一旦重排，as-if-serial语义便无法保证。</li>
 </ol>
-<p>为保证as-if-serial语义，Java异常处理机制也会为重排序做一些特殊处理。例如在下面的代码中，y = 0 / 0可能会被重排序在x = 2之前执行，为了保证最终不致于输出x = 1的错误结果，JIT在重排序时会在catch语句中插入错误代偿代码，将x赋值为2，将程序恢复到发生异常时应有的状态。这种做法的确将异常捕捉的逻辑变得复杂了，但是JIT的优化的原则是，尽力优化正常运行下的代码逻辑，哪怕以catch块逻辑变得复杂为代价，毕竟，进入catch块内是一种“异常”情况的表现。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">public class Reordering &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        int x, y;</span><br><span class="line">        x = 1;</span><br><span class="line">        try &#123;</span><br><span class="line">            x = 2;</span><br><span class="line">            y = 0 / 0;    </span><br><span class="line">        &#125; catch (Exception e) &#123;</span><br><span class="line">        &#125; finally &#123;</span><br><span class="line">            System.out.println(&quot;x = &quot; + x);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>为保证as-if-serial语义，Java异常处理机制也会为重排序做一些特殊处理。例如在下面的代码中，y = 0 / 0可能会被重排序在x = 2之前执行，为了保证最终不致于输出x = 1的错误结果，JIT在重排序时会在catch语句中插入错误代偿代码，将x赋值为2，将程序恢复到发生异常时应有的状态。这种做法的确将异常捕捉的逻辑变得复杂了，但是JIT的优化的原则是，尽力优化正常运行下的代码逻辑，哪怕以catch块逻辑变得复杂为代价，毕竟，进入catch块内是一种“异常”情况的表现。<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public class Reordering &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        int x, y;</span><br><span class="line">        x = 1;</span><br><span class="line">        try &#123;</span><br><span class="line">            x = 2;</span><br><span class="line">            y = 0 / 0;    </span><br><span class="line">        &#125; catch (Exception e) &#123;</span><br><span class="line">        &#125; finally &#123;</span><br><span class="line">            System.out.println(&quot;x = &quot; + x);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <h1 id="内存访问重排序与内存可见性"><a href="#内存访问重排序与内存可见性" class="headerlink" title="内存访问重排序与内存可见性"></a>内存访问重排序与内存可见性</h1><p>计算机系统中，为了尽可能地避免处理器访问主内存的时间开销，处理器大多会利用缓存(cache)以提高性能。其模型如下图所示。</p>
 <p><img src="/images/pasted-119.png" alt="upload successful"></p>
 <p>处理器Cache模型</p>
@@ -538,6 +538,10 @@
 
       
     </div>
+
+    
+      
+
 
     
 
@@ -678,7 +682,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">204</span>
+                    <span class="site-state-item-count">211</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -753,7 +757,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">31</span>
+                      
+                    
+                    <span class="site-state-item-count">32</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -765,8 +771,6 @@
                 <div class="site-state-item site-state-tags">
                   <a href="/tags/index.html">
                     
-                    
-                      
                     
                       
                     
@@ -967,11 +971,6 @@
               
                 <span class="links-of-author-item">
                   <a href="https://github.com/victorsheng" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
-                  
-                </span>
-              
-                <span class="links-of-author-item">
-                  <a href="psychovitor@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
                   
                 </span>
               

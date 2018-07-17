@@ -535,14 +535,58 @@
 <p><img src="/images/pasted-087.png" alt="upload successful"></p>
 <h1 id="针对limit-优化有很多种方式"><a href="#针对limit-优化有很多种方式" class="headerlink" title="针对limit 优化有很多种方式"></a>针对limit 优化有很多种方式</h1><p>1 前端加缓存、搜索，减少落到库的查询操作。比如海量商品可以放到搜索里面，使用瀑布流的方式展现数据，很多电商网站采用了这种方式。<br>2 优化SQL 访问数据的方式，直接快速定位到要访问的数据行。<br>3 使用<strong>书签方式</strong> ，记录上次查询最新/大的id值，向后追溯 M行记录。</p>
 <hr>
-<h2 id="快速定位"><a href="#快速定位" class="headerlink" title="快速定位"></a>快速定位</h2><p>对于第二种方式 我们推荐使用”延迟关联”的方法来优化排序操作，何谓”延迟关联” ：通过使用覆盖索引查询返回需要的主键,再根据主键关联原表获得需要的数据。<br>3.1 延迟关联<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">root@xxx 12:33:48&gt;explain SELECT id, cu_id, name, info, biz_type, gmt_create, gmt_modified,start_time, end_time, market_type, back_leaf_category,item_status,picuture_url FROM relation where biz_type =&apos;0&apos; AND end_time &gt;=&apos;2014-05-29&apos; ORDER BY id asc LIMIT 149420 ,20;</span><br><span class="line"></span><br><span class="line">explain SELECT a.* FROM relation a, (select id from relation where biz_type =&apos;0&apos; AND end_time &gt;=&apos;2014-05-29&apos; ORDER BY id asc LIMIT 149420 ,20 ) b where a.id=b.id;</span><br></pre></td></tr></table></figure></p>
-<h2 id="书签方式"><a href="#书签方式" class="headerlink" title="书签方式"></a>书签方式</h2><p>首先要获取复合条件的记录的最大 id和最小id(默认id是主键)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select max(id) as maxid ,min(id) as minid from t where kid=2333 and type=1;</span><br></pre></td></tr></table></figure></p>
+<h2 id="快速定位"><a href="#快速定位" class="headerlink" title="快速定位"></a>快速定位</h2><p>对于第二种方式 我们推荐使用”延迟关联”的方法来优化排序操作，何谓”延迟关联” ：通过使用覆盖索引查询返回需要的主键,再根据主键关联原表获得需要的数据。<br>3.1 延迟关联<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">root@xxx 12:33:48&gt;explain SELECT id, cu_id, name, info, biz_type, gmt_create, gmt_modified,start_time, end_time, market_type, back_leaf_category,item_status,picuture_url FROM relation where biz_type =&apos;0&apos; AND end_time &gt;=&apos;2014-05-29&apos; ORDER BY id asc LIMIT 149420 ,20;</span><br><span class="line"></span><br><span class="line">explain SELECT a.* FROM relation a, (select id from relation where biz_type =&apos;0&apos; AND end_time &gt;=&apos;2014-05-29&apos; ORDER BY id asc LIMIT 149420 ,20 ) b where a.id=b.id;</span><br></pre></td></tr></table></figure></p>
+<h2 id="书签方式"><a href="#书签方式" class="headerlink" title="书签方式"></a>书签方式</h2><p>首先要获取复合条件的记录的最大 id和最小id(默认id是主键)<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">select max(id) as maxid ,min(id) as minid from t where kid=2333 and type=1;</span><br></pre></td></tr></table></figure></p>
 <p>其次 根据id 大于最小值或者小于最大值 进行遍历。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">select xx,xx from t where      kid=2333 and type=1 and id &gt;=min_id order by id asc  limit 100;</span><br><span class="line"></span><br><span class="line">select xx,xx from t where      kid=2333 and type=1 and id &lt;=max_id order by id  desc limit 100;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">select xx,xx from t where      kid=2333 and type=1 and id &gt;=min_id order by id asc  limit 100;</span><br><span class="line"></span><br><span class="line">select xx,xx from t where      kid=2333 and type=1 and id &lt;=max_id order by id  desc limit 100;</span><br></pre></td></tr></table></figure>
 <p>使用延迟关联查询数据510ms ，使用基于书签模式的解决方法减少到10ms以内 绝对是一个质的飞跃。</p>
 
       
     </div>
+
+    
+      
+
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2018/03/10/egenie_bugfix/bugfix-mysql-lock-timeout/" rel="bookmark">mysql锁超时处理</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2018/01/06/egenie_bugfix/error-sql-update-lock/" rel="bookmark">error-sql-update-lock</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2017/12/13/egenie_bugfix/optime-156/" rel="bookmark">156服务器优化2:定位io高的原因mysql</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2018/01/24/mysql/mysql-debug/" rel="bookmark">mysql下划线关键字</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2018/03/29/mysql/mysql-master-slave/" rel="bookmark">mysql-master-slave</a></div>
+      
+    </li>
+  
+  </ul>
+
 
     
 
@@ -689,7 +733,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">204</span>
+                    <span class="site-state-item-count">211</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -764,7 +808,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">31</span>
+                      
+                    
+                    <span class="site-state-item-count">32</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -776,8 +822,6 @@
                 <div class="site-state-item site-state-tags">
                   <a href="/tags/index.html">
                     
-                    
-                      
                     
                       
                     
@@ -978,11 +1022,6 @@
               
                 <span class="links-of-author-item">
                   <a href="https://github.com/victorsheng" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
-                  
-                </span>
-              
-                <span class="links-of-author-item">
-                  <a href="psychovitor@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
                   
                 </span>
               

@@ -494,10 +494,10 @@
 <li>带超时的尝试获取锁，就是在尝试获取锁的时候，会有超时时间，当到达了指定的时间后，还未获取到锁，就返回false。</li>
 </ul>
 <h1 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h1><p><img src="/images/pasted-116.png" alt="upload successful"></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">public interface Lock &#123;</span><br><span class="line"></span><br><span class="line">    //获取锁，获取到锁后返回</span><br><span class="line">    //注意一定要记得释放锁</span><br><span class="line">    void lock();</span><br><span class="line"></span><br><span class="line">    //可中断的获取锁</span><br><span class="line">    //获取锁的时候，如果线程正在等待获取锁，则该线程能响应中断</span><br><span class="line">    void lockInterruptibly() throws InterruptedException;</span><br><span class="line"></span><br><span class="line">    //尝试获取锁，当线程获取锁的时候，获取成功与否都会立即返回</span><br><span class="line">    //不会一直等着去获取锁</span><br><span class="line">    boolean tryLock();</span><br><span class="line"></span><br><span class="line">    //带有超时时间的尝试获取锁</span><br><span class="line">    //在一定的时间内获取到锁会返回true</span><br><span class="line">    //在这段时间内被中断了，会返回</span><br><span class="line">    //在这段时间内，没有获取到锁，会返回false</span><br><span class="line">    boolean tryLock(long time, TimeUnit unit) throws InterruptedException;</span><br><span class="line"></span><br><span class="line">    //释放锁</span><br><span class="line">    void unlock();</span><br><span class="line"></span><br><span class="line">    //获取一个Condition对象。</span><br><span class="line">    Condition newCondition();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public interface Lock &#123;</span><br><span class="line"></span><br><span class="line">    //获取锁，获取到锁后返回</span><br><span class="line">    //注意一定要记得释放锁</span><br><span class="line">    void lock();</span><br><span class="line"></span><br><span class="line">    //可中断的获取锁</span><br><span class="line">    //获取锁的时候，如果线程正在等待获取锁，则该线程能响应中断</span><br><span class="line">    void lockInterruptibly() throws InterruptedException;</span><br><span class="line"></span><br><span class="line">    //尝试获取锁，当线程获取锁的时候，获取成功与否都会立即返回</span><br><span class="line">    //不会一直等着去获取锁</span><br><span class="line">    boolean tryLock();</span><br><span class="line"></span><br><span class="line">    //带有超时时间的尝试获取锁</span><br><span class="line">    //在一定的时间内获取到锁会返回true</span><br><span class="line">    //在这段时间内被中断了，会返回</span><br><span class="line">    //在这段时间内，没有获取到锁，会返回false</span><br><span class="line">    boolean tryLock(long time, TimeUnit unit) throws InterruptedException;</span><br><span class="line"></span><br><span class="line">    //释放锁</span><br><span class="line">    void unlock();</span><br><span class="line"></span><br><span class="line">    //获取一个Condition对象。</span><br><span class="line">    Condition newCondition();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h2 id="lockInterruptibly"><a href="#lockInterruptibly" class="headerlink" title="lockInterruptibly"></a>lockInterruptibly</h2><p>如果当前线程获得该锁，则将锁保持计数设置为 1。<br>   如果当前线程：<br>1）在进入此方法时已经设置了该线程的中断状态；或者<br>2）在等待获取锁的同时被中断。</p>
 <p>   则抛出 InterruptedException，并且清除当前线程的已中断状态。</p>
-<h2 id="tryLock"><a href="#tryLock" class="headerlink" title="tryLock"></a>tryLock</h2><p>如果该锁没有被另一个线程保持，并且立即返回 true 值，则将锁的保持计数设置为 1。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">即使已将此锁设置为使用公平排序策略，但是调用 tryLock() 仍将 立即获取锁（如果有可用的），</span><br><span class="line">而不管其他线程当前是否正在等待该锁。在某些情况下，此“闯入”行为可能很有用，即使它会打破公</span><br><span class="line">平性也如此。如果希望遵守此锁的公平设置，则使用 tryLock(0, TimeUnit.SECONDS)</span><br></pre></td></tr></table></figure></p>
+<h2 id="tryLock"><a href="#tryLock" class="headerlink" title="tryLock"></a>tryLock</h2><p>如果该锁没有被另一个线程保持，并且立即返回 true 值，则将锁的保持计数设置为 1。<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">即使已将此锁设置为使用公平排序策略，但是调用 tryLock() 仍将 立即获取锁（如果有可用的），</span><br><span class="line">而不管其他线程当前是否正在等待该锁。在某些情况下，此“闯入”行为可能很有用，即使它会打破公</span><br><span class="line">平性也如此。如果希望遵守此锁的公平设置，则使用 tryLock(0, TimeUnit.SECONDS)</span><br></pre></td></tr></table></figure></p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>lock ： 在锁上等待，直到获取锁；</p>
 <p>tryLock：立即返回，获得锁返回true,没获得锁返回false；</p>
 <p>tryInterruptibly：在锁上等待，直到获取锁，但是会响应中断，这个方法优先考虑响应中断，而不是响应锁的普通获取或重入获取。 </p>
@@ -511,6 +511,50 @@
 
       
     </div>
+
+    
+      
+
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2018/02/28/java/java_thread/JUC-ReetrantLock/" rel="bookmark">ReetrantLock源码</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2018/03/30/java/java_thread/JUC-1-overview/" rel="bookmark">juc概览</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2018/02/28/java/java_thread/JUC-4-cas-unsafe/" rel="bookmark">CAS和Unsafe</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2018/04/03/java/java_thread/JUC-CyclicBarrier/" rel="bookmark">CyclicBarrier循环屏障</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2018/04/02/java/java_thread/JUC-CountDownLatch/" rel="bookmark">CountDownLatch学习</a></div>
+      
+    </li>
+  
+  </ul>
+
 
     
 
@@ -657,7 +701,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">204</span>
+                    <span class="site-state-item-count">211</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -732,7 +776,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">31</span>
+                      
+                    
+                    <span class="site-state-item-count">32</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -744,8 +790,6 @@
                 <div class="site-state-item site-state-tags">
                   <a href="/tags/index.html">
                     
-                    
-                      
                     
                       
                     
@@ -946,11 +990,6 @@
               
                 <span class="links-of-author-item">
                   <a href="https://github.com/victorsheng" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
-                  
-                </span>
-              
-                <span class="links-of-author-item">
-                  <a href="psychovitor@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
                   
                 </span>
               
