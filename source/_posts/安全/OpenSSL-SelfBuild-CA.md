@@ -123,6 +123,17 @@ Sign the certificate? [y/n]
 `openssl rsa -in nginx.key -pubout -out nginx_public_key.pem`
 `openssl rsa -in nginx.key -pubout -outform DER -out nginx_public_key.der`
 
+
+## PEM转DER格式(PEM是DER格式进行base64编码的格式)
+```
+# 私钥：PEM --(convert)--> DER
+ openssl rsa -inform PEM -in Key0.pem -outform DER -out Key0.der
+
+# 公钥：PEM --(convert)> DER
+ openssl rsa -inform PEM -in Key0_pub.pem -pubin -outform DER -out Key0_pub.der
+```
+
+
 # 其他证书操作
 - 查看证书的内容：` openssl x509 -in cert.pem -text -noout`
 - 吊销证书：` openssl ca -revoke cert.pem -config openssl.cnf`
@@ -264,3 +275,6 @@ https://yq.aliyun.com/articles/47314
 https://docs.azure.cn/zh-cn/articles/azure-operations-guide/application-gateway/aog-application-gateway-howto-create-self-signed-cert-via-openssl
 
 http://www.shangyang.me/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%A7%91%E5%AD%A6%E4%B8%8E%E6%8A%80%E6%9C%AF/%E5%8A%A0%E5%AF%86%E8%A7%A3%E5%AF%86/RSA/
+
+
+https://blog.csdn.net/guyongqiangx/article/details/74331892
