@@ -1,0 +1,1720 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.3.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.3.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":true,"scrollpercent":true,"onmobile":true},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="CGLIB是一个强大的、高性能的代码生成库。它被广泛使用在基于代理的AOP框架（例如Spring AOP和dynaop）提供方法拦截。Hibernate作为最流行的ORM工具也同样使用CGLIB库来代理单端关联（集合懒加载除外，它使用另外一种机制）。EasyMock和jMock作为流行的Java测试库，它们提供Mock对象的方式来支持测试，都使用了CGLIB来对没有接口的类进行代理。">
+<meta name="keywords" content="aop,cglib">
+<meta property="og:type" content="article">
+<meta property="og:title" content="cglib类库说明">
+<meta property="og:url" content="http://yoursite.com/2018/07/18/cglib-index/index.html">
+<meta property="og:site_name" content="Victor的博客">
+<meta property="og:description" content="CGLIB是一个强大的、高性能的代码生成库。它被广泛使用在基于代理的AOP框架（例如Spring AOP和dynaop）提供方法拦截。Hibernate作为最流行的ORM工具也同样使用CGLIB库来代理单端关联（集合懒加载除外，它使用另外一种机制）。EasyMock和jMock作为流行的Java测试库，它们提供Mock对象的方式来支持测试，都使用了CGLIB来对没有接口的类进行代理。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-07-19T13:46:06.771Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="cglib类库说明">
+<meta name="twitter:description" content="CGLIB是一个强大的、高性能的代码生成库。它被广泛使用在基于代理的AOP框架（例如Spring AOP和dynaop）提供方法拦截。Hibernate作为最流行的ORM工具也同样使用CGLIB库来代理单端关联（集合懒加载除外，它使用另外一种机制）。EasyMock和jMock作为流行的Java测试库，它们提供Mock对象的方式来支持测试，都使用了CGLIB来对没有接口的类进行代理。">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/07/18/cglib-index/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>cglib类库说明 | Victor的博客</title>
+  
+
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?2342180055c7117a644c0e88269f1028";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Victor的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />关于</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分类</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-书单">
+    <a href="/book/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-book"></i> <br />书单</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-常用网站">
+    <a href="/web/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br />常用网站</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+    <a href="/sitemap.xml" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />站点地图</a>
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+  
+  
+  
+    
+      
+    
+    <a href="https://github.com/victorsheng" class="github-corner" target="_blank" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#222; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg>
+    
+      </a>
+    
+
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/18/cglib-index/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Victor">
+      <meta itemprop="description" content="victor的个人博客,作为一枚后端开发工程师,写本博客目的,旨在记录自己在工作生活中的点点滴滴,形成自己的知识体系">
+      <meta itemprop="image" content="/images/tennis.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">cglib类库说明
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-07-18 20:13:37" itemprop="dateCreated datePublished" datetime="2018-07-18T20:13:37+08:00">2018-07-18</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-07-19 21:46:06" itemprop="dateModified" datetime="2018-07-19T21:46:06+08:00">2018-07-19</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/07/18/cglib-index/#comments" itemprop="discussionUrl">
+                
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/07/18/cglib-index/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/07/18/cglib-index/" class="leancloud_visitors" data-flag-title="cglib类库说明">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数：</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>CGLIB是一个强大的、高性能的代码生成库。它被广泛使用在基于代理的AOP框架（例如Spring AOP和dynaop）提供方法拦截。Hibernate作为最流行的ORM工具也同样使用CGLIB库来代理单端关联（集合懒加载除外，它使用另外一种机制）。EasyMock和jMock作为流行的Java测试库，它们提供Mock对象的方式来支持测试，都使用了CGLIB来对没有接口的类进行代理。<br><a id="more"></a></p>
+<h1 id="生成代理类Enhancer"><a href="#生成代理类Enhancer" class="headerlink" title="生成代理类Enhancer"></a>生成代理类Enhancer</h1><h2 id="返回相同的结果"><a href="#返回相同的结果" class="headerlink" title="返回相同的结果"></a>返回相同的结果</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Enhancer enhancer = new Enhancer();</span><br><span class="line">enhancer.setSuperclass(PersonService.class);</span><br><span class="line">enhancer.setCallback((FixedValue) () -&gt; &quot;Hello Tom!&quot;);</span><br><span class="line">PersonService proxy = (PersonService) enhancer.create();</span><br><span class="line"> </span><br><span class="line">String res = proxy.sayHello(null);</span><br><span class="line"> </span><br><span class="line">assertEquals(&quot;Hello Tom!&quot;, res);</span><br></pre></td></tr></table></figure>
+<p>在上面的示例中，增强器将返回SampleClass的已检测子类的实例，其中所有方法调用都返回由上面的匿名FixedValue实现生成的固定值。该对象由Enhancer create（Object …）创建，其中该方法接受任意数量的参数，这些参数用于选择被代理类的任何构造函数。 （尽管构造函数只是Java字节代码级别的方法，但Enhancer类不能检测构造函数。它也不能检测静态类或final类。）如果你只想创建一个类，但没有实例，那么Enhancer #creinClass将创建一个可用于动态创建实例的类实例。被代理类的所有构造函数都将在此动态生成的类中作为委托构造函数使用。</p>
+<p>请注意，在上面的示例中将委托任何方法调用，也调用java.lang.Object中定义的方法。因此，对proxy.toString（）的调用也将返回“Hello cglib！”。相反，对proxy.hashCode（）的调用会导致ClassCastException，因为FixedValue拦截器总是返回一个String，即使Object＃hashCode签名需要一个原始整数。</p>
+<p>可以做出的另一个观察是final方法没有被截获。这种方法的一个例子是Object＃getClass，它将在调用时返回类似“SampleClass $$ EnhancerByCGLIB $$ e277c63c”的内容。此类名由cglib随机生成，以避免命名冲突。在程序代码中使用显式类型时，请注意增强实例的不同类。但是，由cglib生成的类将与被代理类位于同一个包中（因此可以覆盖package-private方法）。与final方法类似，子类化方法使得无法增强final类。因此，Hibernate框架无法持久化final类。</p>
+<h2 id="根据方法签名返回结果"><a href="#根据方法签名返回结果" class="headerlink" title="根据方法签名返回结果"></a>根据方法签名返回结果</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Enhancer enhancer = new Enhancer();</span><br><span class="line">enhancer.setSuperclass(PersonService.class);</span><br><span class="line">enhancer.setCallback((MethodInterceptor) (obj, method, args, proxy) -&gt; &#123;</span><br><span class="line">    if (method.getDeclaringClass() != Object.class &amp;&amp; method.getReturnType() == String.class) &#123;</span><br><span class="line">        return &quot;Hello Tom!&quot;;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        return proxy.invokeSuper(obj, args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line"> </span><br><span class="line">PersonService proxy = (PersonService) enhancer.create();</span><br><span class="line"> </span><br><span class="line">assertEquals(&quot;Hello Tom!&quot;, proxy.sayHello(null));</span><br><span class="line">int lengthOfName = proxy.lengthOfName(&quot;Mary&quot;);</span><br><span class="line">  </span><br><span class="line">assertEquals(4, lengthOfName);</span><br></pre></td></tr></table></figure>
+<h2 id="MethodInerceptor"><a href="#MethodInerceptor" class="headerlink" title="MethodInerceptor"></a>MethodInerceptor</h2><ul>
+<li>MethodInterceptor允许完全控制截获的方法，并提供一些实用程序来调用处于原始状态的被代理类的方法。但是为什么人们还是想要使用其他方法呢？因为其他方法更有效，并且cglib经常用于边缘案例框架中，其中效率起着重要作用。 MethodInterceptor的创建和链接需要生成不同类型的字节代码以及创建InvocationHandler不需要的某些运行时对象。因此，还有其他类可以与Enhancer一起使用：</li>
+<li>LazyLoader：尽管LazyLoader的唯一方法与FixedValue具有相同的方法签名，但LazyLoader与FixedValue拦截器根本不同。实际上，LazyLoader应该返回被代理类的子类的实例。仅当在增强对象上调用方法然后存储该方法以供将来调用生成的代理时，才会请求此实例。如果你的对象在创建过程中很昂贵而不知道是否会使用该对象，这是有道理的。请注意，必须为代理对象和延迟加载的对象调用被代理类的某些构造函数。因此，请确保有另一个廉价（可能受保护）的构造函数可用或使用代理的接口类型。您可以通过向Enhancer #create（Object …）提供参数来选择所调用的构造。</li>
+<li>Dispatcher：Dispatcher与LazyLoader类似，但会在每次方法调用时调用，而不存储加载的对象。这允许更改类的实现而不更改对它的引用。同样，请注意必须为代理和生成的对象调用某些构造函数。</li>
+<li>ProxyRefDispatcher：此类携带对其签名中调用的代理对象的引用。这允许例如将方法调用委托给该代理的另一个方法。请注意，如果从ProxyRefDispatcher＃loadObject（Object）中调用相同的方法，这很容易导致无限循环，并且总是会导致无限循环。</li>
+<li>NoOp：NoOp类并不是它的名字所暗示的。相反，它将每个方法调用委托给被代理类的方法实现。</li>
+</ul>
+<p>此时，最后两个拦截器可能对你没有意义。 当你总是将方法调用委托给增强类时，为什么你甚至想要增强一个类呢？ 而你是对的。 这些拦截器应该只与CallbackFilter一起使用，如下面的代码片段所示：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@Test</span><br><span class="line">public void testCallbackFilter() throws Exception &#123;</span><br><span class="line">  Enhancer enhancer = new Enhancer();</span><br><span class="line">  CallbackHelper callbackHelper = new CallbackHelper(SampleClass.class, new Class[0]) &#123;</span><br><span class="line">    @Override</span><br><span class="line">    protected Object getCallback(Method method) &#123;</span><br><span class="line">      if(method.getDeclaringClass() != Object.class &amp;&amp; method.getReturnType() == String.class) &#123;</span><br><span class="line">        return new FixedValue() &#123;</span><br><span class="line">          @Override</span><br><span class="line">          public Object loadObject() throws Exception &#123;</span><br><span class="line">            return &quot;Hello cglib!&quot;;</span><br><span class="line">          &#125;;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125; else &#123;</span><br><span class="line">        return NoOp.INSTANCE; // A singleton provided by NoOp.</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;;</span><br><span class="line">  enhancer.setSuperclass(MyClass.class);</span><br><span class="line">  enhancer.setCallbackFilter(callbackHelper);</span><br><span class="line">  enhancer.setCallbacks(callbackHelper.getCallbacks());</span><br><span class="line">  SampleClass proxy = (SampleClass) enhancer.create();</span><br><span class="line">  assertEquals(&quot;Hello cglib!&quot;, proxy.test(null));</span><br><span class="line">  assertNotEquals(&quot;Hello cglib!&quot;, proxy.toString());</span><br><span class="line">  proxy.hashCode(); // Does not throw an exception or result in an endless loop.</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>Enhancer实例在其Enhancer＃setCallbackFilter（CallbackFilter）方法中接受CallbackFilter，它希望增强类的方法映射到Callback实例数组的数组索引。 当在创建的代理上调用方法时，Enhancer将选择相应的拦截器并在相应的Callback上调度被调用的方法（这是迄今为止引入的所有拦截器的标记接口）。 为了使这个API不那么笨拙，cglib提供了一个CallbackHelper，它代表一个CallbackFilter，可以为你创建一个Callbacks数组。 上面的增强对象在功能上等同于MethodInterceptor示例中的对象，但它允许您编写专门的拦截器，同时保持这些拦截器的调度逻辑分离。</p>
+<h2 id="如何工作"><a href="#如何工作" class="headerlink" title="如何工作"></a>如何工作</h2><p>当Enhancer创建一个类时，它将为每个拦截器创建一个私有静态字段，该拦截器在创建后被注册为增强类的Callback。这也意味着使用cglib创建的类定义在创建后无法重用，因为回调的注册不会成为生成的类的初始化阶段的一部分，而是在类已经由JVM初始化之后由cglib手动准备。这也意味着使用cglib创建的类在初始化后在技术上尚未就绪，并且例如无法通过线路发送，因为目标机器中加载的类不存在回调。</p>
+<p>根据已注册的拦截器，cglib可能会注册其他字段，例如MethodInterceptor，其中两个私有静态字段（一个持有反射方法，另一个持有MethodProxy）按照在增强类或任何中截获的方法进行注册。它的子类。请注意，MethodProxy正在过度使用FastClass，这会触发创建其他类，并在下面进一步详细介绍。</p>
+<p>出于所有这些原因，使用Enhancer时要小心。并且始终以防御方式注册回调类型，因为MethodInterceptor将例如触发创建其他类并在增强类中注册其他字段。这是特别危险的，因为回调变量也存储在增强器的缓存中：这意味着回调实例不是垃圾收集的（除非所有实例和增强器的ClassLoader都是，这是不寻常的）。当使用匿名类来静默地携带对其外部类的引用时，这尤其危险。回想一下上面的例子：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@Test</span><br><span class="line">public void testFixedValue() throws Exception &#123;</span><br><span class="line">  Enhancer enhancer = new Enhancer();</span><br><span class="line">  enhancer.setSuperclass(SampleClass.class);</span><br><span class="line">  enhancer.setCallback(new FixedValue() &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public Object loadObject() throws Exception &#123;</span><br><span class="line">      return &quot;Hello cglib!&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">  SampleClass proxy = (SampleClass) enhancer.create();</span><br><span class="line">  assertEquals(&quot;Hello cglib!&quot;, proxy.test(null));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>FixedValue的匿名子类很难从增强的SampleClass中引用，因此匿名的FixedValue实例或持有@Test方法的类都不会被垃圾收集。这可能会在您的应用程序中导致令人讨厌的内存泄漏。因此，不要将非静态内部类与cglib一起使用。 （我只在博客文章中使用它们来保持示例简短。）</p>
+<p>最后，你永远不应该拦截Object＃finalize（）。由于cglib的子类化方法，拦截最终化是通过覆盖它来实现的，这通常是一个坏主意。拦截finalize的增强实例将被垃圾收集器区别对待，并且还会导致这些对象在JVM的终结队列中排队。此外，如果您（意外地）在截获的finalize调用中创建了对增强类的硬引用，则您已经有效地创建了一个不可收集的实例。这通常不是你想要的。请注意，最终方法永远不会被cglib截获。因此，Object＃wait，Object＃notify和Object＃notifyAll不会产生同样的问题。但请注意，可以拦截Object＃clone，这可能是您不想做的事情。</p>
+<h1 id="BeanGenerator"><a href="#BeanGenerator" class="headerlink" title="BeanGenerator"></a>BeanGenerator</h1><p>它允许我们动态创建bean并使用setter和getter方法添加字段。代码生成工具可以使用它来生成简单的POJO对象：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">BeanGenerator beanGenerator = new BeanGenerator();</span><br><span class="line"> </span><br><span class="line">beanGenerator.addProperty(&quot;name&quot;, String.class);</span><br><span class="line">Object myBean = beanGenerator.create();</span><br><span class="line">Method setter = myBean.getClass().getMethod(&quot;setName&quot;, String.class);</span><br><span class="line">setter.invoke(myBean, &quot;some string value set by a cglib&quot;);</span><br><span class="line"> </span><br><span class="line">Method getter = myBean.getClass().getMethod(&quot;getName&quot;);</span><br><span class="line">assertEquals(&quot;some string value set by a cglib&quot;, getter.invoke(myBean));</span><br></pre></td></tr></table></figure>
+<h1 id="Mixin-合体"><a href="#Mixin-合体" class="headerlink" title="Mixin (合体)"></a>Mixin (合体)</h1><p>mixin是一种允许将多个对象组合成一个的构造。 我们可以包含几个类的行为，并将该行为公开为单个类或接口。 cglib Mixins允许将多个对象组合成一个对象。 但是，为了这样做，mixin中包含的所有对象必须由接口支持。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public interface Interface1 &#123;</span><br><span class="line">    String first();</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">public interface Interface2 &#123;</span><br><span class="line">    String second();</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">public class Class1 implements Interface1 &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public String first() &#123;</span><br><span class="line">        return &quot;first behaviour&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">public class Class2 implements Interface2 &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public String second() &#123;</span><br><span class="line">        return &quot;second behaviour&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">	</span><br><span class="line">public interface MixinInterface extends Interface1, Interface2 &#123; &#125;</span><br></pre></td></tr></table></figure>
+<p>应用</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Mixin mixin = Mixin.create(</span><br><span class="line">  new Class[]&#123; Interface1.class, Interface2.class, MixinInterface.class &#125;,</span><br><span class="line">  new Object[]&#123; new Class1(), new Class2() &#125;</span><br><span class="line">);</span><br><span class="line">MixinInterface mixinDelegate = (MixinInterface) mixin;</span><br><span class="line"> </span><br><span class="line">assertEquals(&quot;first behaviour&quot;, mixinDelegate.first());</span><br><span class="line">assertEquals(&quot;second behaviour&quot;, mixinDelegate.second());</span><br></pre></td></tr></table></figure>
+<h1 id="Immutable-bean"><a href="#Immutable-bean" class="headerlink" title="Immutable bean"></a>Immutable bean</h1><p>cglib的ImmutableBean允许您创建类似于例如Collections＃immutableSet的不变性包装器。 IllegalStateException将阻止底层bean的所有更改（但是，不是由Java API推荐的UnsupportedOperationException）。<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public class SampleBean &#123;</span><br><span class="line">  private String value;</span><br><span class="line">  public String getValue() &#123;</span><br><span class="line">    return value;</span><br><span class="line">  &#125;</span><br><span class="line">  public void setValue(String value) &#123;</span><br><span class="line">    this.value = value;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">@Test(expected = IllegalStateException.class)</span><br><span class="line">public void testImmutableBean() throws Exception &#123;</span><br><span class="line">  SampleBean bean = new SampleBean();</span><br><span class="line">  bean.setValue(&quot;Hello world!&quot;);</span><br><span class="line">  SampleBean immutableBean = (SampleBean) ImmutableBean.create(bean);</span><br><span class="line">  assertEquals(&quot;Hello world!&quot;, immutableBean.getValue());</span><br><span class="line">  bean.setValue(&quot;Hello world, again!&quot;);</span><br><span class="line">  assertEquals(&quot;Hello world, again!&quot;, immutableBean.getValue());</span><br><span class="line">  immutableBean.setValue(&quot;Hello cglib!&quot;); // Causes exception.</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="Bean-copier"><a href="#Bean-copier" class="headerlink" title="Bean copier"></a>Bean copier</h1><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public class OtherSampleBean &#123;</span><br><span class="line">  private String value;</span><br><span class="line">  public String getValue() &#123;</span><br><span class="line">    return value;</span><br><span class="line">  &#125;</span><br><span class="line">  public void setValue(String value) &#123;</span><br><span class="line">    this.value = value;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@Test</span><br><span class="line">public void testBeanCopier() throws Exception &#123;</span><br><span class="line">  BeanCopier copier = BeanCopier.create(SampleBean.class, OtherSampleBean.class, false);</span><br><span class="line">  SampleBean bean = new SampleBean();</span><br><span class="line">  myBean.setValue(&quot;Hello cglib!&quot;);</span><br><span class="line">  OtherSampleBean otherBean = new OtherSampleBean();</span><br><span class="line">  copier.copy(bean, otherBean, null);</span><br><span class="line">  assertEquals(&quot;Hello cglib!&quot;, otherBean.getValue());  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Bulk-bean"><a href="#Bulk-bean" class="headerlink" title="Bulk bean"></a>Bulk bean</h1><p>BulkBean获取一个getter名称数组，一个setter名称数组和一个属性类型数组作为其构造函数参数。 然后，可以通过BulkBean＃getPropertyBalues（Object）将生成的检测类提取为数组。 类似地，可以通过BulkBean＃setPropertyBalues（Object，Object []）设置bean的属性。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@Test</span><br><span class="line">public void testBulkBean() throws Exception &#123;</span><br><span class="line">  BulkBean bulkBean = BulkBean.create(SampleBean.class, </span><br><span class="line">      new String[]&#123;&quot;getValue&quot;&#125;, </span><br><span class="line">      new String[]&#123;&quot;setValue&quot;&#125;, </span><br><span class="line">      new Class[]&#123;String.class&#125;);</span><br><span class="line">  SampleBean bean = new SampleBean();</span><br><span class="line">  bean.setValue(&quot;Hello world!&quot;);</span><br><span class="line">  assertEquals(1, bulkBean.getPropertyValues(bean).length);</span><br><span class="line">  assertEquals(&quot;Hello world!&quot;, bulkBean.getPropertyValues(bean)[0]);</span><br><span class="line">  bulkBean.setPropertyValues(bean, new Object[] &#123;&quot;Hello cglib!&quot;&#125;);</span><br><span class="line">  assertEquals(&quot;Hello cglib!&quot;, bean.getValue());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="bean-map"><a href="#bean-map" class="headerlink" title="bean map"></a>bean map</h1><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@Test</span><br><span class="line">public void testBeanGenerator() throws Exception &#123;</span><br><span class="line">  SampleBean bean = new SampleBean();</span><br><span class="line">  BeanMap map = BeanMap.create(bean);</span><br><span class="line">  bean.setValue(&quot;Hello cglib!&quot;);</span><br><span class="line">  assertEquals(&quot;Hello cglib&quot;, map.get(&quot;value&quot;));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Key-factory"><a href="#Key-factory" class="headerlink" title="Key factory"></a>Key factory</h1><p>KeyFactory工厂允许动态创建由多个值组成的键，这些值可用于例如Map实现。 为此，KeyFactory需要一些接口来定义应该在这样的密钥中使用的值。 此接口必须包含名为newInstance的单个方法，该方法返回Object。 例如：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public interface SampleKeyFactory &#123;</span><br><span class="line">  Object newInstance(String first, int second);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@Test</span><br><span class="line">public void testKeyFactory() throws Exception &#123;</span><br><span class="line">  SampleKeyFactory keyFactory = (SampleKeyFactory) KeyFactory.create(Key.class);</span><br><span class="line">  Object key = keyFactory.newInstance(&quot;foo&quot;, 42);</span><br><span class="line">  Map&lt;Object, String&gt; map = new HashMap&lt;Object, String&gt;();</span><br><span class="line">  map.put(key, &quot;Hello cglib!&quot;);</span><br><span class="line">  assertEquals(&quot;Hello cglib!&quot;, map.get(keyFactory.newInstance(&quot;foo&quot;, 42)));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>KeyFactory将确保正确实现Object＃equals（Object）和Object＃hashCode方法，以便生成的关键对象可以在Map或Set中使用。 KeyFactory也在cglib库中内部使用了很多。</p>
+<h1 id="String-switcher"><a href="#String-switcher" class="headerlink" title="String switcher"></a>String switcher</h1><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@Test</span><br><span class="line">public void testStringSwitcher() throws Exception &#123;</span><br><span class="line">  String[] strings = new String[]&#123;&quot;one&quot;, &quot;two&quot;&#125;;</span><br><span class="line">  int[] values = new int[]&#123;10, 20&#125;;</span><br><span class="line">  StringSwitcher stringSwitcher = StringSwitcher.create(strings, values, true);</span><br><span class="line">  assertEquals(10, stringSwitcher.intValue(&quot;one&quot;));</span><br><span class="line">  assertEquals(20, stringSwitcher.intValue(&quot;two&quot;));</span><br><span class="line">  assertEquals(-1, stringSwitcher.intValue(&quot;three&quot;));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>StringSwitcher允许在字符串上模拟一个switch命令，例如自Java 7以来可以使用内置的Java switch语句。如果在Java 6或更低版本中使用StringSwitcher确实为你的代码增加了一个好处，那么我仍然会怀疑 不建议使用它。</p>
+<h1 id="Interface-maker"><a href="#Interface-maker" class="headerlink" title="Interface maker"></a>Interface maker</h1><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@Test</span><br><span class="line">public void testInterfaceMaker() throws Exception &#123;</span><br><span class="line">  Signature signature = new Signature(&quot;foo&quot;, Type.DOUBLE_TYPE, new Type[]&#123;Type.INT_TYPE&#125;);</span><br><span class="line">  InterfaceMaker interfaceMaker = new InterfaceMaker();</span><br><span class="line">  interfaceMaker.add(signature, new Type[0]);</span><br><span class="line">  Class iface = interfaceMaker.create();</span><br><span class="line">  assertEquals(1, iface.getMethods().length);</span><br><span class="line">  assertEquals(&quot;foo&quot;, iface.getMethods()[0].getName());</span><br><span class="line">  assertEquals(double.class, iface.getMethods()[0].getReturnType());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>除了任何其他类的cglib的公共API之外，接口制造商还依赖于ASM类型。 在正在运行的应用程序中创建接口几乎没有意义，因为接口仅表示编译器可用于检查类型的类型。 但是，当您生成将在以后的开发中使用的代码时，它可能是有意义的。</p>
+<h1 id="Method-delegate"><a href="#Method-delegate" class="headerlink" title="Method delegate"></a>Method delegate</h1><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">public class DelegateTest &#123;</span><br><span class="line"></span><br><span class="line">  @Test</span><br><span class="line">  public void testMethodDelegate() throws Exception &#123;</span><br><span class="line">    SampleBean bean = new SampleBean();</span><br><span class="line">    bean.setValue(&quot;Hello cglib!&quot;);</span><br><span class="line">    BeanDelegate delegate = (BeanDelegate) MethodDelegate.create(</span><br><span class="line">        bean, &quot;getValue&quot;, BeanDelegate.class);</span><br><span class="line">    assertEquals(&quot;Hello cglib!&quot;, delegate.getValueFromDelegate());</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>但是有一些事情需要注意：</p>
+<ul>
+<li>工厂方法MethodDelegate #create只接受一个方法名称作为其第二个参数。这是MethodDelegate将为您代理的方法。</li>
+<li>必须有一个没有为对象定义参数的方法，该方法作为第一个参数提供给工厂方法。因此，MethodDelegate没有那么强大。</li>
+<li>第三个参数必须是只有一个参数的接口。 MethodDelegate实现了这个接口，可以强制转换为它。调用该方法时，它将在作为第一个参数的对象上调用代理方法。<br>此外，考虑这些缺点：</li>
+<li>cglib为每个代理创建一个新类。最终，这会浪费你的永久代堆空间</li>
+<li>您不能代理带参数的方法。</li>
+<li>如果您的接口接受参数，则方法委托将在没有抛出异常的情况下无法工作（返回值将始终为null）。如果你的接口需要另一种返回类型（即使它更通用），你将得到一个IllegalArgumentException。</li>
+</ul>
+<h1 id="Multicast-delegate"><a href="#Multicast-delegate" class="headerlink" title="Multicast delegate"></a>Multicast delegate</h1><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public interface DelegatationProvider &#123;</span><br><span class="line">  void setValue(String value);</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">public class SimpleMulticastBean implements DelegatationProvider &#123;</span><br><span class="line">  private String value;</span><br><span class="line">  public String getValue() &#123;</span><br><span class="line">    return value;</span><br><span class="line">  &#125;</span><br><span class="line">  public void setValue(String value) &#123;</span><br><span class="line">    this.value = value;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@Test</span><br><span class="line">public void testMulticastDelegate() throws Exception &#123;</span><br><span class="line">  MulticastDelegate multicastDelegate = MulticastDelegate.create(</span><br><span class="line">      DelegatationProvider.class);</span><br><span class="line">  SimpleMulticastBean first = new SimpleMulticastBean();</span><br><span class="line">  SimpleMulticastBean second = new SimpleMulticastBean();</span><br><span class="line">  multicastDelegate = multicastDelegate.add(first);</span><br><span class="line">  multicastDelegate = multicastDelegate.add(second);</span><br><span class="line"> </span><br><span class="line">  DelegatationProvider provider = (DelegatationProvider)multicastDelegate;</span><br><span class="line">  provider.setValue(&quot;Hello world!&quot;);</span><br><span class="line"> </span><br><span class="line">  assertEquals(&quot;Hello world!&quot;, first.getValue());</span><br><span class="line">  assertEquals(&quot;Hello world!&quot;, second.getValue());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>同样，有一些缺点：<br>对象需要实现单方法接口。 这对于第三方库来说很糟糕，当你使用CGlib做一些神奇的事情时，这种魔法会暴露在普通代码中，这很麻烦。 此外，您可以轻松地实现自己的委托（虽然没有字节代码，但我怀疑您在手动委托方面赢了很多）。<br>当您的代理人返回一个值时，您将只收到您添加的最后一个代表的值。 所有其他返回值都将丢失（但在某个时候由多播委托检索）。</p>
+<h1 id="Constructor-delegate"><a href="#Constructor-delegate" class="headerlink" title="Constructor delegate"></a>Constructor delegate</h1><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">public interface SampleBeanConstructorDelegate &#123;</span><br><span class="line">  Object newInstance();</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">@Test</span><br><span class="line">public void testConstructorDelegate() throws Exception &#123;</span><br><span class="line">  SampleBeanConstructorDelegate constructorDelegate = (SampleBeanConstructorDelegate) ConstructorDelegate.create(</span><br><span class="line">    SampleBean.class, SampleBeanConstructorDelegate.class);</span><br><span class="line">  SampleBean bean = (SampleBean) constructorDelegate.newInstance();</span><br><span class="line">  assertTrue(SampleBean.class.isAssignableFrom(bean.getClass()));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Parallel-sorter"><a href="#Parallel-sorter" class="headerlink" title="Parallel sorter"></a>Parallel sorter</h1><p>在排序数组数组时，ParallelSorter声称是Java标准库的数组排序器的更快替代品<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@Test</span><br><span class="line">public void testParallelSorter() throws Exception &#123;</span><br><span class="line">  Integer[][] value = &#123;</span><br><span class="line">    &#123;4, 3, 9, 0&#125;,</span><br><span class="line">    &#123;2, 1, 6, 0&#125;</span><br><span class="line">  &#125;;</span><br><span class="line">  ParallelSorter.create(value).mergeSort(0);</span><br><span class="line">  for(Integer[] row : value) &#123;</span><br><span class="line">    int former = -1;</span><br><span class="line">    for(int val : row) &#123;</span><br><span class="line">      assertTrue(former &lt; val);</span><br><span class="line">      former = val;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="Fast-class-and-fast-members"><a href="#Fast-class-and-fast-members" class="headerlink" title="Fast class and fast members"></a>Fast class and fast members</h1><p>通过包装Java类并为反射API提供类似的方法，FastClass承诺比Java反射API更快地调用方法<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@Test</span><br><span class="line">public void testFastClass() throws Exception &#123;</span><br><span class="line">  FastClass fastClass = FastClass.create(SampleBean.class);</span><br><span class="line">  FastMethod fastMethod = fastClass.getMethod(SampleBean.class.getMethod(&quot;getValue&quot;));</span><br><span class="line">  MyBean myBean = new MyBean();</span><br><span class="line">  myBean.setValue(&quot;Hello cglib!&quot;);</span><br><span class="line">  assertTrue(&quot;Hello cglib!&quot;, fastMethod.invoke(myBean, new Object[0]));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>除了演示的FastMethod之外，FastClass还可以创建FastConstructors但不会创建快速字段。但FastClass如何比正常反射更快？ Java反射由JNI执行，其中方法调用由某些C代码执行。另一方面，FastClass创建了一些字节代码，可以直接从JVM中调用该方法。但是，较新版本的HotSpot JVM（可能还有许多其他现代JVM）知道一个名为<strong>通胀(inflation)</strong>的概念，当反射方法执行得足够频繁时，JVM会将反射方法调用转换为FastClass的本机版本(C代码执行))。您甚至可以通过将sun.reflect.inflationThreshold属性设置为较低的值来控制此行为（至少在HotSpot JVM上）。 （默认值为15.）此属性确定在多少反射调用之后，JNI调用应由字节代码检测版本替换。因此，我建议不要在现代JVM上使用FastClass，但它可以微调旧Java虚拟机的性能。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://www.baeldung.com/cglib" target="_blank" rel="noopener">http://www.baeldung.com/cglib</a></p>
+<p><a href="http://mydailyjava.blogspot.com/2013/11/cglib-missing-manual.html" target="_blank" rel="noopener">http://mydailyjava.blogspot.com/2013/11/cglib-missing-manual.html</a></p>
+
+      
+    </div>
+
+    
+      
+
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2018/07/19/cglib-FastClass/" rel="bookmark">cglib-fastClass</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2018/07/19/cglib-usage/" rel="bookmark">cglib应用之spring-aop</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2018/07/13/name-binding-spring-aop/" rel="bookmark">name-binding-spring-aop</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="/2018/07/09/aspectj/" rel="bookmark">aspectj</a></div>
+      
+    </li>
+  
+  </ul>
+
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Victor</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://yoursite.com/2018/07/18/cglib-index/" title="cglib类库说明">http://yoursite.com/2018/07/18/cglib-index/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/aop/" rel="tag"># aop</a>
+          
+            <a href="/tags/cglib/" rel="tag"># cglib</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/13/wifi-detector/" rel="next" title="wifi-detector">
+                <i class="fa fa-chevron-left"></i> wifi-detector
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/07/19/exception-handle/" rel="prev" title="异常处理">
+                异常处理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+      <div id="sidebar-dimmer"></div>
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/tennis.jpg"
+                alt="Victor" />
+            
+              <p class="site-author-name" itemprop="name">Victor</p>
+              <p class="site-description motion-element" itemprop="description">victor的个人博客,作为一枚后端开发工程师,写本博客目的,旨在记录自己在工作生活中的点点滴滴,形成自己的知识体系</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">219</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">32</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">98</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/victorsheng" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#生成代理类Enhancer"><span class="nav-number">1.</span> <span class="nav-text">生成代理类Enhancer</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#返回相同的结果"><span class="nav-number">1.1.</span> <span class="nav-text">返回相同的结果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#根据方法签名返回结果"><span class="nav-number">1.2.</span> <span class="nav-text">根据方法签名返回结果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MethodInerceptor"><span class="nav-number">1.3.</span> <span class="nav-text">MethodInerceptor</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何工作"><span class="nav-number">1.4.</span> <span class="nav-text">如何工作</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#BeanGenerator"><span class="nav-number">2.</span> <span class="nav-text">BeanGenerator</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Mixin-合体"><span class="nav-number">3.</span> <span class="nav-text">Mixin (合体)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Immutable-bean"><span class="nav-number">4.</span> <span class="nav-text">Immutable bean</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Bean-copier"><span class="nav-number">5.</span> <span class="nav-text">Bean copier</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Bulk-bean"><span class="nav-number">6.</span> <span class="nav-text">Bulk bean</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#bean-map"><span class="nav-number">7.</span> <span class="nav-text">bean map</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Key-factory"><span class="nav-number">8.</span> <span class="nav-text">Key factory</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#String-switcher"><span class="nav-number">9.</span> <span class="nav-text">String switcher</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Interface-maker"><span class="nav-number">10.</span> <span class="nav-text">Interface maker</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Method-delegate"><span class="nav-number">11.</span> <span class="nav-text">Method delegate</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Multicast-delegate"><span class="nav-number">12.</span> <span class="nav-text">Multicast delegate</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Constructor-delegate"><span class="nav-number">13.</span> <span class="nav-text">Constructor delegate</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Parallel-sorter"><span class="nav-number">14.</span> <span class="nav-text">Parallel sorter</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Fast-class-and-fast-members"><span class="nav-number">15.</span> <span class="nav-text">Fast class and fast members</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">16.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Victor</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Muse</a></div>
+
+
+
+  <div class="footer-custom">Hosted by <a target="_blank" rel="external nofollow" href="https://pages.coding.me"><b>Coding Pages</b></a></div>
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script>
+
+
+
+  
+
+  
+    <script id="dsq-count-scr" src="https://victor123-cn.disqus.com/count.js" async></script>
+  
+
+  
+    <script type="text/javascript">
+      var disqus_config = function () {
+        this.page.url = 'http://yoursite.com/2018/07/18/cglib-index/';
+        this.page.identifier = '2018/07/18/cglib-index/';
+        this.page.title = 'cglib类库说明';
+        };
+      function loadComments () {
+        var d = document, s = d.createElement('script');
+        s.src = 'https://victor123-cn.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      }
+      
+        loadComments();
+      
+    </script>
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("QdvsGi5rrGt05B6T1cP9buCX-gzGzoHsz", "IPzdnLkdvxDPxh2zyHn82bWk");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            
+            counter.save(null, {
+              success: function(counter) {
+                
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(counter.get('time'));
+                
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            
+              var $element = $(document.getElementById(url));
+              $element.find('.leancloud-visitors-count').text('Counter not initialized! See more at console err msg.');
+              console.error('ATTENTION! LeanCloud counter has security bug, see here how to solve it: https://github.com/theme-next/hexo-leancloud-counter-security. \n But you also can use LeanCloud without security, by set \'security\' option to \'false\'.');
+            
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=6.3.0"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=6.3.0"></script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
