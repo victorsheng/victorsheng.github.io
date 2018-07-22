@@ -1,6 +1,8 @@
+---
 title: aspectj
 date: 2018-07-09 11:26:23
 tags:
+    - aop
 categories:
 ---
 # full AspectJ

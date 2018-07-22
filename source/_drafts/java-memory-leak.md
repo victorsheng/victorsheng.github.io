@@ -113,3 +113,8 @@ OutOfMemory主要有几个方面：永久带溢出，java堆溢出。 容易发�
 4.tomcat部署、运行出现OutOfMemoryError，加大内存参数值，解决此问题。
 # StackOverFlow
 栈溢出一般就是指JAVA虚拟机栈溢出。每一个线程都有一个虚拟机栈，每个栈会有许多栈帧，每个栈帧是一个方法的调用，因此如果很多层递归的话就容易导致栈溢出。
+
+
+# 内存泄漏的工具
+## LeakCanary
+https://github.com/square/leakcanary
