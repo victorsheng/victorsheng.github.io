@@ -15,3 +15,8 @@ https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/ht
 
 ## jersey 文档
 https://jersey.github.io/documentation/latest
+
+
+# 开发者工具
+## 搜索某个java类方法的使用样例
+https://www.programcreek.com/java-api-examples/index.php?action=search

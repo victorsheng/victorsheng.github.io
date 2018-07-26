@@ -133,6 +133,14 @@ Sign the certificate? [y/n]
  openssl rsa -inform PEM -in Key0_pub.pem -pubin -outform DER -out Key0_pub.der
 ```
 
+## DER转PEM
+```
+# 私钥：DER --(convert)--> PEM
+ openssl rsa -inform DER -in Key0.der -outform PEM -out Key0.PEM 
+
+# 公钥：DER --(convert)--> PEM
+ openssl rsa -inform DER -in Key0_pub.der -pubin -outform PEM -out Key0_pub.PEM
+```
 
 # 其他证书操作
 - 查看证书的内容：` openssl x509 -in cert.pem -text -noout`
@@ -142,7 +150,7 @@ Sign the certificate? [y/n]
 
 # 密钥/公钥格式
 
-## PEM
+## DER 二进制
 DER 是密钥的二进制表述格式；
 
 http://fileformats.archiveteam.org/wiki/DER
@@ -152,7 +160,7 @@ http://fileformats.archiveteam.org/wiki/DER
 
 很明显，DER 就是 ASN.1 的二进制格式；
 
-## DER
+## PEM 文本
 PEM 格式既是对 DER 编码转码为 Base64 字符格式；通过解码，将会还原为 DER 格式；
 
 >A PEM file is plain text. It contain one or more objects, such as certificates or keys, which may not all be the same type. Each object is delimited by lines similar to “—–BEGIN …—–” and “—–END …—–”. Data that is not between such lines is ignored, and is sometimes used for comments, or for a human-readable dump of the encoded data.

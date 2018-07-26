@@ -6,11 +6,19 @@ tags:
   - cglib
 categories:
 ---
-CGLIB是一个强大的、高性能的代码生成库。它被广泛使用在基于代理的AOP框架（例如Spring AOP和dynaop）提供方法拦截。Hibernate作为最流行的ORM工具也同样使用CGLIB库来代理单端关联（集合懒加载除外，它使用另外一种机制）。EasyMock和jMock作为流行的Java测试库，它们提供Mock对象的方式来支持测试，都使用了CGLIB来对没有接口的类进行代理。
+CGLIB(Code Generation Library)是一个强大的、高性能的代码生成库。它被广泛使用在基于代理的AOP框架（例如Spring AOP和dynaop）提供方法拦截。Hibernate作为最流行的ORM工具也同样使用CGLIB库来代理单端关联（集合懒加载除外，它使用另外一种机制）。EasyMock和jMock作为流行的Java测试库，它们提供Mock对象的方式来支持测试，都使用了CGLIB来对没有接口的类进行代理。
 <!-- more -->
 
-# 生成代理类Enhancer
+# cglib 功能列表
+- net.sf.cglib.core：底层字节码操作类；大部分与ASP相关。
+- net.sf.cglib.transform：编译期、运行期的class文件转换类。
+- net.sf.cglib.proxy：代理创建类、方法拦截类。
+- net.sf.cglib.reflect：更快的反射类、C#风格的代理类。
+- net.sf.cglib.util：集合排序工具类
+- net.sf.cglib.beans：JavaBean相关的工具类
 
+
+# 生成代理类Enhancer
 
 ## 返回相同的结果
 ```
