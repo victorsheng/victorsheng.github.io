@@ -1,4 +1,3 @@
----
 title: 优化idea插件安装
 tags:
   - 代理
@@ -15,4 +14,18 @@ https://plugins.jetbrains.com/search?correctionAllowed=true&pr=idea&orderBy=&sea
 
 
 2.使用ss作代理，直接下载
-<img src="http://pic.victor123.cn/17-12-1/24998248.jpg">
+
+
+
+# Class diagram(uml类图自动生成)
+https://www.jetbrains.com/help/idea/class-diagram.html
+
+例子:内容签名类图
+![upload successful](/images/pasted-217.png)
+
+
+# SequencePlugin(uml时序图自动生成)
+http://vanco.github.io/SequencePlugin/
+
+例子:内容签名时序图
+![upload successful](/images/pasted-218.png)
