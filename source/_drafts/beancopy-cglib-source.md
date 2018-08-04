@@ -1,8 +1,13 @@
 ---
-title: beancopy-cglib-source
+title: beancopy源码学习
 tags:
+    -cglib
 categories:
 ---
+
+# 使用方法
+BeanCopier是用于在两个bean之间进行属性拷贝的。
+eanCopier支持两种方式，一种是不使用Converter的方式，仅对两个bean间属性名和类型完全相同的变量进行拷贝。另一种则引入Converter，可以对某些特定属性值进行特殊操作。
 
 # 测试用例
 
@@ -150,70 +155,7 @@ KeyFactory#create
 -> AbstractClassGenerator#create
 
 # AbstractClassGenerator#create方法流程
-这个方法封装了类创建的主要流程。为了便于阅读，去掉了部分不重要的代码。
-```
-protected Object create(Object key) {
-    Class gen = null;
-
-    synchronized (source) {
-        ClassLoader loader = getClassLoader();
-        Map cache2 = null;
-        cache2 = (Map) source.cache.get(loader);
-        
-        /** 1.尝试加载缓存 **/
-        // 如果缓存不存在,则新建空的缓存
-        if (cache2 == null) {
-            cache2 = new HashMap();
-            cache2.put(NAME_KEY, new HashSet()); // NAME_KEY对应的Set集合用于去重
-            source.cache.put(loader, cache2);
-        }
-        // 如果缓存存在,且要求使用缓存
-        else if (useCache) {
-            // 通过key获取缓存中的生成类(拿到的是引用[WeakReference],调用ref.get()拿到类本身)
-            Reference ref = (Reference) cache2.get(key);
-            gen = (Class) ((ref == null) ? null : ref.get());
-        }
-
-        this.key = key;
-        
-        /** 2.如果不能从缓存中查找到生成类,则新建类 **/
-        if (gen == null) {
-            // strategy.generate中调用了子类里的generateClass函数
-            // 并返回生成的字节码
-            byte[] b = strategy.generate(this);
-
-            String className = ClassNameReader.getClassName(new ClassReader(b));
-
-            // 将className放入NAME_KEY对应的Set中
-            getClassNameCache(loader).add(className);
-            
-            // 根据返回的字节码生成类
-            gen = ReflectUtils.defineClass(className, b, loader);
-        }
-
-        if (useCache) {
-            // 在缓存中放入新生成的类
-            cache2.put(key, new WeakReference(gen));
-        }
-        /** 3.根据生成类，创建实例并返回 **/
-        return firstInstance(gen);
-    }
-    /** 3.根据生成类，创建实例并返回 **/
-    return firstInstance(gen);
-}
-
-```
-
-关于source.cache
-source.cache用于缓存生成类，是一个两层嵌套Map，第一层key值为classloader，第二层key值为生成类对应的唯一索引名（在这里就是"BeanCopierKey"啦）
-source.cache使用了 WeakHashMap
-WeakHashMap的key值为弱引用（WeakReference）。如果一个WeakHashMap的key被回收，那么它对应用的value也将被自动的被移除。这也是为什么要使用classloader作为key，当classloader被回收，使用这个classloader加载的类也应该被回收，在这时将这个键值对移除是合理的。
-在第二层Map中，出现了唯一一个不和谐的key值：NAME_KEY。它对应的Set存储了当前缓存的所有生成类的类名，用于检测生成类的类名是否重复。
-
-
-1. 根据生成策略（GeneratorStrategy）生成字节码
-2. 根据字节码创建类,其原理是通过反射调用ClassLoader#defineClass方法。
-3. 如果要求使用缓存，则将新生成的类放入缓存中。
+(见上一篇enhancer的文章)
 
 # KeyFactory#generateClass方法流程(类2的创建)
 ```
@@ -407,9 +349,4 @@ public void generateClass(ClassVisitor v) {
 # 参考
 https://www.jianshu.com/p/f8b892e08d26
 
-https://yq.aliyun.com/articles/14528
-
-https://www.cnblogs.com/killbug/p/8442069.html
-
-带类图
 https://blog.csdn.net/chinrui/article/details/79905074

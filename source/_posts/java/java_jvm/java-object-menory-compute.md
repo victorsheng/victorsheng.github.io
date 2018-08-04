@@ -61,18 +61,17 @@ HotSpot虚拟机默认的分配策略为longs/doubles、ints、shorts/chars、by
 
 # 基本类型
 
-
-
-|Type | 32 位系统 | 64 位系统\(+UseCompressedOops\) | 64 位系统\(-UseCompressedOops\) |
+堆内存中的占用个情况:
+|Type | 32 位系统 | 64 位系统\(+UseCompressedOops\) | 64 位系统\(-UseCompressedOops\) |32位栈内存|64位栈内存
 | :--- | :--- | :--- | :--- |
-| double | 8 bytes | 8 bytes | 8 bytes |
-| long | 8 bytes | 8 bytes | 8 bytes |
-| float | 4 bytes | 4 bytes | 4 bytes |
-| int | 4 bytes | 4 bytes | 4 bytes |
-| char | 2 bytes | 2 bytes | 2 bytes |
-| short | 2 bytes | 2 bytes | 2 bytes |
-| byte | 1 bytes | 1 bytes | 1 bytes |
-| boolean | 1 bytes | 1 bytes | 1 bytes |
+| double | 8 bytes | 8 bytes |  | 8 |8|
+| long | 8 bytes | 8 bytes |  | 8 |8|
+| float | 4 bytes | 4 bytes |  | 4 |8|
+| int | 4 bytes | 4 bytes |  | 4| 8 |
+| char | 2 bytes | 2 bytes |  | 4| 8 |
+| short | 2 bytes | 2 bytes |  | 4| 8 |
+| byte | 1 bytes | 1 bytes |  | 4| 8 |
+| boolean | 1 bytes | 1 bytes |  |4| 8 |
 | oops\(ordinary object pointers\) | 4 bytes | 4 bytes | 8 bytes |
 
 

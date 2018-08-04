@@ -16,6 +16,11 @@ https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/ht
 ## jersey 文档
 https://jersey.github.io/documentation/latest
 
+##  jvm规范
+英文版:
+https://docs.oracle.com/javase/specs/jvms/se8/html/index.html
+中文版
+https://files.cnblogs.com/files/zhuYears/Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%A7%84%E8%8C%83%EF%BC%88JavaSE7%EF%BC%89.pdf
 
 # 开发者工具
 ## 搜索某个java类方法的使用样例

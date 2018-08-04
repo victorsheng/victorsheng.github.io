@@ -1,24 +1,19 @@
-title: aop-cglib字节码生成
+title: cglib源码学习之Enhancer
 date: 2018-07-25 20:35:01
 tags:
 categories:
 ---
-何时生成
-如何生成
+# Enhancer设计图
+## 源码时序图
+![upload successful](/images/pasted-219.png)
+注解版cglib:
+https://github.com/victorsheng/cglib.git
 
-jdk的是如何生成的
-与javassist的比较
+## 类图
 
+![upload successful](/images/pasted-220.png)
 
-整体流程图
-
-cglib 类图
-proxy 类图
-对比aspectJ静态代理
-juice
-
-
-# AbstractClassGenerator
+# 关键类1:AbstractClassGenerator
 cglib基本所有的核心类都继承了AbstractClassGenerator
 - 作为cglib代码中 最核心的调度者 ，封装了类创建的主要流程，并支持一些缓存操作、命名策略（NamingPolicy）、代码生成策略（GeneratorStrategy）等。
 - 其中，protected Object create(Object key) 作为模版方法，定义了类的生成过程。同时将变化点进行封装，供继承类自主实现。
@@ -35,7 +30,7 @@ cglib基本所有的核心类都继承了AbstractClassGenerator
 被代理类名 + $$ + CGLIB核心处理类 + "ByCGLIB" + $$ + key的hashCode
 
 
-# KeyFactory
+# 关键类2:KeyFactory
 类库中重要的唯一标识生成器，用于cglib做cache时做map key，比较底层的基础类。
 
 
