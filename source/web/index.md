@@ -8,10 +8,16 @@ categories:
 ## jdk8规范:
 https://docs.oracle.com/javase/specs/jls/se8/html/
 
+## jdk10
+https://docs.oracle.com/javase/10/index.html
+
 # web服务开发
 
-## springmvc 文档
-https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/
+## spring 文档
+https://docs.spring.io/spring/docs/current/spring-framework-reference/core.html
+
+## springmvc
+https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html
 
 ## jersey 文档
 https://jersey.github.io/documentation/latest

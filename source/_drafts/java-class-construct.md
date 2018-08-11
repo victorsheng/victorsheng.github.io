@@ -1,4 +1,3 @@
----
 title: java-class-construct
 date: 2018-08-01 07:58:05
 tags:
