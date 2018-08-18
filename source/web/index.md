@@ -28,6 +28,14 @@ https://docs.oracle.com/javase/specs/jvms/se8/html/index.html
 中文版
 https://files.cnblogs.com/files/zhuYears/Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%A7%84%E8%8C%83%EF%BC%88JavaSE7%EF%BC%89.pdf
 
+# 测试相关
+## mockito
+http://static.javadoc.io/org.mockito/mockito-core/2.9.0/org/mockito/Mockito.html
+
 # 开发者工具
 ## 搜索某个java类方法的使用样例
 https://www.programcreek.com/java-api-examples/index.php?action=search
+
+##  jsr 列表
+https://www.jcp.org/en/jsr/stage?listBy=final
+https://en.wikipedia.org/wiki/Java_Community_Process#List_of_JSRs
