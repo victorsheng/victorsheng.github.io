@@ -352,6 +352,7 @@ public class DoCGLib {
 ```
 
 # spring生命周期
+https://zsr.github.io/2017/05/05/Spring-Bean-%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/
 
 - 1.Spring对Bean进行实例化（相当于程序中的new Xx()）
 - 2.Spring将值和Bean的引用注入进Bean对应的属性中
@@ -370,7 +371,7 @@ Bean的完整生命周期经历了各种方法调用，这些方法可以划分�
 
 1、Bean自身的方法　　：　　这个包括了Bean本身调用的方法和通过配置文件中<bean>的init-method和destroy-method指定的方法
 
-2、Bean级生命周期接口方法　　：　　这个包括了BeanNameAware、BeanFactoryAware、InitializingBean和DiposableBean这些接口的方法
+2、Bean级生命周期接口方法　　：　　这个包括了BeanNameAware、BeanFactoryAware、ApplicationContextAware、InitializingBean和DiposableBean这些接口的方法
 
 3、容器级生命周期接口方法　　：　　这个包括了InstantiationAwareBeanPostProcessor 和 BeanPostProcessor 这两个接口实现，一般称它们的实现类为“后处理器”。
 
@@ -378,9 +379,9 @@ Bean的完整生命周期经历了各种方法调用，这些方法可以划分�
 
 
 ## 1.类级别生命周期回调
-- 1.1 init-method xml配置
-- 1.2 InitializingBean接口
-- 1.3 PostConstruct注解
+- 1.1 init-method and destroy-method attribute xml配置
+- 1.2 实现InitializingBean, DisposableBean
+- 1.3 @PostConstruct, @PreDestroy Annotations
 ## 2.容器级别扩展
 - 2.1BeanPostProcessor接口
 bean实例初始化后处理器及后处理器链

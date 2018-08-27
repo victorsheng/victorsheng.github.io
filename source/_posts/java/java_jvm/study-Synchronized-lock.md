@@ -1,4 +1,4 @@
-title: study-Synchronized-lock
+title: study-synchronized-lock
 date: 2018-02-01 22:49:51
 tags:
 categories:

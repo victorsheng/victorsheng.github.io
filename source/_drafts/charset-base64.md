@@ -37,3 +37,14 @@ http://www.ruanyifeng.com/blog/2008/06/base64.html
       16 Q            33 h            50 y         (pad) =
 C
 ```
+
+# 工作中遇到的:
+```
+import java.util.Base64;
+
+
+Base64.getUrlEncoder().encodeToString(content);
+```
+结果字符串还是带有=的padding
+
+https://bugs.openjdk.java.net/browse/JDK-8026330
