@@ -124,7 +124,7 @@
 <meta property="og:image" content="http://www.victor123.cn/images/pasted-45.png">
 <meta property="og:image" content="http://www.victor123.cn/images/pasted-46.png">
 <meta property="og:image" content="http://www.victor123.cn/images/pasted-36.png">
-<meta property="og:updated_time" content="2018-04-03T01:23:38.159Z">
+<meta property="og:updated_time" content="2018-08-26T07:40:00.164Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="review_spring">
 <meta name="twitter:description" content="Spring的优点 轻量级：相较于EJB容器，Spring采用的IoC容器非常的轻量级，基础版本的Spring框架大约只有2MB。Spring可以让开发者们仅仅使用POJO(Plain Old Java Object，相对于EJB)就能够开发出企业级的应用。这样做的好处是，你不需要使用臃肿庞大的 EJB容器(应用服务器)，你只需要轻量的servlet容器(如Tomcat)。尤其在一些开发当中，很稀">
@@ -449,7 +449,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2018-04-03 09:23:38" itemprop="dateModified" datetime="2018-04-03T09:23:38+08:00">2018-04-03</time>
+                <time title="修改时间：2018-08-26 15:40:00" itemprop="dateModified" datetime="2018-08-26T15:40:00+08:00">2018-08-26</time>
               
             
           </span>
@@ -585,7 +585,8 @@
 <p>获取的对象是$Proxy对象,里面持有了真正的原始对象</p>
 <h2 id="cglib"><a href="#cglib" class="headerlink" title="cglib"></a>cglib</h2><p>核心是MethodInterceptor接口和Enhancer类<br>对于final方法，无法进行代理(不报错,正常执行原方法)</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">public class CglibProxy implements MethodInterceptor &#123;</span><br><span class="line">    private Enhancer enhancer = new Enhancer();</span><br><span class="line">    public Object getProxy(Class clazz)&#123;</span><br><span class="line">        //设置需要创建子类的类</span><br><span class="line">        enhancer.setSuperclass(clazz);</span><br><span class="line">        enhancer.setCallback(this);</span><br><span class="line">        //通过字节码技术动态创建子类实例</span><br><span class="line">        return enhancer.create();</span><br><span class="line">    &#125;</span><br><span class="line">    //实现MethodInterceptor接口方法</span><br><span class="line">    public Object intercept(Object obj, Method method, Object[] args,</span><br><span class="line">                            MethodProxy proxy) throws Throwable &#123;</span><br><span class="line">        System.out.println(&quot;前置代理&quot;);</span><br><span class="line">        //通过代理类调用父类中的方法</span><br><span class="line">        Object result = proxy.invokeSuper(obj, args);</span><br><span class="line">        System.out.println(&quot;后置代理&quot;);</span><br><span class="line">        return result;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public class DoCGLib &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">    CglibProxy proxy = new CglibProxy();</span><br><span class="line">    //通过生成子类的方式创建代理类</span><br><span class="line">    HelloWorldImpl proxyImp = (HelloWorldImpl)proxy.getProxy(HelloWorldImpl.class);</span><br><span class="line">    proxyImp.sayHello(&quot;wing&quot;);</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h1 id="spring生命周期"><a href="#spring生命周期" class="headerlink" title="spring生命周期"></a>spring生命周期</h1><ul>
+<h1 id="spring生命周期"><a href="#spring生命周期" class="headerlink" title="spring生命周期"></a>spring生命周期</h1><p><a href="https://zsr.github.io/2017/05/05/Spring-Bean-%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/" target="_blank" rel="noopener">https://zsr.github.io/2017/05/05/Spring-Bean-%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/</a></p>
+<ul>
 <li>1.Spring对Bean进行实例化（相当于程序中的new Xx()）</li>
 <li>2.Spring将值和Bean的引用注入进Bean对应的属性中</li>
 <li>3.如果Bean实现了BeanNameAware接口，Spring将Bean的ID传递给setBeanName()方法（实现BeanNameAware清主要是为了通过Bean的引用来获得Bean的ID，一般业务中是很少有用到Bean的ID的）</li>
@@ -600,13 +601,13 @@
 <hr>
 <p>Bean的完整生命周期经历了各种方法调用，这些方法可以划分为以下几类：</p>
 <p>1、Bean自身的方法　　：　　这个包括了Bean本身调用的方法和通过配置文件中<bean>的init-method和destroy-method指定的方法</bean></p>
-<p>2、Bean级生命周期接口方法　　：　　这个包括了BeanNameAware、BeanFactoryAware、InitializingBean和DiposableBean这些接口的方法</p>
+<p>2、Bean级生命周期接口方法　　：　　这个包括了BeanNameAware、BeanFactoryAware、ApplicationContextAware、InitializingBean和DiposableBean这些接口的方法</p>
 <p>3、容器级生命周期接口方法　　：　　这个包括了InstantiationAwareBeanPostProcessor 和 BeanPostProcessor 这两个接口实现，一般称它们的实现类为“后处理器”。</p>
 <p>4、工厂后处理器接口方法　　：　　这个包括了AspectJWeavingEnabler, ConfigurationClassPostProcessor, CustomAutowireConfigurer等等非常有用的工厂后处理器　　接口的方法。工厂后处理器也是容器级的。在应用上下文装配配置文件之后立即调用。</p>
 <h2 id="1-类级别生命周期回调"><a href="#1-类级别生命周期回调" class="headerlink" title="1.类级别生命周期回调"></a>1.类级别生命周期回调</h2><ul>
-<li>1.1 init-method xml配置</li>
-<li>1.2 InitializingBean接口</li>
-<li>1.3 PostConstruct注解<h2 id="2-容器级别扩展"><a href="#2-容器级别扩展" class="headerlink" title="2.容器级别扩展"></a>2.容器级别扩展</h2></li>
+<li>1.1 init-method and destroy-method attribute xml配置</li>
+<li>1.2 实现InitializingBean, DisposableBean</li>
+<li>1.3 @PostConstruct, @PreDestroy Annotations<h2 id="2-容器级别扩展"><a href="#2-容器级别扩展" class="headerlink" title="2.容器级别扩展"></a>2.容器级别扩展</h2></li>
 <li>2.1BeanPostProcessor接口<br>bean实例初始化后处理器及后处理器链<br>实例初始化后处理器多用于对实例的一些代理操作。Spring中一些使用到AOP的特性也是通过后处理器的方式实现的。<br>实例初始化后处理器链 是多个后处理器，就会有执行顺序的问题，可以通过实现Ordered接口，指定后处理的执行顺序，Ordered接口声明了getOrder方法，方法返回值越小，后处理的优先级越高，越早执行。<br>在通过实现BeanPostProcessor接口自定义实例初始化后处理器的时候，建议也实现Ordered接口，指定优先级。</li>
 <li>2.2 BeanFactoryPostProcessor接口<br>2.2.1 bean factory后处理器<br>BeanFactoryPostProcessors接口在bean实例化前处理bean的配置元数据，BeanPostProcessor接口在bean实例化后处理bean的实例</li>
 </ul>
@@ -792,7 +793,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">246</span>
+                    <span class="site-state-item-count">263</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
