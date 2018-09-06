@@ -120,8 +120,89 @@ Bean的销毁过程:
 说明:如果有多个bean需要初始化，会循环执行5--15。
 
 
+概括来说主要有四个阶段：实例化，初始化，使用，销毁。
+
 # 自己补充
 BeanFactory和ApplicationContext是Spring中两种很重要的容器，
-前者提供了最基本的依赖注入的支持，后者在继承前者的基础上进行了功能的拓展，增加了事件传播，资源访问，国际化的支持等功能。同时两者的生命周期也稍微有些不同。
+## 前者提供了最基本的依赖注入的支持
+## 后者在继承前者的基础上进行了功能的拓展，增加了事件传播，资源访问，国际化的支持等功能。同时两者的生命周期也稍微有些不同。
+* MessageSource, 提供国际化的消息访问  
+* 资源访问，如URL和文件  
+* 事件传播  
+* 载入多个（有继承关系）上下文 ，使得每一个上下文都专注于一个特定的层次，比如应用的web层  
 
-概括来说主要有四个阶段：实例化，初始化，使用，销毁。
+
+1.利用MessageSource进行国际化  
+   BeanFactory是不支持国际化功能的，因为BeanFactory没有扩展Spring中MessageResource接口。相反，由于ApplicationContext扩展了MessageResource接口，因而具有消息处理的能力(i18N)，具体spring如何使用国际化，以后章节会详细描述。  
+
+2.强大的事件机制(Event)  
+   基本上牵涉到事件(Event)方面的设计，就离不开观察者模式。不明白观察者模式的朋友，最好上网了解下。因为，这种模式在java开发中是比较常用的，又是比较重要的。  
+ApplicationContext的事件机制主要通过ApplicationEvent和ApplicationListener这两个接口来提供的，和java swing中的事件机制一样。即当ApplicationContext中发布一个事件的时，所有扩展了ApplicationListener的Bean都将会接受到这个事件，并进行相应的处理。  
+
+3.底层资源的访问  
+    ApplicationContext扩展了ResourceLoader(资源加载器)接口，从而可以用来加载多个Resource，而BeanFactory是没有扩展ResourceLoader  
+
+4.对Web应用的支持  
+   与BeanFactory通常以编程的方式被创建不同的是，ApplicationContext能以声明的方式创建，如使用ContextLoader。当然你也可以使用ApplicationContext的实现之一来以编程的方式创建ApplicationContext实例 。  
+
+5.其它区别  
+  1).BeanFactroy采用的是延迟加载形式来注入Bean的，即只有在使用到某个Bean时(调用getBean())，才对该Bean进行加载实例化，这样，我们就不能发现一些存在的Spring的配置问题。而ApplicationContext则相反，它是在容器启动时，一次性创建了所有的Bean。这样，在容器启动时，我们就可以发现Spring中存在的配置错误。  
+
+  2).BeanFactory和ApplicationContext都支持BeanPostProcessor、BeanFactoryPostProcessor的使用，但两者之间的区别是：BeanFactory需要手动注册，而ApplicationContext则是自动注册
+
+
+# FactoryBean
+我们在配置spring的时候有两种bean可以配置，
+
+一种是普通bean：配置的class就是生成的bean的真正对象。
+
+一种是工厂Bean，即FactoryBean：配置class不是生成bean的真正对象。
+
+他们都被spring容器管理，工厂Bean其返回的对象不是指定类的一个实例，是该FactoryBean的getObject方法所返回的对象。
+
+应用：它们在很多应用如(Spring的AOP、ORM、事务管理)及与其它第三框架(ehCache)集成时都有体现，
+
+## FactoryBean接口
+```
+package org.springframework.beans.factory;
+
+public interface FactoryBean<T> {
+
+    T getObject() throws Exception;
+    
+    Class<?> getObjectType();
+ 
+    boolean isSingleton();
+
+}
+```
+其中是java泛型机制实现，即T表示要生成的对象。也可以不使用，推荐使用。
+getObject()方法返回欲生成对象。getObjectType()欲返回对象类型,isSingleton()获得对象的机制(singleton|prototype|request|session).
+
+## 例子:mybatis和spring集成的SqlSessionFactoryBean
+```
+  <!-- MyBatis -->
+  <bean class="org.mybatis.spring.SqlSessionFactoryBean" id="sqlSessionFactory">
+    <property name="dataSource" ref="opalAPDataSource"/>
+    <property name="mapperLocations"
+      value="classpath*:mappers/*Mapper.xml"/>
+  </bean>
+```
+容器通过getBean方法返回的不是SqlSessionFactory本身，而是FactoryBean实现类中getObject()方法返回的对象。 
+
+## 例子:Spring集成 ehcache的EhCacheManagerFactoryBean
+```
+<bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">    
+    <property name="configLocation">    
+        <value>classpath:ehcache.xml</value>    
+    </property>    
+</bean>
+<bean id="levelOneCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">    
+    <property name="cacheManager">    
+        <ref local="cacheManager" />    
+    </property>    
+    <property name="cacheName">    
+        <value>levelOneCache</value>    
+    </property>    
+</bean>
+```
