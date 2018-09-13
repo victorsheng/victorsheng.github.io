@@ -1,4 +1,4 @@
-title: geektime-jvm-20-method-inline
+title: 方法内联上
 date: 2018-09-06 15:24:43
 tags:
 categories:
