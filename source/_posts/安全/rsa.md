@@ -151,3 +151,6 @@ pre master的存在在于SSL协议不信任每个主机都能产生完全随机�
 至此，整个握手阶段全部结束。接下来，客户端与服务器进入加密通信，就完全是使用普通的HTTP协议，只不过用"会话密钥"加密内容。
 
 
+# 算法相关
+http://www.ruanyifeng.com/blog/2013/06/rsa_algorithm_part_one.html
+https://github.com/channg/my/blob/master/RSA.md
