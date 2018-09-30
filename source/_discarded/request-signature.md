@@ -1,6 +1,6 @@
----
 title: request-signature
 abbrlink: 398828867
+date: 2018-09-30 10:07:37
 tags:
 categories:
 ---
