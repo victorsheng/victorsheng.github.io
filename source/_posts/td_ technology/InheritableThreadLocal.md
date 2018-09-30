@@ -64,8 +64,9 @@ public static void main(String[] args) {
     }
   }
 
-````
+```
 输出结果
+
 ```
 Span{name='xiexiexie', age=0}
 ========
@@ -149,6 +150,7 @@ private void init(ThreadGroup g, Runnable target, String name,
 ```
 
 # 父线程,通过包装Runnable和Callable接口
+
 ```
 /**
    * If task run in {@link Executor} thread pool, use this method for propagating security context
