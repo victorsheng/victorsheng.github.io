@@ -1,5 +1,6 @@
 ---
 title: lambda_study
+abbrlink: 901692314
 tags:
 categories:
 ---

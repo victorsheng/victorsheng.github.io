@@ -1,7 +1,9 @@
+---
 title: 异常处理
-date: 2018-07-19 20:05:08
 tags:
-    - exception
+  - exception
+abbrlink: 42497983
+date: 2018-07-19 20:05:08
 categories:
 ---
 # 最佳实践

@@ -1,5 +1,6 @@
 ---
 title: java-genercity
+abbrlink: 269373254
 date: 2018-04-26 18:28:01
 tags:
 categories:

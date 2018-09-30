@@ -1,4 +1,6 @@
+---
 title: bytecode-Bytebuddy
+abbrlink: 1212406173
 date: 2018-08-14 19:57:22
 tags:
 categories:

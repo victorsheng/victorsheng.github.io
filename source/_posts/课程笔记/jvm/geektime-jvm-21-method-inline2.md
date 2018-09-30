@@ -1,5 +1,6 @@
 ---
 title: 方法内联下
+abbrlink: 27474036
 date: 2018-09-10 16:28:53
 tags:
 categories:

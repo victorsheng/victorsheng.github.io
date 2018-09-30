@@ -1,10 +1,12 @@
+---
 title: '156服务器优化2:定位io高的原因mysql'
 tags:
   - io高
   - 优化
   - mysql
-categories: 
-    - mysql
+categories:
+  - mysql
+abbrlink: 1050875980
 date: 2017-12-13 13:39:00
 ---
 #重新定位问题

@@ -1,5 +1,6 @@
 ---
 title: mavenjar包发布中遇到的问题
+abbrlink: 3736081830
 date: 2018-09-13 18:18:00
 tags:
 categories:

@@ -1,4 +1,6 @@
+---
 title: geektime-jvm-07-reflect
+abbrlink: 3452104663
 date: 2018-08-10 08:55:11
 tags:
 categories:

@@ -1,5 +1,6 @@
 ---
 title: 06-kubeadm
+abbrlink: 4075983281
 date: 2018-09-17 22:23:22
 tags:
 categories:

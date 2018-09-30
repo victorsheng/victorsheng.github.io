@@ -1,10 +1,12 @@
+---
 title: BI-olap技术选型
-date: 2018-01-05 19:31:54
 tags:
-    - BI
-    - olap
+  - BI
+  - olap
 categories:
-    - BI
+  - BI
+abbrlink: 4162788070
+date: 2018-01-05 19:31:54
 ---
 # 备选列表:
 - 阿里云-分析性数据库

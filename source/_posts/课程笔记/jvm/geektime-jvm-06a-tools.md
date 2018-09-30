@@ -1,4 +1,6 @@
+---
 title: geektime-jvm-06a-tools
+abbrlink: 1189180890
 date: 2018-08-07 08:14:06
 tags:
 categories:

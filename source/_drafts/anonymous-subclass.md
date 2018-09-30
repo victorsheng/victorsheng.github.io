@@ -1,5 +1,6 @@
 ---
 title: anonymous-subclass
+abbrlink: 32121057
 tags:
 categories:
 ---

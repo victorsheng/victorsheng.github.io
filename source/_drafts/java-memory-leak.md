@@ -1,4 +1,6 @@
+---
 title: (转载)java-memory-leak
+abbrlink: 590091311
 date: 2018-01-16 07:05:10
 tags:
 categories:

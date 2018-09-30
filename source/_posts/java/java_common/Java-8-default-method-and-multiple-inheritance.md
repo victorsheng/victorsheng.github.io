@@ -1,5 +1,6 @@
 ---
 title: Java-8-default-method-and-multiple-inheritance
+abbrlink: 360731080
 date: 2018-07-03 16:06:42
 tags:
 categories:

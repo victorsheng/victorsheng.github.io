@@ -1,5 +1,6 @@
 ---
 title: JUC-AtomicReference
+abbrlink: 1321681518
 date: 2018-04-05 09:52:37
 tags:
 categories:

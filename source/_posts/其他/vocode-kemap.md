@@ -1,5 +1,6 @@
 ---
 title: vocode-kemap
+abbrlink: 1919916204
 date: 2018-04-19 09:02:53
 tags:
 categories:

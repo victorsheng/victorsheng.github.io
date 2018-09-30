@@ -1,4 +1,6 @@
+---
 title: design-case-geek-time
+abbrlink: 1231902832
 date: 2018-06-25 10:03:09
 tags:
 categories:

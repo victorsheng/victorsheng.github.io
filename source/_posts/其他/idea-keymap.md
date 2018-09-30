@@ -1,4 +1,6 @@
+---
 title: idea快捷键
+abbrlink: 59097869
 date: 2018-04-03 21:55:52
 tags:
 categories:

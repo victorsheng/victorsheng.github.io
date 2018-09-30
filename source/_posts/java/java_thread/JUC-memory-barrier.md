@@ -1,4 +1,6 @@
+---
 title: JUC-memory-barrier
+abbrlink: 4010839904
 date: 2018-04-05 21:26:55
 tags:
 categories:

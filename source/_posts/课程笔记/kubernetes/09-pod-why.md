@@ -1,5 +1,6 @@
 ---
 title: 为什么我们需要Pod？
+abbrlink: 968504805
 date: 2018-09-21 20:29:27
 tags:
 categories:

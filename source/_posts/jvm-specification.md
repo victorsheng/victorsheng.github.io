@@ -1,5 +1,6 @@
 ---
 title: jvm-specification
+abbrlink: 3241459811
 date: 2018-09-04 10:01:11
 tags:
 categories:

@@ -1,7 +1,9 @@
+---
 title: CAS和Unsafe
-date: 2018-02-28 09:03:00
 tags:
   - 多线程
+abbrlink: 1876822110
+date: 2018-02-28 09:03:00
 categories:
 ---
 # 无锁的概念

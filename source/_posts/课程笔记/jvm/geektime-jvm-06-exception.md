@@ -1,5 +1,6 @@
 ---
 title: geektime-jvm-06-exception
+abbrlink: 502048033
 date: 2018-08-05 09:57:47
 tags:
 categories:

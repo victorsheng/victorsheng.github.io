@@ -1,3 +1,4 @@
+---
 title: JDK- MashMap 学习
 tags:
   - 数据结构
@@ -5,6 +6,7 @@ tags:
   - HashMap
 categories:
   - java
+abbrlink: 287090520
 date: 2018-01-05 11:14:00
 ---
 # hashmap数据结构

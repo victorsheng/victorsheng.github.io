@@ -1,5 +1,6 @@
 ---
 title: unittest-powermock
+abbrlink: 1111136188
 date: 2018-08-10 19:37:41
 tags:
 categories:

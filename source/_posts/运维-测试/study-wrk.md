@@ -1,4 +1,6 @@
+---
 title: study-wrk
+abbrlink: 440790584
 date: 2018-06-05 19:58:40
 tags:
 categories:

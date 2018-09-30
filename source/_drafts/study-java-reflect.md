@@ -1,5 +1,6 @@
 ---
 title: study-java-reflect
+abbrlink: 481594819
 tags:
 categories:
 ---

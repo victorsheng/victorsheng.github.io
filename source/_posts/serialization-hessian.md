@@ -1,5 +1,6 @@
 ---
 title: serialization-hessian
+abbrlink: 3693289268
 date: 2018-09-05 18:48:20
 tags:
 categories:

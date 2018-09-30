@@ -1,9 +1,11 @@
+---
 title: docker学习分型
 tags:
   - 技术分享
   - docker
 categories:
   - docker
+abbrlink: 4067886838
 date: 2017-11-27 22:36:00
 ---
 # 简介

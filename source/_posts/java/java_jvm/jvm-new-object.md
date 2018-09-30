@@ -1,4 +1,6 @@
+---
 title: jvm-new-object
+abbrlink: 2801736360
 date: 2018-02-10 09:32:02
 tags:
 categories:

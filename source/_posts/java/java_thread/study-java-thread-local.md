@@ -1,9 +1,11 @@
+---
 title: study-java-thread-local
 tags:
   - 引用
   - 多线程
 categories:
   - java
+abbrlink: 3528681969
 date: 2018-01-24 23:21:00
 ---
 # Thread Local的作用

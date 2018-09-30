@@ -1,11 +1,13 @@
+---
 title: springboot配置FastJsonHttpMessageConverter(实战篇)
 tags:
   - springboot
   - fastjson
   - http
   - springMVC
-categories: 
-    - spring
+categories:
+  - spring
+abbrlink: 2029409209
 date: 2018-01-22 15:12:00
 ---
 # 背景

@@ -1,10 +1,12 @@
+---
 title: 禁止使用@Reference的注解
 tags:
   - dubbo
   - reference
   - xml
-categories: 
+categories:
   - dubbo
+abbrlink: 4095470255
 date: 2017-12-14 17:04:00
 ---
 # dubbo服务引用

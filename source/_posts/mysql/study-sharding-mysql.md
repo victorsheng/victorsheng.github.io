@@ -1,9 +1,11 @@
+---
 title: mysql分库分表
-date: 2018-03-21 13:53:45
 tags:
-    - mysql
+  - mysql
 categories:
-    - mysql
+  - mysql
+abbrlink: 2262056388
+date: 2018-03-21 13:53:45
 ---
 # 参考
 https://tech.meituan.com/dianping_order_db_sharding.html

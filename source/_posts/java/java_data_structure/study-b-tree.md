@@ -1,9 +1,11 @@
+---
 title: study-b-tree
 tags:
   - 数据结构
   - b-tree
 categories:
   - 数据结构
+abbrlink: 2155297965
 date: 2018-01-05 11:16:00
 ---
 # b-树

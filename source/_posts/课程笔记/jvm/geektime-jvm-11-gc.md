@@ -1,5 +1,6 @@
 ---
 title: geektime-jvm-11-gc
+abbrlink: 2256177216
 date: 2018-08-20 19:47:46
 tags:
 categories:

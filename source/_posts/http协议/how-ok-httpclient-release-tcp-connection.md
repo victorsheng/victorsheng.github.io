@@ -1,7 +1,9 @@
+---
 title: how-ok-httpclient-release-tcp-connection
-date: 2018-07-06 06:55:04
 tags:
-    - httpclient
+  - httpclient
+abbrlink: 2534971501
+date: 2018-07-06 06:55:04
 categories:
 ---
 # httpclient未close时,进行关闭

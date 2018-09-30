@@ -1,8 +1,10 @@
+---
 title: dubbo-概述
 tags:
   - dubbo
 categories:
   - dubbo
+abbrlink: 2822083703
 date: 2018-02-01 21:53:00
 ---
 # 各层说明

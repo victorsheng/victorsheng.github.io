@@ -1,9 +1,11 @@
+---
 title: mysql下划线关键字
 tags:
   - mysql
   - like
 categories:
-    - mysql
+  - mysql
+abbrlink: 3852680114
 date: 2018-01-24 15:42:00
 ---
 # 问题sql

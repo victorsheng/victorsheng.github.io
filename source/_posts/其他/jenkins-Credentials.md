@@ -1,4 +1,6 @@
+---
 title: jenkins-Credentials
+abbrlink: 2068823166
 date: 2018-04-20 12:58:56
 tags:
 categories:

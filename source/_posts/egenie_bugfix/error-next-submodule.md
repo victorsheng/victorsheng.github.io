@@ -1,3 +1,4 @@
+---
 title: hexo next主题保存
 tags:
   - hexo
@@ -5,6 +6,7 @@ tags:
   - submodule
 categories:
   - 异常
+abbrlink: 3858977206
 date: 2017-11-30 22:41:00
 ---
 # 通过git的submodule功能对博客内容和主题分别进行版本控制

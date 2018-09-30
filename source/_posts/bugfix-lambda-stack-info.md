@@ -1,5 +1,6 @@
 ---
 title: bugfix-lambda-stack-info
+abbrlink: 2965848908
 date: 2018-09-04 11:13:12
 tags:
 categories:

@@ -1,9 +1,11 @@
+---
 title: java-线程复习
 tags:
   - java
   - 多线程
 categories:
   - java
+abbrlink: 473206613
 date: 2018-01-13 10:13:27
 ---
 # 线程

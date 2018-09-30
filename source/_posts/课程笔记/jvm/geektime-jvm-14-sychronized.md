@@ -1,4 +1,6 @@
+---
 title: geektime-jvm-14-sychronized
+abbrlink: 2224175231
 date: 2018-08-23 18:17:52
 tags:
 categories:

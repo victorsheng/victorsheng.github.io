@@ -1,4 +1,6 @@
+---
 title: 03-file
+abbrlink: 594218390
 date: 2018-09-10 18:46:35
 tags:
 categories:

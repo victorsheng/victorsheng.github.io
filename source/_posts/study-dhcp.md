@@ -1,7 +1,9 @@
+---
 title: study-dhcp
-date: 2018-06-07 17:31:21
 tags:
-    - 网络协议
+  - 网络协议
+abbrlink: 836450078
+date: 2018-06-07 17:31:21
 categories:
 ---
 # 背景

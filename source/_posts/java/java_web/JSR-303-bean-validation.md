@@ -1,5 +1,6 @@
 ---
 title: JSR-303-bean-validation
+abbrlink: 4000243504
 date: 2018-05-03 10:20:38
 tags:
 categories:

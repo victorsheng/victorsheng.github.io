@@ -1,8 +1,10 @@
+---
 title: study-red–black-tree
-tags: 
-    - 红黑树
-categories: 
-    - java
+tags:
+  - 红黑树
+categories:
+  - java
+abbrlink: 2099413748
 date: 2018-01-05 11:16:00
 ---
 # 二叉搜索树

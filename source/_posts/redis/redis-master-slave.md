@@ -1,4 +1,6 @@
+---
 title: redis主从复制
+abbrlink: 2571511853
 date: 2018-03-28 22:20:50
 tags:
 categories:

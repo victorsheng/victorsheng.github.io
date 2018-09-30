@@ -1,9 +1,11 @@
+---
 title: study_quick_sort
-date: 2018-01-22 22:39:55
 tags:
-    - 排序
+  - 排序
 categories:
-    - java
+  - java
+abbrlink: 440599423
+date: 2018-01-22 22:39:55
 ---
 ![upload successful](/images/pasted-41.png)
 

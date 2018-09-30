@@ -1,4 +1,6 @@
+---
 title: geektime-jvm-05-method
+abbrlink: 867486069
 date: 2018-08-04 13:07:34
 tags:
 categories:

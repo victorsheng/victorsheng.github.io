@@ -1,3 +1,4 @@
+---
 title: dubbo线程池相关源码解析
 tags:
   - dubbo
@@ -6,6 +7,7 @@ tags:
   - jstack
 categories:
   - dubbo
+abbrlink: 2531702557
 date: 2018-02-02 10:55:00
 ---
 # dubbo几种线程池选择

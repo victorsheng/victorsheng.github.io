@@ -1,11 +1,11 @@
 ---
-
-title: "redis数据类型"
-date: "2018-03-26 18:21"
+title: redis数据类型
+date: '2018-03-26 18:21'
 tags:
-    - redis
+  - redis
 categories:
-    - redis
+  - redis
+abbrlink: 369369911
 ---
 
 *

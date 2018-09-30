@@ -1,6 +1,8 @@
+---
 title: CountDownLatch学习
 tags:
   - 多线程
+abbrlink: 2008593870
 date: 2018-04-02 11:02:32
 categories:
 ---

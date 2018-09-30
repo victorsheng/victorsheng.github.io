@@ -1,5 +1,6 @@
 ---
 title: bugfix-dubbo-channel-close
+abbrlink: 2240571519
 date: 2018-02-06 10:09:16
 tags:
 categories:

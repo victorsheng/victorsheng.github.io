@@ -1,4 +1,6 @@
+---
 title: data-warehouse-layering
+abbrlink: 3289707423
 date: 2018-03-21 17:05:26
 tags:
 categories:

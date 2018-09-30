@@ -1,8 +1,10 @@
+---
 title: bugfix对接baidu语音合成
 tags:
   - bugfix
-categories: 
-    - bugfix
+categories:
+  - bugfix
+abbrlink: 1118581910
 date: 2017-12-13 19:26:00
 ---
 # 背景

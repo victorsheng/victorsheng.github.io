@@ -1,4 +1,6 @@
+---
 title: javassist在easy-mapper和dubbo项目中的应用
+abbrlink: 3210990680
 date: 2018-05-03 20:38:58
 tags:
 categories:

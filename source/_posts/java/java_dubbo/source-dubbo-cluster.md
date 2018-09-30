@@ -1,8 +1,10 @@
+---
 title: source_dubbo_cluster
 tags:
   - dubbo
 categories:
   - dubbo
+abbrlink: 308556685
 date: 2018-01-31 12:33:00
 ---
 # cluster层

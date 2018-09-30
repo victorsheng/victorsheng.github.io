@@ -1,5 +1,6 @@
 ---
 title: 深入解析Pod对象（一）：基本概念
+abbrlink: 19639
 date: 2018-09-24 13:10:10
 tags:
 categories:
@@ -208,3 +209,33 @@ Pod 的这些状态信息，是我们判断应用运行情况的重要标准，�
 在今天这篇文章中，我详细讲解了 Pod API 对象，介绍了 Pod 的核心使用方法，并分析了 Pod 和 Container 在字段上的异同。希望这些讲解能够帮你更好地理解和记忆 Pod YAML 中的核心字段，以及这些字段的准确含义。
 
 实际上，Pod API 对象是整个 Kubernetes 体系中最核心的一个概念，也是后面我讲解各种控制器时都要用到的。
+
+
+# pod配置大全
+https://github.com/kubernetes/community/blob/master/contributors/devel/api-conventions.md#metadata
+https://github.com/kubernetes/community/blob/master/contributors/devel/api-conventions.md#spec-and-status
+
+## Metadata
+### MUST
+- namespace: a namespace is a DNS compatible label that objects are subdivided into. The default namespace is 'default'. See the namespace docs for more.
+- name: a string that uniquely identifies this object within the current namespace (see the identifiers docs). This value is used in the path when retrieving an individual object.
+- uid: a unique in time and space value (typically an RFC 4122 generated identifier, see the identifiers docs) used to distinguish between objects with the same name that have been deleted and recreated
+
+
+### SHOULD
+
+- resourceVersion: a string that identifies the internal version of this object that can be used by clients to determine when objects have changed. This value MUST be treated as opaque by clients and passed unmodified back to the server. Clients should not assume that the resource version has meaning across namespaces, different kinds of resources, or different servers. (See concurrency control, below, for more details.)
+- generation: a sequence number representing a specific generation of the desired state. Set by the system and monotonically increasing, per-resource. May be compared, such as for RAW and WAW consistency.
+- creationTimestamp: a string representing an RFC 3339 date of the date and time an object was created
+- deletionTimestamp: a string representing an RFC 3339 date of the date and time after which this resource will be deleted. This field is set by the server when a graceful deletion is requested by the user, and is not directly settable by a client. The resource will be deleted (no longer visible from resource lists, and not reachable by name) after the time in this field except when the object has a finalizer set. In case the finalizer is set the deletion of the object is postponed at least until the finalizer is removed. Once the deletionTimestamp is set, this value may not be unset or be set further into the future, although it may be shortened or the resource may be deleted prior to this time.
+- labels: a map of string keys and values that can be used to organize and categorize objects (see the labels docs)
+- annotations: a map of string keys and values that can be used by external tooling to store and retrieve arbitrary metadata about this object (see the annotations docs)
+
+
+## Spec and Status
+
+Kubernetes API区分对象的期望状态（称为“spec”的嵌套对象字段）的规范和当前时间对象的状态（称为“status”的嵌套对象字段）。
+
+当一个新版本的对象被POST或PUT时，“spec”会立即更新并可用。随着时间的推移，系统将努力使“状态”与“规范”保持一致。无论该节的先前版本如何，该系统都将推向最新的“规范”。
+
+Kubernetes API还可作为系统声明性配置架构的基础。为了促进基于级别的操作和声明性配置的表达，规范中的字段应该具有声明性而非命令性的名称和语义 - 它们代表期望的状态，而不是旨在产生期望状态的动作。

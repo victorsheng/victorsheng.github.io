@@ -1,5 +1,6 @@
 ---
 title: geektime-jvm-04-method
+abbrlink: 4280207851
 date: 2018-08-01 23:20:07
 tags:
 categories:

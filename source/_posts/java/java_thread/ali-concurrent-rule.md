@@ -1,5 +1,6 @@
 ---
 title: ali-concurrent-rule
+abbrlink: 2646735463
 date: 2018-04-05 20:49:44
 tags:
 categories:

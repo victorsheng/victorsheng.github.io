@@ -1,4 +1,6 @@
+---
 title: data-warehouse-build
+abbrlink: 1465671089
 date: 2018-03-21 19:55:08
 tags:
 categories:

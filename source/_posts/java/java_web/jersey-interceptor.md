@@ -1,4 +1,6 @@
+---
 title: jersey-interceptor
+abbrlink: 4167561562
 date: 2018-07-03 17:40:34
 tags:
 categories:

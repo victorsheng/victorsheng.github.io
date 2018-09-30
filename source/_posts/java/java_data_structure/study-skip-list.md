@@ -1,9 +1,11 @@
+---
 title: study-skip-list
-date: 2018-01-05 11:16:40
 tags:
-    - 跳跃表
+  - 跳跃表
 categories:
-    - java
+  - java
+abbrlink: 2366404641
+date: 2018-01-05 11:16:40
 ---
 # 跳跃表
 - 一种基于有序链表的扩展

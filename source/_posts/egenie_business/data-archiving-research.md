@@ -1,7 +1,9 @@
+---
 title: data-Archiving-research
 tags:
   - MySQL
 categories: []
+abbrlink: 3291804496
 date: 2018-01-25 10:42:00
 ---
 

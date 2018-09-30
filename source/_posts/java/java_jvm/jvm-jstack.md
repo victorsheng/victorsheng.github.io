@@ -1,11 +1,12 @@
 ---
 title: jvm-jstack
-date: 2018-02-02 23:16:05
 tags:
-	- jvm
-	- jstack
+  - jvm
+  - jstack
 categories:
-	- jvm
+  - jvm
+abbrlink: 1838615533
+date: 2018-02-02 23:16:05
 ---
 # jstack
 jstack命令的语法格式： jstack  <pid>。可以用jps查看java进程id。这里要注意的是：

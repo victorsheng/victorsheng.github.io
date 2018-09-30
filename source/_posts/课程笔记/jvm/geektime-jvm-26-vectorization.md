@@ -1,5 +1,6 @@
 ---
 title: geektime-jvm-26-vectorization
+abbrlink: 745262539
 date: 2018-09-21 09:01:52
 tags:
 categories:

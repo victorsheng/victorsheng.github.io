@@ -1,3 +1,4 @@
+---
 title: mac安装seaborn遇到的问题
 tags:
   - python
@@ -5,6 +6,7 @@ tags:
   - seaborn
 categories:
   - 异常
+abbrlink: 1950799952
 date: 2017-11-30 07:58:00
 ---
 # 异常信息

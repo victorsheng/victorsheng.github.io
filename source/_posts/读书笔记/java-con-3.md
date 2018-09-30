@@ -1,5 +1,7 @@
+---
 title: java并发编程实战-第三章-对象的共享
 author: Victor
+abbrlink: 2462899033
 date: 2018-04-15 23:04:18
 tags:
 categories:

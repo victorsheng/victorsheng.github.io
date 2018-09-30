@@ -1,4 +1,6 @@
+---
 title: geektime-jvm-17-jit-2
+abbrlink: 2208891961
 date: 2018-08-29 20:31:45
 tags:
 categories:

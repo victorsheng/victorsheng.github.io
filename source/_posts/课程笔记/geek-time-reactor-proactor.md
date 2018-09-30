@@ -1,4 +1,6 @@
+---
 title: 极客时间reactor-preactor学习笔记
+abbrlink: 3218294535
 date: 2018-06-21 10:29:59
 tags:
 categories:

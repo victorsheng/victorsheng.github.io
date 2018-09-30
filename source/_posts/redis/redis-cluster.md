@@ -1,4 +1,6 @@
+---
 title: redis集群
+abbrlink: 2975048490
 date: 2018-03-28 22:33:59
 tags:
 categories:

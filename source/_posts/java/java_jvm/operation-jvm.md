@@ -1,9 +1,11 @@
+---
 title: jvm崩溃
 tags:
   - jvm
   - OOM
-categories: 
-    - jvm
+categories:
+  - jvm
+abbrlink: 4215529590
 date: 2017-12-14 14:14:00
 ---
 # 日常日志及错误

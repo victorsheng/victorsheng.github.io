@@ -1,7 +1,7 @@
 ---
 title: beancopy源码学习
-tags:
-    -cglib
+tags: '-cglib'
+abbrlink: 3190299189
 categories:
 ---
 

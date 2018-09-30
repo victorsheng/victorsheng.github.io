@@ -1,4 +1,6 @@
+---
 title: 04-recognition-docker-image
+abbrlink: 2889535296
 date: 2018-09-12 18:24:56
 tags:
 categories:

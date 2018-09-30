@@ -1,4 +1,6 @@
+---
 title: http和ajax区别和练习
+abbrlink: 1757700508
 date: 2018-04-13 19:03:38
 tags:
 categories:

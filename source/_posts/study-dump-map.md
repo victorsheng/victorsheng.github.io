@@ -1,5 +1,6 @@
 ---
 title: study-dump-map
+abbrlink: 2164492415
 date: 2018-09-03 18:23:44
 tags:
 categories:

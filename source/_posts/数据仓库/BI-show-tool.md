@@ -1,3 +1,4 @@
+---
 title: 数据展现技术选型
 tags:
   - BI
@@ -5,6 +6,7 @@ tags:
   - 数据仓库
 categories:
   - BI
+abbrlink: 1154545606
 date: 2017-11-28 16:36:00
 ---
 数据展现技术选型

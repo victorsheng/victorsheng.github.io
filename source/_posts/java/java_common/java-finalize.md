@@ -1,4 +1,6 @@
+---
 title: java-finalize
+abbrlink: 2480628981
 date: 2018-06-22 17:49:39
 tags:
 categories:

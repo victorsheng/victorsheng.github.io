@@ -1,10 +1,12 @@
+---
 title: springboot配置FastJsonHttpMessageConverter(原理篇)
 tags:
   - springboot
   - http
   - springMVC
-categories: 
-    - spring
+categories:
+  - spring
+abbrlink: 2693755685
 date: 2018-01-22 17:18:00
 ---
 # springboot如何配置DispatcherServlet?

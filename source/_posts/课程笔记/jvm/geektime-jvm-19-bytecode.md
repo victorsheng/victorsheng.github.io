@@ -1,4 +1,6 @@
+---
 title: geektime-jvm-19-bytecode
+abbrlink: 3516899880
 date: 2018-09-03 10:06:14
 tags:
 categories:

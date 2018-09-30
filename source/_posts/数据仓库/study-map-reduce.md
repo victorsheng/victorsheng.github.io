@@ -1,8 +1,10 @@
+---
 title: study_map_reduce
 tags:
   - MapReduce
 categories:
   - BI
+abbrlink: 4036242772
 date: 2018-01-31 15:16:00
 ---
 

@@ -1,4 +1,6 @@
+---
 title: java-class-construct
+abbrlink: 4073574398
 date: 2018-08-01 07:58:05
 tags:
 categories:

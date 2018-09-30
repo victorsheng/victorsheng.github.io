@@ -1,3 +1,4 @@
+---
 title: kaggle-expedia-hotel-recommendations学习笔记
 tags:
   - kaggle
@@ -5,6 +6,7 @@ tags:
   - python
 categories:
   - kaggle
+abbrlink: 4247890574
 date: 2017-12-05 16:31:00
 ---
 

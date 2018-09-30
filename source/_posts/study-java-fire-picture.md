@@ -1,5 +1,6 @@
 ---
 title: study-java-fire-picture
+abbrlink: 2403632108
 date: 2018-08-08 10:01:42
 tags:
 categories:

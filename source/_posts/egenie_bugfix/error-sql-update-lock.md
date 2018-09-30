@@ -1,10 +1,11 @@
 ---
 title: error-sql-update-lock
-date: 2018-01-06 14:53:37
 tags:
-    - mysql
+  - mysql
 categories:
-    - mysql
+  - mysql
+abbrlink: 3503374044
+date: 2018-01-06 14:53:37
 ---
 com.mysql.jdbc.exceptions.jdbc4.MySQLTransactionRollbackException: Lock wait timeout exceeded; try restarting transaction
 

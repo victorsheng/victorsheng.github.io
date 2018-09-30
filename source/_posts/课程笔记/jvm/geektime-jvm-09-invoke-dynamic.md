@@ -1,5 +1,6 @@
 ---
 title: geektime-jvm-09-invoke-dynamic
+abbrlink: 2309912552
 date: 2018-08-14 22:12:54
 tags:
 categories:

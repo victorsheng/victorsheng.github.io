@@ -1,4 +1,6 @@
+---
 title: study-id-generater
+abbrlink: 3074620109
 date: 2018-02-06 07:00:36
 tags:
 categories:

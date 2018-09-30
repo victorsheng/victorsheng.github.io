@@ -1,5 +1,6 @@
 ---
 title: JUC-Double-check
+abbrlink: 3473552964
 date: 2018-04-05 21:22:46
 tags:
 categories:

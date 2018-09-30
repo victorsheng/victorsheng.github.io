@@ -1,10 +1,11 @@
 ---
 title: desin_pattern
-date: 2018-01-19 23:04:56
 tags:
-    - 设计模式
+  - 设计模式
 categories:
-    - 设计模式
+  - 设计模式
+abbrlink: 495611574
+date: 2018-01-19 23:04:56
 ---
 # 模板方法（Template Method ）
 

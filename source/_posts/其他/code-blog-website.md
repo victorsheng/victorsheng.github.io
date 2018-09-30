@@ -1,8 +1,10 @@
+---
 title: 技术搜索技巧
 tags:
   - 技术分享
 categories:
   - 搜索技巧
+abbrlink: 3262320489
 date: 2017-11-28 17:34:00
 ---
 

@@ -1,7 +1,9 @@
+---
 title: 极客时间-学习笔记-AI技术内参1-经典搜索核心算法
 tags: []
-categories: 
-    - 人工智能
+categories:
+  - 人工智能
+abbrlink: 291802475
 date: 2017-12-18 21:43:00
 ---
 # TF-IDF及其变种

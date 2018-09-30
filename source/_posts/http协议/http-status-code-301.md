@@ -1,6 +1,6 @@
 ---
 title: http-status-code-301-302
-
+abbrlink: 2144662365
 date: 2018-06-03 14:18:28
 tags:
 categories:

@@ -1,4 +1,6 @@
+---
 title: serialization-study
+abbrlink: 2616200048
 date: 2018-09-06 09:44:39
 tags:
 categories:

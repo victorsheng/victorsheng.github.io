@@ -1,4 +1,6 @@
+---
 title: 方法内联上
+abbrlink: 1990461666
 date: 2018-09-06 15:24:43
 tags:
 categories:

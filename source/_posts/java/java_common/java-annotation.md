@@ -1,5 +1,6 @@
 ---
 title: java_annotation
+abbrlink: 1818142997
 date: 2018-05-03 10:08:00
 tags:
 categories:

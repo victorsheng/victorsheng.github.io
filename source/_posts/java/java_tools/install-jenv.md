@@ -1,9 +1,11 @@
+---
 title: jenv安装(管理多个jdk版本)
-date: 2018-01-06 08:03:10
 tags:
-    - jenv
+  - jenv
 categories:
-    - java
+  - java
+abbrlink: 206566238
+date: 2018-01-06 08:03:10
 ---
 1.安装jenv
 ``` shell

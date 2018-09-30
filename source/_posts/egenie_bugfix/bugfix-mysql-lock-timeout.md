@@ -1,8 +1,9 @@
 ---
 title: mysql锁超时处理
-date: 2018-03-10 12:12:00
 tags:
-	- mysql
+  - mysql
+abbrlink: 1001227538
+date: 2018-03-10 12:12:00
 categories:
 ---
 

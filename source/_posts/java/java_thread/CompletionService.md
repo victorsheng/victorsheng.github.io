@@ -1,5 +1,7 @@
+---
 title: 并发工具之CompletionService
 author: Victor
+abbrlink: 4177496835
 date: 2018-04-16 22:23:47
 tags:
 categories:

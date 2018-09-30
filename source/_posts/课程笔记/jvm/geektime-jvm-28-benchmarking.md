@@ -1,5 +1,6 @@
 ---
 title: geektime-jvm-28-benchmarking
+abbrlink: 961213917
 date: 2018-09-24 11:05:28
 tags:
 categories:

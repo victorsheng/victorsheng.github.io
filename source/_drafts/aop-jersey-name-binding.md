@@ -1,5 +1,6 @@
 ---
 title: aop-jersey-name-binding
+abbrlink: 2820051264
 tags:
 categories:
 ---

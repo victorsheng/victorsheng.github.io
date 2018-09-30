@@ -1,5 +1,6 @@
 ---
 title: nginx-proxy_pass-path
+abbrlink: 2351374196
 date: 2018-09-17 14:14:22
 tags:
 categories:

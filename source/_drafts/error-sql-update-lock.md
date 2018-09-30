@@ -1,4 +1,6 @@
+---
 title: error-sql-update-lock
+abbrlink: 3503374043
 date: 2018-01-06 14:53:37
 tags:
 categories:

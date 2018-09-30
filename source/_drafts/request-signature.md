@@ -1,5 +1,6 @@
 ---
 title: request-signature
+abbrlink: 398828867
 tags:
 categories:
 ---

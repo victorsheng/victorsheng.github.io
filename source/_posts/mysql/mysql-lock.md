@@ -1,8 +1,10 @@
+---
 title: mysql-lock
 tags:
   - mysql
 categories:
   - mysql
+abbrlink: 335527762
 date: 2018-04-07 22:55:48
 ---
 # MySQL中锁的种类

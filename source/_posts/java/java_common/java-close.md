@@ -1,4 +1,6 @@
+---
 title: java-close
+abbrlink: 1203295839
 date: 2018-06-25 10:03:18
 tags:
 categories:

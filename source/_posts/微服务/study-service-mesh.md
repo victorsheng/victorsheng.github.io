@@ -1,11 +1,13 @@
+---
 title: study-service-mesh(服务网格)
 tags:
   - kubernetes
   - service-mesh
   - 微服务
-categories: 
-    - docker
+categories:
+  - docker
 author: ''
+abbrlink: 3332714950
 date: 2017-12-20 21:47:00
 ---
 # service-mesh概念

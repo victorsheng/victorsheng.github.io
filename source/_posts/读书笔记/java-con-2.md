@@ -1,5 +1,7 @@
+---
 title: java并发编程实战-第二章-线程安全性
 author: Victor
+abbrlink: 76319416
 date: 2018-04-15 23:12:07
 tags:
 categories:

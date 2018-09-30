@@ -1,4 +1,6 @@
+---
 title: 05-kubernetes
+abbrlink: 4287793359
 date: 2018-09-12 21:45:04
 tags:
 categories:

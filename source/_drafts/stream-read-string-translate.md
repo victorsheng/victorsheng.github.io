@@ -1,5 +1,6 @@
 ---
 title: stream-read-string-translate
+abbrlink: 266837032
 tags:
 categories:
 ---

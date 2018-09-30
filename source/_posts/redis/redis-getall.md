@@ -1,10 +1,11 @@
 ---
 title: redis中获取全部的方法
-date: 2018-03-27 13:07:36
 tags:
-    - redis
+  - redis
 categories:
-    - redis
+  - redis
+abbrlink: 1028475328
+date: 2018-03-27 13:07:36
 ---
 
 # String

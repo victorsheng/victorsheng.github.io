@@ -1,5 +1,6 @@
 ---
 title: jvm-memory-model
+abbrlink: 3341262921
 date: 2018-02-07 21:10:26
 tags:
 categories:

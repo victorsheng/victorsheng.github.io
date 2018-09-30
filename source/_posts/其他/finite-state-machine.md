@@ -1,4 +1,6 @@
+---
 title: 有限状态机的应用
+abbrlink: 1280851884
 date: 2018-04-21 15:17:19
 tags:
 categories:

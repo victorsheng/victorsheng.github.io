@@ -1,9 +1,11 @@
+---
 title: java集合并发修改
 tags:
   - java
   - 并发修改
-categories: 
-    - java
+categories:
+  - java
+abbrlink: 2358092615
 date: 2018-01-05 11:21:00
 ---
 # 并发修改

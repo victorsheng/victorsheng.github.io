@@ -1,5 +1,6 @@
 ---
 title: bugfix-remote-ssh
+abbrlink: 3500998150
 date: 2018-04-20 17:00:37
 tags:
 categories:

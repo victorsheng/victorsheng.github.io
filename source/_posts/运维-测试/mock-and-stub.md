@@ -1,5 +1,6 @@
 ---
 title: mock-and-stub
+abbrlink: 966268620
 date: 2018-04-21 13:22:14
 tags:
 categories:

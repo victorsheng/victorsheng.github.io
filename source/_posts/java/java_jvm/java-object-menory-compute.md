@@ -1,4 +1,6 @@
+---
 title: java对象字节码占用计算
+abbrlink: 861228827
 date: 2018-03-27 22:22:30
 tags:
 categories:

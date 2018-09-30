@@ -1,8 +1,10 @@
+---
 title: java-study-BlockingQueue
 tags:
   - 数据结构
 categories:
   - java
+abbrlink: 3844820149
 date: 2018-01-29 23:47:00
 ---
 # BlockingQueue

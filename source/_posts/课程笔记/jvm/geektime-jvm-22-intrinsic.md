@@ -1,5 +1,6 @@
 ---
 title: geektime-jvm-22-intrinsic
+abbrlink: 3393891442
 date: 2018-09-10 18:13:46
 tags:
 categories:

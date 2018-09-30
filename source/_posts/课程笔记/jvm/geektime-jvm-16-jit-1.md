@@ -1,5 +1,6 @@
 ---
 title: 即时编译（上）
+abbrlink: 3580736425
 date: 2018-08-27 11:18:54
 tags:
 categories:

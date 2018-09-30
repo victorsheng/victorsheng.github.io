@@ -1,10 +1,12 @@
+---
 title: RESTful-API概念学习
-date: 2018-01-15 20:13:15
 tags:
-    - HTTP协议
-    - RESTful
+  - HTTP协议
+  - RESTful
 categories:
-    - HTTP协议
+  - HTTP协议
+abbrlink: 2994087375
+date: 2018-01-15 20:13:15
 ---
 # RESTful API
 - 透明性，暴露资源存在。

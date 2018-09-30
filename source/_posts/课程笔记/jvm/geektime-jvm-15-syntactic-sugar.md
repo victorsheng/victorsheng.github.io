@@ -1,5 +1,6 @@
 ---
 title: geektime-jvm-15-syntactic-sugar
+abbrlink: 1552230599
 date: 2018-08-26 11:18:54
 tags:
 categories:

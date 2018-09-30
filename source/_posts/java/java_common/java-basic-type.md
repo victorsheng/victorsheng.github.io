@@ -1,5 +1,6 @@
 ---
 title: java基本数据类型
+abbrlink: 1083280395
 date: 2018-07-03 07:21:33
 tags:
 categories:

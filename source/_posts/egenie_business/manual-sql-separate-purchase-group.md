@@ -1,5 +1,6 @@
 ---
 title: 手工合并采购单分组的sql
+abbrlink: 4244448105
 date: 2018-02-26 16:34:41
 tags:
 categories:

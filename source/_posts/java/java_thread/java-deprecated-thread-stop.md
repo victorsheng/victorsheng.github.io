@@ -1,6 +1,8 @@
+---
 title: 为什么废弃thread类的stop方法及java中的中断概念
 tags:
   - 多线程
+abbrlink: 3578124973
 date: 2018-03-28 14:27:14
 categories:
 ---

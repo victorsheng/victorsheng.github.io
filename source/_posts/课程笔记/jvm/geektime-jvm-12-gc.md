@@ -1,4 +1,6 @@
+---
 title: geektime-jvm-12-gc
+abbrlink: 2496604078
 date: 2018-08-20 20:41:38
 tags:
 categories:

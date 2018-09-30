@@ -1,7 +1,9 @@
+---
 title: 使用fastclass 进行”反射”
 tags:
   - aop
   - cglib
+abbrlink: 1638459447
 date: 2018-07-19 20:13:43
 categories:
 ---

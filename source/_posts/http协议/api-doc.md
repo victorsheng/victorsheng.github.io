@@ -1,9 +1,11 @@
+---
 title: 接口文档编写规范
-date: 2018-01-15 20:13:15
 tags:
-    - HTTP协议
+  - HTTP协议
 categories:
-    - HTTP协议
+  - HTTP协议
+abbrlink: 2736957875
+date: 2018-01-15 20:13:15
 ---
 # 接口
 ## 描述

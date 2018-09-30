@@ -1,5 +1,6 @@
 ---
 title: java-log
+abbrlink: 1388794462
 tags:
 categories:
 ---

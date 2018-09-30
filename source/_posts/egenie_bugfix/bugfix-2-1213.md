@@ -1,9 +1,11 @@
+---
 title: bugfix总结-12.13
 tags:
   - bugfix
   - redis
 categories:
-    - redis
+  - redis
+abbrlink: 3903153811
 date: 2017-12-14 08:00:00
 ---
 # bugfix1-redis相关

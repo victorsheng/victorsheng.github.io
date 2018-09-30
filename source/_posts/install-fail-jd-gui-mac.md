@@ -1,5 +1,6 @@
 ---
 title: install-fail-jd-gui-mac
+abbrlink: 214036766
 date: 2018-08-15 09:56:54
 tags:
 categories:

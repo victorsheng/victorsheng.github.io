@@ -1,6 +1,8 @@
+---
 title: juc的Lock接口
 tags:
   - 多线程
+abbrlink: 1309543040
 date: 2018-04-03 09:03:00
 categories:
 ---

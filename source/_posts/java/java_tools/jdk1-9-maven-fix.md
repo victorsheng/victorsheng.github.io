@@ -1,10 +1,11 @@
+---
 title: jdk1.9-maven-fix
 tags:
   - java
   - maven
   - JDK1.9
-categories: 
-    java
+categories: java
+abbrlink: 1552463004
 date: 2018-01-08 13:59:00
 ---
 # 背景

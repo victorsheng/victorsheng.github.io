@@ -1,10 +1,12 @@
+---
 title: redis-bitmap
 author: Victor
-date: 2018-06-24 17:56:10
 tags:
-    - redis
+  - redis
 categories:
-    - redis
+  - redis
+abbrlink: 1878081963
+date: 2018-06-24 17:56:10
 ---
 # bitMap概念
 

@@ -1,5 +1,6 @@
 ---
 title: geektime-jvm-13-jvm-memory-model
+abbrlink: 2196845810
 date: 2018-08-21 20:15:08
 tags:
 categories:

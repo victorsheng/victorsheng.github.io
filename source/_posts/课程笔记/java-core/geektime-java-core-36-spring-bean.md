@@ -1,4 +1,6 @@
+---
 title: geektime-java-core-36-spring-bean
+abbrlink: 3581370749
 date: 2018-08-26 14:30:13
 tags:
 categories:

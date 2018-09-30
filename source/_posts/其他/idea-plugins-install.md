@@ -1,9 +1,11 @@
+---
 title: 优化idea插件安装
 tags:
   - 代理
   - idea
 categories:
   - idea
+abbrlink: 956934319
 date: 2017-12-01 06:42:00
 ---
 # 常常遇到从idea程序中搜索插件，下载超时的情况,解决方式如下

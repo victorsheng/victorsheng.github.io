@@ -1,5 +1,6 @@
 ---
 title: content-type
+abbrlink: 3266185539
 date: 2018-05-17 10:31:00
 tags:
 categories:

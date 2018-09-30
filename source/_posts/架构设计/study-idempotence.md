@@ -1,5 +1,6 @@
 ---
 title: 常见用来保证幂等的手段
+abbrlink: 3829302446
 date: 2018-03-27 09:28:00
 tags:
 categories:

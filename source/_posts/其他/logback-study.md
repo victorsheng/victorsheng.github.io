@@ -1,5 +1,6 @@
 ---
 title: logback-study
+abbrlink: 1789189556
 date: 2018-04-27 17:49:43
 tags:
 categories:

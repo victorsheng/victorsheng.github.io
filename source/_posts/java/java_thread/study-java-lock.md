@@ -1,7 +1,9 @@
+---
 title: study-java-lock
-date: 2018-02-01 22:49:51
 tags:
   - 多线程
+abbrlink: 2264190668
+date: 2018-02-01 22:49:51
 categories:
 ---
 ```

@@ -1,9 +1,11 @@
+---
 title: 优化mysql排序
-date: 2018-03-24 15:34:50
 tags:
-    - mysql
+  - mysql
 categories:
-    - mysql
+  - mysql
+abbrlink: 4014084071
+date: 2018-03-24 15:34:50
 ---
 # mysql排序方式:
 ## 常规排序

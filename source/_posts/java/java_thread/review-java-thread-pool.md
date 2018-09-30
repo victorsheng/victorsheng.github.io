@@ -1,9 +1,11 @@
+---
 title: review-java-thread-pool
 tags:
   - 多线程
   - 线程池
 categories:
   - java
+abbrlink: 1794271216
 date: 2018-01-31 11:14:41
 ---
 # 线程池

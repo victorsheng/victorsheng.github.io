@@ -1,5 +1,7 @@
+---
 title: kubernetes-01
-date: 
+abbrlink: 2710393900
+date:
 tags:
 categories:
 ---

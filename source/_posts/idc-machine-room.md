@@ -1,5 +1,6 @@
 ---
 title: idc机房
+abbrlink: 1543067476
 date: 2018-08-18 14:46:51
 tags:
 categories:

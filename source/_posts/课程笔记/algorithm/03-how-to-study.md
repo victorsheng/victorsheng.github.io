@@ -1,4 +1,6 @@
+---
 title: 03-how-to-study
+abbrlink: 2084814357
 date: 2018-09-24 08:35:16
 tags:
 categories:

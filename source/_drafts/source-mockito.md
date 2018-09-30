@@ -1,5 +1,6 @@
 ---
 title: source-mockito
+abbrlink: 3404213338
 tags:
 categories:
 ---

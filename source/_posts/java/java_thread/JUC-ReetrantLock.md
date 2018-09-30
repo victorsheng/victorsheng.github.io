@@ -1,7 +1,9 @@
+---
 title: ReetrantLock源码
-date: 2018-02-28 19:12:09
 tags:
   - 多线程
+abbrlink: 2262360278
+date: 2018-02-28 19:12:09
 categories:
 ---
 # Lock接口

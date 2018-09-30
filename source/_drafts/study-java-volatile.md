@@ -1,5 +1,6 @@
 ---
 title: study-java-volatile
+abbrlink: 4088645323
 tags:
 categories:
 ---

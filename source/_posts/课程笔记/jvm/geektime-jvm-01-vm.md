@@ -1,4 +1,6 @@
+---
 title: geektime-jvm-01
+abbrlink: 477520477
 date: 2018-07-30 09:13:36
 tags:
 categories:

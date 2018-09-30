@@ -1,4 +1,6 @@
+---
 title: cglib源码学习之Enhancer
+abbrlink: 2185134716
 date: 2018-07-25 20:35:01
 tags:
 categories:

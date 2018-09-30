@@ -1,9 +1,11 @@
+---
 title: mac安装kubernetes
 tags:
   - docker
   - kubernetes
-categories: 
-    - docker
+categories:
+  - docker
+abbrlink: 2095167864
 date: 2017-12-21 07:17:00
 ---
 https://github.com/jolestar/kubernetes-complete-course

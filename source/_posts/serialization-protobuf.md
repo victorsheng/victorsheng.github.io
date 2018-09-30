@@ -1,5 +1,6 @@
 ---
 title: serialization-protobuf
+abbrlink: 313737339
 date: 2018-09-05 22:33:36
 tags:
 categories:

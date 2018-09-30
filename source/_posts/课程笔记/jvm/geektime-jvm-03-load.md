@@ -1,5 +1,6 @@
 ---
 title: geektime-jvm-3-load
+abbrlink: 433235518
 date: 2018-08-01 10:00:51
 tags:
 categories:

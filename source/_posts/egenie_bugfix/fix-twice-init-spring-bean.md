@@ -1,4 +1,6 @@
+---
 title: fix-twice-init-spring-bean
+abbrlink: 2296630493
 date: 2018-06-05 19:56:33
 tags:
 categories:

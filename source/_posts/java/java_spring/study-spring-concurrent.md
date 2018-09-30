@@ -1,5 +1,7 @@
+---
 title: study-spring-concurrent
 author: Victor
+abbrlink: 3317845941
 date: 2018-03-19 23:35:45
 tags:
 categories:

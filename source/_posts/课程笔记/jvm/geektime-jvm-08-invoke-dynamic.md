@@ -1,5 +1,6 @@
 ---
 title: geektime-jvm-08-drynicinvoke
+abbrlink: 760260758
 date: 2018-08-11 15:03:12
 tags:
 categories:

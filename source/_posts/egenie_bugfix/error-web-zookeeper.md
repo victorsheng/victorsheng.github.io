@@ -1,10 +1,11 @@
 ---
 title: error-web-zookeeper
-date: 2017-12-28 14:46:11
 tags:
-    - zookeeper
+  - zookeeper
 categories:
-    - zookeeper
+  - zookeeper
+abbrlink: 2305364143
+date: 2017-12-28 14:46:11
 ---
 ```
 2017-12-26 19:42:40.907 WARN [localhost-startStop-1-SendThread(10.26.235.193:2181)][ClientCnxn.java:1162] - Session 0x15e05c1c95a0370 for server 10.26.235.193/10.26.235.193:2181, unexpected error, closing socket connection and attempting reconnect

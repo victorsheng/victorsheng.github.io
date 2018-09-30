@@ -1,5 +1,6 @@
 ---
 title: serialization-thrift
+abbrlink: 901002448
 date: 2018-09-06 09:25:56
 tags:
 categories:

@@ -1,5 +1,7 @@
+---
 title: 文件句柄泄漏
 author: Victor
+abbrlink: 3092670121
 date: 2018-07-05 20:16:42
 tags:
 categories:

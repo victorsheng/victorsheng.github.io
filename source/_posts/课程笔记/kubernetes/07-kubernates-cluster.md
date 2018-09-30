@@ -1,5 +1,6 @@
 ---
 title: 07-kubernates-cluster
+abbrlink: 881185341
 date: 2018-09-19 07:10:55
 tags:
 categories:

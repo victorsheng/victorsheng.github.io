@@ -1,8 +1,10 @@
+---
 title: 字符集-学习总结
 author: Victor
-date: 2018-07-07 07:32:30
 tags:
-    - 字符集
+  - 字符集
+abbrlink: 3546251453
+date: 2018-07-07 07:32:30
 categories:
 ---
 # 概念

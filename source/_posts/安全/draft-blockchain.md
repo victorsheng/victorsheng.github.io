@@ -1,5 +1,6 @@
 ---
 title: draft-blockchain
+abbrlink: 3008536627
 date: 2018-03-04 15:13:55
 tags:
 categories:

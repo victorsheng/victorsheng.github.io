@@ -1,4 +1,6 @@
+---
 title: 01-process
+abbrlink: 3409022640
 date: 2018-09-06 16:59:29
 tags:
 categories:

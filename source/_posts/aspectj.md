@@ -1,8 +1,9 @@
 ---
 title: aspectj
-date: 2018-07-09 11:26:23
 tags:
-    - aop
+  - aop
+abbrlink: 1687437683
+date: 2018-07-09 11:26:23
 categories:
 ---
 # full AspectJ

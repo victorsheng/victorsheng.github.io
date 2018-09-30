@@ -1,8 +1,9 @@
 ---
 title: CyclicBarrier循环屏障
-date: 2018-04-03 10:22:29
 tags:
-	- 多线程
+  - 多线程
+abbrlink: 3815139432
+date: 2018-04-03 10:22:29
 categories:
 ---
 # 简介

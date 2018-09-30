@@ -1,4 +1,6 @@
+---
 title: geektime-jvm-02-base-type
+abbrlink: 1263760056
 date: 2018-07-31 07:58:25
 tags:
 categories:

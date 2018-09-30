@@ -1,8 +1,10 @@
+---
 title: java-io-study
-date: 2018-07-05 07:05:09
 tags:
-    - io
-    - java
+  - io
+  - java
+abbrlink: 4195793335
+date: 2018-07-05 07:05:09
 categories:
 ---
 

@@ -1,9 +1,10 @@
 ---
 title: cglib应用之spring-aop
-date: 2018-07-19 20:08:14
 tags:
-	- aop
-	- cglib
+  - aop
+  - cglib
+abbrlink: 201383825
+date: 2018-07-19 20:08:14
 categories:
 ---
 # 应用

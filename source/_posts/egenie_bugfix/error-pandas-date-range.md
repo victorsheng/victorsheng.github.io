@@ -1,3 +1,4 @@
+---
 title: 学习pandas api时发现了一个奇怪的现象
 tags:
   - pandas
@@ -5,6 +6,7 @@ tags:
   - jupyter
 categories:
   - 机器学习
+abbrlink: 1551802988
 date: 2017-12-10 16:15:00
 ---
 # 学习pandas api时发现了一个奇怪的现象

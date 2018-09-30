@@ -1,5 +1,6 @@
 ---
 title: How-To-Ask-Questions-The-Smart-Way
+abbrlink: 166009673
 date: 2018-07-04 09:21:09
 tags:
 categories:

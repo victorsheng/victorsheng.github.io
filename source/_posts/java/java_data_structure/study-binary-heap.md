@@ -1,5 +1,6 @@
 ---
 title: study-binary-heap
+abbrlink: 2978947752
 date: 2018-03-05 10:20:49
 tags:
 categories:

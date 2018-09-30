@@ -1,5 +1,6 @@
 ---
 title: http-header-httponly
+abbrlink: 4194410282
 date: 2018-06-06 15:53:09
 tags:
 categories:

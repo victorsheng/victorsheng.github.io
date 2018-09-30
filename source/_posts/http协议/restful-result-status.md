@@ -1,5 +1,6 @@
 ---
 title: restfule-result-status
+abbrlink: 1970140225
 date: 2018-04-19 17:48:29
 tags:
 categories:

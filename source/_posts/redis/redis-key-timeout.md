@@ -1,11 +1,11 @@
 ---
-
-title: "Redis过期淘汰机制"
-date: "2018-03-26 18:21"
+title: Redis过期淘汰机制
+date: '2018-03-26 18:21'
 tags:
-    - redis
+  - redis
 categories:
-    - redis
+  - redis
+abbrlink: 795944394
 ---
 # 参考
  [https://yq.aliyun.com/articles/257459](https://yq.aliyun.com/articles/257459)

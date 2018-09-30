@@ -1,4 +1,6 @@
+---
 title: 字符集与string
+abbrlink: 450188657
 date: 2018-07-03 07:43:36
 tags:
 categories:

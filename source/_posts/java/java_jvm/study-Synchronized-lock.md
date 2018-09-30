@@ -1,4 +1,6 @@
+---
 title: study-synchronized-lock
+abbrlink: 2610491251
 date: 2018-02-01 22:49:51
 tags:
 categories:

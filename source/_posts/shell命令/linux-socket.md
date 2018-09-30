@@ -1,8 +1,10 @@
+---
 title: linux-socket挥手
-date: 2018-06-27 05:58:36
 tags:
-    - socket
-    - 网络协议
+  - socket
+  - 网络协议
+abbrlink: 2295228067
+date: 2018-06-27 05:58:36
 categories:
 ---
 # Socket是什么

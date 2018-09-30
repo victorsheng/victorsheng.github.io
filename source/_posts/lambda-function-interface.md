@@ -1,5 +1,6 @@
 ---
 title: lambda-function-interface
+abbrlink: 3485702017
 date: 2018-08-15 11:06:33
 tags:
 categories:

@@ -1,4 +1,6 @@
+---
 title: class上找不到的注解不会抛出ClassNotFoundException
+abbrlink: 1148835200
 date: 2018-07-13 10:45:54
 tags:
 categories:

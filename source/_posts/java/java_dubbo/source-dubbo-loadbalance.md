@@ -1,10 +1,11 @@
 ---
 title: source-dubbo-loadbalance
-date: 2018-02-03 10:04:26
 tags:
-	- loadbalance
+  - loadbalance
 categories:
-	- dubbo
+  - dubbo
+abbrlink: 3820398604
+date: 2018-02-03 10:04:26
 ---
 # 负载均衡
 

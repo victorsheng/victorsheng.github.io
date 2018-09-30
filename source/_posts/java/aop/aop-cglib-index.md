@@ -1,9 +1,10 @@
 ---
 title: cglib类库说明
-date: 2018-07-18 20:13:37
 tags:
   - aop
   - cglib
+abbrlink: 3756615804
+date: 2018-07-18 20:13:37
 categories:
 ---
 CGLIB(Code Generation Library)是一个强大的、高性能的代码生成库。它被广泛使用在基于代理的AOP框架（例如Spring AOP和dynaop）提供方法拦截。Hibernate作为最流行的ORM工具也同样使用CGLIB库来代理单端关联（集合懒加载除外，它使用另外一种机制）。EasyMock和jMock作为流行的Java测试库，它们提供Mock对象的方式来支持测试，都使用了CGLIB来对没有接口的类进行代理。

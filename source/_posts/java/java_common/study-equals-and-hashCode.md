@@ -1,8 +1,10 @@
+---
 title: study_equals_and_hashCode
+categories:
+  - java
+abbrlink: 181208395
 date: 2018-01-22 12:36:24
 tags:
-categories:
-    - java
 ---
 https://www.ibm.com/developerworks/cn/java/j-jtp05273/index.html
 

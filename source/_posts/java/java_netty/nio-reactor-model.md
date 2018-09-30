@@ -1,4 +1,6 @@
+---
 title: nio-reactor-model
+abbrlink: 3340305725
 date: 2018-04-20 19:52:52
 tags:
 categories:

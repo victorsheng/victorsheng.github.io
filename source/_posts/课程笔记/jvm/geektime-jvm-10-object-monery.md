@@ -1,5 +1,6 @@
 ---
 title: geektime-jvm-10-object-monery
+abbrlink: 2827992282
 date: 2018-08-16 18:36:25
 tags:
 categories:

@@ -1,5 +1,6 @@
 ---
 title: aspectj-aop
+abbrlink: 3746106726
 tags:
 categories:
 ---

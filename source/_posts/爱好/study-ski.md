@@ -1,9 +1,10 @@
 ---
 title: 双板滑雪笔记
+categories:
+  - 滑雪
+abbrlink: 2481240714
 date: 2017-12-26 19:27:06
 tags:
-categories:
-    - 滑雪
 ---
 # 犁式直降
 # 动作

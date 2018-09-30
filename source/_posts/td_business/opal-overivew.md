@@ -1,4 +1,6 @@
+---
 title: opal(open algorithm)概览
+abbrlink: 1462518494
 date: 2018-04-23 10:39:20
 tags:
 categories:

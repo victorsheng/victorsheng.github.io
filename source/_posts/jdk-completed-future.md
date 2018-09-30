@@ -1,5 +1,6 @@
 ---
 title: jdk-completed-future
+abbrlink: 849532567
 date: 2018-09-07 11:17:43
 tags:
 categories:

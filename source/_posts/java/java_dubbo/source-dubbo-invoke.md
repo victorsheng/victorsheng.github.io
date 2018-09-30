@@ -1,8 +1,10 @@
+---
 title: source_dubbo_invoke
 tags:
   - dubbo
 categories:
   - dubbo
+abbrlink: 3443009135
 date: 2018-02-01 19:41:00
 ---
 

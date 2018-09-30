@@ -4,7 +4,8 @@ tags:
   - redis
   - breakdown
 categories:
-    - redis
+  - redis
+abbrlink: 3603021577
 date: 2017-12-14 09:39:00
 ---
 # 错误日志

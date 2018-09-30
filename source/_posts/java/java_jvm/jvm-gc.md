@@ -1,4 +1,6 @@
+---
 title: jvm垃圾回收策略
+abbrlink: 619707318
 date: 2018-02-18 09:11:18
 tags:
 categories:

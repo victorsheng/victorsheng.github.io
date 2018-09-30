@@ -1,5 +1,6 @@
 ---
 title: 02-cgroup
+abbrlink: 2218268172
 date: 2018-09-06 18:11:42
 tags:
 categories:

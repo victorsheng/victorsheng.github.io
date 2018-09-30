@@ -1,5 +1,6 @@
 ---
 title: 08-kubernates-application
+abbrlink: 3213573169
 date: 2018-09-21 20:29:11
 tags:
 categories:

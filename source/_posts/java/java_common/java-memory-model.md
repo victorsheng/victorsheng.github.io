@@ -1,4 +1,6 @@
+---
 title: java内存模型
+abbrlink: 2262361025
 date: 2018-04-07 19:14:17
 tags:
 categories:

@@ -1,5 +1,6 @@
 ---
 title: geektime-jvm-18-jit-mid-process
+abbrlink: 1590151434
 date: 2018-08-31 21:14:22
 tags:
 categories:

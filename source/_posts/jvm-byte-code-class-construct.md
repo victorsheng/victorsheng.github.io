@@ -1,5 +1,6 @@
 ---
 title: 深入理解jvm第六章类文件机构
+abbrlink: 1717250831
 date: 2018-08-01 23:01:22
 tags:
 categories:

@@ -1,8 +1,10 @@
+---
 title: dubbo需求
 tags:
   - dubbo
 categories:
   - dubbo
+abbrlink: 2645348325
 date: 2018-01-17 07:43:00
 ---
 # 需求

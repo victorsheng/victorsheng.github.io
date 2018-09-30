@@ -1,4 +1,6 @@
+---
 title: bugfix类转换异常
+abbrlink: 2632917015
 date: 2018-03-13 15:47:48
 tags:
 categories:
