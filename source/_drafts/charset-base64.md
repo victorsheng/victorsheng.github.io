@@ -1,6 +1,5 @@
 ---
 title: charset-base64
-abbrlink: 29718
 tags:
 categories:
 ---
