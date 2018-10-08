@@ -6,9 +6,7 @@ abbrlink: 2891225637
 date: 2018-03-30 10:14:33
 categories:
 ---
-# 参考
-http://www.cnblogs.com/chenpi/p/5614290.html
-http://ifeve.com/doug-lea/
+
 
 # J.U.C：
 
@@ -24,7 +22,7 @@ JSR，全称 Java Specification Requests， 即Java规范提案， 主要是用�
 ## 什么是J.U.C：
 即java.util.concurrent的缩写，该包参考自EDU.oswego.cs.dl.util.concurrent，是JSR 166标准规范的一个实现；
 
-
+java发布的J2SE-1.5介绍了java.util.concurrent包，是一个通过JCP(Java Community Process)和JSR创建的一个支持中间并发类的集合。这些组件都是同步组件，由抽象数据类型（ADT）类来支持内部同步状态（比如：表示一个锁是locked还是unlocked状态），并更新及监控该状态，如果其他线程修改了状态并且状态允许，则根据该状态，至少有一个方法调用线程阻塞。例如：各种形式的互斥锁、读写锁、信号量、barriers、futures、事件指示器及队列。
 
 
 - 同步器(Synchronizers)
@@ -46,3 +44,11 @@ JSR，全称 Java Specification Requests， 即Java规范提案， 主要是用�
 
 
 ![upload successful](/images/pasted-113.png)
+
+# 参考
+
+http://www.cnblogs.com/chenpi/p/5614290.html
+http://ifeve.com/doug-lea/
+http://ifeve.com/j-u-c-framework/
+
+

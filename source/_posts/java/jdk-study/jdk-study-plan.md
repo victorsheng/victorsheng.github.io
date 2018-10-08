@@ -7,6 +7,7 @@ categories:
 ---
 学习标准:
 - api文档学习:http://tool.oschina.net/apidocs/apidoc?api=jdk-zh
+- http://tutorials.jenkov.com/java-util-concurrent/index.html
 - 源码
 - 博客学习
 - 验证测试
