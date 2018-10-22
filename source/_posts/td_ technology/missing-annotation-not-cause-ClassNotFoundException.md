@@ -47,8 +47,9 @@ but no definition for the class with the specified name could be found.
     </dependency>
 ```
 
-# ClassNotFoundException和NoClassDefFoundError的区别
-
+# ClassNotFoundException和NoClassDefFoundError的区别 ??? 还是不太懂
+https://dzone.com/articles/java-classnotfoundexception-vs-noclassdeffounderro
+https://my.oschina.net/jasonultimate/blog/166932
 
 ## ClassNotFoundException:
 - Class loader fails to **verify** a class byte code we mention in Link phase of class loading subsystem we get ClassNotFoundException.
