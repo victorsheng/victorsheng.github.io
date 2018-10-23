@@ -378,6 +378,7 @@ com.baidu.unbiz.easymapper.exception.MappingException: Generating mapping code f
 
 问题:
 重启后该就不报该错误了
+原因不清楚
 
 解决方案:
 使用cgblib的beancopier替换掉了easyMapper

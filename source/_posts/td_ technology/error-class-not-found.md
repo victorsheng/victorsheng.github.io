@@ -59,3 +59,5 @@ java.lang.NoClassDefFoundError: com/demo/opal/book/service/impl/bookServiceImpl$
 ```
 
 https://stackoverflow.com/questions/17973970/how-to-solve-java-lang-noclassdeffounderror
+
+暂时还是不清楚为何发生
