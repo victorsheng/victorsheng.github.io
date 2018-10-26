@@ -65,3 +65,10 @@ HotSpot 虚拟机是通过句柄（handle）来完成上述需求的。这里句
 - Handle JNI exceptions.
 - Remove the stack frame.
 https://stackoverflow.com/questions/24746776/what-does-a-jvm-have-to-do-when-calling-a-native-method/24747484#24747484
+
+
+# 总结与实践
+今天我介绍了 JNI 的运行机制。
+Java 中的 native 方法的链接方式主要有两种。一是按照 JNI 的默认规范命名所要链接的 C 函数，并依赖于 Java 虚拟机自动链接。另一种则是在 C 代码中主动链接。
+JNI 提供了一系列 API 来允许 C 代码使用 Java 语言特性。这些 API 不仅使用了特殊的数据结构来表示 Java 类，还拥有特殊的异常处理模式。
+JNI 中的引用可分为局部引用和全局引用。这两者都可以阻止垃圾回收器回收被引用的 Java 对象。不同的是，局部引用在 native 方法调用返回之后便会失效。传入参数以及大部分 JNI API 函数的返回值都属于局部引用。

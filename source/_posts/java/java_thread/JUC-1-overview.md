@@ -42,8 +42,73 @@ java发布的J2SE-1.5介绍了java.util.concurrent包，是一个通过JCP(Java 
 - BlockingQueue（阻塞队列）
 - TimeUnit枚举
 
-
 ![upload successful](/images/pasted-113.png)
+
+# 高级并发对象
+1. Lock objects support locking idioms that simplify many concurrent applications.
+2. Executors define a high-level API for launching and managing threads. Executor implementations provided by java.util.concurrent provide thread 3. pool management suitable for large-scale applications.
+3. Concurrent collections make it easier to manage large collections of data, and can greatly reduce the need for synchronization.
+4. Atomic variables have features that minimize synchronization and help avoid memory consistency errors.
+
+## 1.锁对象
+Lock (java.util.concurrent.locks)
+ReadLockView in StampedLock (java.util.concurrent.locks)
+ReentrantLock (java.util.concurrent.locks)
+Segment in ConcurrentReferenceHashMap (org.springframework.util)
+Segment in ConcurrentHashMap (java.util.concurrent)
+WriteLock in ReentrantReadWriteLock (java.util.concurrent.locks)
+WriteLockView in StampedLock (java.util.concurrent.locks)
+ReadLock in ReentrantReadWriteLock (java.util.concurrent.locks)
+
+## 2.Executors
+
+Executor Interfaces define the three executor object types.
+Thread Pools are the most common kind of executor implementation.
+Fork/Join is a framework (new in JDK 7) for taking advantage of multiple processors.
+
+### Executor
+
+#### ExecutorService
+
+#### ScheduledExecutorService
+
+### Fork/Join
+
+## 3.并发集合
+BlockingQueue defines a first-in-first-out data structure that blocks or times out when you attempt to add to a full queue, or retrieve from an empty queue.
+ConcurrentMap is a subinterface of java.util.Map that defines useful atomic operations. These operations remove or replace a key-value pair only if the key is present, or add a key-value pair only if the key is absent. Making these operations atomic helps avoid synchronization. The standard general-purpose implementation of ConcurrentMap is ConcurrentHashMap, which is a concurrent analog of HashMap.
+ConcurrentNavigableMap is a subinterface of ConcurrentMap that supports approximate matches. The standard general-purpose implementation of ConcurrentNavigableMap is ConcurrentSkipListMap, which is a concurrent analog of TreeMap.
+
+所有这些集合通过定义将对象添加到集合的操作与访问或删除该对象的后续操作之间的先发生关系来帮助避免内存一致性错误。
+
+### BlockingQueue接口
+BlockingQueue (java.util.concurrent)
+ArrayBlockingQueue (java.util.concurrent)
+DelayedWorkQueue in ScheduledThreadPoolExecutor (java.util.concurrent)
+SynchronousQueue (java.util.concurrent)
+BlockingDeque (java.util.concurrent)
+LinkedBlockingDeque (java.util.concurrent)
+DelayQueue (java.util.concurrent)
+TransferQueue (java.util.concurrent)
+LinkedTransferQueue (java.util.concurrent)
+LinkedBlockingQueue (java.util.concurrent)
+PriorityBlockingQueue (java.util.concurrent)
+
+### ConcurrentMap接口
+
+ConcurrentMap (java.util.concurrent)
+ConcurrentReferenceHashMap (org.springframework.util)
+ConcurrentNavigableMap (java.util.concurrent)
+ConcurrentSkipListMap (java.util.concurrent)
+SubMap in ConcurrentSkipListMap (java.util.concurrent)
+ConcurrentHashMap (java.util.concurrent)
+
+
+## 4.原子变量
+
+
+# 思维导图
+http://naotu.baidu.com/file/e6b41e23a4ec47e38b751e8dd976776c
 
 # 参考
 
@@ -51,4 +116,7 @@ http://www.cnblogs.com/chenpi/p/5614290.html
 http://ifeve.com/doug-lea/
 http://ifeve.com/j-u-c-framework/
 
+https://docs.oracle.com/javase/tutorial/essential/concurrency/highlevel.html
+中文博客:
+http://www.blogjava.net/xylz/archive/2010/07/08/325587.html
 

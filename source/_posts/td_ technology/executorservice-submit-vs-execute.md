@@ -3,6 +3,8 @@ title: executorservice-submit-vs-execute
 abbrlink: 2771641018
 date: 2018-09-05 11:09:51
 tags:
+    - 线程池
+    - jdk
 categories:
 ---
 
@@ -175,7 +177,55 @@ uncaughtException:-1, 1958052599 {com.talkingdata.opal.dataset.service.impl.Data
 dispatchUncaughtException:1959, Thread {java.lang}
 
 ```
+# 测试两个方法的区别
+- submit会将异常存到Future中
+- 而execute就会直接抛出异常
+```
+package com.example.demo.threadpool;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import org.junit.Test;
+
+public class ExceptionHanleTest {
+
+  private ExecutorService executorService = Executors.newFixedThreadPool(3);
+
+  @Test
+  public void test1() {
+    for (int i = 0; i < 100; i++) {
+      executorService.submit(new ExceptionTask());
+    }
+  }
+
+  @Test
+  public void test2() throws ExecutionException, InterruptedException {
+    for (int i = 0; i < 100; i++) {
+      Future<?> submit = executorService.submit(new ExceptionTask());
+      submit.get();
+    }
+  }
+
+  @Test
+  public void test3() throws ExecutionException, InterruptedException {
+    for (int i = 0; i < 100; i++) {
+      executorService.execute(new ExceptionTask());
+    }
+  }
+
+
+  class ExceptionTask implements Runnable {
+
+    @Override
+    public void run() {
+      throw new RuntimeException();
+    }
+  }
+}
+
+```
 
 # 异常处理
 ```
