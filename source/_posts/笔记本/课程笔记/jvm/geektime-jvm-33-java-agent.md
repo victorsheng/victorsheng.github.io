@@ -1,5 +1,6 @@
 ---
 title: Java Agent与字节码注入
+abbrlink: 2860365721
 date: 2018-10-25 19:11:09
 tags:
 categories:

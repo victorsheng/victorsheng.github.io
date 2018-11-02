@@ -1,5 +1,6 @@
 ---
 title: concurrent-program
+abbrlink: 3350504067
 date: 2018-10-23 18:28:59
 tags:
 categories:

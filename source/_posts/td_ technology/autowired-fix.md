@@ -1,8 +1,9 @@
 ---
 title: Field injection is not recommended
-date: 2018-10-23 15:21:18
 tags:
-    - idea
+  - idea
+abbrlink: 2584054196
+date: 2018-10-23 15:21:18
 categories:
 ---
 # Field injection is not recommended
