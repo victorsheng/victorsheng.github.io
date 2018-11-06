@@ -3,9 +3,14 @@ title: jetty-deploy-debug
 date: 2018-11-02 11:11:27
 tags:
 ---
-# 服务器上无法打印出异常信息
+# 本地开发的war包,部署服务器上无法打印出异常信息
 无异常无法启动
 
+差异:部署的jetty版本不同
+```
+   本地版本:     <version>9.4.9.v20180320</version>
+   服务器版本:     <version>9.3.14.v20161028</version>
+```
 
 # 下载jetty9.3到本地,启动出现异常1
 
@@ -61,15 +66,15 @@ https://stackoverflow.com/questions/46878035/error-scanning-entry-meta-inf-versi
 
 
 log4j 2.9 and later are multi-release jars for Java 9.
-
 Your Jetty version don't support that. Either upgrade Jetty to a Java 9 compatible version, or use log4j 2.8.x.
-
 See Jetty issue #1797: JEP 238 - Multi-Release JAR files break bytecode scanning.
 
 
+升级jdk9编译的或者,使用log4j 2.8.x及以下
+
 
 ## 解决
-排除log4j 2.10
+发现依赖中有log4j 2.10,高于2.8.x,排除之
 ```
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -89,6 +94,7 @@ See Jetty issue #1797: JEP 238 - Multi-Release JAR files break bytecode scanning
 ```
 
 # 异常2
+解决上述问题后,跑出了新的异常
 ```
 org.springframework.context.ApplicationContextException: Failed to start bean 'stompWebSocketHandlerMapping'; nested exception is java.lang.IllegalStateException: Unable to start Jetty
  WebSocketServerFactory
@@ -606,13 +612,13 @@ java.lang.NoSuchMethodError: org.eclipse.jetty.websocket.server.WebSocketServerF
 2018-11-05 14:55:20.415:INFO:oejs.Server:main: Started @13673ms
 ```
 
-# 问题
+## 核心问题
 ```
 Caused by: java.lang.NoSuchMethodError: org.eclipse.jetty.websocket.server.WebSocketServerFactory.<init>(Ljavax/servlet/ServletContext;Lorg/eclipse/jetty/websocket/api/WebSocketPolicy;)V
 	at org.springframework.web.socket.server.jetty.JettyRequestUpgradeStrategy.start(JettyRequestUpgradeStrategy.java:118)
 ```
 
-
+怀疑,可能是jar包冲突,于是下载了jetty的源码,查找该构造方法是何时添加的,或是如何删除的
 
 ## 问题来源:
 ### jetty升级了构造方法
