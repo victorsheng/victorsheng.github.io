@@ -1,5 +1,6 @@
 ---
 title: cross-domain
+abbrlink: 4048241359
 date: 2018-11-06 10:30:14
 tags:
 categories:

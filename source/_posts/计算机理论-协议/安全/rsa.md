@@ -154,5 +154,24 @@ pre master的存在在于SSL协议不信任每个主机都能产生完全随机�
 
 
 # 算法相关
+
+
+```
+1. 公开密钥：n=pq，（p，q为两个不同的很大的质数，p和q必须保密）
+
+2. 将(p-1)和(q-1)相乘得到φ(n)
+
+3. 选择一个整数e (1<e<φ(n))与φ(n)互质
+
+4. 秘密密钥：d=e-1modφ(n)，即计算一个数字d，使得它满足公式 de=1 modφ(n)
+
+------------ 
+
+1. 加密：c=m^e(mod n) 
+
+2. 解密：m=c^d(mod n)，m为明文，c为密文。
+```
+
+
 http://www.ruanyifeng.com/blog/2013/06/rsa_algorithm_part_one.html
 https://github.com/channg/my/blob/master/RSA.md
