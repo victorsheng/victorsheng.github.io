@@ -1,5 +1,6 @@
 ---
 title: 如何打fatjar包
+abbrlink: 4053706656
 date: 2018-11-08 18:10:38
 tags:
 categories:
