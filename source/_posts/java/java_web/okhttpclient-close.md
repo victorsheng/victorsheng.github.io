@@ -73,7 +73,7 @@ ConnectionPool内部维护了一个清理线程
 ```
 
 实际清理:
-- 如果空闲醉酒的socket它超出了保持活动时间限制或空闲连接数限制，则驱逐空闲时间最长的连接,并返回0,再次检查
+- 如果空闲最久的socket它超出了保持活动时间限制或空闲连接数限制，则驱逐空闲时间最长的连接,并返回0,再次检查
 - 如果有空闲状态的,返回下次检查的时间:keepAliveDurationNs - longestIdleDurationNs;
 - 如果没有空闲状态的,返回下次检查的时间:keepAliveDurationNs
 ```
