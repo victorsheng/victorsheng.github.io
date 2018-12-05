@@ -503,7 +503,12 @@ message没有索引，所以走的是全表扫描过滤。这时表上的各个�
 ### 锁与隔离级别的关系
 
 ```
-大学数据库原理都学过，为了保证并发操作数据的正确性，数据库都会有事务隔离级别的概念：1）未提交读（Read uncommitted）；2）已提交读（Read committed（RC））；3）可重复读（Repeatable read（RR））；4）可串行化（Serializable）。我们较常使用的是RC和RR。
+大学数据库原理都学过，为了保证并发操作数据的正确性，数据库都会有事务隔离级别的概念：
+1）未提交读（Read uncommitted）；
+2）已提交读（Read committed（RC））；
+3）可重复读（Repeatable read（RR））；
+4）可串行化（Serializable）。
+我们较常使用的是RC和RR。
 
 提交读\(RC\)：只能读取到已经提交的数据。
 

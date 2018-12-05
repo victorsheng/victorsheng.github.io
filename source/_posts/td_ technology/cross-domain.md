@@ -56,3 +56,7 @@ OPTIONS请求方法的主要用途有两个：
 1、获取服务器支持的HTTP请求方法；
 2、用来检查服务器的性能。例如：AJAX进行跨域请求时的预检，需要向另外一个域名的资源发送一个HTTP OPTIONS请求头，用以判断实际发送的请求是否安全。
 这是浏览器给我们加上的，后端并没有做任何操作。
+
+
+# 参考
+https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Access_control_CORS
