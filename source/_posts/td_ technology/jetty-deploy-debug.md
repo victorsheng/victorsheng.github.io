@@ -664,3 +664,20 @@ https://webtide.com/jetty-9-updated-websocket-api/
 尽管宣称在9.x版本支持了websocket,但是与其他组件例如spring framework 之间的相互配合,本文特指org.eclipse.jetty.websocket.server.WebSocketServerFactory, 到了9.3.15才稳定了下来
 
 **so 新功能还是别着急用,稳定了再用,还是尽量使用大版本之后稳定下来的小版本,才靠谱啊**
+
+
+# spring调用websocket是否有类似serlet api的统一接口??
+否,spring对各种容器分别作了集成,并没有统一的接口,使用了策略模式
+接口:
+- RequestUpgradeStrategy (org.springframework.web.socket.server):
+实现:
+- AbstractStandardUpgradeStrategy (org.springframework.web.socket.server.standard)
+- WebSphereRequestUpgradeStrategy (org.springframework.web.socket.server.standard)
+- AbstractTyrusRequestUpgradeStrategy (org.springframework.web.socket.server.standard)
+- WebLogicRequestUpgradeStrategy (org.springframework.web.socket.server.standard)
+- GlassFishRequestUpgradeStrategy (org.springframework.web.socket.server.standard)
+- TomcatRequestUpgradeStrategy (org.springframework.web.socket.server.standard)
+- UndertowRequestUpgradeStrategy (org.springframework.web.socket.server.standard)
+- JettyRequestUpgradeStrategy (org.springframework.web.socket.server.jetty)
+
+

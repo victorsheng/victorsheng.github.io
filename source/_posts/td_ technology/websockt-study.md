@@ -4,6 +4,11 @@ date: 2018-10-10 09:42:10
 tags:
 categories:
 ---
+# 概念
+WebSocket是一种在单个TCP连接上进行全双工通信的协议。WebSocket通信协议于2011年被IETF定为标准RFC 6455，并由RFC7936补充规范。WebSocket API也被W3C定为标准。
+
+WebSocket使得客户端和服务器之间的数据交换变得更加简单，允许服务端主动向客户端推送数据。在WebSocket API中，浏览器和服务器只需要完成一次握手，两者之间就直接可以创建持久性的连接，并进行双向数据传输。
+
 # 对比1:对比websockets和http请求
 https://stackoverflow.com/questions/14703627/websockets-protocol-vs-http
 
@@ -410,3 +415,19 @@ WebSocket
     Masked payload
     Payload
 ```
+
+# websocket与socket的关系
+HTTP、WebSocket 等应用层协议，都是基于 TCP 协议来传输数据的。我们可以把这些高级协议理解成对 TCP 的封装。
+对于 WebSocket 来说，它必须依赖 HTTP 协议进行一次握手 ，握手成功后，数据就直接从 TCP 通道传输，与 HTTP 无关了。
+
+## scoket
+Socket 其实并不是一个协议。它工作在 OSI 模型会话层（第5层），是为了方便大家直接使用更底层协议（一般是 TCP 或 UDP ）而存在的一个抽象层。
+Socket是应用层与TCP/IP协议族通信的中间软件抽象层，它是一组接口。在设计模式中，Socket其实就是一个门面模式，它把复杂的TCP/IP协议族隐藏在Socket接口后面，对用户来说，一组简单的接口就是全部，让Socket去组织数据，以符合指定的协议。
+
+## 小结
+感觉是因为Socket实现的是TCP，而TCP是面向stream传输的，直接用Socket容易出问题，比如粘包问题。WebSocket是一个应用层协议，更抽象，不需要考虑这些问题。所以当然可以直接用Socket实现长连接，不过仍然需要实现自己的上层协议来处理分包，比较麻烦，不如直接用WebSocket。自己的客户端使用自己的私有协议还行，但浏览器的话更需要一个统一的应用层协议，所以WebSocket就出现
+所以，从使用上来说，WebSocket 更易用，而 Socket 更灵活。
+
+# 参考
+https://github.com/onlyliuxin/coding2017/issues/497
+https://blog.zengrong.net/post/2199.html
