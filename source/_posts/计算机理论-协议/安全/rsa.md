@@ -172,6 +172,6 @@ pre master的存在在于SSL协议不信任每个主机都能产生完全随机�
 2. 解密：m=c^d(mod n)，m为明文，c为密文。
 ```
 
-
+# 参考
 http://www.ruanyifeng.com/blog/2013/06/rsa_algorithm_part_one.html
 https://github.com/channg/my/blob/master/RSA.md
