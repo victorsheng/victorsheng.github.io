@@ -70,6 +70,24 @@ xhr.send(formData);
 ## enctype 属性
 表单能够用四种编码，向服务器发送数据。编码格式由表单的enctype属性决定。
 
+例子:
+```
+<form action="form_action.asp" enctype="text/plain">
+  <p>First name: <input type="text" name="fname" /></p>
+  <p>Last name: <input type="text" name="lname" /></p>
+  <input type="submit" value="Submit" />
+</form>
+```
+
+**enctype 属性规定在发送到服务器之前应该如何对表单数据进行编码。**
+
+默认地，表单数据会编码为 "application/x-www-form-urlencoded"。就是说，在发送到服务器之前，所有字符都会进行编码（空格转换为 "+" 加号，特殊符号转换为 ASCII HEX 值）。
+
+- application/x-www-form-urlencoded	在发送前编码所有字符（默认）
+- multipart/form-data	:不对字符编码。在使用包含文件上传控件的表单时，必须使用该值。
+- text/plain	空格转换为 "+" 加号，但不对特殊字符编码。
+
+
 ### 1.脚本提交的post方法:GET 方法
 如果表单使用GET方法发送数据，enctype属性无效。
 数据将以 URL 的查询字符串发出。
@@ -81,9 +99,10 @@ xhr.send(formData);
 
 发送的 HTTP 请求如下。
 ```
-Content-Type: application/x-www-form-urlencoded
+POST http://www.example.com HTTP/1.1
+Content-Type: application/x-www-form-urlencoded;charset=utf-8
 
-foo=bar&baz=The+first+line.%0D%0AThe+second+line.%0D%0A
+title=test&sub%5B%5D=1&sub%5B%5D=2&sub%5B%5D=3
 ```
 上面代码中，数据体里面的%0D%0A代表换行符（\r\n）。
 
@@ -106,20 +125,22 @@ The second line.
 
 **如果表单使用POST方法，enctype属性为multipart/form-data，那么数据将以混合的格式发送。**
 
+该类型用于高效传输文件、非ASCII数据和二进制数据，将表单数据逐项地分成不同的部分，用指定的分割符分割每一部分。每一部分都拥有Content-Disposition头部，指定了该表单项的键名和一些其他信息；并且每一部分都有可选的Content-Type，不特殊指定就为text/plain。
+
 ```
-Content-Type: multipart/form-data; boundary=---------------------------314911788813839
+POST http://www.example.com HTTP/1.1
+Content-Type:multipart/form-data; boundary=----WebKitFormBoundaryrGKCBY7qhFd3TrwA
 
------------------------------314911788813839
-Content-Disposition: form-data; name="foo"
+------WebKitFormBoundaryrGKCBY7qhFd3TrwA
+Content-Disposition: form-data; name="text"
 
-bar
------------------------------314911788813839
-Content-Disposition: form-data; name="baz"
+title
+------WebKitFormBoundaryrGKCBY7qhFd3TrwA
+Content-Disposition: form-data; name="file"; filename="chrome.png"
+Content-Type: image/png
 
-The first line.
-The second line.
-
------------------------------314911788813839--
+PNG ... content of chrome.png ...
+------WebKitFormBoundaryrGKCBY7qhFd3TrwA--
 
 ```
 这种格式也是文件上传的格式。
@@ -127,7 +148,19 @@ The second line.
 postman中对应的form-data
 ![](https://s3.amazonaws.com/postman-static-getpostman-com/postman-docs/requestBuilderForm.png)
 
+### 5.json
+```
+POST http://www.example.com HTTP/1.1 
+Content-Type: application/json;charset=utf-8
+
+{"title":"test","sub":[1,2,3]}
+```
+
+# 其他
+## enctype 与content type
+The enctype attribute specifies the content type  used by the browser when it submits the form data to server.
 
 # 参考
 https://wangdoc.com/javascript/bom/form.html
 https://www.getpostman.com/docs/v6/postman/sending_api_requests/requests
+http://www.w3school.com.cn/tags/att_form_enctype.asp
