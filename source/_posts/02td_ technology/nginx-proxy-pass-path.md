@@ -14,7 +14,7 @@ upstream demo {
 ```
 
 
-## 第一种相对路径(原始转发)
+## 第一种相对路径(原始转发)p
 ```
 location /proxy/ {
          proxy_pass http://demo;

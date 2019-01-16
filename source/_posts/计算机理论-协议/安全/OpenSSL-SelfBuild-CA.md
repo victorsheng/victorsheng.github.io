@@ -34,7 +34,7 @@ date: 2018-07-10 14:58:32
 ```
 sudo cp /etc/ssl/openssl.cnf ~/ssl/openssl.cnf
 ```
-理论上是可以拷贝过来的.可是mac中的配置过于简单且不完成,所以我们从github中进行下载
+理论上是可以拷贝过来的.可是mac中的配置过于简单且不完整,所以我们从github中进行下载
 
 https://github.com/openssl/openssl/blob/master/apps/openssl.cnf
 
