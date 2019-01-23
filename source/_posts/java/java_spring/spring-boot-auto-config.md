@@ -227,3 +227,4 @@ public class RabbitAutoConfiguration {
 
 # 参考
 https://blog.csdn.net/liaokailin/article/details/49559951
+https://cloud.tencent.com/developer/article/1362789
