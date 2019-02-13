@@ -269,5 +269,39 @@ public class Test {
 
 # 各个字符集对比
 
+
+## utf16
+Unicode的编码空间从U+0000到U+10FFFF，共有1,112,064个码位（code point）可用来映射字符
+
+## utf8
+1-6个字节（越往前越常用，一般3个字节）
+| First code point | Last code point | Byte 1     | Byte 2     | Byte 3     | Byte 4     | Byte 5     | Byte 6     |
+| ---------------- | --------------- | ---------- | ---------- | ---------- | ---------- | ---------- | ---------- |
+| U+0000           | U+007F          | `0xxxxxxx` |            |            |            |            |            |
+| U+0080           | U+07FF          | `110xxxxx` | `10xxxxxx` |            |            |            |            |
+| U+0800           | U+FFFF          | `1110xxxx` | `10xxxxxx` | `10xxxxxx` |            |            |            |
+| U+10000          | U+1FFFFF        | `11110xxx` | `10xxxxxx` | `10xxxxxx` | `10xxxxxx` |            |            |
+| U+200000         | U+3FFFFFF       | `111110xx` | `10xxxxxx` | `10xxxxxx` | `10xxxxxx` | `10xxxxxx` |            |
+| U+4000000        | U+7FFFFFFF      | `1111110x` | `10xxxxxx` | `10xxxxxx` | `10xxxxxx` | `10xxxxxx` | `10xxxxxx` |
+
+
+所以开始的128个字符（US-ASCII）只需一字节，接下来的1920个字符需要双字节编码，包括带附加符号的拉丁字母，希腊字母，西里尔字母，科普特语字母，亚美尼亚语字母，希伯来文字母和阿拉伯字母的字符。基本多文种平面中其余的字符使用三个字节，剩余字符使用四个字节。
+
+
+···
+对于UTF-8编码中的任意字节B，如果B的第一位为0，则B独立的表示一个字符(ASCII码)；
+如果B的第一位为1，第二位为0，则B为一个多字节字符中的一个字节(非ASCII字符)；
+如果B的前两位为1，第三位为0，则B为两个字节表示的字符中的第一个字节；
+如果B的前三位为1，第四位为0，则B为三个字节表示的字符中的第一个字节；
+如果B的前四位为1，第五位为0，则B为四个字节表示的字符中的第一个字节；
+···
+
+
+按四位来计算空间的话：
+2^7 + 2^11 + 2^16 + 2^21
+
+**Quote from Wikipedia: "UTF-8 encodes each of the 1,112,064 code points in the Unicode character set using one to four 8-bit bytes (termed "octets" in the Unicode Standard)."**
+
 # 参考
 https://blog.csdn.net/darxin/article/details/5079242
+https://zh.wikipedia.org/wiki/UTF-8
