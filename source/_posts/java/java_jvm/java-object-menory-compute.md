@@ -46,7 +46,7 @@ HotSpot 虚拟机的对象头包括两部分信息：Mark Word 和 类型指针�
 | Mark Word | 4 bytes | 8 bytes | 8 bytes |
 | Class Pointer | 4 bytes | 4 bytes | 8 bytes |
 | Length | 4 bytes | 4 bytes | 4 bytes |
-| 对象头 | 12 bytes | 16 bytes | 24 bytes??(有的博客说是20) |
+| 对象头 | 12 bytes | 16 bytes | 24 bytes |
 
 多4字节的Length占用
 
@@ -98,6 +98,15 @@ JVM默认是开启压缩参数的-XX:+UseCompressedOops
 
 # 数组
 64位机器上，数组对象的对象头占用24 bytes，启用压缩后占用16字节。比普通对象占用内存多是因为需要额外的空间存储数组的长度。基础数据类型数组占用的空间包括数组对象头以及基础数据类型数据占用的内存空间。由于对象数组中存放的是对象的引用，所以对象数组本身的大小=数组对象头+length * 引用指针大小，总大小为对象数组本身大小+存放的数据的大小之和。
+
+## byte[0]:
+开启压缩：16
+关闭压缩：24
+
+## byte[1]:
+开启压缩：16+1+7=24
+关闭压缩：24+1+7=32
+
 ## int[10]:   
 开启压缩：16 + 10 * 4 = 56 bytes；
 关闭压缩：24 + 10 * 4 = 64bytes。
